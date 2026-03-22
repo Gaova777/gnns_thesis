@@ -1,0 +1,30 @@
+﻿y", line 150, in main
+    stoch = run_stochastic_replicas(
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\alejo\OneDrive\Escritori
+o\gnns_thesis\src\stability\stochastic_te
+st.py", line 65, in 
+run_stochastic_replicas
+    explainer = create_explainer(
+                ^^^^^^^^^^^^^^^^^
+  File "C:\Users\alejo\OneDrive\Escritori
+o\gnns_thesis\src\explainability\explaine
+r_runner.py", line 41, in 
+create_explainer
+    explainer = Explainer(
+                ^^^^^^^^^^
+  File "C:\Users\alejo\OneDrive\Escritori
+o\gnns_thesis\.venv\Lib\site-packages\tor
+ch_geometric\explain\explainer.py", line 
+94, in __init__
+    
+self.algorithm.connect(explainer_config, 
+self.model_config)
+  File "C:\Users\alejo\OneDrive\Escritori
+o\gnns_thesis\.venv\Lib\site-packages\tor
+ch_geometric\explain\algorithm\base.py", 
+line 90, in connect
+    raise ValueError(
+ValueError: The explanation algorithm 
+'PGExplainer' does not support the given 
+explanation settings.

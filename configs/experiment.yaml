@@ -1,0 +1,94 @@
+# Experiment configuration for XAI Stability in GNNs
+
+data:
+  root: "./data"
+  # Time-split: train ts 1-34, val ts 35-42, test ts 43-49
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
+    - name: "1:50"
+      illicit_to_licit: 0.02
+    - name: "1:100"
+      illicit_to_licit: 0.01
+
+models:
+  architectures:
+    - name: "GCN"
+      class: "src.models.gcn.GCN"
+    - name: "GraphSAGE"
+      class: "src.models.sage.GraphSAGE"
+    - name: "GAT"
+      class: "src.models.gat.GAT"
+    - name: "TAGCN"
+      class: "src.models.tagcn.TAGCN"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 256]
+    num_layers: [2, 3]
+    dropout: [0.1, 0.2, 0.3, 0.5]
+    learning_rate: [0.0001, 0.001, 0.01]
+    optuna_trials: 50
+    optuna_metric: "mcc"
+
+training:
+  epochs: 300
+  patience: 20
+  optimizer: "adam"
+  batch_size: null  # Full-batch (transductive)
+  seeds: [42, 123, 456]
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.25
+    - name: "graphsmote"
+      up_scale: 1.0  # Target ratio for oversampling
+
+explainability:
+  methods:
+    - name: "GNNExplainer"
+      epochs: 200
+      lr: 0.01
+    - name: "PGExplainer"
+      epochs: 30
+      lr: 0.003
+    - name: "GNNShap"
+      num_samples: 100
+
+  # Number of nodes to explain per class (illicit nodes in test set)
+  nodes_per_class: 100
+
+stability:
+  # Number of replicas with different random seeds
+  num_replicas: 30
+  # Noise levels for perturbation tests
+  noise_levels: [0.01, 0.05, 0.10]
+  # Top-k edges for Jaccard subgraph comparison
+  top_k_edges: 20
+  # Top-k features for ranking comparison
+  top_k_features: 20
+
+analysis:
+  # Success thresholds for recommendation matrix
+  thresholds:
+    f1_min: 0.80
+    mcc_min: 0.70
+    jaccard_min: 0.70
+  # Bootstrap confidence interval parameters
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"  # "mlflow" or "csv"
+  experiment_name: "xai-gnn-stability"
+  results_dir: "./results"

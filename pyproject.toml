@@ -1,0 +1,30 @@
+[project]
+name = "gnns-thesis"
+version = "0.1.0"
+description = "XAI Stability in GNNs for AML on Elliptic Dataset"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.6.0",
+    "torch-geometric>=2.7.0",
+    "optuna>=4.0",
+    "mlflow>=2.0",
+    "scikit-learn>=1.5",
+    "scipy>=1.14",
+    "statsmodels>=0.14",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "pyyaml>=6.0",
+    "tqdm",
+]
+
+[tool.uv]
+index = [
+  { name = "pytorch-cu124", url = "https://download.pytorch.org/whl/cu124", explicit = true }
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu124" }
+torchvision = { index = "pytorch-cu124" }
+torchaudio = { index = "pytorch-cu124" }
