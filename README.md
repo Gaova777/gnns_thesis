@@ -3,6 +3,20 @@
 Esta es la guía oficial de cómo usar, configurar y leer los resultados del pipeline de investigación para el estudio de la estabilidad de métodos XAI en Redes Neuronales de Grafos (GNNs) para el dataset Elliptic.
 
 ---
+```bash
+## 1. Install dependencies
+uv sync
+
+## 2. Quick smoke test (5 epochs, random model)
+uv run python scripts/run_training.py --model GCN --scenario "1:10" --epochs 5 --dry-run
+
+## 3. Run full pipeline (quick mode for testing)
+uv run python scripts/run_full_pipeline.py --quick
+
+## 4. Run full experimental matrix
+uv run python scripts/run_full_pipeline.py
+```
+---
 
 ## 1. ⚙️ Archivo de Configuración Principal (`configs/experiment.yaml`)
 
