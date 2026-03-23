@@ -43,6 +43,7 @@ class Trainer:
         device: str = "cpu",
         patience: int = 20,
         checkpoint_dir: str = "./results/models",
+        tracker=None,
     ):
         self.model = model.to(device)
         self.loss_fn = loss_fn
@@ -51,6 +52,7 @@ class Trainer:
         self.patience = patience
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.tracker = tracker  # ExperimentTracker for per-epoch logging
 
         # Tracking
         self.best_val_mcc = -2.0
@@ -131,6 +133,16 @@ class Trainer:
             self.history["val_loss"].append(val_metrics["loss"])
             self.history["val_f1"].append(val_metrics["f1"])
             self.history["val_mcc"].append(val_metrics["mcc"])
+
+            # Log per-epoch metrics to MLflow (visible as live curves)
+            if self.tracker:
+                self.tracker.log_epoch(
+                    epoch,
+                    train_loss=train_loss,
+                    val_loss=val_metrics["loss"],
+                    val_f1=val_metrics["f1"],
+                    val_mcc=val_metrics["mcc"],
+                )
 
             # Early stopping on MCC
             if val_metrics["mcc"] > self.best_val_mcc:

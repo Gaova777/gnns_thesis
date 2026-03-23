@@ -1,11 +1,10 @@
 """
-Experiment tracking and logging.
+Experiment tracking and logging with real-time MLflow support.
 
-Supports MLflow for rich experiment tracking or CSV fallback
-for lightweight, portable logging.
+Uses parent runs for training configs and nested runs for explainers.
+Logs per-epoch metrics so curves are visible live in MLflow UI.
 """
 
-import json
 import csv
 import os
 from pathlib import Path
@@ -21,35 +20,130 @@ except ImportError:
 
 class ExperimentTracker:
     """
-    Unified experiment tracker supporting MLflow or CSV backends.
+    Unified experiment tracker with real-time MLflow logging.
 
-    Args:
-        backend: "mlflow" or "csv".
-        experiment_name: Name of the experiment.
-        results_dir: Base directory for results.
+    Architecture:
+      - One MLflow experiment per study
+      - One parent run per training config (scenario+arch+balance)
+      - Nested runs per explainer within each parent
+
+    Usage:
+        tracker = ExperimentTracker(backend="mlflow")
+        with tracker.training_run("1:1_GCN_none", params={...}) as run:
+            # Log per-epoch metrics
+            tracker.log_epoch(epoch=1, train_loss=0.5, val_f1=0.3, val_mcc=0.1)
+            # After training:
+            tracker.log_test_metrics({"f1": 0.8, "mcc": 0.7})
+            # Per explainer:
+            with tracker.explainer_run("GNNExplainer") as exp_run:
+                tracker.log_stability({"jaccard_mean": 0.85})
     """
 
     def __init__(
         self,
-        backend: str = "csv",
+        backend: str = "mlflow",
         experiment_name: str = "xai-gnn-stability",
         results_dir: str = "./results",
+        tracking_uri: str = "sqlite:///mlruns.db",
     ):
         self.backend = backend
         self.experiment_name = experiment_name
         self.results_dir = Path(results_dir)
         self.results_dir.mkdir(parents=True, exist_ok=True)
+        self._active_parent_run = None
+        self._active_child_run = None
 
         if backend == "mlflow" and MLFLOW_AVAILABLE:
+            mlflow.set_tracking_uri(tracking_uri)
             mlflow.set_experiment(experiment_name)
             print(f"  MLflow experiment: {experiment_name}")
+            print(f"  Tracking URI: {tracking_uri}")
         elif backend == "mlflow" and not MLFLOW_AVAILABLE:
             print("  MLflow not installed, falling back to CSV")
             self.backend = "csv"
 
-        if self.backend == "csv":
-            self.csv_path = self.results_dir / f"{experiment_name}.csv"
-            self._csv_initialized = self.csv_path.exists()
+        # Always init CSV path (used as backup even with MLflow)
+        self.csv_path = self.results_dir / f"{experiment_name}.csv"
+
+    # ── Context managers for MLflow runs ──
+
+    class _RunContext:
+        """Context manager for MLflow runs."""
+        def __init__(self, tracker, run_name, params=None, nested=False, parent_run_id=None):
+            self.tracker = tracker
+            self.run_name = run_name
+            self.params = params or {}
+            self.nested = nested
+            self.parent_run_id = parent_run_id
+            self.run = None
+
+        def __enter__(self):
+            if self.tracker.backend == "mlflow" and MLFLOW_AVAILABLE:
+                self.run = mlflow.start_run(
+                    run_name=self.run_name,
+                    nested=self.nested,
+                )
+                if self.params:
+                    # MLflow limits param values to 500 chars
+                    safe_params = {k: str(v)[:500] for k, v in self.params.items()}
+                    mlflow.log_params(safe_params)
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            if self.run and MLFLOW_AVAILABLE:
+                if exc_type:
+                    mlflow.set_tag("status", "FAILED")
+                    mlflow.set_tag("error", str(exc_val)[:500])
+                else:
+                    mlflow.set_tag("status", "COMPLETED")
+                mlflow.end_run()
+            return False  # Don't suppress exceptions
+
+    def training_run(self, run_name: str, params: dict = None):
+        """Start a parent run for a training configuration."""
+        ctx = self._RunContext(self, run_name, params, nested=False)
+        self._active_parent_run = ctx
+        return ctx
+
+    def explainer_run(self, explainer_name: str, params: dict = None):
+        """Start a nested run for an explainer within the current training run."""
+        ctx = self._RunContext(self, explainer_name, params, nested=True)
+        self._active_child_run = ctx
+        return ctx
+
+    # ── Per-epoch logging ──
+
+    def log_epoch(self, epoch: int, **metrics):
+        """Log per-epoch metrics (visible as curves in MLflow UI)."""
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            for key, value in metrics.items():
+                if isinstance(value, (int, float)):
+                    mlflow.log_metric(key, value, step=epoch)
+
+    # ── Summary metrics ──
+
+    def log_test_metrics(self, metrics: dict):
+        """Log final test metrics on the current run."""
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            for key, value in metrics.items():
+                if isinstance(value, (int, float)):
+                    mlflow.log_metric(f"test_{key}", value)
+
+    def log_stability(self, metrics: dict):
+        """Log stability metrics on the current (nested) run."""
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            for key, value in metrics.items():
+                if isinstance(value, (int, float)):
+                    mlflow.log_metric(f"stab_{key}", value)
+                elif isinstance(value, str):
+                    mlflow.set_tag(f"stab_{key}", value[:500])
+
+    def log_model_artifact(self, checkpoint_path: str):
+        """Log a model checkpoint as an MLflow artifact."""
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            mlflow.log_artifact(str(checkpoint_path), artifact_path="models")
+
+    # ── Legacy flat logging (CSV fallback + backward compat) ──
 
     def log_run(
         self,
@@ -63,20 +157,7 @@ class ExperimentTracker:
         hyperparams: dict = None,
         tags: dict = None,
     ) -> None:
-        """
-        Log a single experiment run.
-
-        Args:
-            scenario: Imbalance scenario (e.g., "1:10").
-            architecture: GNN arch name.
-            balancing: Balancing technique.
-            explainer: XAI method.
-            seed: Random seed.
-            predictive_metrics: Dict with f1, mcc, pr_auc, etc.
-            stability_metrics: Dict with jaccard, spearman, etc.
-            hyperparams: Model hyperparameters.
-            tags: Additional metadata tags.
-        """
+        """Legacy: log a complete run as a single row (CSV backend)."""
         run_data = {
             "timestamp": datetime.now().isoformat(),
             "scenario": scenario,
@@ -96,45 +177,57 @@ class ExperimentTracker:
                 else:
                     run_data[f"stab_{k}"] = v
 
-        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
-            self._log_mlflow(run_data, hyperparams, tags)
-        else:
-            self._log_csv(run_data)
-
-    def _log_mlflow(self, run_data: dict, hyperparams: dict = None, tags: dict = None):
-        """Log to MLflow."""
-        with mlflow.start_run():
-            # Log params
-            for key in ["scenario", "architecture", "balancing", "explainer", "seed"]:
-                mlflow.log_param(key, run_data[key])
-            if hyperparams:
-                mlflow.log_params(hyperparams)
-
-            # Log metrics
-            for k, v in run_data.items():
-                if isinstance(v, (int, float)) and k not in ["seed"]:
-                    mlflow.log_metric(k, v)
-
-            # Log tags
-            if tags:
-                mlflow.set_tags(tags)
+        self._log_csv(run_data)
 
     def _log_csv(self, run_data: dict):
         """Log to CSV file."""
         file_exists = self.csv_path.exists()
-
         with open(self.csv_path, "a", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=run_data.keys())
             if not file_exists:
                 writer.writeheader()
             writer.writerow(run_data)
 
+    # ── Utilities ──
+
+    def get_completed_runs(self) -> set:
+        """Return set of run_names already completed in MLflow."""
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            experiment = mlflow.get_experiment_by_name(self.experiment_name)
+            if experiment is None:
+                return set()
+            runs = mlflow.search_runs(
+                experiment_ids=[experiment.experiment_id],
+                filter_string="tags.status = 'COMPLETED' AND tags.`mlflow.parentRunId` = ''",
+                output_format="list",
+            )
+            return {r.info.run_name for r in runs}
+        return set()
+
     def get_results_df(self):
         """Load results as a pandas DataFrame."""
         import pandas as pd
-
         if self.backend == "csv":
             return pd.read_csv(self.csv_path)
         elif self.backend == "mlflow" and MLFLOW_AVAILABLE:
             experiment = mlflow.get_experiment_by_name(self.experiment_name)
             return mlflow.search_runs(experiment_ids=[experiment.experiment_id])
+
+    def clean_experiment(self):
+        """Delete all runs in the current experiment (for --clean flag)."""
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            experiment = mlflow.get_experiment_by_name(self.experiment_name)
+            if experiment:
+                runs = mlflow.search_runs(
+                    experiment_ids=[experiment.experiment_id],
+                    output_format="list",
+                )
+                for run in runs:
+                    mlflow.delete_run(run.info.run_id)
+                print(f"  Cleaned {len(runs)} MLflow runs")
+
+        # Also clean CSV if it exists
+        csv_path = self.results_dir / f"{self.experiment_name}.csv"
+        if csv_path.exists():
+            csv_path.unlink()
+            print(f"  Cleaned CSV: {csv_path}")

@@ -11,7 +11,7 @@ import numpy as np
 from torch_geometric.data import Data
 from typing import Optional
 
-from src.explainability.explainer_runner import create_explainer, explain_nodes
+from src.explainability.explainer_runner import create_explainer, explain_nodes, train_pgexplainer
 from src.explainability.shap_runner import explain_node_shap
 from src.explainability.extraction import extract_subgraph, extract_feature_ranking
 
@@ -65,6 +65,10 @@ def run_stochastic_replicas(
             explainer = create_explainer(
                 model, method, epochs=explainer_epochs, lr=explainer_lr
             )
+            # PGExplainer must be trained before generating explanations
+            if method == "PGExplainer":
+                train_pgexplainer(explainer, data, device=device)
+
             explanations = explain_nodes(explainer, data, [node_idx], device)
             exp = explanations[0]
 

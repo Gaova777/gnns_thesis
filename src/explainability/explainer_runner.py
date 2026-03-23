@@ -87,7 +87,8 @@ def explain_nodes(
     explanations = []
 
     # PGExplainer with 'phenomenon' explanation_type needs a target
-    needs_target = explainer.explanation_type == "phenomenon"
+    # PyG stores explanation_type as an enum, so compare via str()
+    needs_target = "phenomenon" in str(explainer.explanation_type).lower()
 
     for idx in node_indices:
         kwargs = {"index": idx}

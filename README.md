@@ -1,103 +1,191 @@
-# Guía del Usuario: Pipeline de Investigación XAI + GNN 🚀
+# Estabilidad de Metodos XAI en GNNs para Deteccion de Lavado de Dinero
 
-Esta es la guía oficial de cómo usar, configurar y leer los resultados del pipeline de investigación para el estudio de la estabilidad de métodos XAI en Redes Neuronales de Grafos (GNNs) para el dataset Elliptic.
+Pipeline de investigacion para el estudio de la estabilidad de metodos de explicabilidad (XAI) en Graph Neural Networks (GNNs) aplicados a la deteccion de lavado de dinero en el **Elliptic Bitcoin Dataset** bajo condiciones de desbalance de datos.
 
----
+## Estructura del Proyecto
+
+```
+gnns_thesis/
+|-- configs/
+|   +-- experiment.yaml        # Configuracion central (modelos, escenarios, hiperparametros)
+|-- scripts/
+|   |-- run_full_pipeline.py   # Orquestador completo (192 configs experimentales)
+|   |-- run_training.py        # Entrenar un modelo individual
+|   |-- run_explain.py         # Ejecutar explicabilidad sobre un modelo entrenado
+|   +-- run_stability.py       # Ejecutar pruebas de estabilidad
+|-- src/
+|   |-- data/                  # Carga, preprocesamiento, escenarios de desbalance
+|   |-- models/                # GCN, GraphSAGE, GAT, TAGCN
+|   |-- balancing/             # Focal Loss, Weighted CE, GraphSMOTE
+|   |-- training/              # Entrenamiento con early stopping + Optuna hyperopt
+|   |-- explainability/        # GNNExplainer, PGExplainer, SHAP permutacional
+|   |-- stability/             # Tests estocasticos, perturbacion, metricas
+|   +-- analysis/              # Tracking MLflow/CSV, ANOVA factorial, recomendacion
+|-- pyproject.toml             # Dependencias y configuracion de uv
+|-- uv.lock                    # Lockfile de dependencias exactas
++-- README.md
+```
+
+## Requisitos Previos
+
+- **Python 3.12+**
+- **[uv](https://docs.astral.sh/uv/)** (gestor de paquetes y entornos)
+- **GPU con CUDA 12.4** (recomendado, funciona sin GPU pero es muy lento)
+
+### Instalacion de uv (si no lo tienes)
+
 ```bash
-## 1. Install dependencies
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Linux/macOS
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+## Instalacion
+
+```bash
+# 1. Clonar el repositorio
+git clone <URL_DEL_REPO>
+cd gnns_thesis
+
+# 2. Instalar dependencias (uv crea el entorno automaticamente)
 uv sync
 
-## 2. Quick smoke test (5 epochs, random model)
-uv run python scripts/run_training.py --model GCN --scenario "1:10" --epochs 5 --dry-run
-
-## 3. Run full pipeline (quick mode for testing)
-uv run python scripts/run_full_pipeline.py --quick
-
-## 4. Run full experimental matrix
-uv run python scripts/run_full_pipeline.py
-```
----
-
-## 1. ⚙️ Archivo de Configuración Principal (`configs/experiment.yaml`)
-
-**TODO** el comportamiento del pipeline, modelos, escenarios y parámetros se define desde el archivo `configs/experiment.yaml`. Nunca deberías tener que tocar el código madre para cambiar algo básico.
-
-Puedes abrir este archivo en tu editor para cambiar:
-- **Estrategias de imbalances:** Cambia `ratios` dentro de `scenarios.imbalance_ratios`.
-- **Arquitecturas:** Agrega o quita modelos en la lista `models.architectures` (Soporta `GCN`, `GraphSAGE`, `GAT`, `TAGCN`).
-- **Hiperparámetros:** Edita los valores de `models.hyperparameter_search` o `training.epochs`, `training.patience`, y `training.learning_rate`.
-- **Técnicas de balanceo:** Ajusta factores como `gamma` (Focal Loss) o `up_scale` (GraphSMOTE) en `balancing.techniques`.
-- **Pruebas de estabilidad:** Configura los niveles de perturbación (`noise_levels`), el número de grafos (`num_replicas`), y número de nodos a explicar (`nodes_per_class`).
-- **Tracking / Guardado:** Cambia el destino de `results_dir`, y escoge entre usar SQLite/MLflow o un simple archivo `.csv`.
-
----
-
-## 2. 🏃‍♂️ Ejecutando Partes Individuales del Pipeline
-
-El proyecto está diseñado de forma modular. **Antes de correr cualquier comando**, asegúrate de que le estás indicando a Python donde está la carpeta de tu código agregando `$env:PYTHONPATH="."`.
-
-### A. Para Entrenar un Modelo (Pruebas Unitarias o Ajustes Finos)
-Prueba entrenar una configuración específica (ej., GAT con Focal Loss y un escenario de 1:50) en la terminal así:
-```bash
-$env:PYTHONPATH="."; uv run python scripts/run_training.py --model GAT --scenario "1:50" --balancing focal_loss
-```
-> **Tip:** Usa `--dry-run` para correr apenas 5 épocas y asegurarte que todo funciona antes de iniciar un entrenamiento largo de 300 épocas.
-
-**¿Dónde se guarda?**
-Los mejores pesos del modelo entrenado (*checkpoints*) se guardan localmente en:
-📂 `results/models/[Modelo]_[Escenario]_[Balanceo]_s[Semilla]_best.pt`
-
-### B. Para Extraer Explicaciones (XAI)
-Puedes correr un explicador sobre un modelo pre-entrenado:
-```bash
-$env:PYTHONPATH="."; uv run python scripts/run_explain.py --model GCN --explainer GNNExplainer --checkpoint results/models/GCN_1:10_none_s42_best.pt
+# 3. Verificar GPU
+uv run python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}, Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"CPU\"}')"
 ```
 
-**¿Dónde se guarda?**
-Crea un archivo local `.json` de fácil lectura en:
-📂 `results/explanations/[Modelo]_[Explicador].json`
+> **Nota:** El dataset Elliptic (~300MB) se descarga automaticamente la primera vez que corres el pipeline. No necesitas descargarlo manualmente.
 
-### C. Para Evaluar la Estabilidad de este Explicador
-Permite correr múltiples iteraciones con ruidos o diferentes semillas estocásticas para el cálculo sobre los nodos.
-```bash
-$env:PYTHONPATH="."; uv run python scripts/run_stability.py --model GCN --explainer GNNExplainer --replicas 30
+## Uso Rapido
+
+Todos los comandos deben ejecutarse desde la raiz del proyecto. En **PowerShell** (Windows), agrega `$env:PYTHONPATH="."` antes de cada comando:
+
+### Smoke Test (verificar que todo funciona)
+
+```powershell
+$env:PYTHONPATH="."; uv run python scripts/run_full_pipeline.py --quick --clean
 ```
 
-**¿Dónde se guarda?**
-Calcula la matriz Jaccard, correlación de Spearman y la Concentración SHAP y las tira en crudo a:
-📂 `results/stability/[Modelo]_[Explicador]_stability.json`
+### Pipeline Completo
 
----
-
-## 3. 🎯 Ejecutando el Pipeline Completo (La Matriz Experimental)
-
-Una vez que comprobaste que todo funciona y has configurado el `experiment.yaml` acorde a tus deseos, vas a lanzar TODOS los experimentos como lo requiere la tesis usando un único comando:
-
-```bash
-$env:PYTHONPATH="."; uv run python scripts/run_full_pipeline.py
+```powershell
+# Ejecutar la matriz experimental completa (4 escenarios x 4 archs x 4 balanceos x 3 explainers)
+$env:PYTHONPATH="."; uv run python scripts/run_full_pipeline.py --clean
 ```
-Este script hace un **grid search profundo**, ejecutando una tras otra de las combinaciones (4 modelos × 4 balances × 4 ratios = 64 variaciones de entrenamiento; multiplicadas por los 3 XAI resultando en 192 evaluaciones de estabilidad con sus réplicas de nodos).
 
-> **Aviso:** Esto demora mucho tiempo. Es recomendado dejarlo correr durante la noche y asegurarse de que el computador no pase a estado de "dormir", o en un servidor dedicado.
+### Monitoreo en Tiempo Real (MLflow)
 
----
-
-## 4. 📊 ¿Cómo leer y analizar los Resultados Finales?
-
-Todo el Pipeline está conectado a un trazador automático (`ExperimentTracker`).
-
-### 1. La Base de Datos principal (`results/[nombre_experimento].csv`)
-Si configuraste `backend: "csv"` en el yaml (es lo que viene por defecto), todos los 192 experimentos con su `F1-Score`, `MCC`, y `Jaccard Mean / Spearman Mean` se tabularán automáticamente línea por línea en el archivo CSV configurado. 
-Podrás abrir este CSV fácilmente en Excel o Python(Pandas) para trazar tus propias curvas o pivot tables de degradación de estabilidad a medida que aumenta el desbalanceo.
-
-### 2. Tablas y Estadísticas (`src/analysis/`)
-Dentro de la carpeta `src/analysis/` existen ya las formulas listas de **Tesis**:
-- **`factorial.py`**: Es posible correr la función `run_factorial_anova(tu_dataframe)` en los notebooks para extraer los p-values de ANOVA multifactorial buscando las debilidades.
-- **`recommendation.py`**: Utiliza `build_recommendation_matrix` que filtra cuáles cumplen los umbrales de MCC>0.70 y Jaccard>0.70 dándote un Intervalo de Confianza (Bootstrapping CIs). Al final, escupe a `results/recommendation_matrix.tex` una **Tabla para LaTeX lista para copiar a tu tesis**. 
-
-### 3. MLFlow (Opcional - Interfaz Web Interactiva)
-Si cambias `backend: "mlflow"` dentro de `configs/experiment.yaml`, luego de ejecutar los experimentos puedes simplemente abrir a la consola para ver todas las métricas en visual en vivo:
-```bash
-uv run mlflow ui
+```powershell
+# En otra terminal:
+uv run mlflow ui --backend-store-uri sqlite:///mlruns.db
+# Abrir http://localhost:5000 en el navegador
 ```
-¡Se abrirá una pestaña de internet muy limpia donde podrás filtrar métricas como MCC vs Estabilidad en una gráfica y descargar en Excel!
+
+En MLflow podras ver:
+- **Curvas de entrenamiento** por epoca (loss, F1, MCC)
+- **Metricas de test** por configuracion
+- **Metricas de estabilidad** por explainer (Jaccard, Spearman)
+- **Comparaciones** entre configuraciones
+
+### Resumir Pipeline Interrumpido
+
+```powershell
+# Si el pipeline se detuvo (error, apagon, etc.), usar --resume para continuar:
+$env:PYTHONPATH="."; uv run python scripts/run_full_pipeline.py --resume
+```
+
+### Entrenar un Modelo Individual
+
+```powershell
+$env:PYTHONPATH="."; uv run python scripts/run_training.py --model GAT --scenario "1:10" --balancing focal_loss --epochs 300
+```
+
+## Configuracion (`configs/experiment.yaml`)
+
+Toda la configuracion del pipeline se gestiona desde un unico archivo YAML:
+
+| Seccion        | Que controla                                                    |
+|----------------|----------------------------------------------------------------|
+| `data`         | Ruta de datos y rangos de timesteps para splits temporales      |
+| `scenarios`    | Ratios de desbalance a evaluar (1:1, 1:10, 1:50, 1:100)        |
+| `models`       | Arquitecturas GNN disponibles y espacio de hiperparametros      |
+| `training`     | Epocas, paciencia (early stopping), seeds                       |
+| `balancing`    | Tecnicas: none, class_weighting, focal_loss, graphsmote         |
+| `explainability`| Metodos XAI y parametros (GNNExplainer, PGExplainer, GNNShap) |
+| `stability`    | Replicas estocasticas, niveles de ruido, top-k                  |
+| `analysis`     | Umbrales de exito (F1, MCC, Jaccard) y parametros de bootstrap  |
+| `tracking`     | Backend (mlflow/csv), nombre del experimento                    |
+
+## Donde se Guardan los Resultados
+
+| Tipo                       | Ubicacion                        |
+|----------------------------|----------------------------------|
+| Checkpoints de modelos     | `results/models/*.pt`            |
+| Metricas (CSV backup)      | `results/xai-gnn-stability.csv`  |
+| Metricas (MLflow DB)       | `mlruns.db`                      |
+| Dataset (auto-descarga)    | `data/raw/`, `data/processed/`   |
+
+> Todos estos archivos estan en `.gitignore` — no se suben al repositorio.
+
+## Matriz Experimental
+
+El pipeline ejecuta **192 configuraciones** experimentales:
+
+```
+4 escenarios de desbalance   x   (1:1, 1:10, 1:50, 1:100)
+4 arquitecturas GNN          x   (GCN, GraphSAGE, GAT, TAGCN)
+4 tecnicas de balanceo       x   (none, weighted CE, Focal Loss, GraphSMOTE)
+3 metodos XAI                    (GNNExplainer, PGExplainer, GNNShap)
+= 192 evaluaciones de estabilidad
+```
+
+Para cada combinacion se calculan:
+- **Metricas predictivas**: F1-Score, MCC, PR-AUC
+- **Metricas de estabilidad**: Indice de Jaccard (subgrafos), Correlacion de Spearman (rankings de features), Concentracion SHAP
+
+## Modulos del Codigo
+
+### `src/data/`
+- **`loader.py`**: Carga del Elliptic Dataset via PyG con remapeo de etiquetas (licit=0, illicit=1)
+- **`preprocessing.py`**: Split temporal causal (train: ts 1-34, val: ts 35-42, test: ts 43-49) + normalizacion StandardScaler
+- **`imbalance.py`**: Generador de escenarios de desbalance por undersampling (preserva estructura del grafo)
+
+### `src/models/`
+GCN, GraphSAGE, GAT (multi-head), TAGCN (filtros polinomiales K=3)
+
+### `src/balancing/`
+- **`losses.py`**: Cross-Entropy estandar, ponderada, y Focal Loss
+- **`graphsmote.py`**: GraphSMOTE con encoder GCN + generador de aristas
+
+### `src/training/`
+- **`trainer.py`**: Loop de entrenamiento full-batch con early stopping en MCC y logging MLflow por epoca
+- **`hyperopt.py`**: Busqueda de hiperparametros con Optuna
+
+### `src/explainability/`
+- **`explainer_runner.py`**: GNNExplainer y PGExplainer via API nativa de PyG 2.7
+- **`shap_runner.py`**: SHAP permutacional como fallback
+- **`extraction.py`**: Extraccion de subgrafos y rankings de features
+
+### `src/stability/`
+- **`stochastic_test.py`**: Replicas con diferentes semillas para medir consistencia
+- **`perturbation.py`**: Inyeccion de ruido gaussiano para medir robustez
+- **`metrics.py`**: Jaccard, Spearman, SHAP Concentration, Fidelity
+
+### `src/analysis/`
+- **`tracking.py`**: Tracker unificado MLflow/CSV con parent/nested runs
+- **`factorial.py`**: ANOVA factorial multifactorial + Tukey HSD post-hoc
+- **`recommendation.py`**: Matriz de recomendacion con intervalos de confianza y export LaTeX
+
+## Stack Tecnologico
+
+| Libreria            | Version   | Uso                                        |
+|---------------------|-----------|--------------------------------------------|
+| PyTorch             | >= 2.6    | Framework de deep learning (CUDA 12.4)     |
+| PyTorch Geometric   | >= 2.7    | GNNs y explainers nativos                  |
+| Optuna              | >= 4.0    | Optimizacion de hiperparametros             |
+| MLflow              | >= 2.0    | Tracking de experimentos en tiempo real     |
+| scikit-learn        | >= 1.5    | Metricas (F1, MCC, PR-AUC)                 |
+| statsmodels         | >= 0.14   | ANOVA factorial                             |
+| tqdm                | -         | Barras de progreso con ETA                  |
