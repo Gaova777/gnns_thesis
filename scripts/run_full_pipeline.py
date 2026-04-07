@@ -16,6 +16,7 @@ Usage:
 """
 
 import argparse
+import signal
 import yaml
 import time
 import shutil
@@ -42,6 +43,41 @@ from src.analysis.tracking import ExperimentTracker
 # Suppress sklearn single-label warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
+# ── Graceful interrupt state ───────────────────────────────────────────────────
+_interrupted = False
+_current_run_id: str | None = None
+_active_tracker = None
+
+
+def _signal_handler(signum, frame):
+    """
+    Handle SIGTERM / SIGINT gracefully.
+
+    Sets the global interrupt flag so the main loop exits after the
+    current config finishes.  Also persists the run_id to .interrupted_runs
+    so --resume skips it (avoids partial duplicate results).
+    """
+    global _interrupted
+    _interrupted = True
+    sig_name = signal.Signals(signum).name
+    # tqdm.write to avoid corrupting the progress bar
+    tqdm.write(f"\n[SIGNAL] {sig_name} received — finishing current config then exiting.")
+    tqdm.write("         Resume later with: python scripts/run_full_pipeline.py --resume")
+    if _current_run_id and _active_tracker:
+        try:
+            _active_tracker.mark_interrupted(_current_run_id)
+            tqdm.write(f"         Marked '{_current_run_id}' as interrupted in .interrupted_runs")
+        except Exception:
+            pass
+    # Best-effort: flush active MLflow run
+    try:
+        import mlflow
+        if mlflow.active_run():
+            mlflow.set_tag("status", "interrupted")
+            mlflow.end_run()
+    except Exception:
+        pass
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Full experimental pipeline")
@@ -56,7 +92,12 @@ def parse_args():
 
 
 def main():
+    global _active_tracker, _current_run_id
     args = parse_args()
+
+    # Register signal handlers early so they cover the full run
+    signal.signal(signal.SIGTERM, _signal_handler)
+    signal.signal(signal.SIGINT, _signal_handler)
 
     # Load config
     with open(args.config, "r") as f:
@@ -81,12 +122,13 @@ def main():
             if "epochs" in m:
                 m["epochs"] = 5  # GNNExplainer: 200→5, PGExplainer: 30→5
 
-    # Initialize tracker
+    # Initialize tracker and expose it to signal handler
     tracker = ExperimentTracker(
         backend=config["tracking"]["backend"],
         experiment_name=config["tracking"]["experiment_name"],
         results_dir=config["tracking"]["results_dir"],
     )
+    _active_tracker = tracker
 
     # Handle --clean flag
     if args.clean:
@@ -136,9 +178,15 @@ def main():
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]")
 
     for scenario_name, ratio, arch_name, balance_name, run_id in pbar:
+        # Check for graceful interrupt (SIGTERM/SIGINT) before starting next config
+        if _interrupted:
+            tqdm.write("  Interrupt flag set — stopping after previous config.")
+            break
+
+        _current_run_id = run_id
         pbar.set_postfix_str(run_id, refresh=True)
 
-        # Skip if already completed (--resume)
+        # Skip if already completed or interrupted (--resume)
         if run_id in completed_runs:
             tqdm.write(f"  SKIP (already completed): {run_id}")
             continue
@@ -303,7 +351,11 @@ def main():
 
     pbar.close()
     print(f"\n{'='*70}")
-    print("PIPELINE COMPLETE")
+    if _interrupted:
+        print("PIPELINE INTERRUPTED (clean exit)")
+        print("Resume with: python scripts/run_full_pipeline.py --config <cfg> --resume")
+    else:
+        print("PIPELINE COMPLETE")
     print(f"{'='*70}")
     print(f"Results logged to: {config['tracking']['results_dir']}")
     print(f"View in MLflow UI: uv run mlflow ui --backend-store-uri sqlite:///mlruns.db")

@@ -52,6 +52,7 @@ class Trainer:
         self.patience = patience
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.epoch_ckpt_base = Path("./checkpoints")  # per-epoch recovery checkpoints
         self.tracker = tracker  # ExperimentTracker for per-epoch logging
 
         # Tracking
@@ -125,7 +126,32 @@ class Trainer:
         Returns:
             Dict with best metrics and training history.
         """
-        for epoch in range(1, epochs + 1):
+        # ── Recovery checkpoint setup ──────────────────────────────────────────
+        safe_run_name = run_name.replace(":", "-")
+        epoch_ckpt_path = self.epoch_ckpt_base / safe_run_name / "checkpoint_last.pt"
+        start_epoch = 1
+
+        if epoch_ckpt_path.exists():
+            try:
+                ckpt = torch.load(epoch_ckpt_path, weights_only=False,
+                                  map_location=self.device)
+                self.model.load_state_dict(ckpt["model_state"])
+                self.optimizer.load_state_dict(ckpt["optimizer_state"])
+                start_epoch = ckpt["epoch"] + 1
+                self.best_val_mcc = ckpt["best_val_mcc"]
+                self.patience_counter = ckpt.get("patience_counter", 0)
+                torch.set_rng_state(ckpt["torch_rng_state"])
+                np.random.set_state(ckpt["numpy_rng_state"])
+                if torch.cuda.is_available() and ckpt.get("cuda_rng_state") is not None:
+                    torch.cuda.set_rng_state(ckpt["cuda_rng_state"])
+                print(f"  Resumed from epoch checkpoint: {epoch_ckpt_path}")
+                print(f"  Continuing from epoch {start_epoch} "
+                      f"(best MCC so far: {self.best_val_mcc:.4f})")
+            except Exception as exc:
+                print(f"  WARNING: Could not load epoch checkpoint ({exc}), starting fresh")
+                start_epoch = 1
+
+        for epoch in range(start_epoch, epochs + 1):
             train_loss = self.train_epoch(data)
             val_metrics = self.evaluate(data, "val_mask")
 
@@ -165,13 +191,36 @@ class Trainer:
                     f"Val MCC: {val_metrics['mcc']:.4f}"
                 )
 
+            # Save recovery checkpoint at epoch 1 and every 10 epochs
+            # (epoch 1 ensures a checkpoint exists even with few-epoch quick runs)
+            if epoch == 1 or epoch % 10 == 0:
+                epoch_ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+                torch.save({
+                    "model_state": self.model.state_dict(),
+                    "optimizer_state": self.optimizer.state_dict(),
+                    "epoch": epoch,
+                    "best_val_mcc": self.best_val_mcc,
+                    "patience_counter": self.patience_counter,
+                    "torch_rng_state": torch.get_rng_state(),
+                    "numpy_rng_state": np.random.get_state(),
+                    "cuda_rng_state": (torch.cuda.get_rng_state()
+                                       if torch.cuda.is_available() else None),
+                }, epoch_ckpt_path)
+
             if self.patience_counter >= self.patience:
                 if verbose:
                     print(f"  Early stopping at epoch {epoch} (best: {self.best_epoch})")
                 break
 
+        # Delete recovery checkpoint (training completed cleanly)
+        if epoch_ckpt_path.exists():
+            epoch_ckpt_path.unlink()
+            try:
+                epoch_ckpt_path.parent.rmdir()
+            except OSError:
+                pass
+
         # Load best model
-        safe_run_name = run_name.replace(":", "-")
         ckpt_path = self.checkpoint_dir / f"{safe_run_name}_best.pt"
         if ckpt_path.exists():
             self.model.load_state_dict(torch.load(ckpt_path, weights_only=True))

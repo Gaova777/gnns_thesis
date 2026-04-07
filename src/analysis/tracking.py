@@ -7,6 +7,7 @@ Logs per-epoch metrics so curves are visible live in MLflow UI.
 
 import csv
 import os
+import shutil
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
@@ -64,6 +65,7 @@ class ExperimentTracker:
 
         # Always init CSV path (used as backup even with MLflow)
         self.csv_path = self.results_dir / f"{experiment_name}.csv"
+        self._csv_write_count = 0
 
     # ── Context managers for MLflow runs ──
 
@@ -180,29 +182,86 @@ class ExperimentTracker:
         self._log_csv(run_data)
 
     def _log_csv(self, run_data: dict):
-        """Log to CSV file."""
-        file_exists = self.csv_path.exists()
-        with open(self.csv_path, "a", newline="") as f:
+        """Log to CSV file atomically (tmp → rename) with periodic backup."""
+        tmp_path = self.csv_path.with_suffix(".tmp")
+        bak_path = Path(str(self.csv_path) + ".bak")
+
+        # Copy existing CSV into tmp so we can append to it
+        if self.csv_path.exists():
+            shutil.copy2(self.csv_path, tmp_path)
+        file_exists = tmp_path.exists()
+
+        with open(tmp_path, "a", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=run_data.keys())
             if not file_exists:
                 writer.writeheader()
             writer.writerow(run_data)
+            f.flush()
+            os.fsync(f.fileno())
+
+        # Atomic replace — on Linux/Windows this is a single-syscall rename
+        os.replace(tmp_path, self.csv_path)
+
+        # Backup every 5 writes
+        self._csv_write_count += 1
+        if self._csv_write_count % 5 == 0:
+            shutil.copy2(self.csv_path, bak_path)
 
     # ── Utilities ──
 
+    def mark_interrupted(self, run_id: str) -> None:
+        """
+        Persist run_id as interrupted so --resume skips it cleanly.
+
+        Writes to {results_dir}/.interrupted_runs (one run_id per line).
+        Also tags the active MLflow run if one is open.
+        """
+        interrupted_file = self.results_dir / ".interrupted_runs"
+        try:
+            with open(interrupted_file, "a") as f:
+                f.write(run_id + "\n")
+                f.flush()
+                os.fsync(f.fileno())
+        except OSError:
+            pass
+        if self.backend == "mlflow" and MLFLOW_AVAILABLE:
+            try:
+                mlflow.set_tag("status", "interrupted")
+            except Exception:
+                pass
+
     def get_completed_runs(self) -> set:
-        """Return set of run_names already completed in MLflow."""
+        """
+        Return set of run_names to skip on --resume.
+
+        Includes both COMPLETED MLflow runs and any runs written to
+        .interrupted_runs (partial runs that should not be re-attempted).
+        """
+        completed: set = set()
+
         if self.backend == "mlflow" and MLFLOW_AVAILABLE:
             experiment = mlflow.get_experiment_by_name(self.experiment_name)
-            if experiment is None:
-                return set()
-            runs = mlflow.search_runs(
-                experiment_ids=[experiment.experiment_id],
-                filter_string="tags.status = 'COMPLETED' AND tags.`mlflow.parentRunId` = ''",
-                output_format="list",
-            )
-            return {r.info.run_name for r in runs}
-        return set()
+            if experiment is not None:
+                runs = mlflow.search_runs(
+                    experiment_ids=[experiment.experiment_id],
+                    filter_string="tags.status = 'COMPLETED' AND tags.`mlflow.parentRunId` = ''",
+                    output_format="list",
+                )
+                completed = {r.info.run_name for r in runs}
+
+        # Also skip interrupted runs (avoid partial re-runs)
+        interrupted_file = self.results_dir / ".interrupted_runs"
+        if interrupted_file.exists():
+            try:
+                with open(interrupted_file) as f:
+                    for line in f:
+                        run_id = line.strip()
+                        if run_id:
+                            completed.add(run_id)
+            except OSError:
+                pass
+
+        return completed
 
     def get_results_df(self):
         """Load results as a pandas DataFrame."""
