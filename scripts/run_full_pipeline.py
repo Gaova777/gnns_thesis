@@ -72,6 +72,12 @@ def main():
         # Limit to 1 arch × 1 balancing → 4 configs total (1 per scenario)
         config["models"]["architectures"] = config["models"]["architectures"][:1]
         config["balancing"]["techniques"] = config["balancing"]["techniques"][:1]
+        # Reduce explainer iterations drastically for smoke test (CPU is slow)
+        for m in config["explainability"]["methods"]:
+            if m["name"] == "GNNShap":
+                m["num_samples"] = 5
+            if "epochs" in m:
+                m["epochs"] = 5  # GNNExplainer: 200→5, PGExplainer: 30→5
 
     # Initialize tracker
     tracker = ExperimentTracker(
@@ -211,6 +217,15 @@ def main():
 
             # Explainer loop with sub-progress
             for explainer_name in tqdm(explainers, desc="  Explainers", leave=False, unit="method"):
+                # Pull per-explainer hyperparams from config (epochs, lr, num_samples)
+                explainer_cfg = next(
+                    (e for e in config["explainability"]["methods"] if e["name"] == explainer_name),
+                    {}
+                )
+                explainer_epochs = explainer_cfg.get("epochs", 200)
+                explainer_lr = explainer_cfg.get("lr", 0.01)
+                shap_samples = explainer_cfg.get("num_samples", 100)
+
                 with tracker.explainer_run(explainer_name, params={"method": explainer_name}):
                     try:
                         node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}", leave=False, unit="node")
@@ -222,6 +237,9 @@ def main():
                                 num_replicas=config["stability"]["num_replicas"],
                                 top_k_edges=config["stability"]["top_k_edges"],
                                 device=device,
+                                explainer_epochs=explainer_epochs,
+                                explainer_lr=explainer_lr,
+                                shap_samples=shap_samples,
                             )
                             stab_metrics = compute_stability_metrics(
                                 stoch, top_k_features=config["stability"]["top_k_features"]

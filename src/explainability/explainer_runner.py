@@ -121,12 +121,21 @@ def train_pgexplainer(
     # Get training node indices
     train_indices = torch.where(data.train_mask)[0]
 
+    # Move PGExplainer's internal MLP to the same device as the model
+    explainer.algorithm.to(device)
+
+    # Get model predictions once — PGExplainer needs them as training target
+    with torch.no_grad():
+        out = explainer.model(x, edge_index)
+
     # PGExplainer needs to be trained on examples first
     for epoch in range(explainer.algorithm.epochs):
-        loss = 0
+        loss = 0.0
         for idx in train_indices[:100]:  # Subsample for efficiency
             loss += explainer.algorithm.train(
-                epoch, explainer.model, x, edge_index, target=idx
+                epoch, explainer.model, x, edge_index,
+                target=out,
+                index=idx.item(),
             )
     print(f"  PGExplainer training complete (final loss: {loss:.4f})")
 
