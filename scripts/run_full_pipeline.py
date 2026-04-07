@@ -50,6 +50,8 @@ def parse_args():
     parser.add_argument("--quick", action="store_true", help="Quick test with reduced params")
     parser.add_argument("--resume", action="store_true", help="Resume: skip already completed configs")
     parser.add_argument("--clean", action="store_true", help="Clean all previous results before starting")
+    parser.add_argument("--inter-config-pause", type=int, default=0,
+                        help="Seconds to sleep between configs (for VRAM GC on constrained GPUs)")
     return parser.parse_args()
 
 
@@ -229,7 +231,7 @@ def main():
                 with tracker.explainer_run(explainer_name, params={"method": explainer_name}):
                     try:
                         node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}", leave=False, unit="node")
-                        all_stab = {"jaccard_means": [], "spearman_means": []}
+                        all_stab = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0}
 
                         for node_idx in node_pbar:
                             stoch = run_stochastic_replicas(
@@ -249,6 +251,7 @@ def main():
                                 all_stab["jaccard_means"].append(stab_metrics["jaccard"]["mean"])
                             if "spearman" in stab_metrics:
                                 all_stab["spearman_means"].append(stab_metrics["spearman"]["mean"])
+                            all_stab["shap_oom_retries"] += stoch.get("shap_oom_retries", 0)
 
                         node_pbar.close()
 
@@ -259,6 +262,8 @@ def main():
                             flat_stab["jaccard_std"] = np.std(all_stab["jaccard_means"])
                         if all_stab["spearman_means"]:
                             flat_stab["spearman_mean"] = np.mean(all_stab["spearman_means"])
+                        if all_stab["shap_oom_retries"] > 0:
+                            flat_stab["shap_oom_retries"] = all_stab["shap_oom_retries"]
 
                         tracker.log_stability(flat_stab)
                         tqdm.write(f"    {explainer_name}: Jaccard={flat_stab.get('jaccard_mean', 'N/A'):.4f}" if flat_stab.get('jaccard_mean') else f"    {explainer_name}: done")
@@ -286,6 +291,15 @@ def main():
                             predictive_metrics=pred_metrics,
                             stability_metrics={"error": str(e)},
                         )
+
+        # Inter-config pause for GPU memory GC (used on constrained devices)
+        inter_pause = getattr(args, "inter_config_pause", 0)
+        if inter_pause > 0:
+            import gc
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            time.sleep(inter_pause)
 
     pbar.close()
     print(f"\n{'='*70}")

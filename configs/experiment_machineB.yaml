@@ -1,0 +1,80 @@
+# Experiment config — Machine B (RTX 4060, 8GB)
+# Architectures: GCN, GraphSAGE
+# Scenarios: 1:1, 1:10 (balanced / mild imbalance)
+# Balancing: all 3 (none, class_weighting, focal_loss)
+# Matrix: 2 scenarios × 2 archs × 3 balancing × 3 explainers = 36 configs
+
+data:
+  root: "./data"
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
+
+models:
+  architectures:
+    - name: "GCN"
+      class: "src.models.gcn.GCN"
+    - name: "GraphSAGE"
+      class: "src.models.sage.GraphSAGE"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 256]
+    num_layers: [2, 3]
+    dropout: [0.1, 0.2, 0.3, 0.5]
+    learning_rate: [0.0001, 0.001, 0.01]
+    optuna_trials: 20
+    optuna_metric: "mcc"
+
+training:
+  epochs: 300
+  patience: 20
+  optimizer: "adam"
+  batch_size: null
+  seeds: [42, 123, 456]
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.25
+
+explainability:
+  methods:
+    - name: "GNNExplainer"
+      epochs: 200
+      lr: 0.01
+    - name: "PGExplainer"
+      epochs: 30
+      lr: 0.003
+    - name: "GNNShap"
+      num_samples: 50
+
+  nodes_per_class: 30
+
+stability:
+  num_replicas: 20
+  noise_levels: [0.01, 0.05, 0.10]
+  top_k_edges: 20
+  top_k_features: 20
+
+analysis:
+  thresholds:
+    f1_min: 0.80
+    mcc_min: 0.70
+    jaccard_min: 0.70
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"
+  experiment_name: "xai-gnn-stability-B"
+  results_dir: "./results_machineB"

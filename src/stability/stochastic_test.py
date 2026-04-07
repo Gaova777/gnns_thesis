@@ -52,6 +52,7 @@ def run_stochastic_replicas(
     subgraphs = []
     feature_rankings = []
     shap_values_list = []
+    shap_oom_retries = 0
 
     for replica in range(num_replicas):
         seed = 42 + replica * 17  # Deterministic but varied seeds
@@ -88,6 +89,7 @@ def run_stochastic_replicas(
 
             feature_rankings.append(ranking)
             shap_values_list.append(shap_vals)
+            shap_oom_retries += result.get("shap_oom_retries", 0)
 
     return {
         "node_idx": node_idx,
@@ -96,6 +98,7 @@ def run_stochastic_replicas(
         "subgraphs": subgraphs,
         "feature_rankings": feature_rankings,
         "shap_values": shap_values_list if shap_values_list else None,
+        "shap_oom_retries": shap_oom_retries,
     }
 
 
