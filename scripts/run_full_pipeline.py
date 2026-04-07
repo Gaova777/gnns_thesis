@@ -65,10 +65,13 @@ def main():
 
     # Quick mode reduces everything for testing
     if args.quick:
-        config["training"]["epochs"] = 10
+        config["training"]["epochs"] = 5
         config["training"]["patience"] = 5
-        config["stability"]["num_replicas"] = 3
-        config["explainability"]["nodes_per_class"] = 5
+        config["stability"]["num_replicas"] = 2
+        config["explainability"]["nodes_per_class"] = 3
+        # Limit to 1 arch × 1 balancing → 4 configs total (1 per scenario)
+        config["models"]["architectures"] = config["models"]["architectures"][:1]
+        config["balancing"]["techniques"] = config["balancing"]["techniques"][:1]
 
     # Initialize tracker
     tracker = ExperimentTracker(
@@ -203,13 +206,14 @@ def main():
             selected = select_explanation_nodes(
                 data, n_per_class=config["explainability"]["nodes_per_class"]
             )
-            test_nodes = selected["illicit"][:5]
+            n_explain = config["explainability"]["nodes_per_class"]
+            test_nodes = selected["illicit"][:n_explain]
 
             # Explainer loop with sub-progress
             for explainer_name in tqdm(explainers, desc="  Explainers", leave=False, unit="method"):
                 with tracker.explainer_run(explainer_name, params={"method": explainer_name}):
                     try:
-                        node_pbar = tqdm(test_nodes[:3], desc=f"    {explainer_name}", leave=False, unit="node")
+                        node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}", leave=False, unit="node")
                         all_stab = {"jaccard_means": [], "spearman_means": []}
 
                         for node_idx in node_pbar:

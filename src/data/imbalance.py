@@ -46,24 +46,41 @@ def create_imbalance_scenario(
     licit_in_mask = masked_indices[data_new.y[masked_indices] == 0]
 
     n_illicit = len(illicit_in_mask)
-    n_licit_target = int(n_illicit / target_ratio)
-
-    if n_licit_target >= len(licit_in_mask):
-        # Requested ratio is less imbalanced than current data — keep all
-        print(f"  Warning: target ratio {target_ratio} requires {n_licit_target} licit "
-              f"but only {len(licit_in_mask)} available. Keeping all.")
-        return data_new
-
-    # Randomly select licit nodes to keep
-    licit_keep_idx = rng.choice(
-        licit_in_mask.numpy(), size=n_licit_target, replace=False
-    )
-    licit_keep_idx = torch.tensor(licit_keep_idx, dtype=torch.long)
-
-    # Build new mask: all illicit + sampled licit
+    n_licit = len(licit_in_mask)
     new_mask = torch.zeros_like(mask)
-    new_mask[illicit_in_mask] = True
-    new_mask[licit_keep_idx] = True
+
+    if target_ratio >= 0.1:
+        # Mode A: subsample LICIT → more balanced scenarios (e.g. 1:1, 1:10)
+        n_licit_target = int(n_illicit / target_ratio)
+        if n_licit_target >= n_licit:
+            print(f"  [mode=natural] ratio {target_ratio} needs {n_licit_target:,} licit "
+                  f"but only {n_licit:,} available — using natural ratio")
+            new_mask = mask.clone()
+        else:
+            licit_keep = torch.tensor(
+                rng.choice(licit_in_mask.numpy(), size=n_licit_target, replace=False),
+                dtype=torch.long,
+            )
+            new_mask[illicit_in_mask] = True
+            new_mask[licit_keep] = True
+            print(f"  [mode=subsample-licit] kept {n_licit_target:,}/{n_licit:,} licit nodes")
+    else:
+        # Mode B: subsample ILLICIT → more extreme imbalance (e.g. 1:50, 1:100)
+        # Natural ratio (~1:9) cannot be made more imbalanced by dropping licit nodes.
+        n_illicit_target = max(1, int(n_licit * target_ratio))
+        if n_illicit_target >= n_illicit:
+            print(f"  [mode=natural] ratio {target_ratio} needs {n_illicit_target:,} illicit "
+                  f"but only {n_illicit:,} available — using natural ratio")
+            new_mask = mask.clone()
+        else:
+            illicit_keep = torch.tensor(
+                rng.choice(illicit_in_mask.numpy(), size=n_illicit_target, replace=False),
+                dtype=torch.long,
+            )
+            new_mask[licit_in_mask] = True   # keep ALL licit
+            new_mask[illicit_keep] = True    # keep only sampled illicit
+            print(f"  [mode=subsample-illicit] kept {n_illicit_target:,}/{n_illicit:,} illicit nodes")
+
     setattr(data_new, mask_name, new_mask)
 
     # Stats

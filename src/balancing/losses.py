@@ -131,5 +131,10 @@ def get_loss_function(
     elif technique == "focal_loss":
         print(f"  Focal Loss: gamma={gamma}, alpha={alpha}")
         return FocalLoss(alpha=alpha, gamma=gamma)
+    elif technique == "graphsmote":
+        # GraphSMOTE operates at graph level (node augmentation), not at loss level.
+        # Return standard CE; augmentation must be applied before training.
+        print(f"  GraphSMOTE: using standard CrossEntropyLoss (graph augmentation is separate)")
+        return nn.CrossEntropyLoss()
     else:
         raise ValueError(f"Unknown balancing technique: {technique}")
