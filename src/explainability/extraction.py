@@ -65,8 +65,11 @@ def extract_feature_ranking(
     if shap_values is not None:
         return np.argsort(np.abs(shap_values))[::-1].copy()
 
-    if explanation is not None and explanation.node_mask is not None:
-        node_mask = explanation.node_mask.cpu().detach().numpy()
+    # Use getattr to avoid AttributeError on PyG Explanation objects that
+    # don't have node_mask (e.g. PGExplainer with explanation_type="phenomenon")
+    node_mask_val = getattr(explanation, "node_mask", None) if explanation is not None else None
+    if node_mask_val is not None:
+        node_mask = node_mask_val.cpu().detach().numpy()
         # Average over nodes if multi-node mask
         if node_mask.ndim > 1:
             importance = np.abs(node_mask).mean(axis=0)
