@@ -127,6 +127,14 @@ def run_stochastic_test_batch(
     Returns:
         List of result dicts (one per node).
     """
+    # PGExplainer is a global parametric model — train once per replica,
+    # then explain all nodes. This is 30× faster than per-node retraining
+    # and semantically correct (stability = variance across random inits).
+    if method == "PGExplainer":
+        return _run_pgexplainer_batch(
+            model, data, node_indices, num_replicas, top_k_edges, device, **kwargs
+        )
+
     results = []
     for i, idx in enumerate(node_indices):
         if (i + 1) % 5 == 0:
@@ -136,4 +144,61 @@ def run_stochastic_test_batch(
             top_k_edges, device, **kwargs
         )
         results.append(result)
+    return results
+
+
+def _run_pgexplainer_batch(
+    model: nn.Module,
+    data: Data,
+    node_indices: list,
+    num_replicas: int,
+    top_k_edges: int,
+    device: str,
+    explainer_epochs: int = 200,
+    explainer_lr: float = 0.01,
+    **kwargs,
+) -> list:
+    """
+    PGExplainer stability test: train once per replica, explain all nodes.
+
+    PGExplainer is a global model (not per-node), so the correct way to
+    measure stability is: retrain from scratch with a different random seed,
+    then explain all nodes. This avoids 30x redundant retraining.
+    """
+    node_subgraphs = [[] for _ in node_indices]
+    node_rankings = [[] for _ in node_indices]
+
+    for replica in range(num_replicas):
+        seed = 42 + replica * 17
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+
+        # Train once per replica
+        explainer = create_explainer(
+            model, "PGExplainer", epochs=explainer_epochs, lr=explainer_lr
+        )
+        train_pgexplainer(explainer, data, device=device)
+
+        # Explain all nodes with this trained explainer
+        explanations = explain_nodes(explainer, data, node_indices, device)
+        for i, exp in enumerate(explanations):
+            subgraph = extract_subgraph(exp, top_k=top_k_edges)
+            ranking = extract_feature_ranking(explanation=exp)
+            node_subgraphs[i].append(subgraph)
+            node_rankings[i].append(ranking)
+
+        print(f"    PGExplainer replica {replica+1}/{num_replicas} done")
+
+    results = []
+    for i, idx in enumerate(node_indices):
+        results.append({
+            "node_idx": idx,
+            "method": "PGExplainer",
+            "num_replicas": num_replicas,
+            "subgraphs": node_subgraphs[i],
+            "feature_rankings": node_rankings[i],
+            "shap_values": None,
+            "shap_oom_retries": 0,
+        })
     return results

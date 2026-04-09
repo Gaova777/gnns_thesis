@@ -46,7 +46,7 @@ def create_explainer(
             ),
         )
     elif method == "PGExplainer":
-        algorithm = PGExplainer(epochs=epochs, lr=lr)
+        algorithm = PGExplainer(epochs=epochs, lr=min(lr, 0.003))
         explainer = Explainer(
             model=model,
             algorithm=algorithm,
@@ -129,15 +129,32 @@ def train_pgexplainer(
         out = explainer.model(x, edge_index)
 
     # PGExplainer needs to be trained on examples first
+    loss = float("nan")
+    nan_epochs = 0
     for epoch in range(explainer.algorithm.epochs):
         loss = 0.0
         for idx in train_indices[:100]:  # Subsample for efficiency
-            loss += explainer.algorithm.train(
+            step_loss = explainer.algorithm.train(
                 epoch, explainer.model, x, edge_index,
                 target=out,
                 index=idx.item(),
             )
-    print(f"  PGExplainer training complete (final loss: {loss:.4f})")
+            if torch.is_tensor(step_loss):
+                step_loss = step_loss.item()
+            if not (step_loss == step_loss):  # NaN check
+                nan_epochs += 1
+                break
+            loss += step_loss
+        # Clip gradients to prevent divergence
+        if hasattr(explainer.algorithm, "_mlp"):
+            torch.nn.utils.clip_grad_norm_(
+                explainer.algorithm._mlp.parameters(), max_norm=1.0
+            )
+    if nan_epochs > 0:
+        print(f"  WARNING: PGExplainer loss was NaN in {nan_epochs} epochs "
+              f"— explanations may be unreliable (final loss: {loss})")
+    else:
+        print(f"  PGExplainer training complete (final loss: {loss:.4f})")
 
 
 def select_explanation_nodes(
