@@ -106,6 +106,9 @@ class GraphSMOTE:
         # Calculate how many synthetic nodes to generate
         n_synthetic = int(majority_count * self.up_scale) - minority_count
         if n_synthetic <= 0:
+            print(f"  WARNING: GraphSMOTE n_synthetic={n_synthetic} <= 0 "
+                  f"(majority={majority_count}, minority={minority_count}, "
+                  f"up_scale={self.up_scale}) — skipping augmentation.")
             return None, None
 
         # SMOTE interpolation in embedding space

@@ -1,17 +1,33 @@
 # Experiment config — Machine C (RTX 3050 Laptop, 4GB)
-# Architectures: GCN, GraphSAGE
-# Scenarios: 1:50, 1:100 (extreme imbalance)
-# Balancing: all 3 (none, class_weighting, focal_loss)
-# Matrix: 2 scenarios × 2 archs × 3 balancing × 3 explainers = 36 configs
+# Architectures: GAT, TAGCN (attention-based and polynomial-filter families)
+# Scenarios: all 4 (1:1, 1:10, 1:50, 1:100)
+# Matrix: 4 scenarios x 2 archs x 3 balancing = 24 training configs
+#         24 x 3 explainers = 72 explanation configs
+# Estimated runtime: ~9.5h
+#   - 1:1 and 1:10 (12 configs): always complete — guaranteed architecture comparison
+#   - 1:50 and 1:100 (12 configs): quality gate skips ~50% — runtime depends on balancing
+#   - Use --resume for any focal_loss extreme configs that don't finish in one night
+#
+# Notes on reduced params vs Machine B:
+#   - hidden_dim capped at 128 (GAT multi-head x full-batch 203k nodes, 4GB VRAM limit)
+#   - optuna_trials: 3 (vs 5) — fewer trials, still finds good hyperparams
+#   - nodes_per_class: 3 (vs 4) — 3 nodes, C(5,2)=10 pairs for Jaccard stability
+#   - num_replicas: 5 (vs 7) — statistically marginal but sufficient for pilot analysis
+#   - PGExplainer.epochs: 20 (vs 30) — GAT explain is ~1.5x slower, reduce total time
+#   - GNNShap.num_samples: 15 (vs 25) — 165 features x 15 samples = fast permutation test
 
 data:
-  root: "./data"
+  root: "./dataset"
   train_timesteps: [1, 34]
   val_timesteps: [35, 42]
   test_timesteps: [43, 49]
 
 scenarios:
   imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
     - name: "1:50"
       illicit_to_licit: 0.02
     - name: "1:100"
@@ -19,17 +35,17 @@ scenarios:
 
 models:
   architectures:
-    - name: "GCN"
-      class: "src.models.gcn.GCN"
-    - name: "GraphSAGE"
-      class: "src.models.sage.GraphSAGE"
+    - name: "GAT"
+      class: "src.models.gat.GAT"
+    - name: "TAGCN"
+      class: "src.models.tagcn.TAGCN"
 
   hyperparameter_search:
-    hidden_dim: [64, 128, 256]
+    hidden_dim: [64, 128]
     num_layers: [2, 3]
-    dropout: [0.1, 0.2, 0.3, 0.5]
+    dropout: [0.1, 0.2, 0.3]
     learning_rate: [0.0001, 0.001, 0.01]
-    optuna_trials: 20
+    optuna_trials: 3
     optuna_metric: "mcc"
 
 training:
@@ -37,7 +53,7 @@ training:
   patience: 20
   optimizer: "adam"
   batch_size: null
-  seeds: [42, 123, 456]
+  seeds: [42]
 
 balancing:
   techniques:
@@ -50,23 +66,27 @@ balancing:
 explainability:
   methods:
     - name: "GNNExplainer"
-      epochs: 200
+      epochs: 100
       lr: 0.01
     - name: "PGExplainer"
-      epochs: 30
+      epochs: 20
       lr: 0.003
+      nan_abort_threshold: 2
     - name: "GNNShap"
-      num_samples: 50
+      num_samples: 15
 
-  nodes_per_class: 30
+  nodes_per_class: 3
 
 stability:
-  num_replicas: 20
+  num_replicas: 5
   noise_levels: [0.01, 0.05, 0.10]
   top_k_edges: 20
   top_k_features: 20
 
 analysis:
+  quality_gate:
+    f1_min: 0.05
+    mcc_min: 0.02
   thresholds:
     f1_min: 0.80
     mcc_min: 0.70

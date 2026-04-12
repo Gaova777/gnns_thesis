@@ -1,8 +1,9 @@
 # Experiment config — Machine B (RTX 4060, 8GB)
-# Architectures: GCN, GraphSAGE
-# Scenarios: 1:1, 1:10 (balanced / mild imbalance)
-# Balancing: all 3 (none, class_weighting, focal_loss)
-# Matrix: 2 scenarios × 2 archs × 3 balancing × 3 explainers = 36 configs
+# Architectures: GCN, GraphSAGE (message-passing baselines)
+# Scenarios: all 4 (1:1, 1:10, 1:50, 1:100)
+# Matrix: 4 scenarios x 2 archs x 3 balancing = 24 training configs
+#         24 x 3 explainers = 72 explanation configs
+# Estimated runtime: ~8.3h (quality gate skips ~4 configs in extreme scenarios)
 
 data:
   root: "./data"
@@ -16,6 +17,10 @@ scenarios:
       illicit_to_licit: 1.0
     - name: "1:10"
       illicit_to_licit: 0.1
+    - name: "1:50"
+      illicit_to_licit: 0.02
+    - name: "1:100"
+      illicit_to_licit: 0.01
 
 models:
   architectures:
@@ -29,7 +34,7 @@ models:
     num_layers: [2, 3]
     dropout: [0.1, 0.2, 0.3, 0.5]
     learning_rate: [0.0001, 0.001, 0.01]
-    optuna_trials: 20
+    optuna_trials: 5
     optuna_metric: "mcc"
 
 training:
@@ -37,7 +42,7 @@ training:
   patience: 20
   optimizer: "adam"
   batch_size: null
-  seeds: [42, 123, 456]
+  seeds: [42]
 
 balancing:
   techniques:
@@ -50,23 +55,27 @@ balancing:
 explainability:
   methods:
     - name: "GNNExplainer"
-      epochs: 200
+      epochs: 100
       lr: 0.01
     - name: "PGExplainer"
       epochs: 30
       lr: 0.003
+      nan_abort_threshold: 2
     - name: "GNNShap"
-      num_samples: 50
+      num_samples: 25
 
-  nodes_per_class: 30
+  nodes_per_class: 4
 
 stability:
-  num_replicas: 20
+  num_replicas: 7
   noise_levels: [0.01, 0.05, 0.10]
   top_k_edges: 20
   top_k_features: 20
 
 analysis:
+  quality_gate:
+    f1_min: 0.05
+    mcc_min: 0.02
   thresholds:
     f1_min: 0.80
     mcc_min: 0.70

@@ -68,7 +68,10 @@ def run_stochastic_replicas(
             )
             # PGExplainer must be trained before generating explanations
             if method == "PGExplainer":
-                train_pgexplainer(explainer, data, device=device)
+                success = train_pgexplainer(explainer, data, device=device)
+                if not success:
+                    print(f"  PGExplainer ABORT: training failed (replica {replica})")
+                    continue
 
             explanations = explain_nodes(explainer, data, [node_idx], device)
             exp = explanations[0]
@@ -168,6 +171,9 @@ def _run_pgexplainer_batch(
     node_subgraphs = [[] for _ in node_indices]
     node_rankings = [[] for _ in node_indices]
 
+    consecutive_nan_failures = 0
+    nan_abort_threshold = kwargs.get("nan_abort_threshold", 2)
+
     for replica in range(num_replicas):
         seed = 42 + replica * 17
         torch.manual_seed(seed)
@@ -178,7 +184,17 @@ def _run_pgexplainer_batch(
         explainer = create_explainer(
             model, "PGExplainer", epochs=explainer_epochs, lr=explainer_lr
         )
-        train_pgexplainer(explainer, data, device=device)
+        success = train_pgexplainer(explainer, data, device=device)
+
+        if not success:
+            consecutive_nan_failures += 1
+            if consecutive_nan_failures >= nan_abort_threshold:
+                print(f"    PGExplainer: {nan_abort_threshold} consecutive NaN failures "
+                      f"— aborting remaining replicas")
+                break
+            continue
+        else:
+            consecutive_nan_failures = 0
 
         # Explain all nodes with this trained explainer
         explanations = explain_nodes(explainer, data, node_indices, device)

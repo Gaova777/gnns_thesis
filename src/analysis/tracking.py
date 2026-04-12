@@ -18,6 +18,15 @@ try:
 except ImportError:
     MLFLOW_AVAILABLE = False
 
+# Fixed CSV schema — prevents column mismatch between normal and error rows.
+# All rows always use these exact fieldnames; missing values are written as None.
+CSV_SCHEMA_FIELDS = [
+    "timestamp", "scenario", "architecture", "balancing", "explainer", "seed",
+    "pred_loss", "pred_f1", "pred_mcc", "pred_pr_auc",
+    "stab_jaccard_mean", "stab_jaccard_std", "stab_spearman_mean",
+    "stab_shap_oom_retries", "stab_error", "stab_reason",
+]
+
 
 class ExperimentTracker:
     """
@@ -182,9 +191,17 @@ class ExperimentTracker:
         self._log_csv(run_data)
 
     def _log_csv(self, run_data: dict):
-        """Log to CSV file atomically (tmp → rename) with periodic backup."""
+        """Log to CSV file atomically (tmp → rename) with periodic backup.
+
+        Uses a fixed schema (CSV_SCHEMA_FIELDS) so every row has the same
+        columns regardless of whether it's a normal run or an error row.
+        Missing fields are written as empty (None → '').
+        """
         tmp_path = self.csv_path.with_suffix(".tmp")
         bak_path = Path(str(self.csv_path) + ".bak")
+
+        # Map run_data onto the fixed schema; missing fields become None
+        row = {field: run_data.get(field, None) for field in CSV_SCHEMA_FIELDS}
 
         # Copy existing CSV into tmp so we can append to it
         if self.csv_path.exists():
@@ -192,10 +209,10 @@ class ExperimentTracker:
         file_exists = tmp_path.exists()
 
         with open(tmp_path, "a", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=run_data.keys())
+            writer = csv.DictWriter(f, fieldnames=CSV_SCHEMA_FIELDS)
             if not file_exists:
                 writer.writeheader()
-            writer.writerow(run_data)
+            writer.writerow(row)
             f.flush()
             os.fsync(f.fileno())
 
@@ -232,24 +249,48 @@ class ExperimentTracker:
 
     def get_completed_runs(self) -> set:
         """
-        Return set of run_names to skip on --resume.
+        Return set of run_ids to skip on --resume.
 
-        Includes both COMPLETED MLflow runs and any runs written to
-        .interrupted_runs (partial runs that should not be re-attempted).
+        Checks three sources in order:
+          1. MLflow COMPLETED parent runs (authoritative when DB exists)
+          2. CSV backup rows without errors (fallback when MLflow DB is missing)
+          3. .interrupted_runs file (always checked — partial runs should not retry)
         """
         completed: set = set()
 
+        # Source 1: MLflow
         if self.backend == "mlflow" and MLFLOW_AVAILABLE:
-            experiment = mlflow.get_experiment_by_name(self.experiment_name)
-            if experiment is not None:
-                runs = mlflow.search_runs(
-                    experiment_ids=[experiment.experiment_id],
-                    filter_string="tags.status = 'COMPLETED' AND tags.`mlflow.parentRunId` = ''",
-                    output_format="list",
-                )
-                completed = {r.info.run_name for r in runs}
+            try:
+                experiment = mlflow.get_experiment_by_name(self.experiment_name)
+                if experiment is not None:
+                    runs = mlflow.search_runs(
+                        experiment_ids=[experiment.experiment_id],
+                        filter_string="tags.status = 'COMPLETED' AND tags.`mlflow.parentRunId` = ''",
+                        output_format="list",
+                    )
+                    completed = {r.info.run_name for r in runs}
+            except Exception as e:
+                print(f"  WARNING: MLflow query failed ({e}), falling back to CSV")
 
-        # Also skip interrupted runs (avoid partial re-runs)
+        # Source 2: CSV backup (handles missing/corrupt MLflow DB)
+        if not completed and self.csv_path.exists():
+            try:
+                import csv as csv_mod
+                with open(self.csv_path, "r") as f:
+                    reader = csv_mod.DictReader(f)
+                    for row in reader:
+                        # Only count clean rows as completed
+                        if row.get("stab_error") or row.get("explainer") == "SKIPPED":
+                            continue
+                        s = row.get("scenario", "")
+                        a = row.get("architecture", "")
+                        b = row.get("balancing", "")
+                        if s and a and b:
+                            completed.add(f"{s}_{a}_{b}")
+            except Exception as e:
+                print(f"  WARNING: CSV resume check failed ({e})")
+
+        # Source 3: Interrupted runs file
         interrupted_file = self.results_dir / ".interrupted_runs"
         if interrupted_file.exists():
             try:

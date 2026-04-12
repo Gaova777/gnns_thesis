@@ -36,9 +36,10 @@ from src.explainability.explainer_runner import (
 )
 from src.explainability.shap_runner import explain_nodes_shap
 from src.explainability.extraction import extract_subgraph, extract_feature_ranking
-from src.stability.stochastic_test import run_stochastic_replicas
+from src.stability.stochastic_test import run_stochastic_replicas, run_stochastic_test_batch
 from src.stability.metrics import compute_stability_metrics
 from src.analysis.tracking import ExperimentTracker
+from src.training.hyperopt import run_hyperopt
 
 # Suppress sklearn single-label warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
@@ -88,12 +89,16 @@ def parse_args():
     parser.add_argument("--clean", action="store_true", help="Clean all previous results before starting")
     parser.add_argument("--inter-config-pause", type=int, default=0,
                         help="Seconds to sleep between configs (for VRAM GC on constrained GPUs)")
+    parser.add_argument("--max-hours", type=float, default=10.0,
+                        help="Hard deadline in hours — stops gracefully when <30 min remain")
     return parser.parse_args()
 
 
 def main():
     global _active_tracker, _current_run_id
     args = parse_args()
+    pipeline_start_time = time.time()
+    max_runtime_seconds = args.max_hours * 3600
 
     # Register signal handlers early so they cover the full run
     signal.signal(signal.SIGTERM, _signal_handler)
@@ -183,6 +188,13 @@ def main():
             tqdm.write("  Interrupt flag set — stopping after previous config.")
             break
 
+        # Hard deadline check — stop cleanly if <30 min remain
+        elapsed = time.time() - pipeline_start_time
+        if (max_runtime_seconds - elapsed) < 1800:
+            tqdm.write(f"  DEADLINE: {elapsed/3600:.1f}h elapsed, <30 min remaining — stopping.")
+            tqdm.write(f"  Resume with: python scripts/run_full_pipeline.py --config {args.config} --resume")
+            break
+
         _current_run_id = run_id
         pbar.set_postfix_str(run_id, refresh=True)
 
@@ -198,13 +210,30 @@ def main():
         # Create scenario
         data = create_imbalance_scenario(data_raw, ratio, seed=42)
 
-        # Build model
+        # Hyperparameter search (fast Optuna or defaults in quick mode)
+        hyperopt_cfg = config.get("models", {}).get("hyperparameter_search", {})
+        n_trials = hyperopt_cfg.get("optuna_trials", hyperopt_cfg.get("optuna_trials_fast", 10))
+
+        if args.quick or n_trials == 0:
+            best_hp = {"hidden_dim": 64, "num_layers": 2, "dropout": 0.3, "lr": 0.001}
+            tqdm.write(f"  Hyperparams: defaults (quick mode)")
+        else:
+            tqdm.write(f"  Running Optuna ({n_trials} trials)...")
+            hyperopt_result = run_hyperopt(
+                data, arch_name, balancing=balance_name,
+                n_trials=n_trials, device=device,
+                epochs=100, patience=10,
+            )
+            best_hp = hyperopt_result["best_params"]
+            tqdm.write(f"  Best hyperparams (MCC={hyperopt_result['best_mcc']:.4f}): {best_hp}")
+
+        # Build model with best hyperparameters
         model = build_model(
             arch_name,
             in_channels=data.num_node_features,
-            hidden_channels=128,
-            num_layers=2,
-            dropout=0.3,
+            hidden_channels=best_hp.get("hidden_dim", 128),
+            num_layers=best_hp.get("num_layers", 2),
+            dropout=best_hp.get("dropout", 0.3),
         )
 
         # Loss
@@ -219,22 +248,24 @@ def main():
             device=device,
         )
 
+        best_lr = best_hp.get("lr", 0.001)
+
         # Parent run in MLflow
         train_params = {
             "scenario": scenario_name,
             "architecture": arch_name,
             "balancing": balance_name,
-            "hidden_channels": 128,
-            "num_layers": 2,
-            "dropout": 0.3,
-            "lr": 0.001,
+            "hidden_channels": best_hp.get("hidden_dim", 128),
+            "num_layers": best_hp.get("num_layers", 2),
+            "dropout": best_hp.get("dropout", 0.3),
+            "lr": best_lr,
             "epochs": config["training"]["epochs"],
             "patience": config["training"]["patience"],
         }
 
         with tracker.training_run(run_id, params=train_params):
             # Train (with per-epoch MLflow logging)
-            optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+            optimizer = torch.optim.Adam(model.parameters(), lr=best_lr)
             trainer = Trainer(
                 model, loss_fn, optimizer, device,
                 patience=config["training"]["patience"],
@@ -250,6 +281,21 @@ def main():
 
             # Log test metrics to parent run
             tracker.log_test_metrics(pred_metrics)
+
+            # Quality gate: skip explainers if model didn't learn
+            gate_cfg = config.get("analysis", {}).get("quality_gate", {})
+            gate_f1 = gate_cfg.get("f1_min", 0.05)
+            gate_mcc = gate_cfg.get("mcc_min", 0.02)
+            if pred_metrics["f1"] < gate_f1 and pred_metrics["mcc"] < gate_mcc:
+                tqdm.write(f"  SKIP EXPLAINERS: F1={pred_metrics['f1']:.4f} < {gate_f1} "
+                           f"and MCC={pred_metrics['mcc']:.4f} < {gate_mcc}")
+                tracker.log_run(
+                    scenario=scenario_name, architecture=arch_name,
+                    balancing=balance_name, explainer="SKIPPED",
+                    seed=42, predictive_metrics=pred_metrics,
+                    stability_metrics={"reason": "quality_gate"},
+                )
+                continue
 
             # Log checkpoint artifact
             safe_run_name = run_id.replace(":", "-")
@@ -276,32 +322,54 @@ def main():
                 explainer_lr = explainer_cfg.get("lr", 0.01)
                 shap_samples = explainer_cfg.get("num_samples", 100)
 
+                nan_abort = explainer_cfg.get("nan_abort_threshold", 2)
+
                 with tracker.explainer_run(explainer_name, params={"method": explainer_name}):
                     try:
-                        node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}", leave=False, unit="node")
                         all_stab = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0}
 
-                        for node_idx in node_pbar:
-                            stoch = run_stochastic_replicas(
-                                model, data, node_idx, explainer_name,
+                        # PGExplainer: use batch mode (train once per replica, explain all nodes)
+                        if explainer_name == "PGExplainer":
+                            tqdm.write(f"    PGExplainer: batch mode ({config['stability']['num_replicas']} replicas × {len(test_nodes)} nodes)")
+                            batch_results = run_stochastic_test_batch(
+                                model, data, test_nodes, method="PGExplainer",
                                 num_replicas=config["stability"]["num_replicas"],
                                 top_k_edges=config["stability"]["top_k_edges"],
                                 device=device,
                                 explainer_epochs=explainer_epochs,
                                 explainer_lr=explainer_lr,
-                                shap_samples=shap_samples,
+                                nan_abort_threshold=nan_abort,
                             )
-                            stab_metrics = compute_stability_metrics(
-                                stoch, top_k_features=config["stability"]["top_k_features"]
-                            )
-
-                            if "jaccard" in stab_metrics:
-                                all_stab["jaccard_means"].append(stab_metrics["jaccard"]["mean"])
-                            if "spearman" in stab_metrics:
-                                all_stab["spearman_means"].append(stab_metrics["spearman"]["mean"])
-                            all_stab["shap_oom_retries"] += stoch.get("shap_oom_retries", 0)
-
-                        node_pbar.close()
+                            for stoch in batch_results:
+                                stab_metrics = compute_stability_metrics(
+                                    stoch, top_k_features=config["stability"]["top_k_features"]
+                                )
+                                if "jaccard" in stab_metrics:
+                                    all_stab["jaccard_means"].append(stab_metrics["jaccard"]["mean"])
+                                if "spearman" in stab_metrics:
+                                    all_stab["spearman_means"].append(stab_metrics["spearman"]["mean"])
+                        else:
+                            # GNNExplainer / GNNShap: per-node loop
+                            node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}", leave=False, unit="node")
+                            for node_idx in node_pbar:
+                                stoch = run_stochastic_replicas(
+                                    model, data, node_idx, explainer_name,
+                                    num_replicas=config["stability"]["num_replicas"],
+                                    top_k_edges=config["stability"]["top_k_edges"],
+                                    device=device,
+                                    explainer_epochs=explainer_epochs,
+                                    explainer_lr=explainer_lr,
+                                    shap_samples=shap_samples,
+                                )
+                                stab_metrics = compute_stability_metrics(
+                                    stoch, top_k_features=config["stability"]["top_k_features"]
+                                )
+                                if "jaccard" in stab_metrics:
+                                    all_stab["jaccard_means"].append(stab_metrics["jaccard"]["mean"])
+                                if "spearman" in stab_metrics:
+                                    all_stab["spearman_means"].append(stab_metrics["spearman"]["mean"])
+                                all_stab["shap_oom_retries"] += stoch.get("shap_oom_retries", 0)
+                            node_pbar.close()
 
                         # Aggregate stability over nodes
                         flat_stab = {}
