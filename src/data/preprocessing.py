@@ -9,7 +9,7 @@ Handles:
 
 import torch
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 from typing import Tuple
 
 
@@ -84,7 +84,9 @@ def normalize_features(data, fit_mask=None) -> None:
     if fit_mask is None:
         fit_mask = data.train_mask
 
-    scaler = StandardScaler()
+    # RobustScaler uses median/IQR instead of mean/std — resistant to outliers
+    # common in financial datasets (Elliptic has extreme skew in some features)
+    scaler = RobustScaler()
     x_np = data.x.numpy()
 
     # Fit only on training data
@@ -92,11 +94,19 @@ def normalize_features(data, fit_mask=None) -> None:
 
     # Transform ALL nodes (including unknown)
     x_normalized = scaler.transform(x_np)
+
+    # Clip to [-10, 10] after scaling: prevents exploding activations from
+    # extreme test-set values never seen during training (observed max ~18 000σ)
+    x_normalized = np.clip(x_normalized, -10.0, 10.0)
+
     data.x = torch.tensor(x_normalized, dtype=torch.float32)
 
     # Store scaler for potential inverse transform later
     data._scaler = scaler
-    print(f"  Features normalized: mean~{data.x[fit_mask].mean():.4f}, std~{data.x[fit_mask].std():.4f}")
+    clipped_pct = (np.abs(x_normalized) >= 9.99).mean() * 100
+    print(f"  Features normalized (RobustScaler + clip[-10,10]): "
+          f"mean~{data.x[fit_mask].mean():.4f}, std~{data.x[fit_mask].std():.4f}, "
+          f"clipped={clipped_pct:.2f}% of values")
 
 
 def preprocess(

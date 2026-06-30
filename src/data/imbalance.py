@@ -14,7 +14,7 @@ from copy import deepcopy
 
 def create_imbalance_scenario(
     data: Data,
-    target_ratio: float,
+    target_ratio: Optional[float],
     mask_name: str = "train_mask",
     seed: int = 42,
 ) -> Data:
@@ -29,6 +29,9 @@ def create_imbalance_scenario(
         data: PyG Data object with masks and labels.
         target_ratio: Desired illicit:licit ratio.
                       1.0 = 1:1, 0.1 = 1:10, 0.02 = 1:50, 0.01 = 1:100
+                      None = preserve native distribution (no resampling).
+                            Allows direct comparison with literature baselines
+                            (e.g. Weber 2019 uses Elliptic's native ~1:30 ratio).
         mask_name: Which mask to apply undersampling to ("train_mask").
         seed: Random seed for reproducibility.
 
@@ -36,6 +39,20 @@ def create_imbalance_scenario(
         New Data object with updated mask (does NOT remove nodes from graph,
         only modifies the mask to exclude sampled-out licit nodes).
     """
+    # Native mode: preserve distribution as-is (no resampling).
+    # Useful for literature replication where datasets have known imbalance.
+    if target_ratio is None:
+        data_new = deepcopy(data)
+        mask = getattr(data_new, mask_name)
+        illicit = (data_new.y[mask] == 1).sum().item()
+        licit = (data_new.y[mask] == 0).sum().item()
+        ratio = illicit / licit if licit > 0 else float("inf")
+        print(f"  [mode=native] preserving natural distribution")
+        print(f"  Scenario illicit:licit = 1:{1/ratio:.1f} (native)")
+        print(f"    Illicit: {illicit:,} | Licit: {licit:,} | Total: {mask.sum().item():,}")
+        print(f"    Actual ratio: {ratio:.4f}")
+        return data_new
+
     rng = np.random.RandomState(seed)
     data_new = deepcopy(data)
     mask = getattr(data_new, mask_name)

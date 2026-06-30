@@ -1,0 +1,80 @@
+# Config temporal — solo PGExplainer (re-run tras fix del bug return value)
+# Mismo setup que experiment_machineB.yaml pero con un solo explainer
+
+data:
+  root: "./data"
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
+    - name: "1:50"
+      illicit_to_licit: 0.02
+    - name: "1:100"
+      illicit_to_licit: 0.01
+
+models:
+  architectures:
+    - name: "GCN"
+      class: "src.models.gcn.GCN"
+    - name: "GraphSAGE"
+      class: "src.models.sage.GraphSAGE"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 256]
+    num_layers: [2, 3]
+    dropout: [0.1, 0.2, 0.3, 0.5]
+    learning_rate: [0.0001, 0.001, 0.01]
+    optuna_trials: 5
+    optuna_metric: "mcc"
+
+training:
+  epochs: 300
+  patience: 20
+  optimizer: "adam"
+  batch_size: null
+  seeds: [42]
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.25
+
+explainability:
+  methods:
+    - name: "PGExplainer"
+      epochs: 30
+      lr: 0.003
+      nan_abort_threshold: 2
+
+  nodes_per_class: 4
+
+stability:
+  num_replicas: 7
+  noise_levels: [0.01, 0.05, 0.10]
+  top_k_edges: 20
+  top_k_features: 20
+
+analysis:
+  quality_gate:
+    f1_min: 0.05
+    mcc_min: 0.02
+  thresholds:
+    f1_min: 0.80
+    mcc_min: 0.70
+    jaccard_min: 0.70
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"
+  experiment_name: "xai-gnn-stability-B"
+  results_dir: "./results_machineB"

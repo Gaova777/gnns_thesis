@@ -1,0 +1,93 @@
+# Experiment config — Machine C v3 (RTX 3050 Laptop, 4GB)
+# Pipeline dividido en dos scripts (train_matrix.py + explain_matrix.py).
+# Mismos fixes que v3-B. VRAM más ajustado → hidden_dim capado en 148.
+
+data:
+  root: "./dataset"
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
+    - name: "1:30_native"            # Weber 2019 baseline
+      illicit_to_licit: null
+    - name: "1:50"
+      illicit_to_licit: 0.02
+    - name: "1:100"
+      illicit_to_licit: 0.01
+
+models:
+  architectures:
+    - name: "GAT"
+      class: "src.models.gat.GAT"
+    - name: "TAGCN"
+      class: "src.models.tagcn.TAGCN"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 148]                # cap 148 (prior GAT), VRAM-friendly
+    num_layers: [2, 3]
+    dropout: [0.1, 0.5]
+    learning_rate: [0.0001, 0.01]
+    weight_decay: [0.00001, 0.001]
+    optuna_trials: 8                          # 12→8: GAT attention ~10s/epoch + hidden cap 148
+    optuna_metric: "pr_auc"
+    warm_start: true
+
+training:
+  epochs: 150                                 # 300→150 (GAT cap 148 hidden_dim, ~5s/epoch)
+  patience: 20
+  early_stop_metric: "f1"
+  optimizer: "adam"
+  batch_size: null
+  seeds: [42]
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.75
+
+explainability:
+  methods:
+    - name: "GNNExplainer"
+      epochs: 100
+      lr: 0.01
+    - name: "PGExplainer"
+      epochs: 100
+      lr: 0.001
+      nan_abort_threshold: 2
+    - name: "GNNShap"
+      num_samples: 25                         # GAT es 1.5× más lento
+
+  nodes_per_class: 3
+
+stability:
+  num_replicas: 5
+  noise_levels: [0.01, 0.05, 0.10]
+  top_k_edges: 20
+  top_k_features: 20
+
+analysis:
+  # Quality gate calibrado — post threshold-calibration (ver CLAUDE.md Pipeline v3).
+  quality_gate:
+    f1_min: 0.30
+    mcc_min: 0.15
+  thresholds:
+    f1_min: 0.80
+    mcc_min: 0.70
+    jaccard_min: 0.70
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"
+  experiment_name: "xai-gnn-stability-C-v3"
+  results_dir: "./results_v3"
+  models_dir: "./results_models_v3"

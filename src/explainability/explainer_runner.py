@@ -46,7 +46,20 @@ def create_explainer(
             ),
         )
     elif method == "PGExplainer":
-        algorithm = PGExplainer(epochs=epochs, lr=min(lr, 0.003))
+        # CRITICAL FIXES for PyG 2.7 PGExplainer defaults (methodological findings):
+        # 1. edge_size=0.05 (default) causes mode collapse (mask=0 everywhere).
+        #    Verified on Cora (balanced) and Elliptic. Fix: edge_size=0.005.
+        # 2. temp=[5.0, 2.0] (default) causes NaN explosions on large graphs with
+        #    extreme logits (Elliptic 234k edges + class_weighting magnitude).
+        #    Fix: temp=[1.0, 1.0] for numerical stability.
+        # See scripts/debug_pgexplainer_hyperparams.py for empirical evidence.
+        algorithm = PGExplainer(
+            epochs=epochs,
+            lr=min(lr, 0.003),
+            edge_size=0.005,    # default 0.05 → mode collapse
+            edge_ent=1.0,       # keep default entropy regularizer
+            temp=[1.0, 1.0],    # default [5.0, 2.0] → NaN overflow on large graphs
+        )
         explainer = Explainer(
             model=model,
             algorithm=algorithm,
@@ -104,57 +117,100 @@ def train_pgexplainer(
     explainer: Explainer,
     data: Data,
     device: str = "cpu",
-) -> None:
+) -> bool:
     """
     Train PGExplainer's parametric model on training nodes.
 
-    Must be called before generating explanations with PGExplainer.
+    Uses a rollback strategy: saves weights before each step and restores
+    them if the step produces NaN loss, preventing weight corruption cascades.
 
-    Args:
-        explainer: Explainer with PGExplainer algorithm.
-        data: PyG Data object.
-        device: Target device.
+    Returns True if training produced usable weights, False otherwise.
     """
     x = data.x.to(device)
     edge_index = data.edge_index.to(device)
-
-    # Get training node indices
     train_indices = torch.where(data.train_mask)[0]
-
-    # Move PGExplainer's internal MLP to the same device as the model
     explainer.algorithm.to(device)
 
-    # Get model predictions once — PGExplainer needs them as training target
-    with torch.no_grad():
-        out = explainer.model(x, edge_index)
+    # CRITICAL FIX — gradient clipping via monkey-patching the optimizer.
+    # PyG PGExplainer.train() has no hook for gradient clipping between .backward()
+    # and .step(). On large graphs (Elliptic 234k edges) with class_weighted logits,
+    # gradients explode → NaN loss. Wrap optimizer.step() to clip norm first.
+    _pg_optimizer = explainer.algorithm.optimizer
+    _orig_step = _pg_optimizer.step
 
-    # PGExplainer needs to be trained on examples first
-    loss = float("nan")
+    def _step_with_clip(*args, **kwargs):
+        torch.nn.utils.clip_grad_norm_(
+            explainer.algorithm.parameters(), max_norm=1.0
+        )
+        return _orig_step(*args, **kwargs)
+
+    _pg_optimizer.step = _step_with_clip
+
+    # PGExplainer loss = cross_entropy(y_hat, y).
+    # target must be class indices (long scalars), NOT raw logits.
+    target = data.y.to(device)
+
+    loss = 0.0
     nan_epochs = 0
+    valid_steps = 0
+
     for epoch in range(explainer.algorithm.epochs):
-        loss = 0.0
-        for idx in train_indices[:100]:  # Subsample for efficiency
+        # Save state once per epoch — rollback entire epoch on NaN (50 nodes × 100 epochs
+        # = only 100 snapshots max instead of 10,000 per-step snapshots).
+        epoch_state = None
+        try:
+            epoch_state = {k: v.clone() for k, v in explainer.algorithm.state_dict().items()}
+        except Exception:
+            pass  # LazyModule not yet initialized on first epoch
+
+        epoch_loss = 0.0
+        epoch_valid = 0
+        had_nan = False
+
+        for idx in train_indices[:50]:  # 100→50 nodes: faster, still representative
             step_loss = explainer.algorithm.train(
                 epoch, explainer.model, x, edge_index,
-                target=out,
+                target=target,
                 index=idx.item(),
             )
             if torch.is_tensor(step_loss):
                 step_loss = step_loss.item()
-            if not (step_loss == step_loss):  # NaN check
-                nan_epochs += 1
-                break
-            loss += step_loss
-        # Clip gradients to prevent divergence
-        if hasattr(explainer.algorithm, "_mlp"):
-            torch.nn.utils.clip_grad_norm_(
-                explainer.algorithm._mlp.parameters(), max_norm=1.0
-            )
+
+            if not (step_loss == step_loss):  # NaN
+                had_nan = True
+                break  # abort this epoch
+
+            epoch_loss += step_loss
+            epoch_valid += 1
+
+        if had_nan and epoch_state is not None:
+            explainer.algorithm.load_state_dict(epoch_state)  # rollback entire epoch
+            nan_epochs += 1
+        elif epoch_valid > 0:
+            loss += epoch_loss / epoch_valid
+            valid_steps += 1
+
+    # Final health check
+    has_nan_weights = any(
+        torch.isnan(p).any()
+        for p in explainer.algorithm.parameters()
+        if p is not None
+    )
+
+    if has_nan_weights:
+        print(f"  PGExplainer: weights contain NaN after training — unusable")
+        return False
+
+    total_epochs = nan_epochs + valid_steps
+    nan_pct = 100 * nan_epochs / max(total_epochs, 1)
+    avg_loss = loss / max(valid_steps, 1)
+
     if nan_epochs > 0:
-        print(f"  WARNING: PGExplainer loss was NaN in {nan_epochs} epochs "
-              f"— explanations may be unreliable (final loss: {loss})")
+        print(f"  PGExplainer: {nan_pct:.0f}% epochs rolled back due to NaN, "
+              f"loss={avg_loss:.4f} over {valid_steps} clean epochs — proceeding")
     else:
-        print(f"  PGExplainer training complete (final loss: {loss:.4f})")
+        print(f"  PGExplainer training complete (loss={avg_loss:.4f})")
+    return True
 
 
 def select_explanation_nodes(

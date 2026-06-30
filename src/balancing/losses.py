@@ -41,16 +41,24 @@ class FocalLoss(nn.Module):
     FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
 
     Args:
-        alpha: Weighting factor per class. Can be a float (applied to
-               positive class) or a tensor of per-class weights.
-        gamma: Focusing parameter. gamma=0 reduces to standard CE.
+        alpha: Weighting factor for the RARE (positive, class=1) class.
+               Must be in (0, 1). Values > 0.5 up-weight the rare class
+               (standard usage for imbalanced data). Can also be a tensor
+               of per-class weights [w_class0, w_class1] for full control.
+               Default 0.75 = rare class gets 3× the weight of majority.
+        gamma: Focusing parameter. gamma=0 reduces to weighted CE.
                Higher gamma = more focus on hard examples.
         reduction: 'mean', 'sum', or 'none'.
+
+    Note: Semantics change in v3 (2026-04). Previously alpha meant "class 1
+    weight" directly; that behavior mapped alpha=0.25 to DOWN-weighting
+    the rare class (reverse of what imbalanced data needs). Now alpha is
+    the weight for the rare class, matching intuition and literature.
     """
 
     def __init__(
         self,
-        alpha: float | torch.Tensor = 0.25,
+        alpha: float | torch.Tensor = 0.75,
         gamma: float = 2.0,
         reduction: str = "mean",
     ):
@@ -59,7 +67,7 @@ class FocalLoss(nn.Module):
         self.reduction = reduction
 
         if isinstance(alpha, (float, int)):
-            # For binary: alpha for class 1, (1-alpha) for class 0
+            # alpha = weight for rare class (class 1), (1-alpha) for majority (class 0)
             self.alpha = torch.tensor([1 - alpha, alpha])
         else:
             self.alpha = alpha
@@ -105,7 +113,7 @@ def get_loss_function(
     labels: torch.Tensor = None,
     mask: torch.Tensor = None,
     gamma: float = 2.0,
-    alpha: float = 0.25,
+    alpha: float = 0.75,
     device: str = "cpu",
 ) -> nn.Module:
     """

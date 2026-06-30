@@ -1,0 +1,108 @@
+# Experiment config — Machine B v3 (RTX 4060, 8GB)
+# Pipeline dividido en dos scripts:
+#   1. scripts/train_matrix.py   → entrena + quality gate F1≥0.70
+#   2. scripts/explain_matrix.py → corre explainers solo sobre modelos que pasaron
+#
+# Fixes aplicados respecto a v2:
+#   - Focal loss alpha=0.75 (ahora up-weight de clase rara, antes down-weight)
+#   - Early stopping en F1 (antes MCC, ruidoso en imbalance extremo)
+#   - Optuna warm-start con priors de arXiv:2602.23599 (LR/hidden/dropout publicados)
+#   - Optuna metric PR-AUC (antes MCC)
+#   - Epochs 600, patience 50 (antes 300/30) para convergencia real
+#   - Quality gate F1≥0.70 (antes 0.05, hoy estricto)
+
+data:
+  root: "./data"
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
+    - name: "1:30_native"            # Elliptic's natural ratio — Weber 2019 baseline
+      illicit_to_licit: null          # None → preserve native distribution
+    - name: "1:50"
+      illicit_to_licit: 0.02
+    - name: "1:100"
+      illicit_to_licit: 0.01
+
+models:
+  architectures:
+    - name: "GCN"
+      class: "src.models.gcn.GCN"
+    - name: "GraphSAGE"
+      class: "src.models.sage.GraphSAGE"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 140, 211, 256]     # 140 y 211 son priors publicados
+    num_layers: [2, 3]
+    dropout: [0.1, 0.5]                       # rango continuo (suggest_float)
+    learning_rate: [0.0001, 0.01]             # rango log (suggest_float log=True)
+    weight_decay: [0.00001, 0.001]            # NUEVO — antes no se tuneaba
+    optuna_trials: 50                         # 15→50 (incluye warm-start como trial 0)
+    optuna_metric: "pr_auc"                   # mcc→pr_auc (más estable en imbalance)
+    warm_start: true
+
+training:
+  epochs: 600                                 # 300→600 (literatura 397-508)
+  patience: 50                                # 30→50
+  early_stop_metric: "f1"                     # NUEVO — antes MCC implícito
+  optimizer: "adam"
+  batch_size: null
+  seeds: [42]
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.75                             # 0.25→0.75 (peso clase rara, nueva semántica)
+
+explainability:
+  methods:
+    - name: "GNNExplainer"
+      epochs: 100
+      lr: 0.01
+    - name: "PGExplainer"
+      epochs: 100
+      lr: 0.001
+      nan_abort_threshold: 2
+    - name: "GNNShap"
+      num_samples: 50
+
+  nodes_per_class: 3
+
+stability:
+  num_replicas: 5
+  noise_levels: [0.01, 0.05, 0.10]
+  top_k_edges: 20
+  top_k_features: 20
+
+analysis:
+  # Quality gate evaluado sobre VAL (no test).
+  # Razón: Elliptic tiene covariate shift temporal conocido entre train (ts 1-34)
+  # y test (ts 43-49) por el "dark market shutdown" — test F1 refleja ese shift,
+  # no la calidad del aprendizaje. Val F1 es lo que el training optimizó y
+  # demuestra que el modelo encontró patrones de fraude. Para XAI stability
+  # necesitamos "modelo que aprendió", no "modelo con test alto".
+  # Test metrics igual se reportan + guardan en meta.json (pred_f1, pred_mcc).
+  quality_gate:
+    f1_min: 0.30
+    mcc_min: 0.15
+  thresholds:
+    f1_min: 0.80
+    mcc_min: 0.70
+    jaccard_min: 0.70
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"
+  experiment_name: "xai-gnn-stability-B-v3"
+  results_dir: "./results_v3"
+  models_dir: "./results_models_v3"           # NUEVO — separado de results

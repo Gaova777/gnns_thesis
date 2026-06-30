@@ -1,0 +1,94 @@
+# Experiment config — Machine B v2 (RTX 4060, 8GB)
+# Metodología revisada — todos los explainers funcionales, estimado ~4-5h
+#
+# Cambios respecto a v1:
+#   - optuna_trials: 5→15  (mejor cobertura, rescata escenarios difíciles)
+#   - training patience: 20→30  (más paciencia para imbalance extremo)
+#   - PGExplainer epochs: 30→100, lr: 0.003→0.001  (entrenamiento estable)
+#   - GNNShap num_samples: 25→50  (rankings más confiables)
+#   - nodes_per_class: 4→3  (reducción de tiempo)
+#   - num_replicas: 7→5  (estadísticamente válido, más rápido)
+#   - results_dir: ./results_machineB_v2  (CSV limpio desde cero)
+
+data:
+  root: "./data"
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  imbalance_ratios:
+    - name: "1:1"
+      illicit_to_licit: 1.0
+    - name: "1:10"
+      illicit_to_licit: 0.1
+    - name: "1:50"
+      illicit_to_licit: 0.02
+    - name: "1:100"
+      illicit_to_licit: 0.01
+
+models:
+  architectures:
+    - name: "GCN"
+      class: "src.models.gcn.GCN"
+    - name: "GraphSAGE"
+      class: "src.models.sage.GraphSAGE"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 256]
+    num_layers: [2, 3]
+    dropout: [0.1, 0.2, 0.3, 0.5]
+    learning_rate: [0.0001, 0.001, 0.01]
+    optuna_trials: 15       # 5→15: mejor cobertura para escenarios difíciles
+    optuna_metric: "mcc"
+
+training:
+  epochs: 300
+  patience: 30              # 20→30: más paciencia para 1:50 y 1:100
+  optimizer: "adam"
+  batch_size: null
+  seeds: [42]
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.25
+
+explainability:
+  methods:
+    - name: "GNNExplainer"
+      epochs: 100
+      lr: 0.01
+    - name: "PGExplainer"
+      epochs: 100           # 30→100: entrenamiento real con rollback
+      lr: 0.001             # 0.003→0.001: más estable, menos NaN
+      nan_abort_threshold: 2
+    - name: "GNNShap"
+      num_samples: 50       # 25→50: rankings más confiables
+
+  nodes_per_class: 3        # 4→3: ahorro de tiempo sin perder representatividad
+
+stability:
+  num_replicas: 5           # 7→5: válido estadísticamente, ~28% más rápido
+  noise_levels: [0.01, 0.05, 0.10]
+  top_k_edges: 20
+  top_k_features: 20
+
+analysis:
+  quality_gate:
+    f1_min: 0.05
+    mcc_min: 0.02
+  thresholds:
+    f1_min: 0.80
+    mcc_min: 0.70
+    jaccard_min: 0.70
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"
+  experiment_name: "xai-gnn-stability-B-v2"
+  results_dir: "./results_machineB_v2"   # directorio limpio

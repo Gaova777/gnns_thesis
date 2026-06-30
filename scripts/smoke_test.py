@@ -354,6 +354,131 @@ def main():
     except Exception as e:
         checks.fail("CSV schema", traceback.format_exc().splitlines()[-1])
 
+    # ── Check 11 (v3): FocalLoss up-weights rare class ────────────────────────
+    try:
+        from src.balancing.losses import FocalLoss
+        import torch.nn.functional as F
+
+        # With alpha=0.75 the rare class (label=1) should receive > majority weight.
+        fl = FocalLoss(alpha=0.75, gamma=2.0)
+        w0, w1 = fl.alpha[0].item(), fl.alpha[1].item()
+        if w1 > w0 and abs(w1 - 0.75) < 1e-6:
+            checks.ok("FocalLoss alpha semantics (v3)",
+                      f"alpha=0.75 → [w_majority={w0:.2f}, w_rare={w1:.2f}]  rare up-weighted")
+        else:
+            checks.fail("FocalLoss alpha semantics (v3)",
+                        f"Expected [0.25, 0.75], got [{w0:.2f}, {w1:.2f}]")
+    except Exception:
+        checks.fail("FocalLoss alpha semantics (v3)", traceback.format_exc().splitlines()[-1])
+
+    # ── Check 12 (v3): Optuna warm-start priors available ─────────────────────
+    try:
+        from src.training.hyperopt import get_warm_start_priors
+
+        required_keys = {"hidden_dim", "num_layers", "dropout", "lr", "weight_decay"}
+        missing = []
+        for arch in ("GCN", "GraphSAGE", "GAT", "TAGCN"):
+            prior = get_warm_start_priors(arch)
+            if not required_keys.issubset(prior):
+                missing.append(f"{arch}:{required_keys - set(prior)}")
+        if missing:
+            checks.fail("Warm-start priors (v3)", f"Missing keys: {missing}")
+        else:
+            checks.ok("Warm-start priors (v3)",
+                      "GCN/GraphSAGE/GAT/TAGCN all have literature priors")
+    except Exception:
+        checks.fail("Warm-start priors (v3)", traceback.format_exc().splitlines()[-1])
+
+    # ── Check 13 (v3): Trainer.evaluate() returns pr_auc ──────────────────────
+    if pred_metrics is not None:
+        if "pr_auc" in pred_metrics:
+            checks.ok("Trainer PR-AUC metric (v3)",
+                      f"test_metrics.pr_auc={pred_metrics['pr_auc']:.4f}")
+        else:
+            checks.fail("Trainer PR-AUC metric (v3)",
+                        f"pr_auc missing from test_metrics: {list(pred_metrics.keys())}")
+    else:
+        checks.fail("Trainer PR-AUC metric (v3)", "Skipped — training did not run")
+
+    # ── Check 15 (v3): Threshold calibration ──────────────────────────────────
+    if model is not None:
+        try:
+            from src.training.trainer import Trainer
+            from src.balancing.losses import get_loss_function
+
+            # Reuse trainer from Check 5 — model is already trained.
+            loss_fn_local = get_loss_function(SMOKE_BALANCE, data.y, data.train_mask,
+                                              device=device)
+            opt_local = torch.optim.Adam(model.parameters(), lr=0.001)
+            t_trainer = Trainer(model, loss_fn_local, opt_local, device,
+                                patience=5, disable_checkpointing=True)
+            calib = t_trainer.calibrate_threshold(data, mask_name="val_mask")
+            t, f1_calib = calib["threshold"], calib["f1"]
+            argmax_eval = t_trainer.evaluate(data, mask_name="val_mask")
+            f1_argmax = argmax_eval["f1"]
+
+            # Threshold must be in (0, 1) exclusive, and calibrated F1 >= argmax F1
+            # (or at least not worse — sweep includes something close to 0.5).
+            in_range = 0.0 < t < 1.0
+            not_worse = f1_calib >= f1_argmax - 1e-6
+            if in_range and not_worse:
+                checks.ok("Threshold calibration (v3)",
+                          f"t={t:.2f} F1_calib={f1_calib:.4f} >= F1_argmax={f1_argmax:.4f}")
+            else:
+                checks.fail("Threshold calibration (v3)",
+                            f"in_range={in_range}, t={t:.2f}, "
+                            f"F1_calib={f1_calib:.4f} vs F1_argmax={f1_argmax:.4f}")
+        except Exception:
+            checks.fail("Threshold calibration (v3)",
+                        traceback.format_exc().splitlines()[-1])
+    else:
+        checks.fail("Threshold calibration (v3)", "Skipped — model unavailable")
+
+    # ── Check 14 (v3): train_matrix metadata JSON schema ──────────────────────
+    try:
+        import json
+
+        meta_template = {
+            "run_id": f"{SMOKE_SCENARIO}_{SMOKE_ARCH}_{SMOKE_BALANCE}",
+            "scenario": SMOKE_SCENARIO, "imbalance_ratio": SMOKE_RATIO,
+            "architecture": SMOKE_ARCH, "balancing": SMOKE_BALANCE,
+            "seed": 42,
+            "best_params": {"hidden_dim": 64, "num_layers": 2, "dropout": 0.3,
+                            "lr": 0.001, "weight_decay": 5e-4},
+            "optuna_best_score": 0.5, "optuna_metric": "pr_auc",
+            "early_stop_metric": "f1", "best_epoch": 1,
+            "best_val_score": 0.1, "best_val_mcc": 0.05,
+            "test_metrics": {"f1": 0.25, "mcc": 0.18, "pr_auc": 0.1, "loss": 0.5},
+            "test_metrics_argmax": {"f1": 0.07, "mcc": 0.05, "pr_auc": 0.1, "loss": 0.5},
+            "calibrated_threshold": 0.82,
+            "val_f1_at_threshold": 0.38,
+            "quality_passed": False,
+            "quality_gate": {"f1_min": 0.30, "mcc_min": 0.15},
+            "mlflow_run_id": None,
+            "checkpoint": "smoke_best.pt",
+            "config_path": args.config,
+        }
+        tmp_dir = Path(SMOKE_RESULTS_DIR) / "meta_test"
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        tmp_path = tmp_dir / "smoke_meta.json"
+        with open(tmp_path, "w") as f:
+            json.dump(meta_template, f, indent=2)
+        with open(tmp_path) as f:
+            loaded = json.load(f)
+        required = {
+            "run_id", "scenario", "imbalance_ratio", "architecture", "balancing",
+            "best_params", "test_metrics", "test_metrics_argmax",
+            "calibrated_threshold", "quality_passed", "checkpoint",
+        }
+        if required.issubset(loaded):
+            checks.ok("Metadata JSON schema (v3)",
+                      f"All required keys present: {sorted(required)}")
+        else:
+            checks.fail("Metadata JSON schema (v3)",
+                        f"Missing: {required - set(loaded)}")
+    except Exception:
+        checks.fail("Metadata JSON schema (v3)", traceback.format_exc().splitlines()[-1])
+
     # ── Summary ───────────────────────────────────────────────────────────────
     elapsed = time.time() - start
     print(f"\nElapsed: {elapsed:.1f}s ({elapsed/60:.1f} min)")

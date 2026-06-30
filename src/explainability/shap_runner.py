@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from torch_geometric.data import Data
+from torch_geometric.utils import k_hop_subgraph
 from typing import Optional
 
 
@@ -22,13 +23,15 @@ def compute_shap_values_permutation(
     device: str = "cpu",
     seed: int = 42,
     _oom_retry: bool = False,
+    num_hops: int = 3,
 ) -> np.ndarray:
     """
     Compute approximate SHAP values for a node using permutation sampling.
 
-    This is a fallback implementation when GNNShap is not available.
-    Uses feature masking (setting features to their mean values) to
-    estimate marginal contributions.
+    Uses the k-hop subgraph of the target node instead of the full graph,
+    which is semantically correct (a k-layer GNN can only receive information
+    from k-hop neighbors) and reduces forward-pass cost by >1000× on large
+    graphs like Elliptic.
 
     On CUDA OOM the function automatically clears the cache, halves
     num_samples, and retries once.  A second OOM raises RuntimeError so
@@ -41,6 +44,7 @@ def compute_shap_values_permutation(
         num_samples: Number of permutation samples.
         device: Target device.
         seed: Random seed.
+        num_hops: k-hop neighborhood depth (should match model depth).
 
     Returns:
         SHAP values array of shape [num_features].
@@ -48,51 +52,47 @@ def compute_shap_values_permutation(
     rng = np.random.RandomState(seed)
     model.eval()
 
-    x = data.x.to(device)
-    edge_index = data.edge_index.to(device)
-    num_features = x.shape[1]
+    # Extract k-hop subgraph — semantically correct for a k-layer GNN
+    subset, sub_edge_index, mapping, _ = k_hop_subgraph(
+        node_idx, num_hops, data.edge_index,
+        relabel_nodes=True, num_nodes=data.x.shape[0],
+    )
+    x_sub = data.x[subset].to(device)
+    sub_edge_index = sub_edge_index.to(device)
 
-    # Baseline: mean feature values (from all nodes)
-    baseline = x.mean(dim=0)
+    # Local index of node_idx within the subgraph
+    local_idx = mapping.item() if hasattr(mapping, "item") else int(mapping)
 
-    # Get original prediction probability for illicit class
-    with torch.no_grad():
-        original_pred = torch.softmax(model(x, edge_index), dim=-1)[node_idx, 1].item()
+    num_features = x_sub.shape[1]
+    baseline = x_sub.mean(dim=0)
 
     shap_values = np.zeros(num_features)
 
     try:
         for _ in range(num_samples):
-            # Random permutation of features
             perm = rng.permutation(num_features)
 
-            # Incrementally add features and measure marginal contribution
-            x_masked = x.clone()
-            x_masked[node_idx] = baseline.clone()
+            x_masked = x_sub.clone()
+            x_masked[local_idx] = baseline.clone()
 
-            for i, feat_idx in enumerate(perm):
-                # Prediction WITHOUT this feature
+            for feat_idx in perm:
                 with torch.no_grad():
                     pred_without = torch.softmax(
-                        model(x_masked, edge_index), dim=-1
-                    )[node_idx, 1].item()
+                        model(x_masked, sub_edge_index), dim=-1
+                    )[local_idx, 1].item()
 
-                # Add feature back
-                x_masked[node_idx, feat_idx] = x[node_idx, feat_idx]
+                x_masked[local_idx, feat_idx] = x_sub[local_idx, feat_idx]
 
-                # Prediction WITH this feature
                 with torch.no_grad():
                     pred_with = torch.softmax(
-                        model(x_masked, edge_index), dim=-1
-                    )[node_idx, 1].item()
+                        model(x_masked, sub_edge_index), dim=-1
+                    )[local_idx, 1].item()
 
-                # Marginal contribution
                 shap_values[feat_idx] += (pred_with - pred_without)
 
     except torch.cuda.OutOfMemoryError:
         torch.cuda.empty_cache()
         if _oom_retry:
-            # Second OOM — give up on this replica
             raise RuntimeError(
                 f"SHAP OOM (node {node_idx}): failed even after halving samples to {num_samples}"
             )
@@ -104,12 +104,10 @@ def compute_shap_values_permutation(
         return compute_shap_values_permutation(
             model, data, node_idx,
             num_samples=reduced, device=device, seed=seed,
-            _oom_retry=True,
+            _oom_retry=True, num_hops=num_hops,
         )
 
-    # Average over samples
     shap_values /= num_samples
-
     return shap_values
 
 

@@ -6,16 +6,67 @@ Tesis de maestría. Estudiamos la **estabilidad de métodos XAI** (GNNExplainer,
 aplicados a GNNs (GCN, GraphSAGE, GAT, TAGCN) entrenadas para detectar transacciones ilícitas
 en el dataset Elliptic, bajo distintos niveles de imbalance de clases (1:1, 1:10, 1:50, 1:100).
 
-## Estado actual (2026-04-11)
+## Estado actual (2026-04-14)
 
 Los experimentos corren distribuidos en **2 máquinas**. La 4090 quedó sin acceso.
 
-| Máquina | GPU | Architectures | Escenarios | Configs |
-|---------|-----|---------------|------------|---------|
-| **B** | RTX 4060 8GB | GCN, GraphSAGE | 1:1, 1:10, 1:50, 1:100 | `configs/experiment_machineB.yaml` |
-| **C** | RTX 3050 4GB | GAT, TAGCN | 1:1, 1:10, 1:50, 1:100 | `configs/experiment_machineC.yaml` |
+| Máquina | GPU | Architectures | Escenarios | Config v3 |
+|---------|-----|---------------|------------|-----------|
+| **B** | RTX 4060 8GB | GCN, GraphSAGE | 1:1, 1:10, 1:50, 1:100 | `configs/experiment_machineB_v3.yaml` |
+| **C** | RTX 3050 4GB | GAT, TAGCN | 1:1, 1:10, 1:50, 1:100 | `configs/experiment_machineC_v3.yaml` |
 
-**Machine C (3050) ya fue validada** — smoke test 10/10 PASS el 2026-04-11.
+## Pipeline v3 — dividido en dos scripts (2026-04-14)
+
+La v2 produjo modelos con F1 ~0.02-0.08 (literatura reporta 0.70-0.85). Se
+diagnosticaron tres bugs centrales y se dividió el pipeline en dos etapas
+para poder iterar sobre calidad del modelo independientemente de los explainers.
+
+### Bugs corregidos en src/ (no volver atrás)
+
+| Bug | Archivo | Fix |
+|-----|---------|-----|
+| FocalLoss alpha invertido (daba peso menor a la clase rara) | `src/balancing/losses.py` | alpha ahora = peso clase rara; default 0.75 |
+| Early stopping en MCC es ruidoso en imbalance extremo | `src/training/trainer.py` | Param `early_stop_metric` (default F1); evaluate ahora devuelve pr_auc |
+| Optuna sin prior de literatura, search space estrecho | `src/training/hyperopt.py` | `get_warm_start_priors()` con arXiv:2602.23599 + rango expandido |
+| Métrica Optuna MCC (no ideal para imbalance) | `src/training/hyperopt.py` | Default PR-AUC, métrica configurable |
+
+### Workflow v3 (reemplaza `run_full_pipeline.py`)
+
+**Paso 1 — entrenar matriz con calidad garantizada:**
+
+```bash
+uv run python scripts/train_matrix.py --config configs/experiment_machineB_v3.yaml --max-hours 9
+```
+
+- Corre Optuna con warm-start (prior literatura como trial 0) + 50 trials totales
+- Entrena final con `epochs=600`, `patience=50`, early-stop F1
+- Quality gate: F1 ≥ 0.70 y MCC ≥ 0.40 para marcar `quality_passed=True`
+- Produce `results_models_v3/{run_id}_best.pt` + `{run_id}_meta.json`
+- Retomable: `--resume` saltea configs con meta.json ya guardado
+
+**Paso 2 — explicar sólo modelos que aprendieron:**
+
+```bash
+uv run python scripts/explain_matrix.py --config configs/experiment_machineB_v3.yaml
+```
+
+- Lee `*_meta.json`, filtra por `quality_passed=True` (usar `--force` para ignorar)
+- Corre GNNExplainer + PGExplainer + GNNShap + estabilidad (5 réplicas)
+- Escribe `results_v3/xai-gnn-stability-B-v3.csv` + MLflow nested runs
+- Flags útiles: `--arch GCN`, `--scenario "1:1"`, `--balancing focal_loss`, `--explainer PGExplainer`
+
+### Validación pre-run v3
+
+```bash
+uv run python scripts/smoke_test.py --config configs/experiment_machineB_v3.yaml
+```
+
+Debe pasar 14/14 checks (10 originales + 4 nuevos: focal alpha, warm-start priors, pr_auc, metadata JSON).
+
+### Directorios
+
+- `results_models_v3/` — checkpoints + metadata JSON (nuevo, separado de `results/`)
+- `results_v3/` — CSV y MLflow artifacts del explain stage
 
 ## Lo que hay que hacer en Machine B (RTX 4060)
 
