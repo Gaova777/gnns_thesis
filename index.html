@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XAI Stability in GNNs — Plataforma Educativa</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <!-- Progress bar -->
+  <div id="progress-bar-container">
+    <div id="progress-bar-fill"></div>
+    <span id="progress-bar-text">0%</span>
+  </div>
+
+  <!-- Profile widget -->
+  <div id="profile-widget">
+    <button id="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
+      <span class="icon-sun">&#9728;</span>
+      <span class="icon-moon">&#9790;</span>
+    </button>
+    <span id="profile-name">Sin perfil</span>
+    <span id="profile-score"></span>
+    <button id="profile-btn" title="Perfil">&#9881;</button>
+  </div>
+
+  <!-- Mobile hamburger -->
+  <button id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div id="sidebar-header">
+      <h2>XAI &amp; GNNs</h2>
+      <p class="sidebar-subtitle">Tesis de Maestria</p>
+    </div>
+    <ul id="nav-list">
+      <li data-section="welcome" class="nav-item active">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-text">Bienvenida</span>
+      </li>
+      <li data-section="s01-graphs" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">01</span>
+        <span class="nav-text">Grafos</span>
+      </li>
+      <li data-section="s02-gnn-intro" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">02</span>
+        <span class="nav-text">GNNs</span>
+      </li>
+      <li data-section="s03-architectures" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">03</span>
+        <span class="nav-text">Arquitecturas</span>
+      </li>
+      <li data-section="s04-elliptic" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">04</span>
+        <span class="nav-text">Elliptic</span>
+      </li>
+      <li data-section="s05-imbalance" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">05</span>
+        <span class="nav-text">Imbalance</span>
+      </li>
+      <li data-section="s06-balancing" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">06</span>
+        <span class="nav-text">Balancing</span>
+      </li>
+      <li data-section="s07-explainability" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">07</span>
+        <span class="nav-text">XAI</span>
+      </li>
+      <li data-section="s08-stability" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">08</span>
+        <span class="nav-text">Estabilidad</span>
+      </li>
+      <li data-section="s09-methodology" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">09</span>
+        <span class="nav-text">Metodologia</span>
+      </li>
+      <li data-section="s10-results" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">10</span>
+        <span class="nav-text">Resultados</span>
+      </li>
+      <li data-section="s11-anteproyecto" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">11</span>
+        <span class="nav-text">Anteproyecto</span>
+      </li>
+      <li data-section="s12-analysis" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">12</span>
+        <span class="nav-text">Analisis</span>
+      </li>
+      <li data-section="s13-discussion" class="nav-item">
+        <span class="nav-check">&#10003;</span>
+        <span class="nav-num">13</span>
+        <span class="nav-text">Discusion</span>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <main id="content">
+    <div id="content-inner">
+    </div>
+  </main>
+
+  <!-- Profile modal -->
+  <div id="profile-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h2>Gestion de Perfil</h2>
+      <div id="profile-modal-body"></div>
+      <button class="modal-close" aria-label="Cerrar">&times;</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

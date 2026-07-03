@@ -78,6 +78,17 @@ Thumbs.db
 desktop.ini
 
 # ───────────────────────────────────────────────
+# Claude Code (local settings + runtime locks)
+# ───────────────────────────────────────────────
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# ───────────────────────────────────────────────
+# Nested / separate project (own git repo)
+# ───────────────────────────────────────────────
+web_learning/
+
+# ───────────────────────────────────────────────
 # Debug / temp files
 # ───────────────────────────────────────────────
 debug_output.txt
