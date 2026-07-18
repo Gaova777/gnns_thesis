@@ -22,9 +22,13 @@ except ImportError:
 # All rows always use these exact fieldnames; missing values are written as None.
 CSV_SCHEMA_FIELDS = [
     "timestamp", "scenario", "architecture", "balancing", "explainer", "seed",
-    "pred_loss", "pred_f1", "pred_mcc", "pred_pr_auc",
+    # AUDIT FIX (1b): these are the MODEL's global test metrics — renamed from
+    # pred_* so they are never mistaken for the explainer's or per-node metrics.
+    "model_test_loss", "model_test_f1", "model_test_mcc", "model_test_pr_auc",
     "stab_jaccard_mean", "stab_jaccard_std", "stab_spearman_mean",
-    "stab_shap_oom_retries", "stab_error", "stab_reason",
+    "stab_shap_oom_retries", "stab_n_tp", "stab_n_measurable",
+    "stab_subgraph_n_nodes", "stab_subgraph_n_edges",
+    "stab_error", "stab_reason",
 ]
 
 
@@ -176,7 +180,7 @@ class ExperimentTracker:
             "balancing": balancing,
             "explainer": explainer,
             "seed": seed,
-            **{f"pred_{k}": v for k, v in predictive_metrics.items()},
+            **{f"model_test_{k}": v for k, v in predictive_metrics.items()},
         }
 
         if stability_metrics:

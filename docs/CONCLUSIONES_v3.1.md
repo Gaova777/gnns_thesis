@@ -1,3 +1,9 @@
+> ⚠️ **REEMPLAZADO POR [`CONCLUSIONES_v3.2.md`](CONCLUSIONES_v3.2.md) (2026-07-15).** Los hallazgos
+> cuantitativos de este documento quedaron **invalidados** tras corregir los bugs de medición, resolver el
+> OOM de GAT y reescopar la explicación al receptive field (k-hop subgraph). En particular se **retractan**
+> el "tradeoff accuracy-estabilidad" y el "peak-collapse 1:50→1:100". Usar v3.2 para los números finales.
+> Este archivo se conserva solo como registro histórico.
+
 # Pipeline v3.1 — Conclusiones actualizadas post-investigación académica
 
 **Fecha de actualización**: 2026-04-21
@@ -92,11 +98,11 @@ return (eps.log() - (1 - eps).log() + logits) / temperature
 | Weber 2019 RF | Random Forest | 0.79 | — | Non-GNN baseline |
 | Pareja 2020 EvolveGCN | Temporal GCN | 0.89 | — | Native + temporal model |
 | Bellei 2024 Elliptic2 | SAGE+GAT | 0.93 | — | Subgraph classification |
-| arXiv:2602.23599 (2026) | GraphSAGE+norm | — | 0.85 | GraphNorm + Xavier init |
+| arXiv:2602.23599 (2026) | GCN/GAT/GraphSAGE | — | — | Init/norm (Xavier, GraphNorm); reporta AUPRC ~0.6, NO F1 0.85 |
 | **Nuestro mejor (GraphSAGE 1:10 focal)** | **GraphSAGE** | **0.045** | **0.53** | **Scenario 1:10 forzado** |
 | **Nuestro nativo 1:30 (en training)** | **esperado** | **~0.0-0.1** | **~0.55-0.65** | **Native — comparación Weber directa** |
 
-**Posición honesta**: nuestro F1 val en scenarios forzados (0.53) es consistente con vanilla GraphSAGE methodology. No beat SOTA (0.85+), ni lo pretendemos — nuestro foco es **estabilidad XAI**, no max F1.
+**Posición honesta**: nuestro F1 val en scenarios forzados (0.53) es consistente con vanilla GraphSAGE methodology. No beat SOTA temporal (Pareja 0.89 / Bellei 0.93), ni lo pretendemos — nuestro foco es **estabilidad XAI**, no max F1.
 
 ### XAI Stability
 
@@ -136,7 +142,7 @@ return (eps.log() - (1 - eps).log() + logits) / temperature
 
 9. **Mask-based balancing**: alineado con Zhao 2021 (GraphSMOTE), Tan 2021 (Boosting-GNN), arXiv:2304.04300 (survey 2023).
 10. **Quality gate sobre val**: alineado con Longa 2023 (temporal covariate shift documentado en Elliptic).
-11. **Warm-start priors**: arXiv:2602.23599 (2026) — metodology top-tier para inicialización Optuna.
+11. **Warm-start priors**: defaults informados por literatura (no de una corrida Optuna publicada). NOTA: arXiv:2602.23599 estudia init/normalización (Xavier, GraphNorm), no warm-start Optuna; su hallazgo (GraphSAGE mejor con Xavier) corrobora de forma independiente nuestro resultado de GraphSAGE.
 12. **Spearman range consistente**: 0.24-0.79 cae en rango esperado de Agarwal 2022 (0.30-0.80).
 
 ---

@@ -1,0 +1,805 @@
+diff --git a/configs/experiment_machineB_v3.yaml b/configs/experiment_machineB_v3.yaml
+index 0abbf76..c567558 100644
+--- a/configs/experiment_machineB_v3.yaml
++++ b/configs/experiment_machineB_v3.yaml
+@@ -75,7 +75,7 @@ explainability:
+     - name: "GNNShap"
+       num_samples: 50
+ 
+-  nodes_per_class: 3
++  nodes_per_class: 30    # AUDITORÍA: antes 3 (frágil); ~473 TP disponibles en val
+ 
+ stability:
+   num_replicas: 5
+diff --git a/configs/experiment_machineC_v3.yaml b/configs/experiment_machineC_v3.yaml
+index a67271a..b6584bf 100644
+--- a/configs/experiment_machineC_v3.yaml
++++ b/configs/experiment_machineC_v3.yaml
+@@ -66,7 +66,7 @@ explainability:
+     - name: "GNNShap"
+       num_samples: 25                         # GAT es 1.5× más lento
+ 
+-  nodes_per_class: 3
++  nodes_per_class: 30    # AUDITORÍA: antes 3 (frágil); ~473 TP disponibles en val
+ 
+ stability:
+   num_replicas: 5
+diff --git a/docs/CONCLUSIONES_v3.1.md b/docs/CONCLUSIONES_v3.1.md
+index e5647c3..557c2a7 100644
+--- a/docs/CONCLUSIONES_v3.1.md
++++ b/docs/CONCLUSIONES_v3.1.md
+@@ -92,11 +92,11 @@ return (eps.log() - (1 - eps).log() + logits) / temperature
+ | Weber 2019 RF | Random Forest | 0.79 | — | Non-GNN baseline |
+ | Pareja 2020 EvolveGCN | Temporal GCN | 0.89 | — | Native + temporal model |
+ | Bellei 2024 Elliptic2 | SAGE+GAT | 0.93 | — | Subgraph classification |
+-| arXiv:2602.23599 (2026) | GraphSAGE+norm | — | 0.85 | GraphNorm + Xavier init |
++| arXiv:2602.23599 (2026) | GCN/GAT/GraphSAGE | — | — | Init/norm (Xavier, GraphNorm); reporta AUPRC ~0.6, NO F1 0.85 |
+ | **Nuestro mejor (GraphSAGE 1:10 focal)** | **GraphSAGE** | **0.045** | **0.53** | **Scenario 1:10 forzado** |
+ | **Nuestro nativo 1:30 (en training)** | **esperado** | **~0.0-0.1** | **~0.55-0.65** | **Native — comparación Weber directa** |
+ 
+-**Posición honesta**: nuestro F1 val en scenarios forzados (0.53) es consistente con vanilla GraphSAGE methodology. No beat SOTA (0.85+), ni lo pretendemos — nuestro foco es **estabilidad XAI**, no max F1.
++**Posición honesta**: nuestro F1 val en scenarios forzados (0.53) es consistente con vanilla GraphSAGE methodology. No beat SOTA temporal (Pareja 0.89 / Bellei 0.93), ni lo pretendemos — nuestro foco es **estabilidad XAI**, no max F1.
+ 
+ ### XAI Stability
+ 
+@@ -136,7 +136,7 @@ return (eps.log() - (1 - eps).log() + logits) / temperature
+ 
+ 9. **Mask-based balancing**: alineado con Zhao 2021 (GraphSMOTE), Tan 2021 (Boosting-GNN), arXiv:2304.04300 (survey 2023).
+ 10. **Quality gate sobre val**: alineado con Longa 2023 (temporal covariate shift documentado en Elliptic).
+-11. **Warm-start priors**: arXiv:2602.23599 (2026) — metodology top-tier para inicialización Optuna.
++11. **Warm-start priors**: defaults informados por literatura (no de una corrida Optuna publicada). NOTA: arXiv:2602.23599 estudia init/normalización (Xavier, GraphNorm), no warm-start Optuna; su hallazgo (GraphSAGE mejor con Xavier) corrobora de forma independiente nuestro resultado de GraphSAGE.
+ 12. **Spearman range consistente**: 0.24-0.79 cae en rango esperado de Agarwal 2022 (0.30-0.80).
+ 
+ ---
+diff --git a/scripts/add_native_figures.py b/scripts/add_native_figures.py
+index 845ffe7..cb63e6e 100644
+--- a/scripts/add_native_figures.py
++++ b/scripts/add_native_figures.py
+@@ -36,7 +36,8 @@ rows = []
+ for p in Path("results_v3").glob("*.csv"):
+     try:
+         rows.extend(list(csv.DictReader(open(p))))
+-    except: pass
++    except Exception as _e:  # AUDIT FIX (B6): no more silent swallowing
++        print(f"  WARN add_native_figures: {type(_e).__name__}: {_e}")
+ real = [r for r in rows if r.get("explainer") not in ("SKIPPED_QUALITY_GATE", "SKIPPED")]
+ # Dedupe
+ seen = set(); deduped = []
+@@ -87,7 +88,8 @@ for r in deduped:
+     if r["explainer"] != "GNNExplainer": continue
+     try:
+         by_scenario[r["scenario"]].append(float(r["stab_spearman_mean"]))
+-    except: pass
++    except Exception as _e:  # AUDIT FIX (B6): no more silent swallowing
++        print(f"  WARN add_native_figures: {type(_e).__name__}: {_e}")
+ 
+ # Order: 1:1 → 1:10 → 1:30_native → 1:50 → 1:100
+ order = ["1:1", "1:10", "1:30_native", "1:50", "1:100"]
+@@ -131,7 +133,8 @@ for r in native:
+     key = (r["architecture"], r["explainer"])
+     try:
+         data_matrix[r["architecture"]][r["explainer"]] = float(r["stab_spearman_mean"])
+-    except: pass
++    except Exception as _e:  # AUDIT FIX (B6): no more silent swallowing
++        print(f"  WARN add_native_figures: {type(_e).__name__}: {_e}")
+ 
+ archs_present = sorted(set(r["architecture"] for r in native))
+ explainers = ["GNNExplainer", "PGExplainer", "GNNShap"]
+diff --git a/scripts/explain_matrix.py b/scripts/explain_matrix.py
+index 86fe3dc..4fb4e5d 100644
+--- a/scripts/explain_matrix.py
++++ b/scripts/explain_matrix.py
+@@ -21,6 +21,7 @@ Usage:
+ """
+ 
+ import argparse
++import gc
+ import json
+ import signal
+ import sys
+@@ -40,7 +41,9 @@ from src.analysis.tracking import ExperimentTracker
+ from src.data.imbalance import create_imbalance_scenario
+ from src.data.loader import load_elliptic, print_dataset_stats
+ from src.data.preprocessing import preprocess
+-from src.explainability.explainer_runner import select_explanation_nodes
++from src.explainability.explainer_runner import (
++    select_explanation_nodes, full_graph_logits, SubgraphPredictionMismatch,
++)
+ from src.stability.metrics import compute_stability_metrics
+ from src.stability.stochastic_test import (
+     run_stochastic_replicas,
+@@ -117,6 +120,7 @@ def _completed_pairs_from_csv(tracker: ExperimentTracker) -> set[tuple[str, str]
+ 
+ def _run_one_explainer(
+     model, data, test_nodes, explainer_name, explainer_cfg, stability_cfg, device,
++    base_k=None, full_logits=None,
+ ) -> dict:
+     """Run one explainer over the test nodes and aggregate stability."""
+     ex_epochs = explainer_cfg.get("epochs", 200)
+@@ -127,7 +131,8 @@ def _run_one_explainer(
+     top_k_edges = stability_cfg.get("top_k_edges", 20)
+     top_k_features = stability_cfg.get("top_k_features", 20)
+ 
+-    agg = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0}
++    agg = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0,
++           "subgraph_mismatch": 0, "sub_n_nodes": [], "sub_n_edges": []}
+ 
+     if explainer_name == "PGExplainer":
+         batch_results = run_stochastic_test_batch(
+@@ -146,28 +151,59 @@ def _run_one_explainer(
+         node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}",
+                          leave=False, unit="node")
+         for node_idx in node_pbar:
+-            stoch = run_stochastic_replicas(
+-                model, data, node_idx, explainer_name,
+-                num_replicas=num_replicas, top_k_edges=top_k_edges, device=device,
+-                explainer_epochs=ex_epochs, explainer_lr=ex_lr,
+-                shap_samples=shap_samples,
+-            )
++            try:
++                stoch = run_stochastic_replicas(
++                    model, data, node_idx, explainer_name,
++                    num_replicas=num_replicas, top_k_edges=top_k_edges, device=device,
++                    explainer_epochs=ex_epochs, explainer_lr=ex_lr,
++                    shap_samples=shap_samples,
++                    base_k=base_k,
++                    full_logit=(full_logits[int(node_idx)] if full_logits is not None else None),
++                )
++            except SubgraphPredictionMismatch:
++                # auditor Condición 1: subgraph doesn't reproduce the prediction →
++                # skip this node; never write a false stability value.
++                agg["subgraph_mismatch"] += 1
++                if device != "cpu":
++                    torch.cuda.empty_cache()
++                continue
+             m = compute_stability_metrics(stoch, top_k_features=top_k_features)
+             if "jaccard" in m:
+                 agg["jaccard_means"].append(m["jaccard"]["mean"])
+             if "spearman" in m:
+                 agg["spearman_means"].append(m["spearman"]["mean"])
+             agg["shap_oom_retries"] += stoch.get("shap_oom_retries", 0)
++            if stoch.get("sub_n_nodes") is not None:
++                agg["sub_n_nodes"].append(stoch["sub_n_nodes"])
++                agg["sub_n_edges"].append(stoch["sub_n_edges"])
++            if device != "cpu":
++                torch.cuda.empty_cache()  # free GPU between nodes
+         node_pbar.close()
+ 
+     flat = {}
+-    if agg["jaccard_means"]:
+-        flat["jaccard_mean"] = float(np.mean(agg["jaccard_means"]))
+-        flat["jaccard_std"] = float(np.std(agg["jaccard_means"]))
+-    if agg["spearman_means"]:
+-        flat["spearman_mean"] = float(np.mean(agg["spearman_means"]))
++    # AUDIT FIX: drop NaN (insufficient-replica) nodes before aggregating, so one
++    # unmeasurable node doesn't poison the config mean, and a fully-unmeasurable
++    # config yields no key (empty in CSV) instead of a fake value. (x != x for NaN)
++    jm = [x for x in agg["jaccard_means"] if x == x]
++    if jm:
++        flat["jaccard_mean"] = float(np.mean(jm))
++        flat["jaccard_std"] = float(np.std(jm))
++    sm = [x for x in agg["spearman_means"] if x == x]
++    if sm:
++        flat["spearman_mean"] = float(np.mean(sm))
+     if agg["shap_oom_retries"] > 0:
+         flat["shap_oom_retries"] = agg["shap_oom_retries"]
++    # AUDIT FIX (B5): how many nodes/replica-sets actually produced ≥2 usable
++    # replicas — coverage, so a "mean" over 1 node isn't read like a mean over many.
++    flat["n_measurable"] = len(jm)
++    # Auditor: median receptive-field size for this cell (evidence that Elliptic
++    # illicit nodes have ~2-node neighbourhoods => edge-level stability isn't
++    # informative; feature-ranking Spearman is the primary stability metric).
++    if agg["sub_n_nodes"]:
++        flat["subgraph_n_nodes"] = float(np.median(agg["sub_n_nodes"]))
++        flat["subgraph_n_edges"] = float(np.median(agg["sub_n_edges"]))
++    if agg["subgraph_mismatch"] > 0:
++        flat["reason"] = f"subgraph_prediction_mismatch:{agg['subgraph_mismatch']}"
+     return flat
+ 
+ 
+@@ -325,9 +361,45 @@ def main():
+                 f"(argmax={tm_argmax.get('f1', float('nan')):.4f})"
+             )
+ 
+-        # Select test nodes
+-        selected = select_explanation_nodes(data, n_per_class=nodes_per_class, seed=seed)
++        # Select nodes to explain — condition on TRUE POSITIVES (audit fix).
++        # Framing is validation-based: the model discriminates on val
++        # (VAL PR-AUC ~0.34) but collapses on test (temporal shift), so we explain
++        # illicit nodes it classifies correctly on VALIDATION. threshold=None
++        # (argmax): the test-calibrated threshold (~0.87) is too conservative for
++        # val and would starve TP coverage.
++        selected = select_explanation_nodes(
++            data,
++            n_per_class=nodes_per_class,
++            seed=seed,
++            model=model,
++            threshold=None,
++            only_correct=True,
++            device=device,
++            mask_name="val_mask",
++        )
+         test_nodes = selected["illicit"][:nodes_per_class]
++        n_tp = selected["coverage"]["illicit_selected"]
++
++        # No true positives => stability is not measurable. Record it honestly and
++        # skip; never measure the "stability" of wrong predictions.
++        if n_tp == 0:
++            tqdm.write(f"  SKIP stability {run_id}: 0 true-positive illicit nodes on val.")
++            tracker.log_run(
++                scenario=meta["scenario"], architecture=meta["architecture"],
++                balancing=meta["balancing"], explainer="SKIPPED_NO_TP",
++                seed=seed, predictive_metrics=meta["test_metrics"],
++                stability_metrics={"reason": "no_true_positives", "n_tp": 0},
++            )
++            continue
++
++        # k-hop scope for GNNExplainer (auditor Opción A): receptive field per arch.
++        # GCN/GraphSAGE/GAT explain over num_layers hops; TAGCN over num_layers*K
++        # (each TAGConv aggregates 0..K hops per layer). build_receptive_subgraph
++        # adapts +hops when a degree-normalised model needs the boundary degree, and
++        # verifies the subgraph reproduces the full-graph prediction (Condición 1).
++        num_layers = bp.get("num_layers", 2)
++        base_k = num_layers * bp.get("K", 3) if arch == "TAGCN" else num_layers
++        full_logits = full_graph_logits(model, data, device="cpu")
+ 
+         # Open a parent run to host the nested explainer runs (explainer_run
+         # uses nested=True which requires an active parent).
+@@ -346,12 +418,23 @@ def main():
+                     continue
+ 
+                 with tracker.explainer_run(ex_name, params={"method": ex_name}):
++                    def _log(fm):
++                        # AUDIT FIX (B5): every row carries TP coverage — no silent NaN.
++                        fm.setdefault("n_tp", n_tp)
++                        tracker.log_stability(fm)
++                        tracker.log_run(
++                            scenario=meta["scenario"], architecture=meta["architecture"],
++                            balancing=meta["balancing"], explainer=ex_name,
++                            seed=seed, predictive_metrics=pred_metrics,
++                            stability_metrics=fm,
++                        )
+                     try:
+                         flat = _run_one_explainer(
+                             model, data, test_nodes, ex_name, ex_cfg,
+                             config.get("stability", {}), device,
++                            base_k=base_k, full_logits=full_logits,
+                         )
+-                        tracker.log_stability(flat)
++                        flat["n_tp"] = n_tp
+                         jmean = flat.get("jaccard_mean")
+                         tqdm.write(
+                             f"  {run_id} / {ex_name}: "
+@@ -359,21 +442,39 @@ def main():
+                             + (f", Spearman={flat['spearman_mean']:.4f}"
+                                if 'spearman_mean' in flat else "")
+                         )
+-                        tracker.log_run(
+-                            scenario=meta["scenario"], architecture=meta["architecture"],
+-                            balancing=meta["balancing"], explainer=ex_name,
+-                            seed=seed, predictive_metrics=pred_metrics,
+-                            stability_metrics=flat,
+-                        )
++                        _log(flat)
++                    except torch.cuda.OutOfMemoryError:
++                        # AUDIT FIX (B1/B3): OOM is NOT success. Free the GPU and retry
++                        # this cell on CPU so GAT gets evaluated completely; if CPU also
++                        # fails, record reason='cuda_oom' explicitly (never a silent NaN).
++                        torch.cuda.empty_cache(); gc.collect()
++                        tqdm.write(f"  OOM {run_id}/{ex_name} on GPU — retrying on CPU...")
++                        try:
++                            flat = _run_one_explainer(
++                                model.cpu(), data, test_nodes, ex_name, ex_cfg,
++                                config.get("stability", {}), "cpu",
++                                base_k=base_k, full_logits=full_logits,
++                            )
++                            flat["n_tp"] = n_tp
++                            flat["reason"] = "ran_on_cpu"
++                            tqdm.write(f"  {run_id}/{ex_name}: recovered on CPU"
++                                       + (f", Spearman={flat['spearman_mean']:.4f}"
++                                          if 'spearman_mean' in flat else ""))
++                            _log(flat)
++                        except Exception as exc2:
++                            tqdm.write(f"  CUDA_OOM {run_id}/{ex_name} (CPU retry failed): {exc2}")
++                            _log({"reason": "cuda_oom",
++                                  "error": "CUDA out of memory (CPU retry also failed)"})
++                        finally:
++                            model.to(device)
+                     except Exception as exc:
+-                        tqdm.write(f"  ERROR {run_id}/{ex_name}: {exc}")
+-                        tracker.log_stability({"error": str(exc)})
+-                        tracker.log_run(
+-                            scenario=meta["scenario"], architecture=meta["architecture"],
+-                            balancing=meta["balancing"], explainer=ex_name,
+-                            seed=seed, predictive_metrics=pred_metrics,
+-                            stability_metrics={"error": str(exc)},
+-                        )
++                        import traceback
++                        tqdm.write(f"  UNEXPECTED_ERROR {run_id}/{ex_name}:\n{traceback.format_exc()}")
++                        _log({"reason": "unexpected_error", "error": str(exc)})
++                    finally:
++                        # AUDIT FIX (B2): free GPU between explainers so memory doesn't
++                        # accumulate across cells (root cause of the GAT OOM cascade).
++                        torch.cuda.empty_cache(); gc.collect()
+ 
+     pbar.close()
+     print("\n" + "=" * 70)
+diff --git a/scripts/run_machineA.sh b/scripts/run_machineA.sh
+old mode 100755
+new mode 100644
+diff --git a/scripts/run_machineA_on_4060.sh b/scripts/run_machineA_on_4060.sh
+old mode 100755
+new mode 100644
+diff --git a/scripts/run_machineB.sh b/scripts/run_machineB.sh
+old mode 100755
+new mode 100644
+diff --git a/scripts/run_machineC.sh b/scripts/run_machineC.sh
+old mode 100755
+new mode 100644
+diff --git a/src/analysis/recommendation.py b/src/analysis/recommendation.py
+index 7110a6e..df3b7b8 100644
+--- a/src/analysis/recommendation.py
++++ b/src/analysis/recommendation.py
+@@ -43,14 +43,14 @@ def build_recommendation_matrix(
+     group_cols = ["scenario", "architecture", "balancing", "explainer"]
+ 
+     grouped = df.groupby(group_cols).agg(
+-        f1_mean=("pred_f1", "mean"),
+-        f1_std=("pred_f1", "std"),
+-        mcc_mean=("pred_mcc", "mean"),
+-        mcc_std=("pred_mcc", "std"),
++        f1_mean=("model_test_f1", "mean"),
++        f1_std=("model_test_f1", "std"),
++        mcc_mean=("model_test_mcc", "mean"),
++        mcc_std=("model_test_mcc", "std"),
+         jaccard_mean=("stab_jaccard_mean", "mean"),
+         jaccard_std=("stab_jaccard_mean", "std"),
+         spearman_mean=("stab_spearman_mean", "mean"),
+-        n_runs=("pred_f1", "count"),
++        n_runs=("model_test_f1", "count"),
+     ).reset_index()
+ 
+     # Filter by thresholds
+diff --git a/src/analysis/tracking.py b/src/analysis/tracking.py
+index 8187b6a..0a60258 100644
+--- a/src/analysis/tracking.py
++++ b/src/analysis/tracking.py
+@@ -22,9 +22,13 @@ except ImportError:
+ # All rows always use these exact fieldnames; missing values are written as None.
+ CSV_SCHEMA_FIELDS = [
+     "timestamp", "scenario", "architecture", "balancing", "explainer", "seed",
+-    "pred_loss", "pred_f1", "pred_mcc", "pred_pr_auc",
++    # AUDIT FIX (1b): these are the MODEL's global test metrics — renamed from
++    # pred_* so they are never mistaken for the explainer's or per-node metrics.
++    "model_test_loss", "model_test_f1", "model_test_mcc", "model_test_pr_auc",
+     "stab_jaccard_mean", "stab_jaccard_std", "stab_spearman_mean",
+-    "stab_shap_oom_retries", "stab_error", "stab_reason",
++    "stab_shap_oom_retries", "stab_n_tp", "stab_n_measurable",
++    "stab_subgraph_n_nodes", "stab_subgraph_n_edges",
++    "stab_error", "stab_reason",
+ ]
+ 
+ 
+@@ -176,7 +180,7 @@ class ExperimentTracker:
+             "balancing": balancing,
+             "explainer": explainer,
+             "seed": seed,
+-            **{f"pred_{k}": v for k, v in predictive_metrics.items()},
++            **{f"model_test_{k}": v for k, v in predictive_metrics.items()},
+         }
+ 
+         if stability_metrics:
+diff --git a/src/explainability/explainer_runner.py b/src/explainability/explainer_runner.py
+index ae3b78d..24b8f50 100644
+--- a/src/explainability/explainer_runner.py
++++ b/src/explainability/explainer_runner.py
+@@ -10,9 +10,64 @@ import torch.nn as nn
+ from torch_geometric.explain import Explainer, GNNExplainer, PGExplainer
+ from torch_geometric.explain import Explanation
+ from torch_geometric.data import Data
++from torch_geometric.utils import k_hop_subgraph
+ from typing import Optional
+ 
+ 
++class SubgraphPredictionMismatch(Exception):
++    """No k-hop subgraph reproduced the full-graph prediction for the node."""
++    pass
++
++
++@torch.no_grad()
++def full_graph_logits(model, data, device: str = "cpu"):
++    """Full-graph logits [N, C], computed once per cell for the k-hop assert.
++
++    Runs on CPU by default: a full-graph forward for attention models (GAT) can
++    OOM an 8 GB GPU. This is one forward per cell, not perf-critical.
++    """
++    model.eval()
++    orig = next(model.parameters()).device
++    model.to(device)
++    out = model(data.x.to(device), data.edge_index.to(device)).detach().cpu()
++    model.to(orig)
++    return out
++
++
++def build_receptive_subgraph(model, data, node_idx, base_k, device, full_logit,
++                             max_extra_hops: int = 3, atol: float = 1e-3,
++                             rtol: float = 1e-2):
++    """Extract the node's receptive-field subgraph and VERIFY it reproduces the
++    full-graph prediction (auditor Condición 1).
++
++    Uses an adaptive number of hops: starts at `base_k` (= num_layers, or
++    num_layers*K for TAGCN) and expands up to `+max_extra_hops` — GCN/TAGCN
++    normalise by degree, so boundary nodes need one extra hop for their degree to
++    be correct and the prediction to match. Returns
++    (sub_x, sub_edge_index, target_local, k_used). Raises
++    SubgraphPredictionMismatch if no k in range reproduces the prediction.
++    """
++    n = data.num_nodes
++    last_diff = float("nan")
++    for extra in range(max_extra_hops + 1):
++        k = base_k + extra
++        subset, sub_ei, mapping, _ = k_hop_subgraph(
++            int(node_idx), k, data.edge_index, relabel_nodes=True, num_nodes=n)
++        sub_x = data.x[subset].to(device)
++        sub_ei = sub_ei.to(device)
++        target_local = int(mapping[0])
++        model.eval()
++        with torch.no_grad():
++            sub_logit = model(sub_x, sub_ei)[target_local].detach().cpu()
++        last_diff = float((sub_logit - full_logit).abs().max())
++        if (sub_logit.argmax().item() == full_logit.argmax().item()
++                and torch.allclose(sub_logit, full_logit, atol=atol, rtol=rtol)):
++            return sub_x, sub_ei, target_local, k
++    raise SubgraphPredictionMismatch(
++        f"node {int(node_idx)}: no subgraph in k=[{base_k},{base_k + max_extra_hops}] "
++        f"matched the full-graph prediction (max|Δlogit|={last_diff:.4f})")
++
++
+ def create_explainer(
+     model: nn.Module,
+     method: str = "GNNExplainer",
+@@ -213,43 +268,113 @@ def train_pgexplainer(
+     return True
+ 
+ 
++@torch.no_grad()
++def _predicted_illicit_mask(model, data, threshold, device="cpu"):
++    """Boolean tensor [N], True where the model predicts illicit (class 1).
++
++    The full-graph forward runs on CPU: on small (8GB) GPUs shared with a display,
++    a full-graph forward for attention models (GAT) OOMs. This is one forward per
++    config and not perf-critical; the explainers keep using the GPU. `device` is
++    accepted for signature compatibility but the forward is forced onto CPU.
++    """
++    import torch.nn.functional as F
++    model.eval()
++    orig_dev = next(model.parameters()).device
++    model.to("cpu")
++    try:
++        out = model(data.x.cpu(), data.edge_index.cpu())
++    finally:
++        model.to(orig_dev)  # restore device for the (GPU) explainers
++    if threshold is None:
++        pred = out.argmax(dim=-1)
++    else:
++        probs = F.softmax(out, dim=-1)[:, 1]
++        pred = (probs >= threshold).long()
++    return pred == 1
++
++
+ def select_explanation_nodes(
+     data: Data,
+     n_per_class: int = 100,
+     mask_name: str = "test_mask",
+     seed: int = 42,
++    model=None,
++    threshold=None,
++    only_correct: bool = False,
++    device: str = "cpu",
+ ) -> dict:
+     """
+-    Select nodes to explain from the test set.
++    Select nodes to explain from the mask given by `mask_name`.
+ 
+-    Selects n_per_class illicit and n_per_class licit nodes.
++    AUDIT FIX (Corrección 1): optionally condition on TRUE POSITIVES. The original
++    version chose illicit nodes by ground-truth label only, so on a model that does
++    not discriminate it explained mostly wrong predictions, and the measured
++    "stability" was an artifact. With `only_correct=True` and a `model`, illicit
++    nodes are restricted to those the model predicts illicit (TP) and licit nodes
++    to true negatives (TN). Backward compatible: without `model`/`only_correct`
++    the behavior is identical to before.
+ 
+     Args:
+         data: PyG Data object.
+         n_per_class: Number of nodes per class.
+-        mask_name: Which mask to select from.
++        mask_name: Which mask to select from (default test_mask).
+         seed: Random seed.
++        model: (optional) trained model in eval mode. Required if only_correct.
++        threshold: (optional) decision threshold on P(y=1). If None, argmax.
++        only_correct: if True, restrict to correct predictions (needs `model`).
++        device: device for the forward pass.
+ 
+     Returns:
+-        Dict with "illicit" and "licit" node index lists.
++        Dict with "illicit", "licit", "all" (index lists) and "coverage"
++        (how many nodes were available vs. survived the filter, per class).
+     """
+     import numpy as np
+     rng = np.random.RandomState(seed)
+     mask = getattr(data, mask_name)
+ 
+-    illicit = torch.where(mask & (data.y == 1))[0].numpy()
+-    licit = torch.where(mask & (data.y == 0))[0].numpy()
++    illicit_true = mask & (data.y == 1)
++    licit_true = mask & (data.y == 0)
++
++    if only_correct:
++        if model is None:
++            raise ValueError("only_correct=True requires passing `model`.")
++        pred_illicit = _predicted_illicit_mask(model, data, threshold, device)
++        illicit_sel_mask = illicit_true & pred_illicit          # true positives
++        licit_sel_mask = licit_true & (~pred_illicit)           # true negatives
++    else:
++        illicit_sel_mask = illicit_true
++        licit_sel_mask = licit_true
++
++    illicit = torch.where(illicit_sel_mask)[0].numpy()
++    licit = torch.where(licit_sel_mask)[0].numpy()
+ 
+     n_illicit = min(n_per_class, len(illicit))
+     n_licit = min(n_per_class, len(licit))
+ 
+-    selected_illicit = rng.choice(illicit, size=n_illicit, replace=False).tolist()
+-    selected_licit = rng.choice(licit, size=n_licit, replace=False).tolist()
+-
+-    print(f"  Selected {n_illicit} illicit and {n_licit} licit nodes for explanation")
++    selected_illicit = (rng.choice(illicit, size=n_illicit, replace=False).tolist()
++                        if n_illicit > 0 else [])
++    selected_licit = (rng.choice(licit, size=n_licit, replace=False).tolist()
++                      if n_licit > 0 else [])
++
++    coverage = {
++        "illicit_available": int(illicit_true.sum()),
++        "illicit_after_filter": int(len(illicit)),
++        "illicit_selected": n_illicit,
++        "licit_available": int(licit_true.sum()),
++        "licit_after_filter": int(len(licit)),
++        "licit_selected": n_licit,
++        "only_correct": only_correct,
++    }
++    print(f"  Selected {n_illicit} illicit and {n_licit} licit nodes "
++          f"(only_correct={only_correct}; illicit TP pool={len(illicit)}/"
++          f"{int(illicit_true.sum())})")
++    if only_correct and n_illicit == 0:
++        print("  WARNING: 0 illicit true positives — model does not discriminate "
++              "in this config; stability not applicable here.")
+ 
+     return {
+         "illicit": selected_illicit,
+         "licit": selected_licit,
+         "all": selected_illicit + selected_licit,
++        "coverage": coverage,
+     }
+diff --git a/src/explainability/shap_runner.py b/src/explainability/shap_runner.py
+index 5fff2ad..59e6924 100644
+--- a/src/explainability/shap_runner.py
++++ b/src/explainability/shap_runner.py
+@@ -4,7 +4,7 @@ SHAP-based explanation runner for GNNs.
+ Integrates GNNShap (Akkas & Azad, WWW'24) for scalable, GPU-accelerated
+ Shapley value computation on graph neural networks.
+ 
+-Also provides SHAP Concentration metric (He et al., 2026).
++Also provides a SHAP Concentration metric.
+ """
+ 
+ import torch
+@@ -116,7 +116,7 @@ def compute_shap_concentration(
+     top_k: int = 10,
+ ) -> float:
+     """
+-    Compute SHAP Concentration metric (He et al., 2026).
++    Compute SHAP Concentration metric.
+ 
+     Measures how concentrated the SHAP attributions are in the top-k features.
+     High concentration = model relies on few features = easier to audit.
+diff --git a/src/models/tagcn.py b/src/models/tagcn.py
+index 1ad8cf9..406641c 100644
+--- a/src/models/tagcn.py
++++ b/src/models/tagcn.py
+@@ -1,9 +1,8 @@
+ """
+ Topology Adaptive Graph Convolutional Network (TAGCN) for node classification.
+ 
+-Based on Du et al. (2017). Uses learnable polynomial filters of order K
+-to capture multi-scale topological patterns in a single layer.
+-He et al. (2026) validated K=3 as optimal for the Elliptic dataset.
++Based on Du et al. (2017), arXiv:1710.10370. Uses learnable polynomial filters
++of order K to capture multi-scale topological patterns in a single layer.
+ """
+ 
+ import torch
+@@ -22,7 +21,7 @@ class TAGCN(nn.Module):
+         in_channels: Number of input features (166 for Elliptic).
+         hidden_channels: Hidden dimension size.
+         num_layers: Number of TAGCN layers (default: 2).
+-        K: Order of the polynomial filter (default: 3, per He et al.).
++        K: Order of the polynomial filter (default: 3, the standard TAGCN default).
+         dropout: Dropout rate (default: 0.3).
+         num_classes: Number of output classes (default: 2).
+     """
+diff --git a/src/stability/metrics.py b/src/stability/metrics.py
+index 5452762..f2f637c 100644
+--- a/src/stability/metrics.py
++++ b/src/stability/metrics.py
+@@ -45,7 +45,12 @@ def pairwise_jaccard(subgraphs: list) -> dict:
+         Dict with mean, std, min, max, and all pairwise values.
+     """
+     if len(subgraphs) < 2:
+-        return {"mean": 1.0, "std": 0.0, "min": 1.0, "max": 1.0, "values": [1.0]}
++        # AUDIT FIX: <2 usable replicas => stability is NOT measurable. Return NaN,
++        # never a spurious perfect 1.0. Downstream must treat NaN as "no medible".
++        nan = float("nan")
++        return {"mean": nan, "std": nan, "min": nan, "max": nan,
++                "values": [], "n_replicas": len(subgraphs),
++                "reason": "insufficient_replicas"}
+ 
+     jaccard_values = []
+     for a, b in combinations(range(len(subgraphs)), 2):
+@@ -112,7 +117,10 @@ def pairwise_spearman(
+         Dict with mean, std, min, max.
+     """
+     if len(rankings) < 2:
+-        return {"mean": 1.0, "std": 0.0, "min": 1.0, "max": 1.0}
++        # AUDIT FIX: <2 usable replicas => not measurable. NaN, not a fake 1.0.
++        nan = float("nan")
++        return {"mean": nan, "std": nan, "min": nan, "max": nan,
++                "n_replicas": len(rankings), "reason": "insufficient_replicas"}
+ 
+     spearman_values = []
+     for a, b in combinations(range(len(rankings)), 2):
+@@ -132,7 +140,7 @@ def shap_concentration(
+     top_k: int = 10,
+ ) -> float:
+     """
+-    SHAP Concentration metric (He et al., 2026).
++    SHAP Concentration metric.
+ 
+     Measures what fraction of total attribution is concentrated
+     in the top-k most important features.
+diff --git a/src/stability/stochastic_test.py b/src/stability/stochastic_test.py
+index f3a1401..977b6e3 100644
+--- a/src/stability/stochastic_test.py
++++ b/src/stability/stochastic_test.py
+@@ -11,7 +11,9 @@ import numpy as np
+ from torch_geometric.data import Data
+ from typing import Optional
+ 
+-from src.explainability.explainer_runner import create_explainer, explain_nodes, train_pgexplainer
++from src.explainability.explainer_runner import (
++    create_explainer, explain_nodes, train_pgexplainer, build_receptive_subgraph,
++)
+ from src.explainability.shap_runner import explain_node_shap
+ from src.explainability.extraction import extract_subgraph, extract_feature_ranking
+ 
+@@ -27,10 +29,18 @@ def run_stochastic_replicas(
+     explainer_epochs: int = 200,
+     explainer_lr: float = 0.01,
+     shap_samples: int = 100,
++    base_k: Optional[int] = None,
++    full_logit=None,
+ ) -> dict:
+     """
+     Run multiple explainer replicas with different seeds on the same node.
+ 
++    If `base_k` is given (GNNExplainer), the explanation is computed on the node's
++    receptive-field k-hop subgraph instead of the full graph (auditor Opción A):
++    the subgraph is built once (deterministic across replicas) and verified to
++    reproduce the full-graph prediction (`full_logit`). Raises
++    SubgraphPredictionMismatch if no subgraph in range matches.
++
+     Args:
+         model: Trained GNN model.
+         data: PyG Data object.
+@@ -54,6 +64,21 @@ def run_stochastic_replicas(
+     shap_values_list = []
+     shap_oom_retries = 0
+ 
++    # Build the receptive-field subgraph ONCE (deterministic across replicas).
++    # Raises SubgraphPredictionMismatch → handled by the caller (skips the node).
++    sub = None
++    sub_n_nodes = None
++    sub_n_edges = None
++    if method == "GNNExplainer" and base_k is not None:
++        sub_x, sub_ei, target_local, _k_used = build_receptive_subgraph(
++            model, data, node_idx, base_k, device, full_logit)
++        sub = (sub_x, sub_ei, target_local)
++        # Auditor (dispersión Elliptic): registrar el tamaño del receptive field —
++        # evidencia de que la estabilidad edge-level (Jaccard) no es informativa
++        # aquí (vecindarios de ~2 nodos), solo la del ranking de features (Spearman).
++        sub_n_nodes = int(sub_x.shape[0])
++        sub_n_edges = int(sub_ei.shape[1])
++
+     for replica in range(num_replicas):
+         seed = 42 + replica * 17  # Deterministic but varied seeds
+ 
+@@ -73,8 +98,12 @@ def run_stochastic_replicas(
+                     print(f"  PGExplainer ABORT: training failed (replica {replica})")
+                     continue
+ 
+-            explanations = explain_nodes(explainer, data, [node_idx], device)
+-            exp = explanations[0]
++            if sub is not None:
++                # explain on the receptive-field subgraph (auditor Opción A)
++                sub_x, sub_ei, target_local = sub
++                exp = explainer(sub_x, sub_ei, index=target_local)
++            else:
++                exp = explain_nodes(explainer, data, [node_idx], device)[0]
+ 
+             subgraph = extract_subgraph(exp, top_k=top_k_edges)
+             ranking = extract_feature_ranking(explanation=exp)
+@@ -82,6 +111,12 @@ def run_stochastic_replicas(
+             subgraphs.append(subgraph)
+             feature_rankings.append(ranking)
+ 
++            # AUDIT FIX: free the explainer's edge_mask between replicas so GPU
++            # memory doesn't accumulate across replicas.
++            del explainer, exp
++            if device != "cpu" and torch.cuda.is_available():
++                torch.cuda.empty_cache()
++
+         elif method == "GNNShap":
+             result = explain_node_shap(
+                 model, data, node_idx, num_samples=shap_samples,
+@@ -102,6 +137,8 @@ def run_stochastic_replicas(
+         "feature_rankings": feature_rankings,
+         "shap_values": shap_values_list if shap_values_list else None,
+         "shap_oom_retries": shap_oom_retries,
++        "sub_n_nodes": sub_n_nodes,
++        "sub_n_edges": sub_n_edges,
+     }
+ 
+ 
+diff --git a/src/training/hyperopt.py b/src/training/hyperopt.py
+index 3ac92e6..8b873da 100644
+--- a/src/training/hyperopt.py
++++ b/src/training/hyperopt.py
+@@ -5,8 +5,8 @@ Searches over hidden dimensions, layers, dropout, learning rate, and
+ weight decay for each GNN architecture. Default metric is PR-AUC (more
+ stable than MCC on imbalanced data); MCC and F1 are also supported.
+ 
+-Warm-start priors from arXiv:2602.23599 are enqueued as trial 0 so
+-Optuna always evaluates the literature-optimal config before random
++Warm-start priors (literature-informed default hyperparameters) are enqueued
++as trial 0 so Optuna always evaluates a sensible starting config before random
+ exploration.
+ """
+ 
+@@ -20,9 +20,9 @@ from src.training.trainer import Trainer, build_model
+ from src.balancing.losses import get_loss_function
+ 
+ 
+-# Warm-start hyperparameters from arXiv:2602.23599 (Feb 2026)
+-# "Normalisation and Initialisation Strategies for GNNs in Blockchain Anomaly Detection"
+-# Optimized via Optuna on the Elliptic Bitcoin dataset (F1 illicit ≥ 0.80).
++# Warm-start hyperparameters: literature-informed default starting points, enqueued
++# as Optuna's first trial (study.enqueue_trial). NOTE: these are reasonable defaults,
++# NOT taken from a specific published Optuna run — no specific F1 is attributed to them.
+ _WARM_START_PRIORS = {
+     "GCN": {
+         "hidden_dim": 211,
+@@ -60,10 +60,10 @@ _WARM_START_PRIORS = {
+ 
+ def get_warm_start_priors(arch_name: str) -> dict:
+     """
+-    Return literature-optimal hyperparameters for the given architecture.
++    Return literature-informed default hyperparameters for the given architecture.
+ 
+-    Source: arXiv:2602.23599. Intended to be enqueued as Optuna's first
+-    trial (study.enqueue_trial) so search is warm-started.
++    These are reasonable starting points (not a specific published result),
++    enqueued as Optuna's first trial (study.enqueue_trial) so search is warm-started.
+     """
+     if arch_name not in _WARM_START_PRIORS:
+         raise ValueError(

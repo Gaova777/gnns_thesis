@@ -66,7 +66,7 @@ explainability:
     - name: "GNNShap"
       num_samples: 25                         # GAT es 1.5× más lento
 
-  nodes_per_class: 3
+  nodes_per_class: 30    # AUDITORÍA: antes 3 (frágil); ~473 TP disponibles en val
 
 stability:
   num_replicas: 5

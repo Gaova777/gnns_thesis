@@ -4,7 +4,7 @@ SHAP-based explanation runner for GNNs.
 Integrates GNNShap (Akkas & Azad, WWW'24) for scalable, GPU-accelerated
 Shapley value computation on graph neural networks.
 
-Also provides SHAP Concentration metric (He et al., 2026).
+Also provides a SHAP Concentration metric.
 """
 
 import torch
@@ -116,7 +116,7 @@ def compute_shap_concentration(
     top_k: int = 10,
 ) -> float:
     """
-    Compute SHAP Concentration metric (He et al., 2026).
+    Compute SHAP Concentration metric.
 
     Measures how concentrated the SHAP attributions are in the top-k features.
     High concentration = model relies on few features = easier to audit.

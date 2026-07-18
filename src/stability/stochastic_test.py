@@ -11,7 +11,9 @@ import numpy as np
 from torch_geometric.data import Data
 from typing import Optional
 
-from src.explainability.explainer_runner import create_explainer, explain_nodes, train_pgexplainer
+from src.explainability.explainer_runner import (
+    create_explainer, explain_nodes, train_pgexplainer, build_receptive_subgraph,
+)
 from src.explainability.shap_runner import explain_node_shap
 from src.explainability.extraction import extract_subgraph, extract_feature_ranking
 
@@ -27,9 +29,17 @@ def run_stochastic_replicas(
     explainer_epochs: int = 200,
     explainer_lr: float = 0.01,
     shap_samples: int = 100,
+    base_k: Optional[int] = None,
+    full_logit=None,
 ) -> dict:
     """
     Run multiple explainer replicas with different seeds on the same node.
+
+    If `base_k` is given (GNNExplainer), the explanation is computed on the node's
+    receptive-field k-hop subgraph instead of the full graph (auditor Opción A):
+    the subgraph is built once (deterministic across replicas) and verified to
+    reproduce the full-graph prediction (`full_logit`). Raises
+    SubgraphPredictionMismatch if no subgraph in range matches.
 
     Args:
         model: Trained GNN model.
@@ -54,6 +64,21 @@ def run_stochastic_replicas(
     shap_values_list = []
     shap_oom_retries = 0
 
+    # Build the receptive-field subgraph ONCE (deterministic across replicas).
+    # Raises SubgraphPredictionMismatch → handled by the caller (skips the node).
+    sub = None
+    sub_n_nodes = None
+    sub_n_edges = None
+    if method == "GNNExplainer" and base_k is not None:
+        sub_x, sub_ei, target_local, _k_used = build_receptive_subgraph(
+            model, data, node_idx, base_k, device, full_logit)
+        sub = (sub_x, sub_ei, target_local)
+        # Auditor (dispersión Elliptic): registrar el tamaño del receptive field —
+        # evidencia de que la estabilidad edge-level (Jaccard) no es informativa
+        # aquí (vecindarios de ~2 nodos), solo la del ranking de features (Spearman).
+        sub_n_nodes = int(sub_x.shape[0])
+        sub_n_edges = int(sub_ei.shape[1])
+
     for replica in range(num_replicas):
         seed = 42 + replica * 17  # Deterministic but varied seeds
 
@@ -73,14 +98,24 @@ def run_stochastic_replicas(
                     print(f"  PGExplainer ABORT: training failed (replica {replica})")
                     continue
 
-            explanations = explain_nodes(explainer, data, [node_idx], device)
-            exp = explanations[0]
+            if sub is not None:
+                # explain on the receptive-field subgraph (auditor Opción A)
+                sub_x, sub_ei, target_local = sub
+                exp = explainer(sub_x, sub_ei, index=target_local)
+            else:
+                exp = explain_nodes(explainer, data, [node_idx], device)[0]
 
             subgraph = extract_subgraph(exp, top_k=top_k_edges)
             ranking = extract_feature_ranking(explanation=exp)
 
             subgraphs.append(subgraph)
             feature_rankings.append(ranking)
+
+            # AUDIT FIX: free the explainer's edge_mask between replicas so GPU
+            # memory doesn't accumulate across replicas.
+            del explainer, exp
+            if device != "cpu" and torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
         elif method == "GNNShap":
             result = explain_node_shap(
@@ -102,6 +137,8 @@ def run_stochastic_replicas(
         "feature_rankings": feature_rankings,
         "shap_values": shap_values_list if shap_values_list else None,
         "shap_oom_retries": shap_oom_retries,
+        "sub_n_nodes": sub_n_nodes,
+        "sub_n_edges": sub_n_edges,
     }
 
 

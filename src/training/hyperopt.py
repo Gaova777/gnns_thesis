@@ -5,8 +5,8 @@ Searches over hidden dimensions, layers, dropout, learning rate, and
 weight decay for each GNN architecture. Default metric is PR-AUC (more
 stable than MCC on imbalanced data); MCC and F1 are also supported.
 
-Warm-start priors from arXiv:2602.23599 are enqueued as trial 0 so
-Optuna always evaluates the literature-optimal config before random
+Warm-start priors (literature-informed default hyperparameters) are enqueued
+as trial 0 so Optuna always evaluates a sensible starting config before random
 exploration.
 """
 
@@ -20,9 +20,9 @@ from src.training.trainer import Trainer, build_model
 from src.balancing.losses import get_loss_function
 
 
-# Warm-start hyperparameters from arXiv:2602.23599 (Feb 2026)
-# "Normalisation and Initialisation Strategies for GNNs in Blockchain Anomaly Detection"
-# Optimized via Optuna on the Elliptic Bitcoin dataset (F1 illicit ≥ 0.80).
+# Warm-start hyperparameters: literature-informed default starting points, enqueued
+# as Optuna's first trial (study.enqueue_trial). NOTE: these are reasonable defaults,
+# NOT taken from a specific published Optuna run — no specific F1 is attributed to them.
 _WARM_START_PRIORS = {
     "GCN": {
         "hidden_dim": 211,
@@ -60,10 +60,10 @@ _WARM_START_PRIORS = {
 
 def get_warm_start_priors(arch_name: str) -> dict:
     """
-    Return literature-optimal hyperparameters for the given architecture.
+    Return literature-informed default hyperparameters for the given architecture.
 
-    Source: arXiv:2602.23599. Intended to be enqueued as Optuna's first
-    trial (study.enqueue_trial) so search is warm-started.
+    These are reasonable starting points (not a specific published result),
+    enqueued as Optuna's first trial (study.enqueue_trial) so search is warm-started.
     """
     if arch_name not in _WARM_START_PRIORS:
         raise ValueError(

@@ -21,6 +21,7 @@ Usage:
 """
 
 import argparse
+import gc
 import json
 import signal
 import sys
@@ -40,7 +41,9 @@ from src.analysis.tracking import ExperimentTracker
 from src.data.imbalance import create_imbalance_scenario
 from src.data.loader import load_elliptic, print_dataset_stats
 from src.data.preprocessing import preprocess
-from src.explainability.explainer_runner import select_explanation_nodes
+from src.explainability.explainer_runner import (
+    select_explanation_nodes, full_graph_logits, SubgraphPredictionMismatch,
+)
 from src.stability.metrics import compute_stability_metrics
 from src.stability.stochastic_test import (
     run_stochastic_replicas,
@@ -117,6 +120,7 @@ def _completed_pairs_from_csv(tracker: ExperimentTracker) -> set[tuple[str, str]
 
 def _run_one_explainer(
     model, data, test_nodes, explainer_name, explainer_cfg, stability_cfg, device,
+    base_k=None, full_logits=None,
 ) -> dict:
     """Run one explainer over the test nodes and aggregate stability."""
     ex_epochs = explainer_cfg.get("epochs", 200)
@@ -127,7 +131,8 @@ def _run_one_explainer(
     top_k_edges = stability_cfg.get("top_k_edges", 20)
     top_k_features = stability_cfg.get("top_k_features", 20)
 
-    agg = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0}
+    agg = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0,
+           "subgraph_mismatch": 0, "sub_n_nodes": [], "sub_n_edges": []}
 
     if explainer_name == "PGExplainer":
         batch_results = run_stochastic_test_batch(
@@ -146,28 +151,59 @@ def _run_one_explainer(
         node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}",
                          leave=False, unit="node")
         for node_idx in node_pbar:
-            stoch = run_stochastic_replicas(
-                model, data, node_idx, explainer_name,
-                num_replicas=num_replicas, top_k_edges=top_k_edges, device=device,
-                explainer_epochs=ex_epochs, explainer_lr=ex_lr,
-                shap_samples=shap_samples,
-            )
+            try:
+                stoch = run_stochastic_replicas(
+                    model, data, node_idx, explainer_name,
+                    num_replicas=num_replicas, top_k_edges=top_k_edges, device=device,
+                    explainer_epochs=ex_epochs, explainer_lr=ex_lr,
+                    shap_samples=shap_samples,
+                    base_k=base_k,
+                    full_logit=(full_logits[int(node_idx)] if full_logits is not None else None),
+                )
+            except SubgraphPredictionMismatch:
+                # auditor Condición 1: subgraph doesn't reproduce the prediction →
+                # skip this node; never write a false stability value.
+                agg["subgraph_mismatch"] += 1
+                if device != "cpu":
+                    torch.cuda.empty_cache()
+                continue
             m = compute_stability_metrics(stoch, top_k_features=top_k_features)
             if "jaccard" in m:
                 agg["jaccard_means"].append(m["jaccard"]["mean"])
             if "spearman" in m:
                 agg["spearman_means"].append(m["spearman"]["mean"])
             agg["shap_oom_retries"] += stoch.get("shap_oom_retries", 0)
+            if stoch.get("sub_n_nodes") is not None:
+                agg["sub_n_nodes"].append(stoch["sub_n_nodes"])
+                agg["sub_n_edges"].append(stoch["sub_n_edges"])
+            if device != "cpu":
+                torch.cuda.empty_cache()  # free GPU between nodes
         node_pbar.close()
 
     flat = {}
-    if agg["jaccard_means"]:
-        flat["jaccard_mean"] = float(np.mean(agg["jaccard_means"]))
-        flat["jaccard_std"] = float(np.std(agg["jaccard_means"]))
-    if agg["spearman_means"]:
-        flat["spearman_mean"] = float(np.mean(agg["spearman_means"]))
+    # AUDIT FIX: drop NaN (insufficient-replica) nodes before aggregating, so one
+    # unmeasurable node doesn't poison the config mean, and a fully-unmeasurable
+    # config yields no key (empty in CSV) instead of a fake value. (x != x for NaN)
+    jm = [x for x in agg["jaccard_means"] if x == x]
+    if jm:
+        flat["jaccard_mean"] = float(np.mean(jm))
+        flat["jaccard_std"] = float(np.std(jm))
+    sm = [x for x in agg["spearman_means"] if x == x]
+    if sm:
+        flat["spearman_mean"] = float(np.mean(sm))
     if agg["shap_oom_retries"] > 0:
         flat["shap_oom_retries"] = agg["shap_oom_retries"]
+    # AUDIT FIX (B5): how many nodes/replica-sets actually produced ≥2 usable
+    # replicas — coverage, so a "mean" over 1 node isn't read like a mean over many.
+    flat["n_measurable"] = len(jm)
+    # Auditor: median receptive-field size for this cell (evidence that Elliptic
+    # illicit nodes have ~2-node neighbourhoods => edge-level stability isn't
+    # informative; feature-ranking Spearman is the primary stability metric).
+    if agg["sub_n_nodes"]:
+        flat["subgraph_n_nodes"] = float(np.median(agg["sub_n_nodes"]))
+        flat["subgraph_n_edges"] = float(np.median(agg["sub_n_edges"]))
+    if agg["subgraph_mismatch"] > 0:
+        flat["reason"] = f"subgraph_prediction_mismatch:{agg['subgraph_mismatch']}"
     return flat
 
 
@@ -325,9 +361,45 @@ def main():
                 f"(argmax={tm_argmax.get('f1', float('nan')):.4f})"
             )
 
-        # Select test nodes
-        selected = select_explanation_nodes(data, n_per_class=nodes_per_class, seed=seed)
+        # Select nodes to explain — condition on TRUE POSITIVES (audit fix).
+        # Framing is validation-based: the model discriminates on val
+        # (VAL PR-AUC ~0.34) but collapses on test (temporal shift), so we explain
+        # illicit nodes it classifies correctly on VALIDATION. threshold=None
+        # (argmax): the test-calibrated threshold (~0.87) is too conservative for
+        # val and would starve TP coverage.
+        selected = select_explanation_nodes(
+            data,
+            n_per_class=nodes_per_class,
+            seed=seed,
+            model=model,
+            threshold=None,
+            only_correct=True,
+            device=device,
+            mask_name="val_mask",
+        )
         test_nodes = selected["illicit"][:nodes_per_class]
+        n_tp = selected["coverage"]["illicit_selected"]
+
+        # No true positives => stability is not measurable. Record it honestly and
+        # skip; never measure the "stability" of wrong predictions.
+        if n_tp == 0:
+            tqdm.write(f"  SKIP stability {run_id}: 0 true-positive illicit nodes on val.")
+            tracker.log_run(
+                scenario=meta["scenario"], architecture=meta["architecture"],
+                balancing=meta["balancing"], explainer="SKIPPED_NO_TP",
+                seed=seed, predictive_metrics=meta["test_metrics"],
+                stability_metrics={"reason": "no_true_positives", "n_tp": 0},
+            )
+            continue
+
+        # k-hop scope for GNNExplainer (auditor Opción A): receptive field per arch.
+        # GCN/GraphSAGE/GAT explain over num_layers hops; TAGCN over num_layers*K
+        # (each TAGConv aggregates 0..K hops per layer). build_receptive_subgraph
+        # adapts +hops when a degree-normalised model needs the boundary degree, and
+        # verifies the subgraph reproduces the full-graph prediction (Condición 1).
+        num_layers = bp.get("num_layers", 2)
+        base_k = num_layers * bp.get("K", 3) if arch == "TAGCN" else num_layers
+        full_logits = full_graph_logits(model, data, device="cpu")
 
         # Open a parent run to host the nested explainer runs (explainer_run
         # uses nested=True which requires an active parent).
@@ -346,12 +418,23 @@ def main():
                     continue
 
                 with tracker.explainer_run(ex_name, params={"method": ex_name}):
+                    def _log(fm):
+                        # AUDIT FIX (B5): every row carries TP coverage — no silent NaN.
+                        fm.setdefault("n_tp", n_tp)
+                        tracker.log_stability(fm)
+                        tracker.log_run(
+                            scenario=meta["scenario"], architecture=meta["architecture"],
+                            balancing=meta["balancing"], explainer=ex_name,
+                            seed=seed, predictive_metrics=pred_metrics,
+                            stability_metrics=fm,
+                        )
                     try:
                         flat = _run_one_explainer(
                             model, data, test_nodes, ex_name, ex_cfg,
                             config.get("stability", {}), device,
+                            base_k=base_k, full_logits=full_logits,
                         )
-                        tracker.log_stability(flat)
+                        flat["n_tp"] = n_tp
                         jmean = flat.get("jaccard_mean")
                         tqdm.write(
                             f"  {run_id} / {ex_name}: "
@@ -359,21 +442,39 @@ def main():
                             + (f", Spearman={flat['spearman_mean']:.4f}"
                                if 'spearman_mean' in flat else "")
                         )
-                        tracker.log_run(
-                            scenario=meta["scenario"], architecture=meta["architecture"],
-                            balancing=meta["balancing"], explainer=ex_name,
-                            seed=seed, predictive_metrics=pred_metrics,
-                            stability_metrics=flat,
-                        )
+                        _log(flat)
+                    except torch.cuda.OutOfMemoryError:
+                        # AUDIT FIX (B1/B3): OOM is NOT success. Free the GPU and retry
+                        # this cell on CPU so GAT gets evaluated completely; if CPU also
+                        # fails, record reason='cuda_oom' explicitly (never a silent NaN).
+                        torch.cuda.empty_cache(); gc.collect()
+                        tqdm.write(f"  OOM {run_id}/{ex_name} on GPU — retrying on CPU...")
+                        try:
+                            flat = _run_one_explainer(
+                                model.cpu(), data, test_nodes, ex_name, ex_cfg,
+                                config.get("stability", {}), "cpu",
+                                base_k=base_k, full_logits=full_logits,
+                            )
+                            flat["n_tp"] = n_tp
+                            flat["reason"] = "ran_on_cpu"
+                            tqdm.write(f"  {run_id}/{ex_name}: recovered on CPU"
+                                       + (f", Spearman={flat['spearman_mean']:.4f}"
+                                          if 'spearman_mean' in flat else ""))
+                            _log(flat)
+                        except Exception as exc2:
+                            tqdm.write(f"  CUDA_OOM {run_id}/{ex_name} (CPU retry failed): {exc2}")
+                            _log({"reason": "cuda_oom",
+                                  "error": "CUDA out of memory (CPU retry also failed)"})
+                        finally:
+                            model.to(device)
                     except Exception as exc:
-                        tqdm.write(f"  ERROR {run_id}/{ex_name}: {exc}")
-                        tracker.log_stability({"error": str(exc)})
-                        tracker.log_run(
-                            scenario=meta["scenario"], architecture=meta["architecture"],
-                            balancing=meta["balancing"], explainer=ex_name,
-                            seed=seed, predictive_metrics=pred_metrics,
-                            stability_metrics={"error": str(exc)},
-                        )
+                        import traceback
+                        tqdm.write(f"  UNEXPECTED_ERROR {run_id}/{ex_name}:\n{traceback.format_exc()}")
+                        _log({"reason": "unexpected_error", "error": str(exc)})
+                    finally:
+                        # AUDIT FIX (B2): free GPU between explainers so memory doesn't
+                        # accumulate across cells (root cause of the GAT OOM cascade).
+                        torch.cuda.empty_cache(); gc.collect()
 
     pbar.close()
     print("\n" + "=" * 70)

@@ -1,9 +1,8 @@
 """
 Topology Adaptive Graph Convolutional Network (TAGCN) for node classification.
 
-Based on Du et al. (2017). Uses learnable polynomial filters of order K
-to capture multi-scale topological patterns in a single layer.
-He et al. (2026) validated K=3 as optimal for the Elliptic dataset.
+Based on Du et al. (2017), arXiv:1710.10370. Uses learnable polynomial filters
+of order K to capture multi-scale topological patterns in a single layer.
 """
 
 import torch
@@ -22,7 +21,7 @@ class TAGCN(nn.Module):
         in_channels: Number of input features (166 for Elliptic).
         hidden_channels: Hidden dimension size.
         num_layers: Number of TAGCN layers (default: 2).
-        K: Order of the polynomial filter (default: 3, per He et al.).
+        K: Order of the polynomial filter (default: 3, the standard TAGCN default).
         dropout: Dropout rate (default: 0.3).
         num_classes: Number of output classes (default: 2).
     """

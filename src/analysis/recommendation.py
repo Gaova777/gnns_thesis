@@ -43,14 +43,14 @@ def build_recommendation_matrix(
     group_cols = ["scenario", "architecture", "balancing", "explainer"]
 
     grouped = df.groupby(group_cols).agg(
-        f1_mean=("pred_f1", "mean"),
-        f1_std=("pred_f1", "std"),
-        mcc_mean=("pred_mcc", "mean"),
-        mcc_std=("pred_mcc", "std"),
+        f1_mean=("model_test_f1", "mean"),
+        f1_std=("model_test_f1", "std"),
+        mcc_mean=("model_test_mcc", "mean"),
+        mcc_std=("model_test_mcc", "std"),
         jaccard_mean=("stab_jaccard_mean", "mean"),
         jaccard_std=("stab_jaccard_mean", "std"),
         spearman_mean=("stab_spearman_mean", "mean"),
-        n_runs=("pred_f1", "count"),
+        n_runs=("model_test_f1", "count"),
     ).reset_index()
 
     # Filter by thresholds

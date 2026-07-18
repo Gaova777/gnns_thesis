@@ -52,6 +52,7 @@ logs/
 *.jsonl
 *.pptx
 *.pdf
+*.zip
 overleaf_thesis/
 
 # ───────────────────────────────────────────────
@@ -96,3 +97,9 @@ debug_utf8.txt
 err.log
 err_utf8.txt
 *.tmp
+
+# ───────────────────────────────────────────────
+# Personal / operativo (NO es la tesis — contiene IP de Tailscale + hostname
+# para acceso remoto a la máquina; no debe hacerse público)
+# ───────────────────────────────────────────────
+README_ACCESO_REMOTO_CLAUDE.md

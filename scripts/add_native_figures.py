@@ -36,7 +36,8 @@ rows = []
 for p in Path("results_v3").glob("*.csv"):
     try:
         rows.extend(list(csv.DictReader(open(p))))
-    except: pass
+    except Exception as _e:  # AUDIT FIX (B6): no more silent swallowing
+        print(f"  WARN add_native_figures: {type(_e).__name__}: {_e}")
 real = [r for r in rows if r.get("explainer") not in ("SKIPPED_QUALITY_GATE", "SKIPPED")]
 # Dedupe
 seen = set(); deduped = []
@@ -87,7 +88,8 @@ for r in deduped:
     if r["explainer"] != "GNNExplainer": continue
     try:
         by_scenario[r["scenario"]].append(float(r["stab_spearman_mean"]))
-    except: pass
+    except Exception as _e:  # AUDIT FIX (B6): no more silent swallowing
+        print(f"  WARN add_native_figures: {type(_e).__name__}: {_e}")
 
 # Order: 1:1 → 1:10 → 1:30_native → 1:50 → 1:100
 order = ["1:1", "1:10", "1:30_native", "1:50", "1:100"]
@@ -131,7 +133,8 @@ for r in native:
     key = (r["architecture"], r["explainer"])
     try:
         data_matrix[r["architecture"]][r["explainer"]] = float(r["stab_spearman_mean"])
-    except: pass
+    except Exception as _e:  # AUDIT FIX (B6): no more silent swallowing
+        print(f"  WARN add_native_figures: {type(_e).__name__}: {_e}")
 
 archs_present = sorted(set(r["architecture"] for r in native))
 explainers = ["GNNExplainer", "PGExplainer", "GNNShap"]

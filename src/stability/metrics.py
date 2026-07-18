@@ -45,7 +45,12 @@ def pairwise_jaccard(subgraphs: list) -> dict:
         Dict with mean, std, min, max, and all pairwise values.
     """
     if len(subgraphs) < 2:
-        return {"mean": 1.0, "std": 0.0, "min": 1.0, "max": 1.0, "values": [1.0]}
+        # AUDIT FIX: <2 usable replicas => stability is NOT measurable. Return NaN,
+        # never a spurious perfect 1.0. Downstream must treat NaN as "no medible".
+        nan = float("nan")
+        return {"mean": nan, "std": nan, "min": nan, "max": nan,
+                "values": [], "n_replicas": len(subgraphs),
+                "reason": "insufficient_replicas"}
 
     jaccard_values = []
     for a, b in combinations(range(len(subgraphs)), 2):
@@ -112,7 +117,10 @@ def pairwise_spearman(
         Dict with mean, std, min, max.
     """
     if len(rankings) < 2:
-        return {"mean": 1.0, "std": 0.0, "min": 1.0, "max": 1.0}
+        # AUDIT FIX: <2 usable replicas => not measurable. NaN, not a fake 1.0.
+        nan = float("nan")
+        return {"mean": nan, "std": nan, "min": nan, "max": nan,
+                "n_replicas": len(rankings), "reason": "insufficient_replicas"}
 
     spearman_values = []
     for a, b in combinations(range(len(rankings)), 2):
@@ -132,7 +140,7 @@ def shap_concentration(
     top_k: int = 10,
 ) -> float:
     """
-    SHAP Concentration metric (He et al., 2026).
+    SHAP Concentration metric.
 
     Measures what fraction of total attribution is concentrated
     in the top-k most important features.

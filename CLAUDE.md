@@ -40,7 +40,12 @@ uv run python scripts/train_matrix.py --config configs/experiment_machineB_v3.ya
 
 - Corre Optuna con warm-start (prior literatura como trial 0) + 50 trials totales
 - Entrena final con `epochs=600`, `patience=50`, early-stop F1
-- Quality gate: F1 ≥ 0.70 y MCC ≥ 0.40 para marcar `quality_passed=True`
+- Quality gate (real, definido en config): **VAL F1 ≥ 0.30 y VAL MCC ≥ 0.15** para
+  marcar `quality_passed=True` — evaluado sobre **validación**, no test. (Los valores
+  0.70/0.40 son solo los defaults del código en `train_matrix.py`; los configs v3 los
+  bajan a 0.30/0.15.) NOTA (encuadre "estabilidad sobre modelos que aprenden en val"):
+  en futuros reentrenamientos conviene gate sobre **VAL PR-AUC** (~0.34), no F1/MCC en
+  argmax-0.5, que son degenerados bajo imbalance extremo.
 - Produce `results_models_v3/{run_id}_best.pt` + `{run_id}_meta.json`
 - Retomable: `--resume` saltea configs con meta.json ya guardado
 
