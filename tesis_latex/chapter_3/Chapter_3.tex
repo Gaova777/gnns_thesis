@@ -1,0 +1,402 @@
+\chapter{FUNDAMENTOS DE IA PARA DETECCIÓN DE FRAUDE FINANCIERO}
+
+El presente capítulo introduce los fundamentos técnicos del Aprendizaje Automático (\textit{Machine Learning}, ML) y el Aprendizaje Profundo (\textit{Deep Learning}, DL) aplicados al dominio de detección de fraude financiero. Se enfatiza particularmente en las \textit{Graph Neural Networks} (GNNs), arquitecturas que representan el estado del arte para el análisis de datos relacionales como las redes transaccionales. El capítulo caracteriza de forma comparativa las cuatro arquitecturas evaluadas en esta tesis, a saber GCN, GraphSAGE, GAT y TAGCN, describe sus mecanismos de agregación y prepara al lector para el diseño experimental de los capítulos posteriores. En lugar de designar una arquitectura ganadora de antemano, el estudio plantea a TAGCN como un caso de interés inicial por su agregación multi-hop, y trata la expectativa de que esa capacidad se traduzca en mejores explicaciones como una hipótesis que los resultados someten a contraste. Además, se introducen las nociones estadísticas que sostienen el análisis posterior, de manera que las afirmaciones sobre estabilidad se acompañen de medidas de incertidumbre en lugar de descansar sobre una única ejecución.
+
+\section{Del Aprendizaje Automático al Aprendizaje Profundo}
+
+\subsection{Aprendizaje Automático: Definición y Paradigmas}
+
+El Aprendizaje Automático constituye un subcampo de la inteligencia artificial orientado al desarrollo de algoritmos capaces de aprender patrones a partir de datos sin ser explícitamente programados para cada tarea específica. En el contexto de detección de fraude financiero, los enfoques de ML han evolucionado desde sistemas basados en reglas deterministas hacia modelos estadísticos que identifican comportamientos anómalos mediante el análisis de características transaccionales.
+
+Los paradigmas fundamentales del ML se clasifican en tres categorías principales:
+
+\begin{itemize}
+    \item \textbf{Aprendizaje Supervisado}: El modelo aprende a partir de datos etiquetados, donde cada instancia de entrenamiento está asociada con una etiqueta conocida (por ejemplo, "lícita" o "ilícita"). Este paradigma es fundamental para la detección AML, donde se busca clasificar transacciones en función de ejemplos históricos verificados. Los algoritmos clásicos incluyen regresión logística, árboles de decisión, \textit{Random Forest} y \textit{Support Vector Machines} (SVM) \cite{Unagar2025SurveyXAI}.
+    \item \textbf{Aprendizaje No Supervisado}: El modelo identifica estructuras ocultas en datos no etiquetados, siendo particularmente útil para la detección de anomalías cuando no se dispone de suficientes ejemplos etiquetados de fraude. Técnicas como \textit{clustering} (K-means, DBSCAN) y reducción de dimensionalidad (PCA, t-SNE) han sido empleadas para identificar patrones transaccionales atípicos.
+    \item \textbf{Aprendizaje Semi-Supervisado}: Combina un pequeño conjunto de datos etiquetados con una gran cantidad de datos sin etiquetar, aprovechando la estructura subyacente de los datos para mejorar el rendimiento del modelo. Este paradigma es especialmente relevante en AML, donde las etiquetas verificadas son costosas de obtener debido a la necesidad de investigación manual \cite{Lawal2025AnDataset}.
+\end{itemize}
+
+\subsection{Limitaciones del ML Tabular en Detección AML}
+
+Los métodos tradicionales de ML tratan las transacciones financieras como instancias independientes, representadas mediante vectores de características numéricas extraídas de cada transacción individual: monto, frecuencia, geolocalización, temporalidad, entre otras. Aunque estos enfoques han demostrado capacidad para identificar patrones conocidos de fraude, enfrentan limitaciones estructurales en escenarios contemporáneos de lavado de activos \cite{Unagar2025SurveyXAI}.
+
+La primera limitación radica en su incapacidad para capturar dependencias relacionales. El lavado de dinero no se manifiesta únicamente en las características de una transacción aislada, sino en patrones topológicos que emergen de múltiples transacciones interconectadas: cadenas de dispersión, ciclos transaccionales, estructuras de intermediación artificial y vecindarios sospechosos \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}. Los modelos tabulares, al ignorar estas dependencias, pierden información crítica sobre la estructura de la red financiera.
+
+La segunda limitación es la ingeniería de características manual. Los enfoques clásicos requieren que expertos del dominio diseñen características agregadas que intenten capturar información relacional de forma indirecta (por ejemplo, número de conexiones, promedios de montos de vecinos). Este proceso es laborioso, dependiente del conocimiento experto y potencialmente incompleto frente a tipologías de fraude emergentes \cite{Unagar2025SurveyXAI}.
+
+La tercera limitación concierne a la escalabilidad. A medida que las redes transaccionales crecen en tamaño y complejidad, la construcción manual de características relacionales se vuelve computacionalmente intratable. Este problema es particularmente agudo en ecosistemas de criptomonedas, donde la velocidad y el volumen de transacciones superan ampliamente los flujos financieros tradicionales.
+
+\subsection{El Aprendizaje Profundo como Paradigma de Representación}
+
+El Aprendizaje Profundo representa una evolución del ML caracterizada por el uso de arquitecturas neuronales con múltiples capas de procesamiento que aprenden representaciones jerárquicas de los datos de forma automática. A diferencia de los métodos tradicionales que requieren ingeniería manual de características, los modelos de DL son capaces de descubrir automáticamente representaciones útiles directamente desde los datos crudos \cite{Unagar2025SurveyXAI, He2026AnDetection}.
+
+Las redes neuronales profundas han demostrado capacidad excepcional para modelar funciones complejas no lineales en dominios diversos: visión computacional, procesamiento de lenguaje natural, reconocimiento de voz y, más recientemente, análisis de grafos. Su arquitectura multicapa permite que las capas iniciales capturen características de bajo nivel (patrones simples), mientras que capas superiores construyen representaciones abstractas de alto nivel mediante composición jerárquica.
+
+En el contexto de detección AML, el DL ofrece dos ventajas fundamentales: primero, la capacidad de aprender automáticamente características discriminativas desde datos transaccionales sin requerir conocimiento experto previo; segundo, la flexibilidad arquitectónica para incorporar diferentes tipos de datos (atributos numéricos, secuencias temporales, estructuras de grafos) dentro de un marco unificado \cite{He2026AnDetection}.
+
+No obstante, esta potencia representacional introduce un desafío crítico: la opacidad. Los modelos de DL operan como "cajas negras" cuyo proceso interno de decisión es difícil de interpretar, generando una tensión entre desempeño predictivo y auditabilidad en dominios regulados como AML \cite{Gawantka2024AExplanations}.
+
+Esta tensión entre potencia y opacidad es especialmente aguda en el dominio financiero, donde las decisiones automatizadas están sujetas a escrutinio regulatorio. Un modelo tabular simple, como un árbol de decisión, ofrece una interpretabilidad casi total a costa de una capacidad limitada para capturar patrones complejos, mientras que una red profunda invierte esa relación. El aprendizaje profundo sobre grafos hereda esta tensión y le añade una dificultad propia, la de explicar no solo qué atributos influyen en una predicción, sino también qué relaciones estructurales lo hacen. Esta doble opacidad, sobre features y sobre estructura, es la que motiva el desarrollo de métodos de explicabilidad específicos para grafos, y la que sitúa el estudio de su estabilidad en el centro de la agenda de la IA explicable aplicada a las finanzas.
+
+\section{Graph Neural Networks: Fundamentos Conceptuales}
+
+\subsection{Representación de Datos Financieros como Grafos}
+
+Un grafo $G = (V, E)$ consiste en un conjunto de nodos (vértices) $V$ y un conjunto de aristas (conexiones) $E$ que conectan pares de nodos. En el dominio de transacciones financieras, esta representación es naturalmente adecuada: cada entidad (cuenta bancaria, billetera de criptomonedas, usuario) se modela como un nodo, mientras que cada transacción entre dos entidades constituye una arista dirigida que conecta el nodo origen con el nodo destino \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}.
+
+Formalmente, sea $G = (V, E, \mathbf{X}, \mathbf{y})$ un grafo donde:
+
+\begin{itemize}
+    \item $V = \{v_1, v_2, \ldots, v_N\}$ representa el conjunto de $N$ nodos (entidades financieras).
+    \item $E \subseteq V \times V$ representa el conjunto de aristas (transacciones).
+    \item $\mathbf{X} \in \mathbb{R}^{N \times F}$ es la matriz de características de nodos, donde cada fila $\mathbf{x}_i \in \mathbb{R}^F$ contiene $F$ características del nodo $v_i$.
+    \item $\mathbf{y} \in \{0,1\}^N$ es el vector de etiquetas, donde $y_i = 1$ indica actividad ilícita.
+\end{itemize}
+
+En el \textit{Elliptic Dataset}, cada nodo representa una transacción de Bitcoin con 166 características que incluyen: estadísticas agregadas del flujo transaccional (número de entradas/salidas, montos totales), características temporales y propiedades topológicas locales. Las aristas conectan transacciones que comparten direcciones Bitcoin, capturando así el flujo de fondos en la red \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}.
+
+Esta formulación gráfica permite expresar explícitamente las dependencias relacionales que los modelos tabulares ignoran. Por ejemplo, una transacción puede ser benigna cuando se analiza aisladamente, pero sospechosa cuando se observa su posición dentro de una cadena de dispersión (\textit{peel chain}) o su proximidad a servicios de mezcla conocidos (\textit{mixers}).
+
+\subsection{El Paradigma de Message Passing}
+
+Las \textit{Graph Neural Networks} operan bajo el principio de \textit{message passing} (paso de mensajes), un marco computacional donde cada nodo actualiza iterativamente su representación mediante la agregación de información de sus vecinos en el grafo \cite{Du2017TopologyNetworks, He2026AnDetection}.
+
+El proceso general de una capa GNN se puede descomponer en tres operaciones fundamentales:
+
+\textbf{1. Generación de Mensajes (Message Function)}: Para cada nodo $v_i$, se generan mensajes desde sus vecinos $\mathcal{N}(v_i)$ usando una función parametrizada:
+\[ m_{ji}^{(k)} = \text{MESSAGE}^{(k)}(\mathbf{h}_j^{(k-1)}, \mathbf{h}_i^{(k-1)}, e_{ji}) \]
+donde $\mathbf{h}_i^{(k-1)}$ es la representación del nodo $i$ en la capa anterior, $\mathbf{h}_j^{(k-1)}$ es la representación de un vecino $j$, y $e_{ji}$ representa las características de la arista.
+
+\textbf{2. Agregación de Mensajes (Aggregation Function)}: Los mensajes recibidos se combinan mediante una función de agregación invariante a permutaciones (\textit{permutation-invariant}):
+\[ \mathbf{m}_i^{(k)} = \text{AGGREGATE}^{(k)} \left( \{m_{ji}^{(k)} : j \in \mathcal{N}(v_i)\} \right) \]
+Funciones comunes de agregación incluyen suma ($\sum$), promedio ($\text{mean}$), máximo ($\max$) o funciones más complejas como LSTM.
+
+\textbf{3. Actualización de Estado (Update Function)}: La representación del nodo se actualiza combinando su estado anterior con el mensaje agregado:
+\[ \mathbf{h}_i^{(k)} = \text{UPDATE}^{(k)}(\mathbf{h}_i^{(k-1)}, \mathbf{m}_i^{(k)}) \]
+Típicamente implementado como: $\mathbf{h}_i^{(k)} = \sigma(\mathbf{W}^{(k)} [\mathbf{h}_i^{(k-1)} \, \| \, \mathbf{m}_i^{(k)}])$, donde $\mathbf{W}^{(k)}$ son parámetros aprendibles, $\|$ denota concatenación y $\sigma$ es una función de activación no lineal (ReLU, tanh).
+
+Este proceso se repite por $K$ capas, permitiendo que cada nodo agregue información desde vecindarios cada vez más amplios. Después de $K$ iteraciones, la representación de un nodo captura información estructural hasta una distancia de $K$ saltos en el grafo.
+
+El número de capas define así el campo receptivo del modelo, es decir el conjunto de nodos que pueden influir en la predicción de un nodo dado. Esta noción es central para la explicabilidad, ya que una explicación estructural solo puede señalar elementos que se encuentren dentro del campo receptivo, y su tamaño depende tanto del número de capas como de la densidad del grafo. En grafos densos, un campo receptivo de dos saltos puede abarcar decenas o cientos de nodos, mientras que en grafos dispersos como el \textit{Elliptic Dataset} ese mismo campo receptivo se reduce a unos pocos nodos, lo que limita de raíz lo que una explicación puede expresar. El aumento del número de capas tampoco es una solución sin costo, puesto que apilar demasiadas capas provoca el fenómeno de sobre-suavizado, en el que las representaciones de nodos distintos convergen y pierden capacidad discriminativa. Estas consideraciones justifican que las arquitecturas de esta tesis empleen un número reducido de capas y que las explicaciones se calculen sobre el campo receptivo real de cada nodo, un punto que el Capítulo 4 desarrolla con detalle.
+
+Un ejemplo concreto ilustra cómo el paso de mensajes captura patrones de lavado. Considérese una cuenta que recibe transferencias de numerosas cuentas de origen y las consolida, una configuración característica de la tipología de recolección. En la primera capa, la representación de la cuenta consolidadora agrega la información de sus vecinos inmediatos, de modo que incorpora la señal de recibir muchos flujos entrantes. En la segunda capa, esa representación ya enriquecida se combina con la de vecinos a dos saltos, lo que permite al modelo reconocer no solo que la cuenta recibe muchos flujos, sino que esos flujos provienen a su vez de estructuras dispersas. De esta manera, dos capas de paso de mensajes bastan para que el modelo distinga una consolidación legítima de una que forma parte de una estructura de recolección más amplia, algo que un modelo tabular, al observar la cuenta de forma aislada, no podría lograr.
+
+\subsection{Ventajas de las GNNs en Detección AML}
+
+Las GNNs ofrecen tres ventajas fundamentales sobre métodos tradicionales en el contexto AML:
+
+\begin{itemize}
+    \item \textbf{Captura de Dependencias Estructurales}: Las GNNs explotan explícitamente la topología del grafo, permitiendo identificar patrones relacionales invisibles para modelos tabulares. Por ejemplo, pueden detectar que una transacción forma parte de una cadena de dispersión al analizar el patrón de conectividad de sus vecinos hasta múltiples saltos \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}.
+    \item \textbf{Aprendizaje de Representaciones End-to-End}: Las GNNs aprenden automáticamente representaciones óptimas de nodos mediante \textit{backpropagation}, eliminando la necesidad de ingeniería manual de características relacionales. Las representaciones aprendidas codifican tanto atributos intrínsecos de los nodos como su posición estructural en la red \cite{Du2017TopologyNetworks, He2026AnDetection}.
+    \item \textbf{Capacidad Inductiva}: Arquitecturas como GraphSAGE y GAT son inductivas, es decir, pueden generar representaciones para nodos nunca vistos durante el entrenamiento mediante la aplicación de funciones de agregación aprendidas. Esta propiedad es crítica en redes financieras dinámicas donde continuamente emergen nuevas entidades y transacciones.
+\end{itemize}
+
+Diversos estudios recientes reportan la ventaja de las GNNs en detección AML de forma verificada mediante experimentos controlados. Lawal et al. mostraron que los modelos basados en grafos superan de manera consistente a los enfoques tabulares en el \textit{Elliptic Dataset} \cite{Lawal2025AnDataset}. He et al. describieron un marco explicable en el que las GNNs capturan patrones estructurales que los métodos tabulares no logran recuperar \cite{He2026AnDetection}. Conviene matizar que esta ventaja no es incondicional, ya que su magnitud depende de la densidad del grafo, de la calidad de las conexiones observadas y de la arquitectura concreta empleada, un punto que los resultados de esta tesis abordan de manera directa.
+
+\section{Arquitecturas GNN Fundamentales}
+
+\subsection{Graph Convolutional Networks (GCN)}
+
+Las \textit{Graph Convolutional Networks}, propuestas por Kipf y Welling, constituyen una de las arquitecturas GNN más influyentes. Su diseño simplifica la convolución espectral en grafos mediante una formulación espacial eficiente \cite{Kipf2017Semi-SupervisedNetworks}.
+
+La regla de propagación de una capa GCN se define como:
+\[ \mathbf{H}^{(k+1)} = \sigma(\tilde{\mathbf{D}}^{-1/2} \tilde{\mathbf{A}} \tilde{\mathbf{D}}^{-1/2} \mathbf{H}^{(k)} \mathbf{W}^{(k)}) \]
+donde:
+\begin{itemize}
+    \item $\mathbf{H}^{(k)} \in \mathbb{R}^{N \times F_k}$ es la matriz de representaciones de nodos en la capa $k$.
+    \item $\tilde{\mathbf{A}} = \mathbf{A} + \mathbf{I}$ es la matriz de adyacencia con \textit{self-loops} agregados.
+    \item $\tilde{\mathbf{D}}$ es la matriz diagonal de grados correspondiente a $\tilde{\mathbf{A}}$.
+    \item $\mathbf{W}^{(k)} \in \mathbb{R}^{F_k \times F_{k+1}}$ son parámetros aprendibles.
+    \item $\sigma$ es una función de activación no lineal.
+\end{itemize}
+
+Esta formulación realiza un promedio ponderado normalizado de las características de los vecinos, seguido de una transformación lineal y activación no lineal. La normalización simétrica $\tilde{\mathbf{D}}^{-1/2} \tilde{\mathbf{A}} \tilde{\mathbf{D}}^{-1/2}$ estabiliza el entrenamiento al prevenir que nodos con muchos vecinos dominen la agregación.
+
+\textbf{Características principales de GCN}:
+\begin{itemize}
+    \item \textbf{Agregación isotrópica}: Todos los vecinos contribuyen igualmente (solo ponderados por grado).
+    \item \textbf{Eficiencia computacional}: Operación matricial dispersa eficiente.
+    \item \textbf{Aprendizaje transductivo}: Diseñado originalmente para clasificación en grafos estáticos completos.
+    \item \textbf{Limitación}: Tratamiento uniforme de vecinos puede ser subóptimo cuando diferentes vecinos tienen relevancia distinta para la tarea.
+\end{itemize}
+
+Weber et al. demostraron que GCN aplicada al \textit{Elliptic Dataset} supera significativamente a modelos tabulares clásicos, capturando patrones estructurales de lavado de dinero \cite{Weber2019Anti-MoneyForensics}.
+
+\subsection{GraphSAGE: Aprendizaje Inductivo y Muestreo de Vecindarios}
+
+GraphSAGE (\textit{Graph Sample and AggregatE}), propuesta por Hamilton, Ying y Leskovec, introduce dos innovaciones fundamentales: capacidad inductiva mediante funciones de agregación aprendidas y escalabilidad mediante muestreo de vecindarios \cite{Hamilton2017InductiveGraphs}.
+
+La actualización de representación en GraphSAGE se formula como:
+\[ \mathbf{h}_i^{(k)} = \sigma(\mathbf{W}^{(k)} \cdot \text{CONCAT}(\mathbf{h}_i^{(k-1)}, \text{AGG}^{(k)}(\{\mathbf{h}_j^{(k-1)}, \forall j \in \mathcal{N}(v_i)\}))) \]
+donde AGG puede ser:
+\begin{itemize}
+    \item \textbf{Mean aggregator}: $\text{AGG} = \frac{1}{|\mathcal{N}(v_i)|} \sum_{j \in \mathcal{N}(v_i)} \mathbf{h}_j^{(k-1)}$
+    \item \textbf{Max aggregator}: $\text{AGG} = \max(\{\sigma(\mathbf{W} \mathbf{h}_j^{(k-1)} + \mathbf{b}), \forall j \in \mathcal{N}(v_i)\})$
+    \item \textbf{LSTM aggregator}: Aplicación de LSTM sobre permutación aleatoria de vecinos.
+\end{itemize}
+
+\textbf{Muestreo de vecindarios}: Para mantener complejidad computacional constante, GraphSAGE muestrea un número fijo $S$ de vecinos en cada capa. Esto previene la explosión exponencial del árbol de computación y permite entrenamiento por \textit{mini-batches}.
+
+\textbf{Características principales}:
+\begin{itemize}
+    \item \textbf{Aprendizaje inductivo}: Generaliza a nodos no vistos durante entrenamiento.
+    \item \textbf{Escalabilidad}: Muestreo controla complejidad computacional.
+    \item \textbf{Flexibilidad}: Diferentes agregadores capturan diferentes patrones relacionales.
+    \item \textbf{Aplicabilidad AML}: Crítico para redes transaccionales dinámicas donde continuamente emergen nuevas entidades.
+\end{itemize}
+
+\subsection{Graph Attention Networks (GAT)}
+
+Las \textit{Graph Attention Networks}, introducidas por Velickovic et al., incorporan mecanismos de atención que permiten asignar pesos aprendibles a diferentes vecinos, superando la limitación isotrópica de GCN \cite{Velickovic2018GraphNetworks}.
+
+El mecanismo de atención en GAT se define como:
+\[ \alpha_{ij} = \frac{\exp(\text{LeakyReLU}(\mathbf{a}^T[\mathbf{W}\mathbf{h}_i \, \| \, \mathbf{W}\mathbf{h}_j]))}{\sum_{k \in \mathcal{N}(v_i)} \exp(\text{LeakyReLU}(\mathbf{a}^T[\mathbf{W}\mathbf{h}_i \, \| \, \mathbf{W}\mathbf{h}_k]))} \]
+Los coeficientes de atención $\alpha_{ij}$ determinan la importancia del vecino $j$ para el nodo $i$. La actualización de representación es entonces:
+\[ \mathbf{h}_i^{(k)} = \sigma \left( \sum_{j \in \mathcal{N}(v_i)} \alpha_{ij}^{(k)} \mathbf{W}^{(k)} \mathbf{h}_j^{(k-1)} \right) \]
+
+\textbf{Multi-head attention}: GAT emplea múltiples cabezas de atención en paralelo, concatenando o promediando sus salidas para estabilizar el aprendizaje y capturar diferentes aspectos relacionales.
+
+\textbf{Características principales}:
+\begin{itemize}
+    \item \textbf{Agregación anisotrópica}: Diferentes vecinos reciben pesos distintos según relevancia aprendida.
+    \item \textbf{Interpretabilidad parcial}: Los coeficientes de atención pueden inspeccionarse.
+    \item \textbf{Capacidad expresiva}: Superior a GCN en tareas donde la importancia de vecinos varía.
+    \item \textbf{Costo computacional}: Mayor complejidad que GCN debido a cálculo de atención por arista.
+\end{itemize}
+
+Xu et al. mostraron que mecanismos de atención mejoran la detección AML al ponderar selectivamente conexiones sospechosas en la red transaccional \cite{Lin2026DetectingLaundering}.
+
+\section{TAGCN: Agregación Multi-Hop mediante Filtros Polinomiales}
+
+\subsection{Motivación y Fundamento Teórico}
+
+La \textit{Topology Adaptive Graph Convolutional Network} (TAGCN) constituye una extensión de las GNNs convencionales que incorpora filtros polinomiales adaptativos para capturar dependencias estructurales de mayor alcance \cite{Du2017TopologyNetworks}. A diferencia de GCN, que emplea una aproximación de primer orden (vecindario inmediato), TAGCN define filtros que pueden agregar información desde múltiples saltos topológicos mediante polinomios de Chebyshev.
+
+La formulación de TAGCN se basa en la teoría de procesamiento de señales en grafos (\textit{Graph Signal Processing}, GSP), donde las convoluciones espectrales en grafos se pueden expresar como filtros polinomiales sobre la matriz de adyacencia normalizada:
+\[ g_\theta(\mathbf{L}) = \sum_{k=0}^{K-1} \theta_k \mathbf{T}_k(\tilde{\mathbf{L}}) \]
+donde:
+\begin{itemize}
+    \item $\mathbf{L}$ es el Laplaciano normalizado del grafo.
+    \item $\tilde{\mathbf{L}} = 2\mathbf{L}/\lambda_{\max} - \mathbf{I}$ es el Laplaciano reescalado al intervalo $[-1, 1]$.
+    \item $\mathbf{T}_k$ son polinomios de Chebyshev de orden $k$.
+    \item $\theta_k$ son parámetros aprendibles.
+\end{itemize}
+
+La recursión de Chebyshev permite computar eficientemente los polinomios sin calcular la descomposición espectral completa del grafo:
+\[ \mathbf{T}_0(\mathbf{x}) = 1, \quad \mathbf{T}_1(\mathbf{x}) = \mathbf{x}, \quad \mathbf{T}_k(\mathbf{x}) = 2\mathbf{x}\mathbf{T}_{k-1}(\mathbf{x}) - \mathbf{T}_{k-2}(\mathbf{x}) \]
+
+En la práctica, TAGCN típicamente utiliza $K=3$, limitándose a polinomios de segundo grado para mantener simplicidad computacional mientras captura dependencias hasta 2 saltos en el grafo \cite{Du2017TopologyNetworks}.
+
+La formulación polinomial de TAGCN se sitúa en la frontera entre los enfoques espectrales y espaciales del aprendizaje sobre grafos. Los métodos espectrales definen la convolución en el dominio de la frecuencia del grafo, a través de la descomposición del Laplaciano, lo que ofrece una fundamentación teórica sólida pero un costo computacional elevado y una dependencia de la estructura global. Los métodos espaciales, en cambio, definen la agregación directamente sobre los vecindarios, lo que resulta más eficiente y flexible pero menos fundamentado en la teoría de señales. Al aproximar el filtro espectral mediante polinomios de la matriz de adyacencia, TAGCN conserva parte del rigor de los métodos espectrales mientras opera con la eficiencia de los espaciales, lo que explica el interés inicial que despertó como candidato para grafos financieros de gran tamaño.
+
+\subsection{Ventajas de TAGCN para Detección AML}
+
+TAGCN ofrece varias ventajas específicas para el dominio de detección de lavado de dinero:
+
+\begin{itemize}
+    \item \textbf{Captura de Patrones Multi-Hop}: Las tipologías de lavado frecuentemente involucran cadenas de transacciones intermediarias (\textit{peel chains, chain hopping}) que se extienden más allá del vecindario inmediato. TAGCN puede capturar estos patrones mediante filtros de orden superior que agregan información desde múltiples saltos topológicos \cite{Du2017TopologyNetworks}.
+    \item \textbf{Adaptabilidad Topológica}: Los filtros polinomiales se adaptan automáticamente a la topología local del grafo. En regiones densamente conectadas, el filtro captura información de muchos nodos; en regiones dispersas, se enfoca en conexiones más lejanas. Esta adaptabilidad es valiosa en redes financieras heterogéneas.
+    \item \textbf{Fundamentación Teórica Sólida}: A diferencia de aproximaciones heurísticas, TAGCN está fundamentada en teoría de procesamiento de señales en grafos, garantizando propiedades deseables como invariancia a permutaciones y consistencia con definiciones clásicas de convolución.
+    \item \textbf{Eficiencia Computacional}: Al limitarse a polinomios de grado bajo (típicamente $K=3$), TAGCN mantiene complejidad lineal en el número de aristas, siendo más eficiente que métodos que requieren agregación desde vecindarios extensos.
+    \item \textbf{Rendimiento reportado en la literatura}: Du et al. reportaron que TAGCN obtiene resultados competitivos en varios \textit{benchmarks} de clasificación de nodos \cite{Du2017TopologyNetworks}. Esos resultados provienen de grafos de citación académica, de modo que su traslado al dominio AML y a la estabilidad de las explicaciones constituye una cuestión abierta que esta tesis examina en lugar de asumir.
+\end{itemize}
+
+\subsection{Implementación y Hiperparámetros de TAGCN}
+
+La arquitectura TAGCN empleada en esta investigación sigue la formulación estándar con configuraciones específicas para el dominio AML:
+
+\begin{itemize}
+    \item \textbf{Estructura de Capas}: Se emplea una arquitectura de dos capas:
+    \begin{itemize}
+        \item Primera capa: entrada de 166 características $\rightarrow$ 64 unidades ocultas con ReLU.
+        \item Segunda capa: 64 unidades ocultas $\rightarrow$ 2 clases (lícita/ilícita) con softmax.
+    \end{itemize}
+    \item \textbf{Filtro Polinomial}: Orden $K=3$, capturando dependencias hasta 2 saltos en el grafo.
+    \item \textbf{Normalización}: Se emplea normalización simétrica de la matriz de adyacencia:
+    \[ \mathbf{A}_{\text{norm}} = \mathbf{D}^{-1/2} \mathbf{A} \mathbf{D}^{-1/2} \]
+    \item \textbf{Regularización}: \textit{Dropout} con tasa 0.5 aplicado entre capas para prevenir sobreajuste.
+    \item \textbf{Función de Pérdida}: \textit{Cross-entropy} ponderada para manejar desbalance de clases:
+    \[ \mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} w_{y_i} \log(p_{y_i}(x_i)) \]
+    donde $w_{y_i}$ son pesos de clase inversamente proporcionales a la frecuencia.
+    \item \textbf{Optimización}: Optimizador Adam con \textit{learning rate} $\eta = 0.01$ y \textit{weight decay} $\lambda = 5 \times 10^{-4}$.
+\end{itemize}
+
+\subsection{TAGCN como Caso de Interés Inicial e Hipótesis a Contrastar}
+
+El interés inicial por TAGCN dentro del conjunto de cuatro arquitecturas se apoya en varias consideraciones que conviene enunciar como hipótesis a contrastar, y no como hechos establecidos. Ninguna de ellas designa a TAGCN como arquitectura superior de antemano, y el diseño de esta tesis mantiene a las cuatro arquitecturas en pie de igualdad. De hecho, los resultados del Capítulo 5 muestran que la expectativa central sobre TAGCN no se cumple en el régimen disperso del Elliptic Dataset, lo que se reporta como un hallazgo honesto en lugar de ocultarse. Enunciar estas consideraciones de forma transparente permite que el lector contraste la motivación teórica con la evidencia posteriormente obtenida.
+
+En primer lugar, las tipologías de lavado analizadas en el Capítulo 2, como las \textit{peel chains}, el \textit{chain hopping} y las cadenas de dispersión, involucran patrones estructurales que se extienden más allá del vecindario inmediato. La capacidad de TAGCN para agregar información \textit{multi-hop} mediante filtros polinomiales adaptativos podría, en principio, resultar adecuada para detectar estas configuraciones, lo que constituye una hipótesis razonable pero no verificada de antemano. Esta conjetura solo adquiere valor cuando se contrasta con datos, tarea que el diseño experimental asume de forma directa.
+
+En segundo lugar, el marco comparativo de esta tesis requiere evaluar arquitecturas con mecanismos de agregación distintos bajo condiciones de desbalance extremo. TAGCN representa un punto intermedio entre la simplicidad de GCN y la complejidad de las arquitecturas con atención como GAT, lo que ayuda a aislar el efecto del tipo de agregación sobre la estabilidad de las explicaciones. Esta razón es de diseño experimental y no presupone ninguna ventaja de rendimiento a favor de TAGCN. Por el contrario, busca condiciones equitativas de comparación entre las cuatro arquitecturas.
+
+En tercer lugar, Du et al. reportaron que TAGCN obtiene resultados competitivos en \textit{benchmarks} de clasificación de nodos sobre grafos de citación académica. La hipótesis que esta tesis somete a prueba es si esa eventual ventaja predictiva se traslada a explicaciones más estables en un grafo financiero disperso, una conjetura que los resultados terminan por refutar. Presentar esta expectativa como hipótesis, y no como hecho consumado, resulta esencial para la coherencia entre el marco teórico y la evidencia. La eficiencia computacional de TAGCN, derivada del uso de filtros polinomiales de grado bajo, se aplica además de forma análoga a las demás arquitecturas evaluadas, de modo que tampoco constituye un privilegio de esta arquitectura dentro del estudio comparativo.
+
+\input{chapter_3/propiedades_gnn.tex}
+
+\section{El Desafío de la Explicabilidad en GNNs}
+
+\subsection{Necesidad de Interpretabilidad en Contextos Regulados}
+
+Las \textit{Graph Neural Networks}, a pesar de su potencia predictiva, operan como modelos altamente opacos cuyo proceso interno de decisión resulta difícil de interpretar para analistas humanos. En dominios como la detección AML, esta opacidad genera tensiones críticas con requisitos operativos y regulatorios \cite{Gawantka2024AExplanations}.
+
+Cuando un sistema automatizado identifica una transacción como sospechosa, las instituciones financieras deben poder justificar esta decisión ante reguladores, auditores y potencialmente ante autoridades judiciales. Una predicción sin explicación es insuficiente; se requiere evidencia comprensible sobre qué patrones específicos justificaron la alerta. Además, los equipos de cumplimiento necesitan comprender por qué el modelo consideró una transacción riesgosa para priorizar efectivamente su capacidad investigativa limitada \cite{Unagar2025SurveyXAI, He2026AnDetection}.
+
+La Inteligencia Artificial Explicable (\textit{Explainable AI}, XAI) surge como respuesta a esta necesidad, buscando desarrollar métodos que generen explicaciones comprensibles de las decisiones de modelos complejos sin sacrificar su rendimiento predictivo \cite{Adadi2018PeekingXAI}.
+
+\subsection{Métodos XAI para Graph Neural Networks}
+
+En el contexto de GNNs, las explicaciones típicamente buscan identificar qué subgrafo (conjunto de nodos y aristas) es más relevante para la predicción de un nodo específico. Los tres métodos principales considerados en esta investigación son:
+
+\begin{itemize}
+    \item \textbf{GNNExplainer}: Propuesto por Ying et al., formula la explicación como un problema de optimización que identifica el subgrafo más compacto que maximiza la predicción del modelo para la clase objetivo \cite{Ying2019Gnnexplainer:Networks}. Matemáticamente:
+    \[ \max_{G_S} MI(Y, (G_S, X_S)) = H(Y) - H(Y | G = G_S, X = X_S) \]
+    donde $G_S$ es el subgrafo explicativo, $X_S$ son las características relevantes, y $MI$ denota información mutua. GNNExplainer aprende una máscara sobre aristas y características mediante optimización basada en gradientes.
+    
+    \item \textbf{PGExplainer}: Luo et al. proponen un explicador parametrizado que aprende una función generadora de explicaciones \cite{Luo2020ParameterizedNetwork}. A diferencia de GNNExplainer que optimiza para cada instancia independientemente, PGExplainer entrena una red neuronal que predice las probabilidades de importancia de las aristas:
+    \[ P(e_{ij}) = \sigma(\text{MLP}([\mathbf{h}_i \, \| \, \mathbf{h}_j])) \]
+    Esta formulación permite amortización: una vez entrenado, PGExplainer genera explicaciones en tiempo constante sin optimización adicional.
+    
+    \item \textbf{GNNShap}: Akkas y Azad adaptan los valores de Shapley, formalizados originalmente para modelos tabulares por Lundberg y Lee \cite{Lundberg2017AProach}, al contexto de grafos \cite{Akkas2024Gnnshap:Values}. Para cada arista, GNNShap calcula su contribución marginal promedio sobre todas las posibles coaliciones de aristas:
+    \[ \phi_{ij} = \sum_{S \subseteq E \setminus \{e_{ij}\}} \frac{|S|!(|E|-|S|-1)!}{|E|!} [f(S \cup \{e_{ij}\}) - f(S)] \]
+    donde $f(S)$ es la predicción del modelo cuando solo las aristas en $S$ están presentes. Esta formulación garantiza propiedades teóricas deseables (eficiencia, simetría, aditividad).
+\end{itemize}
+
+\subsection{Comparación de los Tres Métodos de Explicación}
+
+Los tres métodos considerados difieren en su mecanismo, en su costo computacional y en el tipo de salida que producen, y estas diferencias condicionan tanto su estabilidad como su interpretación. GNNExplainer optimiza una máscara de forma independiente para cada nodo, lo que le confiere flexibilidad para adaptarse a cada instancia pero introduce una fuente de variabilidad entre ejecuciones, ya que la optimización parte de una inicialización aleatoria. PGExplainer, en cambio, entrena un modelo paramétrico que aprende a generar explicaciones para todo el grafo, de manera que, una vez entrenado, produce explicaciones deterministas y de bajo costo por nodo, a expensas de una fase de entrenamiento adicional. GNNShap adopta un enfoque inspirado en la teoría de juegos que estima la contribución marginal de cada elemento, lo que le otorga garantías teóricas de consistencia pero exige un muestreo que también introduce variabilidad entre ejecuciones.
+
+Estas diferencias tienen consecuencias directas para el estudio de estabilidad que ocupa a esta tesis. El carácter determinista de PGExplainer implica que su estabilidad entre ejecuciones no puede medirse de la misma manera que la de los otros dos métodos, un punto que se retoma en los capítulos de resultados. El tipo de salida también difiere, ya que GNNExplainer y PGExplainer producen máscaras sobre aristas, mientras que GNNShap pondera features, lo que hace que ciertas métricas de plausibilidad solo sean aplicables a un subconjunto de los métodos. Reconocer estas asimetrías desde el marco teórico permite interpretar correctamente las tablas de resultados posteriores, en las que algunas celdas aparecen como no aplicables por construcción del método y no por ausencia de datos. La comparación entre explicadores, por tanto, no puede reducirse a una única métrica, sino que exige un panorama multidimensional que capture la estabilidad, la plausibilidad y la fidelidad de forma separada.
+
+\subsection{El Problema de la Estabilidad Explicativa}
+
+Estudios recientes han revelado que las explicaciones generadas por métodos XAI para GNNs pueden ser altamente inestables: explicaciones para la misma instancia varían significativamente entre ejecuciones, bajo pequeñas perturbaciones del modelo o frente a cambios mínimos en los datos \cite{Gawantka2024AExplanations, Agarwal2022ProbingMethods, Kosan2023GNNX-BENCH:Benchmarking}.
+
+Gawantka et al. propusieron métricas formales para cuantificar esta inestabilidad, mostrando que explicadores ampliamente usados exhiben variabilidad preocupante en sus salidas \cite{Gawantka2024AExplanations}. Agarwal et al. demostraron que muchas explicaciones consideradas "plausibles" no son necesariamente fieles al mecanismo interno del modelo \cite{Agarwal2022ProbingMethods}. Kosan et al., mediante un \textit{benchmark} exhaustivo, evidenciaron que el desempeño de explicadores depende fuertemente del protocolo de evaluación \cite{Kosan2023GNNX-BENCH:Benchmarking}.
+
+En el contexto AML, esta inestabilidad es particularmente problemática. Una explicación inestable carece de valor operativo: si el subgrafo explicativo cambia radicalmente en cada ejecución, ¿cuál de ellas debe ser considerada por el analista? ¿Cómo puede justificarse una decisión regulatoria basada en evidencia que no es reproducible?
+
+Esta limitación constituye el núcleo motivacional de la presente investigación: evaluar sistemáticamente cómo el desbalance extremo de datos, característico de escenarios AML reales, afecta la estabilidad de las explicaciones generadas por diferentes métodos XAI aplicados a distintas arquitecturas GNN.
+
+\section{Estrategias de Mitigación del Desbalance de Clases}
+
+\subsection{El Problema del Desbalance en Detección AML}
+
+En escenarios reales de detección de fraude financiero, la clase positiva (transacciones ilícitas) representa una fracción mínima del total de transacciones, pudiendo alcanzar razones de desbalance de 1:1000 o más severas \cite{Rai2025EvaluatingData}. Este desbalance extremo genera múltiples desafíos para el entrenamiento de modelos de ML:
+
+\begin{itemize}
+    \item \textbf{Sesgo hacia la clase mayoritaria}: Los algoritmos de optimización tienden a minimizar el error total, lo que en presencia de desbalance severo resulta en modelos que clasifican casi todo como la clase mayoritaria (benigna), ignorando la clase minoritaria (fraude).
+    \item \textbf{Métricas engañosas}: La exactitud (\textit{accuracy}) se convierte en una métrica inapropiada. Un clasificador trivial que predice siempre "benigno" puede alcanzar 99,9\% de \textit{accuracy} en un escenario 1:1000, a pesar de no detectar ningún fraude.
+    \item \textbf{Distribución de gradientes desbalanceada}: Durante el entrenamiento con \textit{backpropagation}, los gradientes dominados por la clase mayoritaria dificultan el aprendizaje de patrones característicos de la clase minoritaria.
+\end{itemize}
+
+\subsection{GraphSMOTE: Sobremuestreo Topológico}
+
+GraphSMOTE constituye una adaptación del algoritmo SMOTE (\textit{Synthetic Minority Over-sampling TEchnique}) al contexto de grafos, diseñada para balancear \textit{datasets} donde las instancias tienen dependencias estructurales \cite{Zhao2021Graphsmote:Networks}.
+
+A diferencia de SMOTE tabular que genera instancias sintéticas mediante interpolación lineal en el espacio de características, GraphSMOTE considera tanto los atributos de los nodos como la topología del grafo. El algoritmo opera en tres etapas:
+
+\begin{itemize}
+    \item \textbf{Etapa 1 - Identificación de Nodos Frontera}: Identifica nodos de la clase minoritaria que tienen al menos un vecino de la clase mayoritaria. Estos nodos frontera son candidatos prioritarios para sobremuestreo, pues se encuentran en regiones donde la separación entre clases es ambigua.
+    \item \textbf{Etapa 2 - Generación de Nodos Sintéticos}: Para cada nodo frontera $v_i$ de la clase minoritaria:
+    \begin{enumerate}
+        \item Selecciona $k$ vecinos más cercanos dentro de la clase minoritaria (topológicamente y en espacio de características).
+        \item Elige aleatoriamente uno de estos vecinos $v_j$.
+        \item Genera un nodo sintético mediante interpolación:
+        \[ \mathbf{x}_{\text{syn}} = \mathbf{x}_i + \lambda (\mathbf{x}_j - \mathbf{x}_i), \quad \lambda \sim U(0,1) \]
+    \end{enumerate}
+    \item \textbf{Etapa 3 - Inserción en el Grafo}: El nodo sintético se conecta a sus $k'$ vecinos más cercanos en el espacio de características, actualizando la estructura del grafo.
+\end{itemize}
+
+GraphSMOTE ha demostrado efectividad en balancear \textit{datasets} de grafos, pero introduce dos preguntas críticas para esta investigación: ¿Los nodos sintéticos mejoran o distorsionan las explicaciones? ¿La topología modificada refleja patrones reales de fraude o artefactos del algoritmo?
+
+Estas preguntas no son retóricas, sino que apuntan a un riesgo concreto del sobremuestreo topológico. Al insertar nodos y aristas sintéticas, GraphSMOTE modifica la estructura del grafo sobre la que el modelo aprende y sobre la que, más tarde, se generan las explicaciones. Si un explicador señalara como relevante una arista sintética, la explicación estaría describiendo un artefacto del algoritmo de balanceo y no un patrón real de la red financiera, lo que comprometería su valor forense. Por esta razón, el impacto de las estrategias de balanceo sobre la calidad de las explicaciones no puede darse por supuesto, sino que debe medirse de forma directa, una tarea que el diseño experimental de esta tesis aborda y cuyo resultado, adelantado aquí, resulta tranquilizador para las estrategias basadas en la función de pérdida.
+
+\subsection{Ponderación de Clases y Funciones de Pérdida}
+
+Una alternativa al sobremuestreo es ajustar la función de pérdida para penalizar diferentemente los errores en cada clase. La \textit{cross-entropy} ponderada asigna pesos inversamente proporcionales a la frecuencia de clase:
+\[ \mathcal{L}_{\text{weighted}} = -\sum_{i=1}^{N} w_{y_i} \log p_{y_i}(\mathbf{x}_i), \quad w_c = \frac{N}{k \cdot N_c} \]
+donde $N_c$ es el número de instancias de la clase $c$, $N$ es el total de instancias y $k$ es el número de clases.
+
+La \textbf{Focal Loss}, propuesta por Lin et al. para detección de objetos con clases desbalanceadas \cite{Lin2017FocalDetection}, reduce el peso de ejemplos bien clasificados, enfocando el aprendizaje en casos difíciles:
+\[ \mathcal{L}_{\text{focal}} = -\sum_{i=1}^{N} \alpha_{y_i} (1 - p_{y_i}(\mathbf{x}_i))^\gamma \log p_{y_i}(\mathbf{x}_i) \]
+El término $(1 - p_{y_i})^\gamma$ reduce el peso (\textit{down-weights}) de ejemplos fáciles cuando $p_{y_i}$ es alta, mientras $\alpha_{y_i}$ balancea la importancia entre clases.
+
+Estas estrategias no alteran la topología del grafo, pero su impacto sobre la estabilidad explicativa es incierto: ¿forzar al modelo a enfocarse en la clase minoritaria mediante pérdidas adaptadas resulta en explicaciones más consistentes o más volátiles?
+
+\section{Formalización de Métricas de Evaluación}
+
+Para garantizar un análisis riguroso en los capítulos posteriores, resulta indispensable formalizar matemáticamente las métricas que permitirán cuantificar tanto el desempeño predictivo del modelo frente al desbalance extremo, como la estabilidad de las explicaciones generadas por los métodos XAI.
+
+\subsection{Métricas Fundamentales de Clasificación}
+
+En los problemas de clasificación binaria, como la detección de fraude, el rendimiento de un modelo se evalúa inicialmente a través de la matriz de confusión, la cual tabula las predicciones frente a los valores reales. A partir de esta matriz se definen cuatro componentes básicos: Verdaderos Positivos ($TP$), Falsos Positivos ($FP$), Verdaderos Negativos ($TN$) y Falsos Negativos ($FN$). Utilizando estos valores, se construyen las métricas de rendimiento elementales:
+
+\begin{itemize}
+    \item \textbf{Precisión (\textit{Precision})}: Mide la proporción de alertas de fraude generadas por el modelo que son genuinas. Indica qué tan confiable es el modelo cuando emite una alerta.
+    \[ \text{Precision} = \frac{TP}{TP + FP} \]
+    
+    \item \textbf{Exhaustividad o Sensibilidad (\textit{Recall} / \textit{True Positive Rate})}: Mide la proporción del total de fraudes reales que el modelo logró detectar exitosamente.
+    \[ \text{Recall} = \frac{TP}{TP + FN} \]
+    
+    \item \textbf{Especificidad (\textit{Specificity} / \textit{True Negative Rate})}: Mide la proporción de transacciones legítimas que fueron correctamente identificadas como tales.
+    \[ \text{Specificity} = \frac{TN}{TN + FP} \]
+\end{itemize}
+
+Aunque estas métricas proporcionan información valiosa sobre el comportamiento del modelo, evaluarlas de manera aislada o depender de la exactitud global (\textit{accuracy}) resulta altamente engañoso en contextos de desbalance extremo (e.g., 1:1000). En estos escenarios, un clasificador trivial que prediga siempre la clase mayoritaria obtendría una exactitud casi perfecta y una alta especificidad, pero su utilidad operativa para detectar el lavado de dinero sería nula. De igual forma, centrarse únicamente en maximizar la precisión suele reducir drásticamente la exhaustividad, dejando pasar operaciones ilícitas críticas \cite{Rai2025EvaluatingData}.
+
+\subsection{Métricas de Rendimiento Predictivo en Escenarios de Desbalance}
+
+Para abordar las deficiencias de las métricas tradicionales frente al sesgo de la clase mayoritaria, la literatura especializada en detección de fraude recomienda emplear métricas compuestas que integren el desempeño sobre la clase minoritaria y penalicen el desequilibrio entre los errores predictivos. Las métricas más adecuadas para conjuntos de datos altamente desbalanceados incluyen:
+
+\begin{itemize}
+    \item \textbf{F1-Score (Clase Minoritaria)}: Es la media armónica entre la Precisión y la Exhaustividad. A diferencia de la media aritmética, la media armónica penaliza fuertemente los valores bajos. Por lo tanto, un modelo solo obtendrá un F1-Score alto si tanto su precisión como su exhaustividad son elevadas de manera simultánea, lo cual es fundamental cuando los falsos positivos y falsos negativos tienen un costo operativo severo.
+    \[ \text{F1-Score} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} \]
+    
+    \item \textbf{Área bajo la Curva Precision-Recall (AUC-PR)}: Mientras que la tradicional curva ROC tiende a mostrar un rendimiento inflado en conjuntos de datos desbalanceados debido a la abundancia masiva de verdaderos negativos, la curva PR evalúa la relación directa entre la Precisión y la Exhaustividad en distintos umbrales de decisión. Un área AUC-PR alta indica que el modelo es capaz de detectar la mayoría de las transacciones ilícitas sin generar un volumen inmanejable de falsas alarmas \cite{Unagar2025SurveyXAI}.
+    
+    \item \textbf{Coeficiente de Correlación de Matthews (MCC)}: Es ampliamente considerada una de las métricas más robustas frente a clases extremadamente desbalanceadas. El MCC evalúa la calidad de la predicción utilizando los cuatro cuadrantes de la matriz de confusión. Produce un valor entre -1 y 1, donde 1 representa una predicción perfecta, 0 indica una predicción aleatoria, y -1 una discordancia total. Su principal ventaja es que solo arroja un puntaje alto si el modelo se desempeña bien en ambas clases, mitigando totalmente la influencia del desbalance.
+    \[ \text{MCC} = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}} \]
+    
+    \item \textbf{Media Geométrica (\textit{G-Mean})}: Evalúa el equilibrio entre el desempeño de la clase mayoritaria y la minoritaria calculando la raíz cuadrada del producto entre la sensibilidad (\textit{Recall}) y la especificidad. Busca maximizar el acierto en ambas clases simultáneamente y evita que el buen rendimiento en la clase mayoritaria enmascare un desempeño deficiente en la detección del fraude.
+    \[ \text{G-Mean} = \sqrt{\text{Recall} \cdot \text{Specificity}} \]
+\end{itemize}
+
+\subsection{Interpretación de las Métricas en el Contexto de Detección de Fraude}
+
+La elección de las métricas anteriores no es meramente técnica, sino que responde a la lógica operativa de un sistema de detección AML, en el que los dos tipos de error tienen costos muy distintos. Un falso negativo, es decir una transacción ilícita que el sistema no detecta, permite que fondos de origen criminal circulen sin control, con consecuencias legales y reputacionales graves para la institución. Un falso positivo, en cambio, genera una alerta que un analista debe revisar, con un costo en tiempo y recursos que, multiplicado por el volumen de transacciones, se vuelve considerable. Las métricas compuestas buscan equilibrar ambos costos, y su interpretación conjunta ofrece una imagen más fiel del desempeño que cualquiera de ellas por separado.
+
+El área bajo la curva de precisión y exhaustividad merece un comentario particular por su idoneidad frente al desbalance. La curva característica operativa del receptor, ampliamente utilizada, incorpora en su cálculo la tasa de verdaderos negativos, que en un escenario con una abrumadora mayoría de transacciones lícitas resulta casi perfecta con independencia de la calidad del modelo. Esto produce una impresión inflada del desempeño, ya que el modelo parece excelente simplemente por acertar en la clase mayoritaria. La curva de precisión y exhaustividad, al no considerar los verdaderos negativos, se concentra en la capacidad del modelo para detectar la clase minoritaria sin generar demasiadas falsas alarmas, lo que la convierte en una medida más honesta del desempeño en el régimen de desbalance extremo que caracteriza al dominio.
+
+El coeficiente de correlación de Matthews complementa esta imagen al resumir en un único número la calidad de la predicción sobre las dos clases a la vez. Su valor solo es alto cuando el modelo acierta tanto en las transacciones ilícitas como en las lícitas, de modo que un clasificador que ignore la clase minoritaria obtiene un valor cercano a cero pese a una exactitud aparentemente alta. Esta propiedad hace del coeficiente una salvaguarda contra la ilusión de desempeño que la exactitud produce en presencia de desbalance. En conjunto, la combinación del F1 de la clase ilícita, el área bajo la curva de precisión y exhaustividad y el coeficiente de correlación de Matthews ofrece un panorama robusto del rendimiento predictivo, sobre el que se apoya la interpretación del colapso de validación a test documentado en el Capítulo 4.
+
+\subsection{Métricas de Estabilidad y Fidelidad Explicativa}
+
+La estabilidad de un método XAI se refiere a su capacidad para producir explicaciones consistentes en diferentes ejecuciones o frente a pequeñas perturbaciones en el modelo o en los datos \cite{Gawantka2024AExplanations}. En el contexto de GNNs, la explicación para un nodo de interés suele representarse como un subgrafo $G_S = (V_S, E_S)$ extraído del grafo original $G$, generalmente seleccionando el subconjunto de las $K$ aristas más relevantes (\textit{Top-$K$}).
+
+Para cuantificar rigurosamente la variación estructural de estas explicaciones, se empleará el \textbf{Índice de Similitud de Jaccard}. Si un explicador se ejecuta dos veces independientes sobre el mismo nodo (o bajo condiciones de ruido topológico introducido) generando dos conjuntos de aristas explicativas $E_{S_1}$ y $E_{S_2}$, el índice de Jaccard se define como:
+\[ J(E_{S_1}, E_{S_2}) = \frac{|E_{S_1} \cap E_{S_2}|}{|E_{S_1} \cup E_{S_2}|} \]
+Donde $J \in [0, 1]$. Un valor de $J = 1$ indica una estabilidad explicativa perfecta (la topología del subgrafo explicativo fue idéntica en ambas instancias), mientras que $J = 0$ indica inestabilidad total (no hay superposición en las aristas identificadas como relevantes).
+
+Complementariamente a la estabilidad observada en repeticiones, es imperativo evaluar si la explicación refleja fidedignamente el mecanismo interno de la red neuronal mediante la \textbf{Fidelidad (\textit{Fidelity})}. Esta métrica cuantifica la caída en la probabilidad asignada a la clase predicha $\hat{y}$ cuando el subgrafo explicativo $G_S$ es removido (enmascarado) del grafo original:
+\[ \text{Fidelity} = \frac{1}{N} \sum_{i=1}^{N} \left( P(\hat{y}_i \mid G_i) - P(\hat{y}_i \mid G_i \setminus G_{S_i}) \right) \]
+Una fidelidad alta garantiza que las aristas identificadas por el método XAI eran, efectivamente, la señal topológica de la cual dependía la GNN para realizar su predicción \cite{Agarwal2022ProbingMethods}.
+
+Además de la fidelidad y de la superposición de aristas, esta tesis emplea como métrica principal de estabilidad la \textbf{correlación de Spearman} entre los rankings de importancia de \textit{features} obtenidos en ejecuciones repetidas. Si un explicador produce, para un mismo nodo, dos ordenamientos de las \textit{features} según su relevancia, la correlación de Spearman entre ambos cuantifica en qué medida el explicador prioriza los mismos atributos de una ejecución a otra. Esta elección responde a una particularidad del \textit{Elliptic Dataset} que se documenta en el Capítulo 4, ya que la dispersión extrema del grafo hace que los subgrafos explicativos sean minúsculos y que el índice de Jaccard de aristas se sature hacia valores altos y poco informativos, con lo cual pierde poder discriminante. La correlación de Spearman de \textit{features}, en cambio, conserva sensibilidad incluso en vecindarios muy pequeños, lo que la convierte en la medida de estabilidad informativa para este dominio.
+
+\subsection{Nociones de Inferencia Estadística para el Análisis de Robustez}
+
+Afirmar que una arquitectura o un explicador es más estable que otro exige distinguir una diferencia real de la variación producida por una única inicialización aleatoria del modelo. Para ello, esta tesis apoya sus conclusiones en réplicas y en pruebas estadísticas formales, cuyas nociones se introducen aquí y se aplican de forma extensa en el Capítulo 5. La lógica general consiste en repetir cada configuración con varias semillas de entrenamiento, resumir la dispersión resultante y contrastar los factores de interés con pruebas adecuadas a la naturaleza de las métricas. De este modo, las afirmaciones dejan de depender de una sola corrida y adquieren una medida explícita de confianza.
+
+La \textbf{réplica por semilla de modelo} consiste en entrenar de forma independiente varios modelos con la misma configuración, variando únicamente la semilla que controla la inicialización de los pesos y el orden del entrenamiento. Cada réplica produce su propio valor de estabilidad o de plausibilidad, de manera que el conjunto de réplicas describe cuánta variación es atribuible al azar del entrenamiento. A partir de esa variación se calcula un \textbf{intervalo de confianza}, que delimita el rango dentro del cual se espera encontrar el valor verdadero de la métrica con un nivel de confianza dado, habitualmente del noventa y cinco por ciento. Un intervalo estrecho indica una estimación reproducible, mientras que un intervalo que incluye el cero, en el caso de una correlación, señala que el efecto no se distingue de la ausencia de relación.
+
+Para comparar el efecto de un factor con varios niveles, como la arquitectura o el explicador, esta tesis emplea la \textbf{prueba de Kruskal-Wallis}, una alternativa no paramétrica al análisis de varianza que no exige que los datos sigan una distribución normal. Esta elección es pertinente porque las métricas de estabilidad y de plausibilidad viven en el intervalo de cero a uno y rara vez cumplen el supuesto de normalidad. La prueba indica si al menos un nivel del factor difiere de los demás, pero no cuantifica la magnitud de esa diferencia, para lo cual se reporta el \textbf{tamaño de efecto eta cuadrado}, que expresa qué proporción de la variabilidad total explica el factor considerado. Un valor de eta cuadrado cercano a cero corresponde a un efecto despreciable, mientras que valores superiores a catorce centésimas suelen interpretarse como efectos grandes.
+
+Por último, cuando el interés recae en comparar dos explicadores sobre las mismas configuraciones, se utiliza la \textbf{prueba de Wilcoxon de rangos con signo} para muestras pareadas. Esta prueba compara, celda por celda, el desempeño de los dos explicadores y evalúa si la diferencia observada es sistemática o compatible con el azar, sin asumir normalidad en la distribución de las diferencias. El uso de una prueba pareada es apropiado porque ambos explicadores se aplican sobre exactamente las mismas configuraciones de arquitectura, escenario y balanceo, de modo que la comparación controla las fuentes de variación comunes. En conjunto, estas herramientas permiten que las afirmaciones del Capítulo 5 se acompañen de una medida explícita de incertidumbre y de significancia, en lugar de descansar sobre una única ejecución.
+
+\section{Preparación para el Diseño Experimental}
+
+Este capítulo ha establecido los fundamentos técnicos y matemáticos necesarios para comprender el diseño experimental que se desarrollará en el Capítulo 4. Se ha justificado la transición desde métodos tabulares hacia GNNs como respuesta a las limitaciones estructurales de los enfoques tradicionales frente a la naturaleza relacional del lavado de dinero. Asimismo, se han caracterizado las cuatro arquitecturas evaluadas (GCN, GraphSAGE, GAT y TAGCN), que se comparan en igualdad de condiciones sin asumir la superioridad de ninguna de ellas.
+
+Se ha caracterizado a TAGCN dentro del conjunto comparativo, destacando su capacidad para capturar dependencias \textit{multi-hop} mediante filtros polinomiales adaptativos, y se ha planteado como hipótesis, no como conclusión, que dicha capacidad pudiera favorecer la detección de tipologías estructuralmente complejas. También se introdujo el desafío crítico de la explicabilidad (presentando a GNNExplainer, PGExplainer y GNNShap) y las estrategias de mitigación del desbalance (GraphSMOTE, ponderación de clases).
+
+Finalmente, la formalización de las métricas predictivas (F1-Score, AUC-PR) y explicativas (correlación de Spearman, similitud de Jaccard y fidelidad), junto con las nociones de inferencia estadística, dota a esta investigación de un marco de evaluación robusto. El siguiente capítulo construye sobre estos fundamentos para desplegar el entorno experimental sobre el \textit{Elliptic Dataset}, examinar cómo se comporta la estabilidad de las explicaciones bajo distintos niveles de desbalance, comparar la resiliencia de las cuatro arquitecturas GNN y sentar las bases para el eje sintético con \textit{ground-truth} y el análisis estadístico que se despliegan en el Capítulo 5.

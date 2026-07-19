@@ -1,0 +1,61 @@
+\chapter{Anexos}
+
+Este anexo recoge el material complementario que respalda la reproducibilidad del estudio. Se presentan el espacio de búsqueda de hiperparámetros y la configuración de entrenamiento, la tabla completa de resultados por configuración sobre el \textit{Elliptic Dataset}, y los detalles del entorno de cómputo y de las semillas empleadas. La finalidad de este material es permitir que un tercero reproduzca el estudio y recalcule las cifras reportadas en los capítulos anteriores.
+
+\section{Espacio de Búsqueda de Hiperparámetros y Configuración de Entrenamiento}
+
+El entrenamiento de cada modelo emplea una búsqueda de hiperparámetros mediante optimización bayesiana, guiada por el área bajo la curva de precisión y exhaustividad sobre la partición de validación. La Tabla \ref{tab:hp} resume el espacio de búsqueda explorado y los valores fijos de la configuración de entrenamiento. La búsqueda parte de un conjunto de valores iniciales inspirados en la literatura sobre GNN aplicadas al \textit{Elliptic Dataset}, encolados como primer ensayo de la optimización, de modo que la exploración no comience en una región arbitraria del espacio de hiperparámetros. Esta estrategia de arranque templado reduce el número de ensayos necesarios para alcanzar configuraciones de calidad.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ll}
+\toprule
+\textbf{Hiperparámetro} & \textbf{Rango o valor} \\
+\midrule
+Dimensión de capas ocultas & valores discretos de 32 a 256 \\
+Número de capas & 2 a 3 \\
+Tasa de \textit{dropout} & 0,1 a 0,5 \\
+Tasa de aprendizaje & 0,0001 a 0,01 (escala logarítmica) \\
+Decaimiento de pesos & 0,00001 a 0,001 (escala logarítmica) \\
+Cabezas de atención (solo GAT) & 4 u 8 \\
+Orden del filtro K (solo TAGCN) & 2 a 4 \\
+\midrule
+Épocas máximas & 600 \\
+Paciencia de parada temprana & 50 \\
+Métrica de parada temprana & F1 de la clase ilícita \\
+Optimizador & Adam \\
+Métrica de la búsqueda & PR-AUC de validación \\
+Umbral de calidad en F1 de validación & mayor o igual a 0,30 \\
+Umbral de calidad en MCC de validación & mayor o igual a 0,15 \\
+\bottomrule
+\end{tabular}
+\caption{Espacio de búsqueda de hiperparámetros y configuración de entrenamiento del pipeline experimental. Los umbrales de calidad definen el subconjunto de configuraciones sobre el que se afirman las conclusiones.}
+\label{tab:hp}
+\end{table}
+
+El entrenamiento final de cada configuración se realiza durante un máximo de seiscientas épocas con parada temprana de paciencia cincuenta sobre el F1 de la clase ilícita, y utiliza el optimizador Adam. El criterio de calidad que decide si una configuración se explica exige un F1 de validación no inferior a treinta centésimas y un coeficiente de correlación de Matthews de validación no inferior a quince centésimas, de manera que la estabilidad se mida solo sobre modelos que efectivamente aprendieron a discriminar. Las configuraciones que no alcanzan ese umbral se reportan pero se excluyen del subconjunto sobre el que se afirman las conclusiones, lo que evita medir la estabilidad de explicaciones de clasificadores triviales. Esta separación entre configuraciones con y sin calidad garantizada es la razón por la que el ranking del Capítulo 4 se presenta en dos corridas.
+
+\section{Resultados Completos por Configuración sobre el Elliptic Dataset}
+
+La Tabla \ref{tab:elliptic-full} presenta el resultado de cada una de las sesenta configuraciones de escenario, arquitectura y balanceo evaluadas sobre el \textit{Elliptic Dataset}, con la estabilidad de las explicaciones, el F1 en test y el número de verdaderos positivos de validación empleados en la medición. Esta tabla permite recalcular las medias reportadas en el Capítulo 4 y verificar de forma independiente la lectura robusta del ranking de estabilidad. La presencia de configuraciones con un número reducido de verdaderos positivos explica la cautela con la que se interpretan algunos valores agregados, en particular los de las arquitecturas con poco soporte en la corrida con filtro de calidad.
+
+\input{tables/elliptic_full.tex}
+
+\section{Resultados Completos de la Matriz Factorial Sintética}
+
+La Tabla \ref{tab:synth-full} presenta los resultados de la matriz factorial sintética desagregados por escenario, arquitectura y explicador, promediados sobre las estrategias de balanceo. Esta tabla complementa el mapa de calor y las tablas resumen del Capítulo 5, y permite verificar que los patrones globales se sostienen a través de los escenarios de desbalance, en particular la superioridad de PGExplainer en plausibilidad de aristas y la mayor estabilidad de GNNShap. La desagregación por escenario confirma además la escasa influencia del desbalance sobre las tres métricas, ya que los valores de una misma combinación de arquitectura y explicador se mantienen próximos a través de los cinco escenarios, en coherencia con el tamaño de efecto despreciable del balanceo reportado en el análisis estadístico.
+
+\input{tables/synth_full.tex}
+
+\section{Resultados de la Matriz Robusta por Configuración}
+
+La Tabla \ref{tab:synth-robust-full} presenta la matriz robusta completa sobre el grafo principal, con la media sobre las tres semillas de modelo para cada combinación de arquitectura, escenario, balanceo y explicador. Esta tabla constituye el respaldo detallado de las medias, los intervalos y las pruebas estadísticas reportadas en el Capítulo 5, y permite recalcular cualquiera de esos valores de forma independiente. La regularidad de los valores a través de escenarios y balanceos, para una misma combinación de arquitectura y explicador, ilustra de forma directa la baja influencia de esos dos factores frente al explicador. Las abreviaturas de la columna de explicador corresponden a GNNExplainer, PGExplainer y GNNShap por sus primeras letras.
+
+\input{tables/synth_robust_full.tex}
+
+\section{Reproducibilidad y Entorno de Cómputo}
+
+Los experimentos se ejecutaron sobre una unidad de procesamiento gráfico de gama media con ocho gigabytes de memoria, con la biblioteca PyTorch Geometric sobre PyTorch. La estabilidad de cada explicación se midió repitiendo la explicación cinco veces con semillas distintas del explicador, mientras que el análisis de robustez del Capítulo 5 empleó tres semillas de modelo, con valores cuarenta y dos, cuarenta y tres y cuarenta y cuatro, y tres realizaciones independientes del grafo sintético. La distinción entre la semilla del explicador, que mide la estabilidad, y la semilla del modelo, que habilita la inferencia estadística, es deliberada y se mantiene a lo largo de todo el análisis. La generación del grafo sintético fija la semilla del generador para cada realización, de modo que cada instancia es reproducible a partir de su semilla.
+
+El código del pipeline se organiza en módulos separados para los modelos, los explicadores, las métricas de estabilidad, la plausibilidad y el análisis, lo que facilita la reproducción de cada etapa de forma independiente. Los resultados intermedios se almacenan en archivos de valores separados por comas que contienen una fila por configuración, de manera que las tablas y figuras de esta tesis pueden regenerarse a partir de esos archivos sin necesidad de reejecutar el entrenamiento. Esta organización responde al principio de que un estudio sobre estabilidad y reproducibilidad de explicaciones debe ser, en sí mismo, reproducible.

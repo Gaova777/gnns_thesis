@@ -1,0 +1,24 @@
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\small
+\begin{tabular}{ll ccc}
+\toprule
+\textbf{Metrica} & \textbf{Factor} & \textbf{Kruskal-Wallis H} & \textbf{valor p} & \textbf{$\eta^2$} \\
+\midrule
+Estabilidad & arquitectura & 91,1 & $<$0,0001 & 0,24 \\
+Estabilidad & explicador & 125,6 & $<$0,0001 & 0,36 \\
+Estabilidad & balanceo & 9,1 & 0,0107 & 0,01 \\
+\midrule
+Plaus. aristas & arquitectura & 10,5 & 0,0149 & 0,04 \\
+Plaus. aristas & explicador & 195,8 & $<$0,0001 & 0,64 \\
+Plaus. aristas & balanceo & 2,4 & 0,3081 & 0,01 \\
+\midrule
+Plaus. features & arquitectura & 11,3 & 0,0103 & 0,05 \\
+Plaus. features & explicador & 176,2 & $<$0,0001 & 0,45 \\
+Plaus. features & balanceo & 3,5 & 0,1730 & 0,01 \\
+\bottomrule
+\end{tabular}
+\caption{Prueba de Kruskal-Wallis y tamano de efecto eta cuadrado de cada factor sobre cada metrica en el grafo sintetico. El explicador ejerce el efecto dominante en las tres metricas, la arquitectura solo en la estabilidad, y el balanceo resulta despreciable.}
+\label{tab:synth-stats}
+\end{table}

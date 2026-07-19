@@ -1,0 +1,160 @@
+\chapter{DISEÑO EXPERIMENTAL Y RESULTADOS SOBRE EL ELLIPTIC DATASET}
+
+Este capítulo traslada los fundamentos del Capítulo 3 a un entorno experimental concreto sobre el \textit{Elliptic Dataset}, el conjunto de transacciones reales de Bitcoin que sirve de referencia en la detección de actividad ilícita. El capítulo describe primero el preprocesamiento y una característica estructural del grafo que condiciona todo el estudio, a saber su dispersión extrema, y luego presenta el espacio factorial de configuraciones que se evaluó. A continuación se reportan el rendimiento predictivo y un fenómeno central del dominio, el colapso del desempeño entre la partición de validación y la de test, que obliga a estudiar la estabilidad de las explicaciones sobre validación. Finalmente, el capítulo documenta una corrección metodológica en la forma de generar las explicaciones que reordena el ranking de estabilidad entre arquitecturas y que constituye una de las contribuciones centrales de la tesis.
+
+\section{Preprocesamiento y Análisis Exploratorio}
+
+\subsection{Composición y Estructura Temporal del Conjunto de Datos}
+
+El \textit{Elliptic Dataset} está compuesto por 203.769 nodos que representan transacciones de Bitcoin y 234.355 aristas que codifican el flujo de fondos entre ellas, con 166 features por nodo distribuidas a lo largo de 49 pasos temporales \cite{Weber2019Anti-MoneyForensics}. De esos nodos, únicamente 46.564 poseen etiqueta conocida, repartidos en 4.545 transacciones ilícitas y 42.019 lícitas, mientras que los 157.205 restantes permanecen sin clasificar. La clase ilícita representa así apenas el dos coma dos por ciento del total de nodos y establece una razón cercana a 1:9 respecto de la clase lícita dentro del subconjunto etiquetado, una proporción que ya de por sí refleja el desbalance característico del dominio AML y que los escenarios experimentales acentúan de forma deliberada. La Tabla \ref{tab:composicion} resume esta composición y fija las magnitudes sobre las que se construye el diseño experimental.
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lc}
+\toprule
+\textbf{Componente} & \textbf{Cantidad} \\
+\midrule
+Nodos totales & 203.769 \\
+Aristas & 234.355 \\
+Features por nodo & 166 \\
+Pasos temporales & 49 \\
+Transacciones ilícitas & 4.545 \\
+Transacciones lícitas & 42.019 \\
+Transacciones sin etiqueta & 157.205 \\
+Razón ilícito a lícito (etiquetado) & 1:9,2 \\
+Fracción ilícita del total & 2,2\% \\
+\bottomrule
+\end{tabular}
+\caption{Composición del \textit{Elliptic Dataset} según el análisis exploratorio realizado sobre los archivos de clases, aristas y features.}
+\label{tab:composicion}
+\end{table}
+
+El preprocesamiento aplicado normaliza las features mediante un escalado robusto, que centra y escala cada atributo utilizando la mediana y el rango intercuartílico, de modo que la presencia de valores extremos no distorsione la representación de entrada. La partición de los datos respeta el orden temporal, con los primeros treinta y cuatro pasos destinados a entrenamiento, los pasos treinta y cinco a cuarenta y dos a validación, y los últimos siete a test, en línea con la práctica establecida para este conjunto de datos. Esta partición temporal no es una elección arbitraria, sino que reproduce la situación real de un sistema de monitoreo que se entrena con transacciones del pasado y debe operar sobre transacciones futuras. La Figura \ref{fig:eda-clases} muestra la distribución de transacciones etiquetadas a lo largo de los pasos temporales, y permite apreciar que tanto el volumen como la proporción de actividad ilícita varían de forma apreciable entre periodos.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{chapter_4/images_ch4/eda_clases_timestep.png}
+    \caption{Distribución de las transacciones etiquetadas del \textit{Elliptic Dataset} a lo largo de los 49 pasos temporales, con las particiones de entrenamiento, validación y test delimitadas. Tanto el volumen total como la proporción de actividad ilícita varían entre periodos, lo que anticipa el desplazamiento temporal que degrada la generalización.}
+    \label{fig:eda-clases}
+\end{figure}
+
+La estructura temporal del conjunto tiene una implicación que se retoma en la Sección 4.4, la de que los patrones que caracterizan la actividad ilícita no son estacionarios. Un modelo que aprende a discriminar transacciones ilícitas en los primeros pasos temporales se enfrenta, en los últimos pasos, a una distribución que ha cambiado, lo que anticipa la dificultad de generalizar del periodo de entrenamiento al de test. Esta no estacionariedad es una propiedad del fenómeno del lavado, cuyas tipologías evolucionan para evadir la detección, y no un defecto del conjunto de datos. Reconocerla desde el análisis exploratorio permite interpretar correctamente los resultados de rendimiento que se presentan más adelante.
+
+\subsection{Dispersión de la Topología}
+
+Una segunda propiedad del grafo resulta determinante para el resto del estudio y merece un análisis detallado, la dispersión extrema de su topología. La mayoría de los nodos poseen muy pocas conexiones, hasta el punto de que el grado mediano es de dos y el nonagésimo percentil se sitúa en tres, con una media de dos coma tres aristas por nodo, tal como ilustra la Figura \ref{fig:eda-grados}. La escasez es aún más marcada en la clase ilícita, ya que el noventa y tres coma dos por ciento de las transacciones ilícitas presentan dos aristas o menos. Esta característica no es un defecto del preprocesamiento sino una propiedad intrínseca de las transacciones de Bitcoin etiquetadas, y condiciona de manera profunda todo lo que puede medirse sobre las explicaciones.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{chapter_4/images_ch4/eda_grados.png}
+    \caption{Distribución del grado de los nodos del \textit{Elliptic Dataset} en escala logarítmica, recortada para su visualización. El grado mediano es de dos, lo que evidencia una topología extremadamente dispersa dominada por nodos con muy pocas conexiones.}
+    \label{fig:eda-grados}
+\end{figure}
+
+La consecuencia directa de esta dispersión se aprecia al construir el subgrafo receptivo de un nodo, es decir el conjunto de nodos que influyen en su predicción a través del paso de mensajes. La mediana del tamaño de ese subgrafo es de apenas dos nodos, como muestra la Figura \ref{fig:dispersion}, de modo que un vecindario tan reducido deja muy poco margen para que una explicación estructural sea informativa o para que su plausibilidad sea medible. Esta limitación es la razón de fondo por la que el eje sintético del Capítulo 5 resulta necesario, ya que sin estructura de subgrafo no existe un patrón que una explicación pueda recuperar ni contra el cual pueda contrastarse.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{chapter_4/images_ch4/dispersion_elliptic.png}
+    \caption{Distribución del tamaño del subgrafo receptivo de los nodos ilícitos en el \textit{Elliptic Dataset}. La mediana se sitúa en dos nodos, lo que evidencia la dispersión extrema del grafo y explica por qué la plausibilidad estructural de las explicaciones no es medible en este dominio.}
+    \label{fig:dispersion}
+\end{figure}
+
+La consecuencia inmediata de esta dispersión sobre la evaluación de estabilidad es que el índice de Jaccard entre aristas explicativas pierde buena parte de su capacidad de discriminar. Cuando el subgrafo receptivo contiene una o dos aristas, cualquier método que seleccione las aristas más relevantes recupera el mismo conjunto en cada ejecución, de modo que el índice de Jaccard se satura hacia valores altos, cercano a la unidad en los subgrafos más pequeños, y su media se mantiene comprimida alrededor de valores elevados con independencia de la arquitectura. La Tabla \ref{tab:jaccard} ilustra este efecto, ya que el Jaccard medio apenas varía entre arquitecturas, mientras que la correlación de Spearman de features se distribuye en un rango mucho más amplio y logra distinguir entre ellas. Por esta razón, y como se anticipó en el Capítulo 3, la correlación de Spearman entre los rankings de importancia de las features se adopta como la métrica de estabilidad informativa para el \textit{Elliptic Dataset}, dado que conserva sensibilidad incluso en vecindarios minúsculos, decisión metodológica que condiciona la lectura de todos los resultados de estabilidad que siguen.
+
+\input{tables/elliptic_jaccard.tex}
+
+\section{Pipeline Experimental y Espacio Factorial}
+
+El diseño experimental se organiza como una matriz factorial que cruza cuatro dimensiones, a saber las cuatro arquitecturas GNN caracterizadas en el Capítulo 3, un conjunto de escenarios de desbalance, tres estrategias de balanceo y los tres métodos de explicabilidad. Las arquitecturas evaluadas son GCN, GraphSAGE, GAT y TAGCN, y ninguna recibe un tratamiento privilegiado dentro de la comparación. Las estrategias de balanceo comprenden el entrenamiento sin intervención, la ponderación de clases inversamente proporcional a su frecuencia y la Focal Loss \cite{Lin2017FocalDetection}, mientras que los explicadores son GNNExplainer, PGExplainer y GNNShap \cite{Ying2019Gnnexplainer:Networks, Luo2020ParameterizedNetwork, Akkas2024Gnnshap:Values}. El pipeline sigue cuatro fases, la preparación de los datos, el entrenamiento de los modelos con búsqueda de hiperparámetros, la generación de explicaciones y la medición de estabilidad mediante réplicas, tal como resume la Figura \ref{fig:metodologia}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{chapter_4/images_ch4/metodologia.png}
+    \caption{Metodología de cuatro fases del pipeline experimental, desde la preparación de los datos hasta la medición de estabilidad de las explicaciones mediante réplicas.}
+    \label{fig:metodologia}
+\end{figure}
+
+El entrenamiento de cada modelo incorpora una búsqueda de hiperparámetros mediante optimización bayesiana, que ajusta la dimensión de las capas ocultas, el número de capas, la tasa de \textit{dropout} y la tasa de aprendizaje. La métrica que guía la búsqueda es el área bajo la curva de precisión y exhaustividad, más adecuada que la exactitud en presencia de desbalance extremo, y el criterio de parada temprana vigila el F1 de la clase ilícita para evitar detenerse por ruido. Este procedimiento busca que cada configuración alcance la mejor calidad posible antes de generar explicaciones, de manera que la estabilidad se mida sobre modelos que efectivamente aprendieron a discriminar y no sobre clasificadores triviales. La medición de estabilidad repite la explicación de cada nodo de interés cinco veces con semillas distintas y resume la variación resultante mediante la correlación de Spearman de los rankings de features.
+
+\subsection{Compuerta de Calidad y Selección de Nodos a Explicar}
+
+Un principio metodológico atraviesa todo el pipeline, el de que solo tiene sentido estudiar la estabilidad de las explicaciones de modelos que efectivamente aprendieron a discriminar. Para hacerlo operativo, cada configuración debe superar una compuerta de calidad antes de que se generen sus explicaciones, definida sobre la partición de validación mediante dos umbrales, un F1 de la clase ilícita no inferior a treinta centésimas y un coeficiente de correlación de Matthews no inferior a quince centésimas. Las configuraciones que no alcanzan estos umbrales se registran, pero se excluyen del subconjunto sobre el que se afirman las conclusiones, lo que evita que la estabilidad se mida sobre clasificadores triviales cuyas explicaciones carecen de significado. Esta compuerta es la razón por la que el ranking de estabilidad se presenta más adelante en dos corridas, una completa y otra restringida a las configuraciones que superan el filtro.
+
+La selección de los nodos que se explican sigue el mismo principio de significado. Para cada configuración, se explican los nodos de la partición de validación que el modelo clasifica correctamente como ilícitos, es decir los verdaderos positivos, ya que solo en ellos existe una predicción positiva cuya explicación tiene interés analítico. Este criterio garantiza que la estabilidad medida corresponda a explicaciones de aciertos y no de errores, y que la comparación entre arquitecturas y explicadores se realice sobre un conjunto de nodos homogéneo en su condición de verdaderos positivos. El número de verdaderos positivos disponibles varía entre configuraciones, y ese número se registra junto con cada resultado para poder ponderar la confianza de las medias reportadas, tal como se detalla en la tabla completa del anexo.
+
+\section{Escenarios de Desbalance}
+
+Para estudiar el efecto del desbalance de clases sobre la estabilidad, el conjunto de entrenamiento se resamplea en cinco escenarios de proporción creciente entre transacciones ilícitas y lícitas. Los escenarios controlados corresponden a las razones 1:1, 1:10, 1:50 y 1:100, obtenidas mediante submuestreo de la clase mayoritaria, y se añade un escenario nativo que conserva la proporción del subconjunto etiquetado sin aplicar resampleo, cercana a 1:9. Esta gradación permite observar si la estabilidad de las explicaciones se degrada de forma monótona a medida que la clase ilícita se vuelve más escasa, o si presenta un comportamiento distinto. La inclusión del escenario nativo resulta relevante porque representa la condición realista del dato, sin manipulación artificial de la proporción, y ofrece un punto de comparación frente a los escenarios construidos.
+
+\section{Rendimiento Predictivo y el Colapso de Validación a Test}
+
+Los modelos entrenados alcanzan un rendimiento razonable sobre la partición de validación, con un área bajo la curva de precisión y exhaustividad cercana a 0,339 en la mejor configuración hallada por la búsqueda de hiperparámetros. Sin embargo, ese desempeño no se traslada a la partición de test, donde el área bajo la misma curva cae a un valor medio cercano a 0,013 y el F1 de la clase ilícita se sitúa alrededor de 0,012. La magnitud de esta caída es tan pronunciada que ninguna arquitectura escapa a ella, como ilustran los valores de F1 en test por arquitectura, de 0,0245 para GAT, 0,0133 para GCN, 0,0077 para GraphSAGE y 0,0015 para TAGCN, que la Tabla \ref{tab:elliptic-perf} recoge junto con el coeficiente de correlación de Matthews y el área bajo la curva de precisión y exhaustividad. Este fenómeno, que puede denominarse colapso de validación a test, constituye uno de los rasgos más importantes del dominio y condiciona la interpretación de todo el estudio.
+
+\input{tables/elliptic_perf.tex}
+
+La causa del colapso no reside en un defecto del método sino en una propiedad estructural del dato, el desplazamiento temporal entre las particiones. El \textit{Elliptic Dataset} ordena las transacciones por pasos temporales, y los patrones que caracterizan la actividad ilícita en los primeros pasos difieren de los que aparecen en los últimos, de modo que un modelo ajustado sobre el periodo de validación encuentra en test una distribución distinta a la que aprendió \cite{Menezes2025SemanticDetectors}. Trabajos previos sobre el mismo conjunto de datos han documentado la fragilidad de los detectores basados en grafos ante este tipo de desplazamiento, lo que refuerza que se trata de una limitación del dato y no de la implementación \cite{Lawal2025AnDataset}. Reconocer esta limitación de forma explícita es preferible a ocultarla, ya que delimita con honestidad el alcance de las conclusiones. En consecuencia, y puesto que el objeto de la tesis es la estabilidad de las explicaciones y no el rendimiento predictivo en test, el estudio de estabilidad se realiza sobre los nodos de la partición de validación que el modelo clasifica correctamente como ilícitos.
+
+Conviene precisar el sentido de esta decisión para evitar malentendidos. Estudiar la estabilidad sobre validación no busca disimular el colapso, sino situar el análisis allí donde el modelo efectivamente discrimina y donde, por tanto, la pregunta por la estabilidad de una explicación tiene sentido. Un modelo que no detecta ninguna transacción ilícita en test no genera predicciones positivas cuya explicación pueda evaluarse, de manera que forzar la medición sobre test produciría explicaciones de predicciones erróneas y carentes de interés analítico. La estabilidad reportada en las secciones siguientes se refiere, por tanto, a las explicaciones de verdaderos positivos sobre validación, un encuadre que se declara de forma transparente y que constituye una respuesta metodológica honesta ante una limitación estructural del dato.
+
+\section{Del Grafo Completo al Subgrafo Receptivo: una Corrección Metodológica}
+
+La forma en que se generan las explicaciones tiene un efecto inesperado y de gran alcance sobre los resultados de estabilidad. En una primera versión del pipeline, cada explicación se calculaba sobre el grafo completo de 203.769 nodos, lo que imponía una carga de memoria considerable a los explicadores basados en máscaras. En el caso de GAT, cuyo mecanismo de atención multiplica el consumo de memoria por el número de cabezas, esa carga provocaba fallos por agotamiento de memoria de la unidad de procesamiento gráfico, con picos cercanos a 7,5 GiB. El problema más serio no era el fallo en sí, sino que trece de esas configuraciones de GAT fallaban de forma silenciosa y sus filas quedaban vacías, de modo que el promedio de estabilidad de GAT terminaba calculándose solo sobre las siete u ocho configuraciones que sí completaban la ejecución.
+
+Este comportamiento generaba un artefacto grave que conviene exponer con detalle. El ranking de estabilidad de la versión anterior situaba a GAT como la arquitectura más estable, con un valor cercano a 0,534, por encima de GraphSAGE, que aparecía como la peor con 0,345, pero esa comparación no era legítima porque GAT se medía sobre un subconjunto favorable de sus configuraciones mientras GraphSAGE se medía sobre todas. La corrección consiste en calcular cada explicación sobre el subgrafo receptivo del nodo de interés, es decir el conjunto de nodos que realmente influyen en su predicción según el número de capas de la arquitectura, en lugar de sobre el grafo completo. Para TAGCN, cuyo campo receptivo se amplía por el orden del filtro polinomial, se emplea un radio de dos saltos. Esta restricción reduce el consumo de memoria de 7,5 GiB a 0,02 GiB y elimina por completo los fallos, de manera que las cuatro arquitecturas se miden ahora sobre el mismo soporte y en condiciones equitativas.
+
+Al recalcular la estabilidad sobre el subgrafo receptivo, el ranking se invierte respecto de la versión anterior. Sobre el conjunto completo de configuraciones, GraphSAGE alcanza la mayor estabilidad con 0,630, seguido de GAT con 0,486 y GCN con 0,468, muy próximos entre sí, mientras que TAGCN queda en último lugar con 0,270, como muestra la Figura \ref{fig:ranking}. Sobre el subconjunto de veintitrés configuraciones que superan el filtro de calidad, el mismo que utiliza la tesis para sus conclusiones, GraphSAGE conserva el primer lugar con 0,640 sobre once configuraciones, seguido de GCN con 0,639 sobre una sola, GAT con 0,535 sobre siete y TAGCN con 0,363 sobre cuatro, tal como recoge la Tabla \ref{tab:ranking}. La prueba de que el ranking anterior era un artefacto resulta directa, ya que sobre este mismo subconjunto GAT apenas se movió, de 0,534 a 0,535, mientras que GraphSAGE saltó de 0,345 a 0,640 al medirse por fin sobre todas sus configuraciones.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{chapter_4/images_ch4/ranking_khop.png}
+    \caption{Estabilidad de las explicaciones por arquitectura sobre el subgrafo receptivo, en la corrida completa y en la corrida con filtro de calidad. GraphSAGE encabeza ambas corridas, mientras que GAT apenas varía entre subconjuntos, lo que evidencia que el ranking previo favorable a GAT era un artefacto del cálculo sobre el grafo completo.}
+    \label{fig:ranking}
+\end{figure}
+
+La lectura que esta tesis afirma como robusta es deliberadamente prudente. La única afirmación que se sostiene en ambas corridas es que GraphSAGE es la arquitectura más estable, y la comparación firme es que GraphSAGE supera a GAT. GAT y GCN no son ordenables entre sí, dado que en la corrida completa sus valores de 0,486 y 0,468 son prácticamente indistinguibles. En la corrida con filtro, además, GCN se apoya en una única configuración y TAGCN en cuatro, un soporte insuficiente para ordenarlos con confianza, de modo que sus valores se reportan pero no se utilizan para establecer un orden. Esta cautela es coherente con el número reducido de configuraciones que superan el filtro y evita sobreinterpretar diferencias que carecen de respaldo estadístico.
+
+El detalle por configuración, que el anexo recoge en su totalidad, permite apreciar el origen de esta cautela. La estabilidad varía de forma apreciable entre configuraciones de una misma arquitectura según el escenario y el balanceo, y el número de verdaderos positivos disponibles para medir la estabilidad oscila también de forma notable, lo que hace que algunas medias por arquitectura descansen sobre un soporte más sólido que otras. GraphSAGE se beneficia de disponer de un número mayor de configuraciones con calidad garantizada, lo que refuerza la confianza en su primer lugar, mientras que GCN y TAGCN, con muy pocas configuraciones en la corrida con filtro, no ofrecen un soporte suficiente para afirmar su posición relativa. Esta lectura, apoyada en la tabla completa, es la que justifica limitar la afirmación robusta a la superioridad de GraphSAGE sobre GAT y a la constatación de que TAGCN ocupa la posición más baja en la corrida completa.
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lcc}
+    \toprule
+    \textbf{Arquitectura} & \textbf{Corrida completa (n)} & \textbf{Corrida con filtro (n)} \\
+    \midrule
+    GraphSAGE & 0,630 (15) & 0,640 (11) \\
+    GAT       & 0,486 (15) & 0,535 (7) \\
+    GCN       & 0,468 (15) & 0,639 (1) \\
+    TAGCN     & 0,270 (12) & 0,363 (4) \\
+    \bottomrule
+    \end{tabular}
+    \caption{Estabilidad de las explicaciones (correlación de Spearman) por arquitectura sobre el subgrafo receptivo, con el número de configuraciones de soporte entre paréntesis. La lectura robusta es que GraphSAGE supera a GAT; GCN con una configuración y TAGCN con cuatro carecen de soporte para ordenarse en la corrida con filtro.}
+    \label{tab:ranking}
+\end{table}
+
+El comportamiento de la estabilidad a lo largo de los escenarios de desbalance también difiere de lo que la versión anterior sugería. En lugar de un deterioro pronunciado en algún punto intermedio, el perfil es esencialmente plano, con valores que van de 0,525 en el escenario 1:1 a 0,433 en el escenario 1:10, pasando por 0,501 en 1:100, 0,470 en 1:50 y 0,439 en el escenario nativo, como ilustra la Figura \ref{fig:escenario} y detalla por arquitectura la Tabla \ref{tab:elliptic-stab-scen}. Este perfil plano tiene consecuencias que obligan a retractar afirmaciones de la versión anterior del estudio. En primer lugar, desaparece el supuesto pico de inestabilidad en el escenario 1:50, ya que ese punto no destaca sobre los demás. En segundo lugar, no existe la paradoja atribuida al escenario nativo, puesto que este queda a mitad de tabla y el valor más bajo corresponde al escenario 1:10.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{chapter_4/images_ch4/estabilidad_escenario.png}
+    \caption{Estabilidad de las explicaciones por escenario de desbalance sobre el subgrafo receptivo. El perfil es esencialmente plano, sin un pico de inestabilidad en el escenario 1:50 y con el valor más bajo en el escenario 1:10, lo que invalida la interpretación previa de un deterioro localizado.}
+    \label{fig:escenario}
+\end{figure}
+
+\input{tables/elliptic_stab_scenario.tex}
+
+La corrección obliga además a retractar el supuesto compromiso entre exactitud y estabilidad que la versión anterior reportaba con una correlación cercana a -0,20. Ese compromiso presuponía que la arquitectura más precisa sacrificaba estabilidad, pero una vez corregido el artefacto de memoria se observa que GraphSAGE encabeza tanto la estabilidad como el rendimiento relativo, de modo que no existe tal disyuntiva. Retractar estos hallazgos no debilita la tesis, sino que la fortalece, ya que sustituye conclusiones apoyadas en un artefacto por conclusiones apoyadas en una medición homogénea. Este episodio ilustra, además, un riesgo metodológico general en la evaluación de explicadores, el de que fallos silenciosos de cómputo se confundan con propiedades genuinas de las arquitecturas.
+
+\section{Degeneración de PGExplainer en un Grafo Disperso}
+
+Un resultado adicional del eje Elliptic concierne al comportamiento de PGExplainer sobre un grafo tan disperso. En este conjunto de datos, PGExplainer produce de forma casi universal una correlación de Spearman nula, un fenómeno de colapso de modo en el que el explicador asigna prácticamente la misma importancia a todas las aristas. La revisión de su implementación permitió corregir varios problemas, entre ellos reducir el tamaño de arista de 0,05 a 0,005 y ajustar la temperatura con un recorte para evitar desbordamientos numéricos, lo que estabilizó el entrenamiento del explicador. Aun así, cerca del noventa por ciento de los valores permanecen vacíos en Elliptic debido a la dispersión, de manera que la degeneración no se resuelve por completo en este dominio. Este resultado se reporta como un hallazgo metodológico y, como se verá en el Capítulo 5, contrasta de forma reveladora con el comportamiento del mismo explicador sobre un grafo denso.
+
+La revisión de PGExplainer merece un comentario adicional por su valor metodológico. El colapso de modo observado, en el que el explicador asigna una importancia casi uniforme a todas las aristas, se manifiesta como una correlación de Spearman nula porque no existe un ranking de importancia que comparar entre ejecuciones. Las correcciones introducidas, que reducen el tamaño de arista y ajustan la temperatura del muestreo con un recorte numérico, atacan las causas de inestabilidad del entrenamiento del explicador, pero no pueden crear estructura donde el grafo no la ofrece. Por esta razón, aun con las correcciones, el explicador sigue produciendo una alta proporción de valores vacíos en Elliptic, lo que confirma que la limitación es del dato y no del ajuste del método.
+
+Este resultado admite una lectura que trasciende el caso particular de PGExplainer. Un explicador que degenera sobre un conjunto de datos no es necesariamente un método deficiente, sino que puede estar reflejando una limitación estructural del grafo sobre el que opera. Distinguir entre ambas situaciones exige comparar el comportamiento del método en regímenes de densidad distintos, algo que un estudio de un solo conjunto de datos no permite. El eje sintético del capítulo siguiente proporciona precisamente ese contraste, y su resultado, que se anticipa aquí, invierte por completo el juicio sobre este explicador.
+
+\section{Síntesis del Eje Elliptic}
+
+El eje Elliptic deja tres conclusiones que enmarcan el resto de la tesis. La primera es que la dispersión extrema del grafo limita de manera estructural lo que puede medirse, hasta el punto de que el índice de Jaccard resulta trivial y la plausibilidad de las explicaciones no es evaluable en este dominio. La segunda es que el colapso de validación a test, causado por el desplazamiento temporal del dato, obliga a estudiar la estabilidad sobre validación y a declarar esta restricción con transparencia. La tercera es que la corrección del subgrafo receptivo reordena el ranking de estabilidad y sitúa a GraphSAGE como la arquitectura más estable, invirtiendo la conclusión previa que favorecía a GAT. Estas limitaciones, lejos de invalidar el estudio, motivan el eje sintético del Capítulo 5, concebido precisamente para medir aquello que el Elliptic Dataset no permite, la plausibilidad de las explicaciones frente a un \textit{ground-truth} conocido.

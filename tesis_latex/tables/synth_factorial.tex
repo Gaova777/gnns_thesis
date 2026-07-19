@@ -1,0 +1,28 @@
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\small
+\begin{tabular}{ll cccc}
+\toprule
+\textbf{Arquitectura} & \textbf{Explicador} & \textbf{Estab.} & \textbf{Plaus. aristas} & \textbf{Plaus. feat.} & \textbf{Fidelity+} \\
+\midrule
+GraphSAGE & GNNExplainer & 0,88 & 0,49 & 0,43 & 0,95 \\
+GraphSAGE & PGExplainer & n/d & 0,91 & n/d & n/d \\
+GraphSAGE & GNNShap & 0,97 & n/d & 0,18 & n/d \\
+\midrule
+GAT & GNNExplainer & 0,96 & 0,54 & 0,51 & 1,00 \\
+GAT & PGExplainer & n/d & 0,55 & n/d & n/d \\
+GAT & GNNShap & 0,98 & n/d & 0,22 & n/d \\
+\midrule
+GCN & GNNExplainer & 0,96 & 0,52 & 0,65 & 0,96 \\
+GCN & PGExplainer & n/d & 0,73 & n/d & n/d \\
+GCN & GNNShap & 0,99 & n/d & 0,15 & n/d \\
+\midrule
+TAGCN & GNNExplainer & 0,89 & 0,42 & 0,40 & 0,93 \\
+TAGCN & PGExplainer & n/d & 0,86 & n/d & n/d \\
+TAGCN & GNNShap & 0,97 & n/d & 0,10 & n/d \\
+\bottomrule
+\end{tabular}
+\caption{Resultados de la matriz factorial sintetica por arquitectura y explicador. Los valores n/d corresponden a metricas que un explicador no produce por diseno. PGExplainer domina la plausibilidad de aristas, GNNExplainer la de features y la fidelidad, y GNNShap la estabilidad.}
+\label{tab:synth-factorial}
+\end{table}

@@ -1,0 +1,73 @@
+\begin{longtable}{lll cccc}
+\caption{Resultados de la matriz factorial sintetica por escenario, arquitectura y explicador, promediados sobre las estrategias de balanceo. Las celdas n/d corresponden a metricas que el explicador no produce por diseno.}\label{tab:synth-full}\\
+\toprule
+\textbf{Escenario} & \textbf{Arquitectura} & \textbf{Explicador} & \textbf{Estab.} & \textbf{Pl. aristas} & \textbf{Pl. feat.} & \textbf{Fid.+} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Escenario} & \textbf{Arquitectura} & \textbf{Explicador} & \textbf{Estab.} & \textbf{Pl. aristas} & \textbf{Pl. feat.} & \textbf{Fid.+} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+1:1 & GraphSAGE & GNNExplainer & 0,84 & 0,46 & 0,47 & 0,90 \\
+1:1 & GraphSAGE & PGExplainer & n/d & 0,94 & n/d & n/d \\
+1:1 & GraphSAGE & GNNShap & 0,96 & n/d & 0,17 & n/d \\
+1:1 & GAT & GNNExplainer & 0,95 & 0,54 & 0,41 & 1,00 \\
+1:1 & GAT & PGExplainer & n/d & 0,37 & n/d & n/d \\
+1:1 & GAT & GNNShap & 0,97 & n/d & 0,12 & n/d \\
+1:1 & GCN & GNNExplainer & 0,97 & 0,50 & 0,78 & 1,00 \\
+1:1 & GCN & PGExplainer & n/d & 0,61 & n/d & n/d \\
+1:1 & GCN & GNNShap & 0,99 & n/d & 0,16 & n/d \\
+1:1 & TAGCN & GNNExplainer & 0,87 & 0,48 & 0,40 & 0,88 \\
+1:1 & TAGCN & PGExplainer & n/d & 0,83 & n/d & n/d \\
+1:1 & TAGCN & GNNShap & 0,96 & n/d & 0,08 & n/d \\
+1:10 & GraphSAGE & GNNExplainer & 0,88 & 0,49 & 0,51 & 0,93 \\
+1:10 & GraphSAGE & PGExplainer & n/d & 0,92 & n/d & n/d \\
+1:10 & GraphSAGE & GNNShap & 0,97 & n/d & 0,17 & n/d \\
+1:10 & GAT & GNNExplainer & 0,96 & 0,55 & 0,49 & 1,00 \\
+1:10 & GAT & PGExplainer & n/d & 0,43 & n/d & n/d \\
+1:10 & GAT & GNNShap & 0,97 & n/d & 0,21 & n/d \\
+1:10 & GCN & GNNExplainer & 0,97 & 0,50 & 0,70 & 1,00 \\
+1:10 & GCN & PGExplainer & n/d & 0,78 & n/d & n/d \\
+1:10 & GCN & GNNShap & 0,99 & n/d & 0,13 & n/d \\
+1:10 & TAGCN & GNNExplainer & 0,86 & 0,42 & 0,50 & 0,91 \\
+1:10 & TAGCN & PGExplainer & n/d & 0,87 & n/d & n/d \\
+1:10 & TAGCN & GNNShap & 0,97 & n/d & 0,09 & n/d \\
+1:50 & GraphSAGE & GNNExplainer & 0,91 & 0,49 & 0,34 & 0,99 \\
+1:50 & GraphSAGE & PGExplainer & n/d & 0,88 & n/d & n/d \\
+1:50 & GraphSAGE & GNNShap & 0,98 & n/d & 0,26 & n/d \\
+1:50 & GAT & GNNExplainer & 0,97 & 0,54 & 0,41 & 1,00 \\
+1:50 & GAT & PGExplainer & n/d & 0,72 & n/d & n/d \\
+1:50 & GAT & GNNShap & 0,98 & n/d & 0,17 & n/d \\
+1:50 & GCN & GNNExplainer & 0,94 & 0,54 & 0,56 & 0,81 \\
+1:50 & GCN & PGExplainer & n/d & 0,74 & n/d & n/d \\
+1:50 & GCN & GNNShap & 0,99 & n/d & 0,18 & n/d \\
+1:50 & TAGCN & GNNExplainer & 0,92 & 0,41 & 0,34 & 0,96 \\
+1:50 & TAGCN & PGExplainer & n/d & 0,87 & n/d & n/d \\
+1:50 & TAGCN & GNNShap & 0,97 & n/d & 0,14 & n/d \\
+1:100 & GraphSAGE & GNNExplainer & 0,92 & 0,52 & 0,35 & 1,00 \\
+1:100 & GraphSAGE & PGExplainer & n/d & 0,89 & n/d & n/d \\
+1:100 & GraphSAGE & GNNShap & 0,98 & n/d & 0,14 & n/d \\
+1:100 & GAT & GNNExplainer & 0,98 & 0,54 & 0,72 & 1,00 \\
+1:100 & GAT & PGExplainer & n/d & 0,81 & n/d & n/d \\
+1:100 & GAT & GNNShap & 0,99 & n/d & 0,41 & n/d \\
+1:100 & GCN & GNNExplainer & 0,98 & 0,57 & 0,43 & 1,00 \\
+1:100 & GCN & PGExplainer & n/d & 0,75 & n/d & n/d \\
+1:100 & GCN & GNNShap & 0,99 & n/d & 0,15 & n/d \\
+1:100 & TAGCN & GNNExplainer & 0,93 & 0,40 & 0,23 & 1,00 \\
+1:100 & TAGCN & PGExplainer & n/d & 0,86 & n/d & n/d \\
+1:100 & TAGCN & GNNShap & 0,98 & n/d & 0,09 & n/d \\
+nativo & GraphSAGE & GNNExplainer & 0,87 & 0,49 & 0,49 & 0,93 \\
+nativo & GraphSAGE & PGExplainer & n/d & 0,92 & n/d & n/d \\
+nativo & GraphSAGE & GNNShap & 0,97 & n/d & 0,16 & n/d \\
+nativo & GAT & GNNExplainer & 0,96 & 0,55 & 0,50 & 1,00 \\
+nativo & GAT & PGExplainer & n/d & 0,43 & n/d & n/d \\
+nativo & GAT & GNNShap & 0,97 & n/d & 0,21 & n/d \\
+nativo & GCN & GNNExplainer & 0,97 & 0,50 & 0,70 & 1,00 \\
+nativo & GCN & PGExplainer & n/d & 0,78 & n/d & n/d \\
+nativo & GCN & GNNShap & 0,99 & n/d & 0,13 & n/d \\
+nativo & TAGCN & GNNExplainer & 0,86 & 0,42 & 0,50 & 0,90 \\
+nativo & TAGCN & PGExplainer & n/d & 0,87 & n/d & n/d \\
+nativo & TAGCN & GNNShap & 0,97 & n/d & 0,09 & n/d \\
+\end{longtable}

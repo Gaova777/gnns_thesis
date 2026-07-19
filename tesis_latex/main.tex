@@ -1,0 +1,250 @@
+\documentclass[a4paper,oneside,12pt]{book}
+
+% ------------------------------------------------
+% Codificación y lenguaje
+% ------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-lcroman,es-tabla]{babel}
+
+% ------------------------------------------------
+% Márgenes
+% ------------------------------------------------
+\usepackage[margin=1in]{geometry}
+
+% ------------------------------------------------
+% Matemáticas
+% ------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+% ------------------------------------------------
+% Figuras
+% ------------------------------------------------
+\usepackage{graphicx}
+\graphicspath{{images/}{chapter_1/images_ch1/}}
+
+\usepackage{float}
+\usepackage{wrapfig}
+
+% ------------------------------------------------
+% Tablas
+% ------------------------------------------------
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+
+% ------------------------------------------------
+% Colores
+% ------------------------------------------------
+\usepackage[table,xcdraw]{xcolor}
+
+% ------------------------------------------------
+% Subfiguras
+% ------------------------------------------------
+\usepackage{subcaption}
+
+% ------------------------------------------------
+% Espaciado
+% ------------------------------------------------
+\usepackage{setspace}
+
+% ------------------------------------------------
+% Encabezados
+% ------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{15.13202pt}
+\addtolength{\topmargin}{-3.13202pt}
+
+% ------------------------------------------------
+% Fuente (Times con soporte matemático completo; mathptmx reemplaza al
+% paquete times antiguo y evita el error de fuente math al formatear URLs)
+% ------------------------------------------------
+\usepackage{mathptmx}
+
+% ------------------------------------------------
+% Párrafos
+% ------------------------------------------------
+\setlength{\parindent}{0pt}
+
+% ------------------------------------------------
+% BIBLIOGRAFÍA (Mendeley compatible)
+% ------------------------------------------------
+\usepackage[
+backend=biber,
+style=numeric,
+sorting=none,
+doi=true,
+url=true,
+isbn=false
+]{biblatex}
+
+% IMPORTANTE: Asegúrate de que el archivo que exportas de Mendeley se llame bibliografia.bib
+\addbibresource{bibliografia.bib}
+
+% --- SOLUCIÓN PARA GUIONES BAJOS DE MENDELEY ---
+\DeclareSourcemap{
+  \maps{
+    \map{
+      \step[fieldsource=doi, match=\regexp{\{\\\_\}|\{\_\}|\\\_}, replace=\regexp{\_}]
+    }
+    \map{
+      \step[fieldsource=url, match=\regexp{\{\\\_\}|\{\_\}|\\\_}, replace=\regexp{\_}]
+    }
+  }
+}
+% --- FIN DE SOLUCIÓN MENDELEY ---
+
+% ------------------------------------------------
+% Hipervínculos (Debe cargarse al final de los paquetes)
+% ------------------------------------------------
+\usepackage{hyperref}
+
+
+% =================================================
+% DOCUMENTO
+% =================================================
+
+\begin{document}
+
+% =================================================
+% PORTADA 1 (Cubierta)
+% =================================================
+
+\begin{titlepage}
+
+\begin{center}
+
+% 1. Logo de la universidad (Encabezado visual)
+\includegraphics[width=0.4\textwidth]{utp.jpg}
+
+\vspace{1.5cm}
+
+% 2. Título principal (Centro de atención)
+{\LARGE \bfseries \linespread{1.3}\selectfont
+Estudio de la Estabilidad de Métodos de Explicabilidad (XAI) en Graph Neural Networks para Detección de Lavado de Dinero bajo Desbalance Extremo de Datos\par}
+
+\vspace{2.5cm}
+
+% 3. Autores
+{\Large
+Alejandro Gómez Huertas \\[0.3cm]
+Juan Diego Garzón Ovalle
+}
+
+\vfill
+
+% 4. Información institucional (Bloque inferior sólido)
+{\large
+Universidad Tecnológica de Pereira \\
+Facultad de Ingenierías \\
+Maestría en Ingeniería en Sistemas y Computación \\
+Pereira, Colombia \\
+2026
+}
+
+\end{center}
+
+\end{titlepage}
+
+% =================================================
+% PORTADA 2 (Portada Interna)
+% =================================================
+
+\begin{titlepage}
+
+\begin{center}
+
+\vspace*{1cm} % Margen superior para equilibrar la ausencia de logo
+
+% 1. Título principal
+{\LARGE \bfseries \linespread{1.3}\selectfont
+Estudio de la Estabilidad de Métodos de Explicabilidad (XAI) en Graph Neural Networks para Detección de Lavado de Dinero bajo Desbalance Extremo de Datos\par}
+
+\vspace{2cm}
+
+% 2. Autores
+{\Large
+Alejandro Gómez Huertas \\[0.3cm]
+Juan Diego Garzón Ovalle
+}
+
+\vspace{2.5cm}
+
+% 3. Propósito académico (Redacción formal estándar)
+{\large Tesis de grado presentada como requisito parcial para optar al título de:}\\[0.5cm]
+{\Large \textbf{Magíster en Ingeniería en Sistemas y Computación}}
+
+\vspace{2cm}
+
+% 4. Director
+{\large \textbf{Director} \\[0.2cm]
+\Large Ph.D. Cristian Rosero}
+
+\vfill
+
+% 5. Información institucional (Mismo bloque que la cubierta para consistencia)
+{\large
+Universidad Tecnológica de Pereira \\
+Facultad de Ingenierías \\
+Maestría en Ingeniería en Sistemas y Computación \\
+Pereira, Colombia \\
+2026
+}
+
+\end{center}
+
+\end{titlepage}
+
+% =================================================
+% ÍNDICES
+% =================================================
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\newpage
+\listoffigures
+\addcontentsline{toc}{chapter}{Índice de figuras}
+
+\newpage
+\listoftables
+\addcontentsline{toc}{chapter}{Índice de tablas}
+
+% =================================================
+% CONTENIDO
+% =================================================
+
+\newpage
+\pagenumbering{arabic}
+
+\input{chapter_1/Chapter_1}
+\input{chapter_2/Chapter_2}
+\input{chapter_3/Chapter_3}
+\input{chapter_4/Chapter_4}
+\input{chapter_5/Chapter_5}
+\input{chapter_6/Chapter_6}
+\input{chapter_7/Chapter_7}
+
+\appendix
+\input{chapter_8/Chapter_8}
+
+% =================================================
+% BIBLIOGRAFÍA
+% =================================================
+
+\newpage
+\addcontentsline{toc}{chapter}{Referencias}
+
+\printbibliography
+
+\end{document}

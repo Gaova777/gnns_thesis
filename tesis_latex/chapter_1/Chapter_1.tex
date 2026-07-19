@@ -1,0 +1,247 @@
+\chapter{INTRODUCCIÓN}
+
+\section{Planteamiento y Contexto del Problema}
+
+El lavado de dinero, designado en la literatura internacional como \textit{Anti-Money Laundering} (AML), constituye uno de los mecanismos centrales mediante los cuales las economías criminales logran insertar recursos ilícitos dentro de los circuitos financieros formales. Este fenómeno no solo facilita la circulación de capitales provenientes del narcotráfico, la trata de personas, el tráfico de armas, la corrupción o el financiamiento del terrorismo, sino que además erosiona la estabilidad institucional, distorsiona los mercados y debilita la confianza en los sistemas de supervisión financiera. Su magnitud ha dejado de ser un asunto exclusivamente policial para convertirse en un problema económico y regulatorio de escala global. En este sentido, se ha estimado que los flujos financieros ilícitos representan entre el 2\% y el 5\% del Producto Interno Bruto mundial, lo cual equivale a montos cercanos a los 2 billones de dólares anuales \cite{Kelkar2024AddressingStability}.
+
+\bigskip
+
+En el caso particular de las criptomonedas, el problema adquiere una complejidad adicional. La arquitectura descentralizada de los sistemas \textit{blockchain}, la facilidad para transferir valor de forma transfronteriza, el seudonimato de las direcciones y la ausencia de intermediarios tradicionales han creado un entorno atractivo para la circulación, fragmentación y ocultamiento de fondos ilícitos \cite{Spotlight2021Cryptocurrencies:Finances, Subashi2024CryptocurrenciesLaundering}. A esto se suma la sofisticación creciente de las técnicas de lavado basadas en criptoactivos, las cuales ya no se limitan a transferencias simples, sino que incluyen estrategias de dispersión, mezcla, integración y transacciones encadenadas que aprovechan la estructura de red de los ecosistemas digitales \cite{Almeida2025FromTechniques}. Como resultado, la detección de operaciones sospechosas en este contexto exige modelos capaces de comprender relaciones dinámicas y patrones estructurales más allá del análisis aislado de transacciones individuales.
+
+\bigskip
+
+Las instituciones financieras y los \textit{exchanges} de criptomonedas continúan dependiendo, en gran medida, de Sistemas de Monitoreo de Transacciones (TMS) convencionales, sustentados en reglas deterministas, listas de vigilancia y umbrales estáticos. Aunque estas herramientas han sido la base del cumplimiento normativo durante décadas, su capacidad para responder a tipologías modernas de lavado es limitada. El principal problema radica en que tratan las transacciones como eventos independientes, ignorando la topología relacional entre cuentas, billeteras y flujos monetarios. Esto produce un ruido operativo masivo: diversos estudios reportan que entre el 95\% y el 98\% de las alertas generadas por estos sistemas corresponden a falsos positivos \cite{Unagar2025SurveyXAI}. En consecuencia, los equipos de cumplimiento deben invertir enormes cantidades de tiempo y recursos en la revisión manual de alertas irrelevantes, mientras que los patrones verdaderamente sofisticados logran mimetizarse dentro del volumen general de actividad financiera.
+
+\bigskip
+
+Este problema de ineficiencia no es únicamente técnico, sino también económico y estratégico. Los falsos positivos elevan de manera desproporcionada los costos de operación, reducen la capacidad de respuesta analítica de las instituciones y generan fatiga organizacional en los procesos de monitoreo. Más grave aún, desplazan la atención desde los casos realmente relevantes hacia señales espurias que no representan riesgo material. En otras palabras, un sistema que produce demasiadas alertas incorrectas no solo falla por exceso, sino también por omisión: al saturar la capacidad investigativa, incrementa la probabilidad de que operaciones ilícitas genuinas pasen desapercibidas \cite{Subashi2024CryptocurrenciesLaundering, Unagar2025SurveyXAI}. Esta realidad ha impulsado la búsqueda de modelos más robustos que puedan capturar estructuras complejas de interacción financiera sin depender exclusivamente de reglas manuales.
+
+\bigskip
+
+En este escenario, las \textit{Graph Neural Networks} (GNNs) han emergido como un paradigma prometedor para el dominio AML. A diferencia de los modelos tabulares tradicionales, las GNNs explotan explícitamente la naturaleza relacional de los datos financieros, representando las transacciones y entidades como nodos, y sus vínculos como aristas dentro de un grafo. Esta formulación permite aprender patrones topológicos que serían invisibles para modelos clásicos, tales como vecindarios sospechosos, cadenas de dispersión, ciclos transaccionales o estructuras de intermediación artificial \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}. Los trabajos pioneros sobre el \textit{Elliptic Dataset} mostraron que el modelado basado en grafos supera a varios enfoques convencionales en la detección de transacciones ilícitas sobre redes de Bitcoin, precisamente porque integra información estructural y contextual en el proceso de clasificación \cite{Weber2019Anti-MoneyForensics}.
+
+\bigskip
+
+La evolución reciente de este campo ha dado lugar a arquitecturas aún más especializadas. Por ejemplo, modelos híbridos que integran dinámicas temporales y convoluciones sobre grafos han mostrado que la detección AML mejora cuando se considera simultáneamente la dependencia estructural y la evolución secuencial de las transacciones \cite{Alarab2023Graph-basedData, Wan2024AMemory}. Asimismo, arquitecturas con mecanismos de atención y variantes de grafos evolutivos han ampliado la capacidad de capturar dependencias de largo alcance y cambios temporales en comportamientos ilícitos \cite{Cui2024EG-SAN:Cryptocurrency, Lin2026DetectingLaundering}. Dentro de este ecosistema, TAGCN (\textit{Topology Adaptive Graph Convolutional Network}) resulta particularmente interesante, ya que incorpora filtros polinomiales adaptativos capaces de agregar información desde múltiples saltos topológicos, permitiendo modelar dependencias más complejas que las capturadas por esquemas puramente locales \cite{Du2017TopologyNetworks, He2026AnDetection}.
+
+\bigskip
+
+Sin embargo, el uso de GNNs en contextos regulados introduce una tensión crítica entre desempeño predictivo y auditabilidad. A pesar de su potencia analítica, estas arquitecturas funcionan como modelos altamente opacos, lo que dificulta comprender qué patrones concretos justifican una predicción de riesgo. En dominios como AML, esta opacidad es especialmente problemática, ya que las decisiones automatizadas pueden derivar en bloqueos de cuentas, reportes de operaciones sospechosas o investigaciones con implicaciones jurídicas y reputacionales significativas \cite{Kelkar2024AddressingStability, Spotlight2021Cryptocurrencies:Finances}. Por ello, la exigencia contemporánea ya no es únicamente construir sistemas más precisos, sino desarrollar sistemas que además sean interpretables, auditables y defendibles frente a reguladores y equipos de cumplimiento.
+
+\bigskip
+
+En respuesta a esta necesidad, la Inteligencia Artificial Explicable (\textit{Explainable AI}, XAI) se ha consolidado como una línea de investigación central para reducir la opacidad de los modelos complejos. En el caso de las GNNs, los métodos XAI buscan identificar qué nodos, aristas, atributos o subgrafos influyen de forma decisiva en una predicción concreta \cite{Adadi2018PeekingXAI, Ying2019Gnnexplainer:Networks, Luo2020ParameterizedNetwork, Akkas2024Gnnshap:Values}. No obstante, la literatura reciente ha mostrado que la generación de explicaciones para modelos de grafos enfrenta limitaciones profundas asociadas con su fidelidad, robustez e inestabilidad. En particular, explicaciones obtenidas sobre una misma instancia pueden variar considerablemente entre ejecuciones o bajo pequeñas perturbaciones, lo que cuestiona su confiabilidad como soporte analítico o forense \cite{Gawantka2024AExplanations, Agarwal2022ProbingMethods,Kosan2023GNNX-BENCH:Benchmarking}. Esta problemática constituye el núcleo conceptual de la presente investigación.
+
+\bigskip
+
+\textbf{Descripción sugerida para Figura 1.1:} Diagrama conceptual del problema AML en criptomonedas, mostrando la relación entre volumen global de lavado, sistemas TMS tradicionales, alta tasa de falsos positivos y necesidad de modelos basados en grafos.
+
+\bigskip
+
+\section{Revisión de Literatura y Estado del Arte}
+
+La literatura reciente sobre detección de lavado de dinero en criptomonedas muestra una evolución progresiva desde enfoques transaccionales convencionales hacia modelos estructurales basados en grafos. En una primera etapa, los trabajos se concentraron en adaptar algoritmos clásicos de clasificación al problema AML, utilizando atributos tabulares extraídos de cada transacción, como montos, frecuencia, temporalidad y estadísticas agregadas. Aunque estos métodos ofrecieron una base importante para automatizar el análisis de riesgo, su principal limitación fue la incapacidad de capturar la dependencia relacional entre transacciones y entidades, una dimensión central en las tipologías de lavado \cite{Weber2019Anti-MoneyForensics, Unagar2025SurveyXAI}.
+
+\bigskip
+
+El trabajo de Weber et al. constituye un punto de inflexión en esta línea, pues introdujo el uso del \textit{Elliptic Dataset} como entorno de experimentación para modelos basados en grafos sobre transacciones Bitcoin. Su estudio mostró que representar la red de transacciones como un grafo permite capturar patrones estructurales que los modelos tabulares pierden, logrando mejoras consistentes en la clasificación de actividad ilícita \cite{Weber2019Anti-MoneyForensics}. Este aporte fue determinante porque transformó el problema AML desde una perspectiva centrada en instancias individuales hacia una perspectiva relacional, donde la posición de una transacción dentro de la red es tan importante como sus atributos intrínsecos.
+
+\bigskip
+
+A partir de este cambio de paradigma, surgieron múltiples variantes de GNNs aplicadas al dominio financiero. Lawal et al. propusieron un marco explicable para detección AML en criptomonedas utilizando el \textit{Elliptic Dataset}, demostrando que los modelos de grafos no solo mejoran el rendimiento predictivo, sino que también pueden complementarse con mecanismos de explicabilidad post-hoc \cite{Lawal2025AnDataset}. Por su parte, He et al. desarrollaron un marco explicable para la detección de transacciones financieras ilícitas, reforzando la idea de que el futuro de estos sistemas no pasa únicamente por maximizar métricas predictivas, sino por integrar interpretabilidad como componente esencial del diseño \cite{He2026AnDetection}.
+
+\bigskip
+
+La investigación también ha explorado arquitecturas dinámicas e híbridas. Alarab y Prakoonwit estudiaron un modelo \textit{graph-based LSTM} que combina componentes temporales con procesamiento estructural de grafos, mostrando que la dimensión temporal puede aportar valor cuando las actividades ilícitas se distribuyen a lo largo de secuencias transaccionales \cite{Alarab2023Graph-basedData}. De manera similar, Wan y Li propusieron un modelo de predicción de lavado basado en una red convolucional dinámica sobre grafos y una arquitectura LSTM, reforzando la hipótesis de que el comportamiento ilícito no es estático, sino evolutivo \cite{Wan2024AMemory}. Estos trabajos abren la puerta a sistemas más realistas para entornos donde las redes transaccionales cambian continuamente en el tiempo.
+
+\bigskip
+
+En paralelo, otros autores han investigado mecanismos de atención y aprendizaje estructural avanzado. Cui y Zhang presentaron EG-SAN, un modelo de autoatención sobre grafos evolutivos para detectar actividades ilícitas en criptomonedas, destacando el valor de ponderar selectivamente la relevancia de diferentes conexiones dentro de la red \cite{Cui2024EG-SAN:Cryptocurrency}. Xu et al. también exploraron redes de autoatención para AML, enfatizando la capacidad de estas arquitecturas para identificar patrones de dependencia más refinados que los capturados por esquemas de agregación uniformes \cite{Lin2026DetectingLaundering}. De forma complementaria, Lo et al. propusieron \textit{Inspection-L}, un enfoque auto-supervisado para aprender representaciones de nodos aplicadas a la detección de lavado de dinero, lo cual evidencia que la literatura también avanza hacia estrategias menos dependientes de grandes cantidades de etiquetas balanceadas \cite{Lo2023Inspection-L:Bitcoin}.
+
+\bigskip
+
+No obstante, la evolución de las arquitecturas predictivas no ha sido acompañada de una evolución igualmente sólida en los mecanismos de validación explicativa. Los métodos XAI para GNNs han crecido rápidamente en número y diversidad, pero aún presentan desafíos importantes. GNNExplainer, propuesto por Ying et al., se consolidó como uno de los primeros métodos capaces de identificar subgrafos y atributos relevantes para justificar una predicción de GNN \cite{Ying2019Gnnexplainer:Networks}. Posteriormente, PGExplainer introdujo un enfoque parametrizado que aprende un generador de explicaciones, mejorando escalabilidad y generalización frente a enfoques puramente locales \cite{Luo2020ParameterizedNetwork}. Más recientemente, GNNShap adaptó la lógica de los valores de Shapley al contexto de grafos, buscando explicaciones más consistentes y teóricamente fundamentadas \cite{Akkas2024Gnnshap:Values}.
+
+\bigskip
+
+A pesar de estos avances, la literatura coincide en que explicar GNNs sigue siendo un problema abierto. Distintos marcos sistemáticos para evaluar métodos de explicabilidad en redes de grafos han mostrado que muchas explicaciones consideradas plausibles no necesariamente son fieles ni robustas \cite{Armgaan2025GnnXemplar:Interpretability}. En una línea similar, Agarwal et al. realizaron un análisis riguroso de los métodos explicadores para GNNs y evidenciaron limitaciones tanto teóricas como prácticas en su capacidad para reflejar con precisión el razonamiento interno del modelo \cite{Agarwal2022ProbingMethods}. Kosan et al., mediante GNNX-BENCH, reforzaron esta crítica al demostrar que el desempeño de los explicadores depende fuertemente del criterio de evaluación utilizado, y que muchos resultados reportados en la literatura son sensibles al protocolo experimental \cite{Kosan2023GNNX-BENCH:Benchmarking}.
+
+\bigskip
+
+En el dominio AML, esta limitación es todavía más delicada. No basta con que un explicador produzca un subgrafo visualmente coherente; es necesario que la explicación sea estable, reproducible y suficientemente fiel como para respaldar decisiones en escenarios regulados. Gawantka et al. propusieron una métrica específica para evaluar la estabilidad de las explicaciones XAI, subrayando que este criterio ha sido históricamente subestimado en la literatura \cite{Gawantka2024AExplanations}. A su vez, Rai et al. mostraron que el desbalance de clases puede deteriorar significativamente el comportamiento de las técnicas XAI, incluso cuando el modelo mantiene un desempeño predictivo aceptable \cite{Rai2025EvaluatingData}. Fujiwara profundizó en esta relación al estudiar cómo técnicas de remuestreo y destilación del conocimiento pueden mejorar simultáneamente el rendimiento predictivo y la estabilidad explicativa en escenarios desbalanceados \cite{Fujiwara2024KnowledgeStability}.
+
+\bigskip
+
+En consecuencia, el estado del arte revela una convergencia clara: el problema AML en criptomonedas requiere modelos estructurales capaces de captar relaciones complejas, pero también exige mecanismos de explicabilidad cuya calidad no se mida únicamente por intuición visual o plausibilidad superficial. La combinación entre GNNs, XAI y desbalance extremo sigue siendo una zona insuficientemente explorada, especialmente cuando el criterio central de evaluación no es solo la exactitud de la clasificación, sino la estabilidad y auditabilidad de la explicación obtenida \cite{Unagar2025SurveyXAI, Gawantka2024AExplanations, Rai2025EvaluatingData}.
+
+\bigskip
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|p{3.2cm}|p{3.7cm}|p{4.2cm}|p{4.2cm}|}
+\hline
+\textbf{Trabajo} & \textbf{Enfoque principal} & \textbf{Aporte} & \textbf{Limitación relevante} \\
+\hline
+Weber et al. \cite{Weber2019Anti-MoneyForensics} & GCN sobre Bitcoin & Introduce el modelado relacional con Elliptic Dataset & Limitada atención a explicabilidad \\
+\hline
+Lawal et al. \cite{Lawal2025AnDataset} & GNN explicable para AML & Integra predicción y explicación en cripto AML & No profundiza en estabilidad bajo desbalance extremo \\
+\hline
+He et al. \cite{He2026AnDetection} & Framework explicable para transacciones ilícitas & Refuerza la necesidad de interpretabilidad en finanzas & Requiere validación exhaustiva de robustez explicativa \\
+\hline
+Wan y Li \cite{Wan2024AMemory} & GCN dinámica + LSTM & Modela dependencias estructurales y temporales & Mayor complejidad experimental \\
+\hline
+Cui y Zhang \cite{Cui2024EG-SAN:Cryptocurrency} & Autoatención en grafos evolutivos & Mejora detección en grafos dinámicos & Explicabilidad no es el foco central \\
+\hline
+Gawantka et al. \cite{Gawantka2024AExplanations} & Métrica de estabilidad XAI & Formaliza la evaluación de estabilidad explicativa & No se centra específicamente en AML \\
+\hline
+Rai et al. \cite{Rai2025EvaluatingData} & XAI bajo desbalance & Evidencia impacto del desbalance sobre explicaciones & Estudio en otro dominio, no sobre grafos AML \\
+\hline
+Fujiwara \cite{Fujiwara2024KnowledgeStability} & Remuestreo y estabilidad explicativa & Relaciona balanceo con estabilidad XAI & No aborda GNNs financieras de forma directa \\
+\hline
+\end{tabular}
+\caption{Síntesis del estado del arte en detección AML basada en grafos y explicabilidad}
+\end{table}
+
+\section{La Arista de Investigación}
+
+A pesar del avance significativo en la detección de lavado de dinero con modelos basados en grafos, la literatura actual exhibe una desconexión evidente entre tres dimensiones que deberían estudiarse de manera integrada: el desbalance extremo de clases, la calidad de las explicaciones XAI y la robustez estructural de las arquitecturas GNN. Esta desconexión constituye la brecha central que motiva la presente investigación. Si bien existen trabajos que mejoran el rendimiento predictivo, trabajos que desarrollan explicadores para GNNs y trabajos que analizan estabilidad explicativa en otros dominios, todavía no existe una evaluación sistemática de cómo estas tres dimensiones interactúan en un entorno AML realista.
+
+\bigskip
+
+En primer lugar, el desbalance extremo de datos sigue siendo tratado de forma insuficiente. En los escenarios reales de monitoreo financiero, la clase ilícita representa una fracción minúscula del total de transacciones, pudiendo llegar a razones cercanas a 1:1000 o incluso más severas dependiendo del contexto operacional \cite{Rai2025EvaluatingData, Unagar2025SurveyXAI}. Sin embargo, una parte importante de la literatura experimental evalúa modelos en condiciones relativamente benignas, con particiones de datos que no reflejan la escasez real de eventos ilícitos. Esta simplificación puede inflar artificialmente el rendimiento del clasificador y ocultar el deterioro que ocurre cuando el sistema debe operar en ambientes altamente desbalanceados. Técnicas como GraphSMOTE han sido propuestas para clasificación desbalanceada en grafos, pero su efecto sobre la explicación generada por el modelo sigue siendo una cuestión abierta \cite{Zhao2021Graphsmote:Networks}.
+
+\bigskip
+
+En segundo lugar, la literatura no ha resuelto satisfactoriamente el problema de la fidelidad y la estabilidad explicativa. La mayoría de los trabajos en XAI para grafos se ha enfocado en producir explicaciones plausibles o visualmente intuitivas, pero no necesariamente en demostrar que estas explicaciones son consistentes entre ejecuciones, robustas frente a perturbaciones o verdaderamente representativas del mecanismo de decisión interno del modelo \cite{Agarwal2022ProbingMethods, Armgaan2025GnnXemplar:Interpretability, Kosan2023GNNX-BENCH:Benchmarking}. En contextos como AML, esta omisión es particularmente crítica, ya que una explicación inestable carece de valor operativo y jurídico. Una entidad financiera no puede sustentar una alerta de alto impacto en un subgrafo explicativo que cambia de forma sustancial cada vez que el explicador se ejecuta sobre la misma transacción.
+
+\bigskip
+
+En tercer lugar, la relación entre estrategias de mitigación del desbalance y calidad explicativa permanece subexplorada. Rai et al. y Fujiwara mostraron que el desbalance afecta no solo al clasificador, sino también a la consistencia de las explicaciones, y que ciertas técnicas de remuestreo pueden modificar esta relación \cite{Rai2025EvaluatingData, Fujiwara2024KnowledgeStability}. Sin embargo, estos hallazgos no se han extendido de forma rigurosa al dominio AML basado en grafos, donde la inserción de nodos sintéticos, el ajuste de pesos o el uso de funciones de pérdida especializadas podrían alterar la topología original y, con ello, introducir sesgos o artefactos en las explicaciones. En otras palabras, aún no está claro si balancear los datos mejora la comprensión del fenómeno ilícito o si, por el contrario, fabrica una representación más conveniente para el clasificador pero menos fiel al comportamiento real de la red financiera.
+
+\bigskip
+
+También existe una brecha comparativa entre arquitecturas. La literatura ha mostrado resultados prometedores con GCN, GraphSAGE, GAT, TAGCN, modelos temporales y modelos de atención, pero no ha establecido con claridad cuál de estas arquitecturas ofrece mejores garantías de interpretabilidad estable bajo condiciones severas de desbalance \cite{Weber2019Anti-MoneyForensics, Lin2026DetectingLaundering, Cui2024EG-SAN:Cryptocurrency, Du2017TopologyNetworks, He2026AnDetection}. El problema no consiste únicamente en identificar qué arquitectura clasifica mejor, sino en determinar cuál produce explicaciones más consistentes, robustas y utilizables en contextos regulatorios. Este es un vacío importante, porque una arquitectura con un desempeño predictivo ligeramente superior podría ser menos deseable si sus explicaciones son erráticas o frágiles.
+
+\bigskip
+
+En síntesis, la literatura no ha respondido de manera integral a la siguiente cuestión: ¿cómo se comportan los métodos XAI aplicados a distintas arquitecturas GNN para detección AML cuando el sistema enfrenta niveles extremos de desbalance, y qué combinación de arquitectura, explicador y estrategia de balanceo ofrece el mejor compromiso entre rendimiento predictivo y estabilidad explicativa? Esta ausencia de evidencia comparativa y metodológicamente rigurosa constituye la brecha específica que esta tesis busca cerrar.
+
+\bigskip
+
+\textbf{Descripción sugerida para Figura 1.3:} Esquema visual de la brecha de investigación, mostrando tres ejes que convergen: (1) GNNs para AML, (2) explicabilidad XAI, y (3) desbalance extremo de clases. En la intersección central debe destacarse el vacío: “falta de evaluación sistemática de estabilidad explicativa bajo desbalance extremo”.
+
+\bigskip
+
+\section{Formulación del Problema}
+
+A partir del contexto presentado y de la revisión del estado del arte, se identifica un vacío de investigación en la evaluación rigurosa de la estabilidad de los métodos de explicabilidad aplicados a modelos GNN en escenarios AML caracterizados por desbalance extremo de datos. Este vacío no es menor: compromete la posibilidad de trasladar los avances en detección basada en grafos hacia entornos donde la auditabilidad, la reproducibilidad y la trazabilidad de la decisión son condiciones indispensables.
+
+\bigskip
+
+El problema no se reduce a mejorar métricas de clasificación. De hecho, una parte relevante de la literatura reciente ya ha mostrado que es posible obtener mejoras sustanciales en tareas de detección AML mediante arquitecturas de grafos, mecanismos de atención o modelos híbridos \cite{Lawal2025AnDataset, Wan2024AMemory, Lin2026DetectingLaundering}. Sin embargo, cuando se introduce la dimensión explicativa, emergen limitaciones todavía no resueltas: las explicaciones pueden ser inestables, sensibles al ruido topológico, dependientes del método explicador e incluso afectadas por las estrategias utilizadas para compensar el desbalance de clases \cite{Gawantka2024AExplanations, Rai2025EvaluatingData, Fujiwara2024KnowledgeStability}. En consecuencia, el problema científico de esta tesis se sitúa en la intersección entre clasificación, interpretabilidad y robustez. Para abordarlo, la investigación articula dos ejes complementarios, el primero sobre el \textit{Elliptic Dataset} de transacciones reales de Bitcoin y el segundo sobre un grafo sintético con \textit{ground-truth} de tipología que hace medible la plausibilidad de las explicaciones, y sostiene sus conclusiones mediante un análisis estadístico basado en réplicas por semilla, intervalos de confianza y pruebas no paramétricas.
+
+\bigskip
+
+\textbf{Problema Principal:}\\
+¿Cómo evaluar y cuantificar la degradación de la estabilidad de los métodos de explicabilidad (XAI) en arquitecturas de \textit{Graph Neural Networks} (GNNs) aplicadas a la detección de lavado de dinero en transacciones de Bitcoin sobre el \textit{Elliptic Dataset}, bajo condiciones severas de desbalance de datos, y qué estrategias de balanceo y selección de modelos logran maximizar la estabilidad explicativa sin sacrificar el rendimiento predictivo?
+
+\bigskip
+
+\textbf{Problemas Específicos:}
+\begin{itemize}
+    \item ¿Cómo se cuantifica de forma verificable la degradación en la estabilidad de las explicaciones estructurales generadas por métodos XAI de diferente naturaleza, como GNNExplainer, PGExplainer y GNNShap, a medida que la razón de desbalance de clases se hace más extrema \cite{Ying2019Gnnexplainer:Networks, Luo2020ParameterizedNetwork, Akkas2024Gnnshap:Values}?
+    \item ¿De qué manera las diferencias estructurales y mecanismos de agregación intrínsecos de diversas arquitecturas GNN, tales como GCN, GraphSAGE, GAT y TAGCN, condicionan la robustez de las explicaciones resultantes frente al ruido topológico presente en un grafo financiero \cite{Du2017TopologyNetworks, He2026AnDetection}?
+    \item ¿Cuál es el impacto colateral de implementar técnicas de sobremuestreo topológico o ajuste de pesos, como GraphSMOTE o funciones de pérdida orientadas al desbalance, sobre la interpretabilidad del modelo \cite{Zhao2021Graphsmote:Networks}?
+    \item ¿Es posible identificar una combinación sinérgica entre arquitectura de red, algoritmo explicador y estrategia de mitigación del desbalance que maximice simultáneamente la fidelidad predictiva y la estabilidad explicativa, sirviendo como referencia para sistemas AML auditables?
+\end{itemize}
+
+\bigskip
+
+\section{Objetivos}
+
+La presente investigación establece un marco de objetivos orientado a estudiar de manera sistemática la estabilidad de las explicaciones generadas por modelos GNN en escenarios AML con desbalance extremo. Más que proponer una mejora incremental en precisión, se busca construir evidencia robusta y verificable que permita entender el comportamiento explicativo de estas arquitecturas en condiciones cercanas a las del dominio real.
+
+\subsection{Objetivo General}
+
+Evaluar exhaustivamente la estabilidad de los métodos de explicabilidad en Redes Neuronales de Grafos bajo condiciones extremas de desbalance de datos en la detección de lavado de dinero sobre el \textit{Elliptic Dataset}, con el fin de proporcionar evidencia rigurosa y recomendaciones técnicas sobre las combinaciones óptimas de arquitectura, explicador y técnica de balanceo que garanticen explicaciones robustas, consistentes y auditables en entornos regulados.
+
+\bigskip
+
+\subsection{Objetivos Específicos}
+
+\begin{itemize}
+    \item Evaluar el impacto directo del desequilibrio de clases en la robustez de las explicaciones estructurales, ejecutando un análisis comparativo y cuantitativo de métodos representativos como GNNExplainer, PGExplainer y GNNShap a través de escenarios incrementales de submuestreo y desbalance en el \textit{Elliptic Dataset} \cite{Ying2019Gnnexplainer:Networks, Luo2020ParameterizedNetwork, Akkas2024Gnnshap:Values}.
+    \item Comparar la resiliencia topológica de múltiples arquitecturas GNN, incluyendo GCN, GraphSAGE, GAT y TAGCN, midiendo la consistencia de los subgrafos explicativos generados bajo condiciones de estrés de datos \cite{Weber2019Anti-MoneyForensics, Du2017TopologyNetworks}.
+    \item Analizar el impacto colateral de las estrategias de mitigación del desbalance, como GraphSMOTE, ponderación de clases y esquemas equivalentes, determinando mediante métricas de fidelidad y estabilidad si dichas intervenciones estabilizan o distorsionan la interpretación topológica del modelo \cite{Zhao2021Graphsmote:Networks, Rai2025EvaluatingData, Fujiwara2024KnowledgeStability}.
+    \item Construir y validar una matriz de recomendación técnica que articule rendimiento predictivo y estabilidad explicativa, proporcionando un marco de decisión fundamentado para el diseño de sistemas de detección AML basados en IA explicable.
+\end{itemize}
+
+\bigskip
+
+\subsection{Hipótesis de Trabajo}
+
+A partir de la revisión del estado del arte y de los objetivos planteados, esta investigación formula un conjunto de hipótesis que los experimentos someten a contraste. La primera sostiene que la estabilidad de las explicaciones se degrada a medida que el desbalance de clases se hace más extremo, una expectativa razonable dado el efecto documentado del desbalance sobre los clasificadores. La segunda sostiene que las arquitecturas con mayor capacidad de agregación multi-hop, como TAGCN, producirían explicaciones más estables, bajo la intuición de que una mejor representación estructural se traduciría en explicaciones más consistentes. La tercera sostiene que un explicador más estable señalaría también de forma más plausible el patrón real de lavado, es decir que existiría un puente entre estabilidad y plausibilidad.
+
+Anticipar estas hipótesis de forma explícita cumple una función metodológica, la de comprometer al estudio con predicciones falsables antes de observar los resultados. Como se detalla en los capítulos de resultados, la evidencia matiza o refuta las tres hipótesis, ya que el desbalance resulta un factor secundario, TAGCN no es la arquitectura más estable, y el puente entre estabilidad y plausibilidad es nulo. Lejos de constituir un fracaso, la refutación de hipótesis razonables es uno de los aportes del trabajo, puesto que corrige intuiciones extendidas con evidencia medida y reorienta la atención hacia el factor que verdaderamente gobierna la calidad de las explicaciones, que resulta ser el explicador. Esta honestidad en el contraste de hipótesis es coherente con el enfoque general de la tesis.
+
+\bigskip
+
+\section{Justificación}
+
+\subsection{Justificación Económica y Operativa}
+
+El costo de la ineficiencia estructural en los sistemas AML actuales es extraordinariamente alto. Cuando entre el 95\% y el 98\% de las alertas generadas corresponden a falsos positivos, el gasto operativo asociado al cumplimiento normativo se incrementa de forma desproporcionada \cite{Unagar2025SurveyXAI}. Esta carga no solo afecta a bancos tradicionales, sino también a plataformas de intercambio de activos virtuales, proveedores de servicios financieros digitales y equipos de investigación forense especializados en criptoactivos \cite{Subashi2024CryptocurrenciesLaundering, Spotlight2021Cryptocurrencies:Finances}. Por tanto, cualquier avance que permita reducir el ruido operativo y dirigir mejor la atención analítica puede traducirse en beneficios tangibles en costos, eficiencia investigativa y capacidad institucional.
+
+\bigskip
+
+Desde esta perspectiva, una solución basada en GNNs explicables no aporta únicamente valor académico. Si las alertas generadas por estos sistemas pueden justificarse mediante subgrafos interpretables y estables, entonces el proceso de revisión manual se vuelve más eficiente, la priorización de casos mejora y la toma de decisiones se respalda con evidencia estructural más sólida. Esto significa que el beneficio esperado no es solamente una mejora en \textit{accuracy} o F1-Score, sino una reducción del tiempo invertido en examinar alertas irrelevantes y una mayor capacidad para enfocar recursos humanos sobre transacciones verdaderamente sospechosas \cite{Lawal2025AnDataset, He2026AnDetection}.
+
+\bigskip
+
+\subsection{Justificación Tecnológica}
+
+La pertinencia tecnológica de esta investigación reside en que aborda simultáneamente dos retos que suelen tratarse por separado: la detección estructural de transacciones ilícitas y la confiabilidad de sus explicaciones. Las GNNs son relevantes para AML porque el fenómeno del lavado no se manifiesta únicamente en atributos individuales, sino en configuraciones relacionales que emergen de la red financiera \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}. Sin embargo, asumir que estas arquitecturas son siempre superiores sería metodológicamente incorrecto. Su ventaja depende del tipo de grafo, de la calidad de las conexiones observadas, de la arquitectura concreta utilizada y de la forma en que se mitigan problemas como el desbalance o el ruido topológico \cite{Du2017TopologyNetworks, Menezes2025SemanticDetectors}.
+
+\bigskip
+
+Por esta razón, la investigación no parte de una defensa dogmática de las GNNs, sino de una evaluación crítica de sus condiciones de utilidad. Del mismo modo, el componente XAI no se incorpora como un complemento estético, sino como una necesidad tecnológica derivada de la opacidad inherente de los modelos profundos. En dominios regulados, una arquitectura altamente precisa pero incapaz de explicar sus decisiones es difícilmente sostenible. En consecuencia, estudiar la estabilidad de explicadores como GNNExplainer, PGExplainer y GNNShap constituye un paso necesario para convertir sistemas prometedores en herramientas realmente auditables \cite{Ying2019Gnnexplainer:Networks, Luo2020ParameterizedNetwork, Akkas2024Gnnshap:Values}.
+
+\bigskip
+
+\subsection{Justificación Científica y Social}
+
+Desde el punto de vista científico, esta tesis busca aportar evidencia donde hoy existe fragmentación. La literatura ofrece estudios sobre clasificación AML, estudios sobre explicabilidad en grafos y estudios sobre estabilidad XAI en otros dominios, pero aún carece de un marco comparativo que cruce estas dimensiones en un mismo diseño experimental \cite{Gawantka2024AExplanations, Rai2025EvaluatingData, Fujiwara2024KnowledgeStability}. Al llenar ese vacío, la investigación contribuye a una comprensión más rigurosa sobre cuándo una explicación puede considerarse no solo informativa, sino también estable y operacionalmente confiable.
+
+A esta contribución de síntesis se añade una aportación de método. Al diseñar dos ejes experimentales complementarios, uno sobre datos reales y otro sobre un grafo controlado con \textit{ground-truth}, la tesis ofrece un patrón replicable para estudiar propiedades de las explicaciones que ningún conjunto de datos aislado permite abordar. Este diseño, que combina la validez externa de los datos reales con la validez interna del entorno controlado, puede aplicarse a otros problemas de explicabilidad sobre grafos más allá del dominio financiero. De este modo, el valor científico del trabajo no se limita a los hallazgos concretos, sino que incluye una forma de plantear la evaluación de explicaciones que otros estudios podrían adoptar.
+
+\bigskip
+
+En el plano social, el problema es igualmente relevante. El lavado de activos permite sostener economías criminales que afectan de forma directa la seguridad, la integridad institucional y la confianza pública. Mejorar la capacidad de detección de flujos ilícitos en criptomonedas tiene implicaciones que trascienden la eficiencia técnica: significa fortalecer los mecanismos de prevención frente a estructuras criminales que se benefician de la velocidad y opacidad parcial de los ecosistemas digitales \cite{Cui2024EG-SAN:Cryptocurrency, Lin2026DetectingLaundering}. Asimismo, en un entorno donde la regulación demanda sistemas más transparentes y justificables, avanzar hacia modelos auditables también implica una contribución ética y jurídica al uso responsable de la inteligencia artificial en finanzas \cite{Kelkar2024AddressingStability}.
+
+\bigskip
+
+\section{Alcance y Limitaciones}
+
+\textbf{Disponibilidad de Datos y Alcance Incluido:}\\
+El diseño experimental de este estudio se delimita al uso del \textit{Elliptic Dataset}, ampliamente reconocido en la literatura como uno de los referentes más importantes para la detección de actividad ilícita en transacciones de Bitcoin \cite{Weber2019Anti-MoneyForensics, Lawal2025AnDataset}. Sobre este conjunto de datos se construirán escenarios controlados de desbalance mediante estrategias de submuestreo y reconfiguración experimental, con el fin de simular proporciones progresivamente más extremas entre clases. El análisis abarcará la comparación de múltiples arquitecturas GNN, la aplicación de distintos métodos XAI y la evaluación de estrategias de mitigación del desbalance, todo ello bajo métricas que consideren tanto el rendimiento predictivo como la estabilidad explicativa.
+
+\bigskip
+
+\textbf{Limitaciones y Alcance Excluido:}\\
+La investigación no contempla el despliegue de un sistema productivo en tiempo real ni la integración directa con infraestructuras bancarias o nodos operativos de redes \textit{blockchain}. Tampoco incluye evaluaciones legales exhaustivas por jurisdicción, estudios de usabilidad con usuarios finales o análisis centrados en otras familias de modelos no basados en grafos, salvo como referencia teórica. Del mismo modo, no se pretende cubrir todos los explicadores existentes para GNNs, sino concentrarse en un conjunto representativo y metodológicamente justificable de métodos comparables \cite{Armgaan2025GnnXemplar:Interpretability, Kosan2023GNNX-BENCH:Benchmarking}. Esta delimitación es necesaria para preservar profundidad analítica, consistencia experimental y viabilidad metodológica.
+
+\bigskip
+
+\section{Estructura de la Tesis}
+
+Con el propósito de desarrollar de manera coherente la argumentación y responder progresivamente al problema de investigación, la tesis se organiza en siete capítulos interrelacionados.
+
+\begin{itemize}
+    \item El \textbf{Capítulo 1} introduce el contexto general de la tesis, presentando el problema de investigación, el marco de referencia y una revisión detallada del estado del arte en la detección de fraude.
+    \item El \textbf{Capítulo 2} recopila y analiza la información relevante en el ámbito de las finanzas y del fraude, abordando los conceptos, mecanismos y tipologías de lavado desde una perspectiva tradicional, sin considerar aún enfoques de aprendizaje automático o profundo.
+    \item El \textbf{Capítulo 3} ofrece los fundamentos de Aprendizaje Automático y Aprendizaje Profundo aplicados a la detección de fraude, caracteriza de forma comparativa las cuatro arquitecturas GNN evaluadas e introduce los métodos de explicabilidad, las estrategias de balanceo y las nociones estadísticas que sostienen el análisis posterior.
+    \item El \textbf{Capítulo 4} presenta el diseño experimental y los resultados sobre el \textit{Elliptic Dataset}, incluyendo el análisis exploratorio, el colapso de validación a test y la corrección metodológica del subgrafo receptivo que reordena el ranking de estabilidad de las arquitecturas.
+    \item El \textbf{Capítulo 5} despliega el eje sintético, un grafo con \textit{ground-truth} de tipología que hace medible la plausibilidad de las explicaciones, junto con el análisis estadístico de robustez que sostiene los hallazgos centrales del estudio.
+    \item El \textbf{Capítulo 6} desarrolla la discusión, cruzando los resultados de ambos ejes con el estado del arte y examinando sus implicaciones técnicas y aplicadas.
+    \item El \textbf{Capítulo 7} sintetiza las conclusiones, las respuestas a los objetivos y las limitaciones identificadas, y traza las perspectivas de trabajo futuro.
+\end{itemize}
