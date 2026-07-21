@@ -256,9 +256,9 @@ Regenerar desde `results_v3/elliptic_merged_v3.csv`:
    clave" reescritos a la narrativa vigente, con nota de retractación de la narrativa vieja
    (pico-colapso 0.42→0.59→0.24, paradoja del régimen nativo, TAGCN·1:50=0.789, "GAT lidera
    explicación", trade-off −0.20).
-2. ⏳ **PENDIENTE** — **Archivar los docs retractados** para que no filtren a las diapositivas:
-   `docs/literature_review.md` y `docs/CONCLUSIONES_v3.1.md` (mueve a `docs/_archivo/` o marca
-   claramente como OBSOLETO en la cabecera).
+2. ✅ **HECHO** — **Docs retractados archivados**: `literature_review.md` y `CONCLUSIONES_v3.1.md`
+   movidos a `docs/_archivo/` (con `git mv`, preservando historia) y con banner de OBSOLETO/RETRACTADO
+   en la cabecera. En `docs/` solo queda la fuente vigente (`CONCLUSIONES_v3.2.md`) y el guion R2.
 3. ✅ **VERIFICADO — PASA** — **DOI de He2026** (`tesis_latex/bibliografia.bib:54-64`,
    `10.1007/s10489-026-07138-9`): registrado en Crossref, es REAL. Título "An explainable graph neural
    network framework for illicit financial transaction detection", Applied Intelligence vol. 56 (2026),
@@ -279,7 +279,7 @@ Regenerar desde `results_v3/elliptic_merged_v3.csv`:
 - [ ] Comparado el nuevo ranking de arquitecturas vs el del Cap. 4 → decidido si se actualiza
 - [x] Tabla 5.1 de fidelidad regenerada con los 3 explicadores (Paso D.1) ✅ commit d00d381
 - [ ] Tablas de Elliptic regeneradas si cambiaron los números (Paso D.2)
-- [~] README raíz actualizado ✅ (commit d00d381) — falta **archivar docs retractados** (Paso E.2)
+- [x] README raíz actualizado ✅ (commit d00d381) + docs retractados archivados en `docs/_archivo/` ✅ (Paso E)
 - [x] DOI de He2026 verificado (Paso E) ✅ real, Crossref, números coinciden
 - [x] Guion de defensa R2 listo — `docs/DEFENSA_R2_evidencia_sintetica.md` ✅ commit 89235c4
 - [ ] **Eje sintético `phase1/` NO tocado** ✅

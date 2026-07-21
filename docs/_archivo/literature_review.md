@@ -1,3 +1,10 @@
+> ⚠️ **DOCUMENTO OBSOLETO / RETRACTADO (archivado 2026-07-21).** Los hallazgos cuantitativos de este
+> documento fueron **retractados** tras la auditoría integral: el "tradeoff accuracy-estabilidad
+> (≈ −0,20)", el "peak-collapse 1:50→1:100", "GAT domina XAI" y el uso de `arXiv:2602.23599` como
+> fuente de los warm-start priors **ya no son válidos** — provenían de una métrica de estabilidad con
+> bug (ya corregida) y de una corrida con fallos de memoria silenciosos en GAT. **Fuente de verdad:**
+> el manuscrito `tesis_latex/` y `docs/CONCLUSIONES_v3.2.md`. Se conserva solo como registro histórico.
+
 # Literature Review — XAI Stability in GNNs for AML Detection
 
 **Fecha**: 2026-04-21
