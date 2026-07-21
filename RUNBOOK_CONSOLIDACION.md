@@ -252,30 +252,36 @@ Regenerar desde `results_v3/elliptic_merged_v3.csv`:
 
 ## 6. PASO E — Documentación y citas (SIN GPU)
 
-1. **Actualizar el `README.md` raíz** — todavía vende la narrativa VIEJA y retractada (pico-colapso
-   0.42→0.59→0.24, paradoja del régimen nativo, TAGCN·1:50=0.789, "GAT lidera explicación",
-   trade-off −0.20). El manuscrito ya retractó todo eso.
-2. **Archivar los docs retractados** para que no filtren a las diapositivas:
+1. ✅ **HECHO** (commit d00d381) — **`README.md` raíz actualizado**: banner de estado + "Hallazgos
+   clave" reescritos a la narrativa vigente, con nota de retractación de la narrativa vieja
+   (pico-colapso 0.42→0.59→0.24, paradoja del régimen nativo, TAGCN·1:50=0.789, "GAT lidera
+   explicación", trade-off −0.20).
+2. ⏳ **PENDIENTE** — **Archivar los docs retractados** para que no filtren a las diapositivas:
    `docs/literature_review.md` y `docs/CONCLUSIONES_v3.1.md` (mueve a `docs/_archivo/` o marca
    claramente como OBSOLETO en la cabecera).
-3. **Verificar el DOI de He2026** (`tesis_latex/bibliografia.bib:54-64`,
-   `10.1007/s10489-026-07138-9`) abriéndolo en el navegador. Reemplazó a una cita fabricada previa —
-   confirma que existe antes de sustentar.
+3. ✅ **VERIFICADO — PASA** — **DOI de He2026** (`tesis_latex/bibliografia.bib:54-64`,
+   `10.1007/s10489-026-07138-9`): registrado en Crossref, es REAL. Título "An explainable graph neural
+   network framework for illicit financial transaction detection", Applied Intelligence vol. 56 (2026),
+   autores He X/Huang J/Ma K/He H/Li M (coinciden con el .bib). Los números atribuidos (TAGCN+SHAP+
+   Elliptic; acc 98.14% / R 86.22% / P 94.23% / F1 90.05% / MCC 0.8913) son los REALES del paper. La
+   alerta previa de auditoría queda descartada (el paper aún no estaba indexado cuando se auditó).
+   Residual menor: confirmar en el PDF si el término exacto "SHAP Concentration" es del paper.
 
 ---
 
 ## 7. Checklist final de consolidación
 
-- [ ] Fix R1 aplicado en `src/stability/metrics.py` + smoke test pasa (Paso A)
+- [~] Fix R1 aplicado en `src/stability/metrics.py` (✅ código commiteado d00d381) — falta que el **smoke test pase** en la máquina con entorno (Paso A)
 - [ ] (opcional pero recomendado) `top_k_features: null` en ambos configs para consistencia entre ejes
-- [ ] Estabilidad de Elliptic recomputada — `results_v3/*.csv` regenerados (Paso B)
+- [ ] Estabilidad de Elliptic recomputada — `results_v3/*.csv` regenerados (Paso B) ← **requiere GPU**
 - [ ] Pass-rate del gate sigue ~23/60 (sanity)
 - [ ] CSV de Elliptic unificado `elliptic_merged_v3.csv` (Paso C)
 - [ ] Comparado el nuevo ranking de arquitecturas vs el del Cap. 4 → decidido si se actualiza
-- [ ] Tabla 5.1 de fidelidad regenerada con los 3 explicadores (Paso D.1)
+- [x] Tabla 5.1 de fidelidad regenerada con los 3 explicadores (Paso D.1) ✅ commit d00d381
 - [ ] Tablas de Elliptic regeneradas si cambiaron los números (Paso D.2)
-- [ ] README raíz actualizado + docs retractados archivados (Paso E)
-- [ ] DOI de He2026 verificado (Paso E)
+- [~] README raíz actualizado ✅ (commit d00d381) — falta **archivar docs retractados** (Paso E.2)
+- [x] DOI de He2026 verificado (Paso E) ✅ real, Crossref, números coinciden
+- [x] Guion de defensa R2 listo — `docs/DEFENSA_R2_evidencia_sintetica.md` ✅ commit 89235c4
 - [ ] **Eje sintético `phase1/` NO tocado** ✅
 
 ---
