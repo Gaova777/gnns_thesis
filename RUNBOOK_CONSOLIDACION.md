@@ -28,6 +28,9 @@
 3. **Nuevo generador** `phase1/gen_tables.py` (solo stdlib; regenera la tabla anterior).
 4. **README raíz** actualizado (banner de estado + Hallazgos clave a la narrativa vigente) y **este
    runbook**.
+5. **Guion de defensa R2** (`docs/DEFENSA_R2_evidencia_sintetica.md`): respuestas ensayables para la
+   objeción "la evidencia fuerte viene del dataset que ustedes construyeron". Material de estudio para
+   los autores, no requiere ejecución.
 
 ### Cómo traer estos cambios a la máquina GPU
 ```bash
