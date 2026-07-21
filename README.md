@@ -17,6 +17,15 @@ desbalance de clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100).
 
 ---
 
+> ### ⚠️ Estado (2026-07-21): consolidación en curso
+> La **fuente de verdad de los hallazgos es el manuscrito** (`tesis_latex/`), no las cifras
+> históricas de este README. Tras la auditoría integral, varias afirmaciones previas fueron
+> **retractadas** (ver [§ Hallazgos clave](#hallazgos-clave)). El plan de consolidación, el estado
+> de los arreglos aplicados y los **pasos pendientes que requieren la máquina con GPU** están en
+> **[RUNBOOK_CONSOLIDACION.md](RUNBOOK_CONSOLIDACION.md)**.
+
+---
+
 ## Tabla de contenidos
 
 - [Pregunta de investigación y objetivos](#pregunta-de-investigación-y-objetivos)
@@ -62,19 +71,31 @@ de balanceo que garanticen explicaciones robustas, consistentes y auditables en 
 
 ## Hallazgos clave
 
-1. **Pico-y-colapso de estabilidad (no monotónico):** la estabilidad explicativa (Spearman) sube
-   de 0,42 en 1:1 a un **máximo de 0,59 en 1:50**, y luego **colapsa a 0,24 en 1:100**
-   (Cohen d 1:1→1:50 = −0,915, efecto grande).
-2. **Paradoja del régimen nativo:** el escenario nativo 1:30 es *menos* estable (Spearman 0,19)
-   que el forzado 1:50 (0,59). Imponer una distribución, aun artificial, estabiliza el aprendizaje
-   entre semillas.
-3. **Dos bugs en PGExplainer de PyTorch Geometric 2.7** (contribución metodológica) — ver
+> El estudio se articula en **dos ejes**: **Elliptic real** (validez externa) y un **grafo sintético
+> propio** con *ground-truth* de tipologías (validez interna, donde vive la evidencia estadística
+> fuerte). Hallazgos vigentes (manuscrito):
+
+1. **Tres dimensiones independientes:** estabilidad, plausibilidad y fidelidad de las explicaciones
+   son **empíricamente independientes** — no covarían entre sí.
+2. **Puente estabilidad→plausibilidad NULO** (hipótesis central de la tesis, *refutada*): una
+   explicación estable no es más plausible (GNNExplainer r ≈ −0,01; IC bootstrap incluye 0). Un
+   no-resultado reportado honestamente como resultado.
+3. **Disociación plausibilidad ↔ fidelidad:** **PGExplainer** domina la plausibilidad de aristas
+   (0,80 vs 0,50; Wilcoxon p ≈ 2,6×10⁻³⁵) pero **colapsa en fidelidad** (0,11 vs 0,56 de
+   GNNExplainer). El explicador más "plausible" no es el más fiel.
+4. **El balanceo es prácticamente irrelevante** para las tres dimensiones (η² < 0,02).
+5. **La estabilidad por arquitectura depende del régimen del grafo:** en el grafo denso sintético
+   GCN/GAT lideran (Spearman ≈ 0,96); el orden difiere respecto al eje Elliptic disperso. *(La
+   estabilidad del eje Elliptic se está recomputando tras corregir la métrica de Spearman — ver
+   [RUNBOOK_CONSOLIDACION.md](RUNBOOK_CONSOLIDACION.md).)*
+6. **Contribución metodológica:** dos bugs en el PGExplainer de PyTorch Geometric 2.7 — ver
    [§ Bugs metodológicos corregidos](#bugs-metodológicos-corregidos).
-4. **Trade-off predicción ↔ estabilidad (débil, negativo):** ρ(F1, Spearman) ≈ −0,20. El mejor
-   predictor no es el mejor explicador: **GraphSAGE** lidera predicción (F1≈0,53), **GAT** lidera
-   explicación (Spearman≈0,64). Pico absoluto: TAGCN · 1:50 · focal loss → Spearman 0,789.
-5. **Matriz de recomendación:** auditabilidad → GAT/TAGCN; precisión → GraphSAGE;
-   desbalance > 1:50 → GAT/TAGCN; inferencia rápida → GCN/GraphSAGE.
+
+> ⚠️ **Narrativa retractada:** las afirmaciones previas de este README (pico-y-colapso
+> 0,42→0,59→0,24, paradoja del régimen nativo, trade-off −0,20, "GAT lidera explicación", pico
+> TAGCN·1:50 = 0,789) fueron **retractadas** en el manuscrito tras la auditoría y **ya no son
+> válidas**. Provenían de una métrica de estabilidad con bug (ya corregida) y de una corrida con
+> fallos de memoria silenciosos en GAT.
 
 ---
 

@@ -82,21 +82,30 @@ def spearman_rank_agreement(
     Returns:
         Spearman correlation coefficient in [-1, 1].
     """
-    if top_k:
-        ranking_a = ranking_a[:top_k]
-        ranking_b = ranking_b[:top_k]
+    ranking_a = np.asarray(ranking_a)
+    ranking_b = np.asarray(ranking_b)
+    if ranking_a.size == 0 or ranking_b.size == 0:
+        return 0.0
 
-    # Convert rankings to rank positions
-    n = max(len(ranking_a), len(ranking_b))
-    ranks_a = np.zeros(n)
-    ranks_b = np.zeros(n)
+    # AUDIT FIX (R1): size the rank vectors by the NUMBER OF FEATURES (max index + 1),
+    # not by top_k. The rankings hold feature INDICES (argsort output, e.g. 0..165), so
+    # the rank vectors must be indexed by feature id to be comparable. The previous code
+    # used np.zeros(top_k) + `if feat < top_k`, which silently DROPPED every feature whose
+    # index exceeded top_k -> with top_k=20 over 166 features only ~2-3 of the top-20
+    # survived and the rest stayed tied at 0, corrupting the Spearman. Now correct for any
+    # top_k; identical to the old behaviour when top_k=None (used by the phase1 pipeline).
+    n_features = int(max(ranking_a.max(), ranking_b.max())) + 1
 
-    for pos, feat in enumerate(ranking_a):
-        if feat < n:
-            ranks_a[feat] = pos
-    for pos, feat in enumerate(ranking_b):
-        if feat < n:
-            ranks_b[feat] = pos
+    # Features outside the (optionally truncated) ranking are tied at the worst rank.
+    ranks_a = np.full(n_features, n_features, dtype=float)
+    ranks_b = np.full(n_features, n_features, dtype=float)
+
+    top_a = ranking_a[:top_k] if top_k else ranking_a
+    top_b = ranking_b[:top_k] if top_k else ranking_b
+    for pos, feat in enumerate(top_a):
+        ranks_a[int(feat)] = pos
+    for pos, feat in enumerate(top_b):
+        ranks_b[int(feat)] = pos
 
     corr, _ = stats.spearmanr(ranks_a, ranks_b)
     return float(corr) if not np.isnan(corr) else 0.0
