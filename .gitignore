@@ -112,6 +112,13 @@ tesis_latex/*.out
 tesis_latex/*.run.xml
 tesis_latex/*.toc
 tesis_latex/**/*.aux
+presentacion_latex/*.aux
+presentacion_latex/*.log
+presentacion_latex/*.nav
+presentacion_latex/*.snm
+presentacion_latex/*.out
+presentacion_latex/*.toc
+presentacion_latex/*.vrb
 
 # ───────────────────────────────────────────────
 # Personal / operativo (NO es la tesis — contiene IP de Tailscale + hostname
