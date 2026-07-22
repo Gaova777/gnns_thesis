@@ -280,7 +280,7 @@ Regenerar desde `results_v3/elliptic_merged_v3.csv`:
 - [x] Tabla 5.1 de fidelidad regenerada con los 3 explicadores (Paso D.1) ✅ commit d00d381
 - [x] Tablas de Elliptic regeneradas (Paso D.2): `elliptic_full`, `elliptic_jaccard`, `elliptic_stab_scenario`, `tab:ranking`, `elliptic_perf` + figuras `ranking_khop`/`estabilidad_escenario`/`contraste_regimen`, todas con métrica corregida ✅
 - [x] **Extra (mejora de métricas):** PR-AUC elevado a métrica primaria + bloque **ROC-AUC / precision@k** (contraste honesto: ROC-AUC engañoso bajo imbalance) en Cap 4. Datos en `results_v3/reeval_metrics.csv` (val ROC 0,884 / PR 0,367 vs test ROC 0,653 / PR 0,017) ✅
-- [x] **PDF recompilado con biber: 101 páginas, sin errores ni refs/citas undefined** ✅
+- [x] **PDF recompilado con biber: 102 páginas, sin errores ni refs/citas undefined** ✅
 - [x] README raíz actualizado ✅ (commit d00d381) + docs retractados archivados en `docs/_archivo/` ✅ (Paso E)
 - [x] DOI de He2026 verificado (Paso E) ✅ real, Crossref, números coinciden
 - [x] Guion de defensa R2 listo — `docs/DEFENSA_R2_evidencia_sintetica.md` ✅ commit 89235c4

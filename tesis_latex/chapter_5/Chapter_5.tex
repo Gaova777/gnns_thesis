@@ -31,7 +31,7 @@ La matriz factorial sintética cruza las cuatro arquitecturas, los cinco escenar
     \label{fig:heatmap}
 \end{figure}
 
-En cuanto a la estabilidad, medida como la correlación de Spearman entre rankings de features, GNNShap resulta el más estable con un valor cercano a 0,977, por encima de GNNExplainer, que alcanza alrededor de 0,924. PGExplainer, por ser determinista una vez entrenado su modelo paramétrico, no admite una medida de estabilidad de este tipo, de modo que su celda se reporta como no aplicable. La estabilidad por arquitectura muestra un fenómeno digno de atención, ya que sobre el grafo denso GCN y GAT encabezan la estabilidad con valores cercanos a 0,965 y 0,960, con TAGCN y GraphSAGE por debajo, en torno a 0,886 y 0,884. Este orden coincide con el que arroja Elliptic una vez corregida la métrica de estabilidad, donde GCN y GAT también figuran a la cabeza, de modo que el orden de estabilidad entre arquitecturas resulta concordante entre ambos regímenes de densidad y ninguna arquitectura domina en términos absolutos. La Figura \ref{fig:contraste} contrasta directamente la estabilidad de GNNExplainer por arquitectura entre el régimen disperso de Elliptic y el régimen denso del grafo sintético, y hace visible la concordancia del orden.
+En cuanto a la estabilidad, medida como la correlación de Spearman entre rankings de features, GNNShap resulta el más estable con un valor cercano a 0,977, por encima de GNNExplainer, que alcanza alrededor de 0,924. PGExplainer, por ser determinista una vez entrenado su modelo paramétrico, no admite una medida de estabilidad de este tipo, de modo que su celda se reporta como no aplicable. La estabilidad por arquitectura muestra un fenómeno digno de atención, ya que sobre el grafo denso GCN y GAT encabezan la estabilidad con valores cercanos a 0,965 y 0,960, con GraphSAGE y TAGCN por debajo, en torno a 0,889 y 0,886. Este orden coincide con el que arroja Elliptic una vez corregida la métrica de estabilidad, donde GCN y GAT también figuran a la cabeza, de modo que el orden de estabilidad entre arquitecturas resulta concordante entre ambos regímenes de densidad y ninguna arquitectura domina en términos absolutos. La Figura \ref{fig:contraste} contrasta directamente la estabilidad de GNNExplainer por arquitectura entre el régimen disperso de Elliptic y el régimen denso del grafo sintético, y hace visible la concordancia del orden.
 
 \begin{figure}[htbp]
     \centering
@@ -96,8 +96,8 @@ La robustez del hallazgo a través de los escenarios de desbalance queda ilustra
     \toprule
     \textbf{Explicador} & \textbf{Grafo 0} & \textbf{Grafo 1} & \textbf{Grafo 2} \\
     \midrule
-    PGExplainer  & 0,820 & 0,765 & 0,829 \\
-    GNNExplainer & 0,498 & 0,523 & 0,529 \\
+    PGExplainer  & 0,801 & 0,765 & 0,829 \\
+    GNNExplainer & 0,495 & 0,523 & 0,529 \\
     \bottomrule
     \end{tabular}
     \caption{Plausibilidad de aristas de PGExplainer y GNNExplainer en las tres realizaciones del grafo sintético. La superioridad de PGExplainer se mantiene en las tres instancias, lo que confirma que el hallazgo no depende de una realización particular.}
