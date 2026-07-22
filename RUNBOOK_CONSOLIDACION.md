@@ -271,18 +271,20 @@ Regenerar desde `results_v3/elliptic_merged_v3.csv`:
 
 ## 7. Checklist final de consolidación
 
-- [~] Fix R1 aplicado en `src/stability/metrics.py` (✅ código commiteado d00d381) — falta que el **smoke test pase** en la máquina con entorno (Paso A)
-- [ ] (opcional pero recomendado) `top_k_features: null` en ambos configs para consistencia entre ejes
-- [ ] Estabilidad de Elliptic recomputada — `results_v3/*.csv` regenerados (Paso B) ← **requiere GPU**
-- [ ] Pass-rate del gate sigue ~23/60 (sanity)
-- [ ] CSV de Elliptic unificado `elliptic_merged_v3.csv` (Paso C)
-- [ ] Comparado el nuevo ranking de arquitecturas vs el del Cap. 4 → decidido si se actualiza
+- [x] Fix R1 aplicado en `src/stability/metrics.py` — **smoke test 15/15 en la máquina GPU** (Paso A) ✅
+- [ ] (opcional) `top_k_features: null` en ambos configs para consistencia entre ejes
+- [x] Estabilidad de Elliptic recomputada (Paso B) — `results_v3/xai-gnn-stability-B-v3.csv` regenerado: 23 passed × 3 explicadores + 37 no-passed × GNNExplainer. **Cero OOM** vía driver troceado (un proceso por config). ✅
+- [x] Pass-rate del gate = **23/60** confirmado (sanity) ✅
+- [x] CSV de Elliptic: `explain_matrix` globea los 60 meta.json, así que el CSV B único ya contiene los 4 archs; no hace falta merge separado (Paso C) ✅
+- [x] Comparado el nuevo ranking vs Cap. 4 → **CAMBIÓ y se actualizó el manuscrito** (Paso C/D). El fix R1 invierte GraphSAGE>GAT a GAT/GCN líderes y **disuelve la "inversión por densidad"**: Elliptic pasa a concordar con el sintético. Reescritos Cap 4/5/6/7. Ver memoria `r1-fix-inverts-graphsage-gat-ranking`. ✅
 - [x] Tabla 5.1 de fidelidad regenerada con los 3 explicadores (Paso D.1) ✅ commit d00d381
-- [ ] Tablas de Elliptic regeneradas si cambiaron los números (Paso D.2)
+- [x] Tablas de Elliptic regeneradas (Paso D.2): `elliptic_full`, `elliptic_jaccard`, `elliptic_stab_scenario`, `tab:ranking`, `elliptic_perf` + figuras `ranking_khop`/`estabilidad_escenario`/`contraste_regimen`, todas con métrica corregida ✅
+- [x] **Extra (mejora de métricas):** PR-AUC elevado a métrica primaria + bloque **ROC-AUC / precision@k** (contraste honesto: ROC-AUC engañoso bajo imbalance) en Cap 4. Datos en `results_v3/reeval_metrics.csv` (val ROC 0,884 / PR 0,367 vs test ROC 0,653 / PR 0,017) ✅
+- [x] **PDF recompilado con biber: 101 páginas, sin errores ni refs/citas undefined** ✅
 - [x] README raíz actualizado ✅ (commit d00d381) + docs retractados archivados en `docs/_archivo/` ✅ (Paso E)
 - [x] DOI de He2026 verificado (Paso E) ✅ real, Crossref, números coinciden
 - [x] Guion de defensa R2 listo — `docs/DEFENSA_R2_evidencia_sintetica.md` ✅ commit 89235c4
-- [ ] **Eje sintético `phase1/` NO tocado** ✅
+- [x] **Eje sintético `phase1/` NO tocado** ✅
 
 ---
 

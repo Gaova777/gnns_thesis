@@ -3,7 +3,7 @@
 # Mismos fixes que v3-B. VRAM más ajustado → hidden_dim capado en 148.
 
 data:
-  root: "./dataset"
+  root: "./data"
   train_timesteps: [1, 34]
   val_timesteps: [35, 42]
   test_timesteps: [43, 49]

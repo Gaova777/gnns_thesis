@@ -3,14 +3,14 @@
 \renewcommand{\arraystretch}{1.3}
 \begin{tabular}{lccc}
 \toprule
-\textbf{Arquitectura} & \textbf{F1 (test)} & \textbf{MCC (test)} & \textbf{PR-AUC (test)} \\
+\textbf{Arquitectura} & \textbf{PR-AUC (test)} & \textbf{F1 (test)} & \textbf{MCC (test)} \\
 \midrule
-GraphSAGE & 0,008 & 0,003 & 0,017 \\
-GAT & 0,025 & 0,017 & 0,014 \\
-GCN & 0,013 & 0,008 & 0,010 \\
-TAGCN & 0,001 & -0,006 & 0,011 \\
+GraphSAGE & 0,017 & 0,008 & 0,003 \\
+GAT & 0,014 & 0,025 & 0,017 \\
+GCN & 0,010 & 0,013 & 0,008 \\
+TAGCN & 0,011 & 0,001 & -0,006 \\
 \bottomrule
 \end{tabular}
-\caption{Rendimiento predictivo medio en la particion de test por arquitectura sobre el \textit{Elliptic Dataset}. El colapso es generalizado, con valores de F1 y MCC muy bajos en las cuatro arquitecturas por efecto del desplazamiento temporal.}
+\caption{Rendimiento predictivo medio en la particion de test por arquitectura sobre el \textit{Elliptic Dataset}, con el area bajo la curva de precision y exhaustividad como metrica primaria por su robustez al desbalance. El colapso es generalizado en las cuatro arquitecturas por efecto del desplazamiento temporal, y el F1 en umbral, degenerado bajo desbalance extremo, lo refleja de forma aun mas marcada.}
 \label{tab:elliptic-perf}
 \end{table}

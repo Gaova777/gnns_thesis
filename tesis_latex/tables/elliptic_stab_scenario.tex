@@ -5,12 +5,12 @@
 \toprule
 \textbf{Arquitectura} & 1:1 & 1:10 & 1:50 & 1:100 & nativo \\
 \midrule
-GraphSAGE & 0,683 & 0,579 & 0,565 & 0,629 & 0,695 \\
-GAT & 0,447 & 0,578 & 0,545 & 0,411 & 0,447 \\
-GCN & 0,701 & 0,378 & 0,381 & 0,555 & 0,326 \\
-TAGCN & 0,268 & 0,195 & 0,351 & 0,361 & 0,212 \\
+GraphSAGE & 0,769 & 0,731 & 0,722 & 0,710 & 0,742 \\
+GAT & 0,769 & 0,853 & 0,759 & 0,790 & 0,727 \\
+GCN & 0,800 & 0,782 & 0,792 & 0,760 & 0,755 \\
+TAGCN & 0,555 & 0,539 & 0,588 & 0,687 & 0,564 \\
 \bottomrule
 \end{tabular}
-\caption{Estabilidad de las explicaciones (correlacion de Spearman) por arquitectura y escenario de desbalance sobre el subgrafo receptivo. GraphSAGE mantiene la mayor estabilidad de forma transversal a los escenarios.}
+\caption{Estabilidad de las explicaciones (correlacion de Spearman de GNNExplainer) por arquitectura y escenario de desbalance sobre el subgrafo receptivo, con la metrica corregida. GCN y GAT encabezan la estabilidad de forma transversal a los escenarios.}
 \label{tab:elliptic-stab-scen}
 \end{table}

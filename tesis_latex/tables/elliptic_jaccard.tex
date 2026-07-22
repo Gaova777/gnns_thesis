@@ -5,12 +5,12 @@
 \toprule
 \textbf{Arquitectura} & \textbf{Jaccard medio} & \textbf{Spearman medio} \\
 \midrule
-GraphSAGE & 0,911 & 0,630 \\
-GAT & 0,791 & 0,486 \\
-GCN & 0,613 & 0,468 \\
-TAGCN & 0,805 & 0,270 \\
+GraphSAGE & 0,911 & 0,735 \\
+GAT & 0,791 & 0,780 \\
+GCN & 0,613 & 0,778 \\
+TAGCN & 0,805 & 0,580 \\
 \bottomrule
 \end{tabular}
-\caption{Comparacion entre el indice de Jaccard de aristas y la correlacion de Spearman de features como metricas de estabilidad sobre el \textit{Elliptic Dataset}. El Jaccard se aproxima trivialmente a la unidad por la dispersion del grafo, mientras que la correlacion de Spearman conserva capacidad de discriminacion entre arquitecturas.}
+\caption{Comparacion entre el indice de Jaccard de aristas y la correlacion de Spearman de features (GNNExplainer) como metricas de estabilidad sobre el \textit{Elliptic Dataset}, con la metrica corregida. El Jaccard se satura hacia valores altos por la dispersion del grafo, mientras que la correlacion de Spearman conserva capacidad de discriminacion entre arquitecturas.}
 \label{tab:jaccard}
 \end{table}
