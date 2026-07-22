@@ -99,6 +99,21 @@ err_utf8.txt
 *.tmp
 
 # ───────────────────────────────────────────────
+# LaTeX build artifacts (tesis_latex) — main.pdf sí se versiona
+# ───────────────────────────────────────────────
+tesis_latex/*.aux
+tesis_latex/*.bbl
+tesis_latex/*.bcf
+tesis_latex/*.blg
+tesis_latex/*.lof
+tesis_latex/*.log
+tesis_latex/*.lot
+tesis_latex/*.out
+tesis_latex/*.run.xml
+tesis_latex/*.toc
+tesis_latex/**/*.aux
+
+# ───────────────────────────────────────────────
 # Personal / operativo (NO es la tesis — contiene IP de Tailscale + hostname
 # para acceso remoto a la máquina; no debe hacerse público)
 # ───────────────────────────────────────────────
