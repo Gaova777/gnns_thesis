@@ -1,10 +1,11 @@
 # Estudio de la Estabilidad de Métodos de Explicabilidad (XAI) en Graph Neural Networks para Detección de Lavado de Dinero bajo Desbalance Extremo de Datos
 
-Repositorio de código y experimentación de la tesis de Maestría en Ingeniería en Sistemas y
-Computación. Estudia la **estabilidad de métodos XAI** (GNNExplainer, PGExplainer, GNNShap)
-aplicados a Graph Neural Networks (GCN, GraphSAGE, GAT, TAGCN) entrenadas para detectar
-transacciones ilícitas en el **Elliptic Bitcoin Dataset**, bajo distintos niveles de
-desbalance de clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100).
+Repositorio de código, manuscrito y experimentación de la tesis de Maestría en Ingeniería en
+Sistemas y Computación. Estudia la **estabilidad de métodos XAI** (GNNExplainer, PGExplainer,
+GNNShap) aplicados a Graph Neural Networks (GCN, GraphSAGE, GAT, TAGCN) entrenadas para detectar
+transacciones ilícitas en el **Elliptic Bitcoin Dataset**, bajo distintos niveles de desbalance de
+clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100), complementado con un **grafo sintético con
+*ground-truth*** que permite medir plausibilidad y fidelidad.
 
 | | |
 |---|---|
@@ -12,17 +13,19 @@ desbalance de clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100).
 | **Director** | Ph.D. Cristian Rosero |
 | **Institución** | Universidad Tecnológica de Pereira (UTP) — Facultad de Ingenierías — Maestría en Ingeniería en Sistemas y Computación (MISC) |
 | **Lugar / Año** | Pereira, Colombia · 2026 |
-| **Dataset** | Elliptic Bitcoin Dataset (~203k nodos, ~234k aristas, 166 features, 49 time-steps) |
-| **Manuscrito** | `tesis_final_v16.pdf` (105 pp) — ver [§ Manuscrito](#-manuscrito) |
+| **Dataset** | Elliptic Bitcoin Dataset (~203k nodos, ~234k aristas, 166 features, 49 time-steps) + grafo sintético propio |
+| **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 102 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
+| **Defensa** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) (26 slides) |
 
 ---
 
-> ### ⚠️ Estado (2026-07-21): consolidación en curso
-> La **fuente de verdad de los hallazgos es el manuscrito** (`tesis_latex/`), no las cifras
-> históricas de este README. Tras la auditoría integral, varias afirmaciones previas fueron
-> **retractadas** (ver [§ Hallazgos clave](#hallazgos-clave)). El plan de consolidación, el estado
-> de los arreglos aplicados y los **pasos pendientes que requieren la máquina con GPU** están en
-> **[RUNBOOK_CONSOLIDACION.md](RUNBOOK_CONSOLIDACION.md)**.
+> ### ✅ Estado (2026-07-22): consolidación completada
+> La **fuente de verdad de los hallazgos es el manuscrito** ([`tesis_latex/`](tesis_latex/)), que
+> compila a 102 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
+> integral se corrigieron **dos artefactos de evaluación** que invertían conclusiones sobre
+> estabilidad; los números de este README ya reflejan la versión corregida. El registro detallado de
+> los cambios está en **[CAMBIOS_CONSOLIDACION_2026-07-22.md](CAMBIOS_CONSOLIDACION_2026-07-22.md)** y
+> el plan operativo en **[RUNBOOK_CONSOLIDACION.md](RUNBOOK_CONSOLIDACION.md)**.
 
 ---
 
@@ -38,7 +41,7 @@ desbalance de clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100).
 - [Detalles técnicos](#detalles-técnicos)
 - [Bugs metodológicos corregidos](#bugs-metodológicos-corregidos)
 - [Resultados y artefactos](#resultados-y-artefactos)
-- [📄 Manuscrito](#-manuscrito)
+- [Manuscrito y defensa](#manuscrito-y-defensa)
 - [Limitaciones y trabajo futuro](#limitaciones-y-trabajo-futuro)
 
 ---
@@ -51,21 +54,20 @@ desbalance de clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100).
 > y estabilidad explicativa?**
 
 **Objetivo general:** evaluar la estabilidad de los métodos de explicabilidad en GNNs bajo
-desbalance extremo en detección de lavado de dinero sobre el Elliptic Dataset, para entregar
-recomendaciones técnicas sobre las combinaciones óptimas de arquitectura, explicador y técnica
-de balanceo que garanticen explicaciones robustas, consistentes y auditables en entornos regulados.
+desbalance extremo en detección de lavado de dinero, para entregar recomendaciones técnicas sobre
+las combinaciones de arquitectura, explicador y técnica de balanceo que garanticen explicaciones
+robustas, consistentes y auditables en entornos regulados.
 
 **Objetivos específicos:**
 
-1. Evaluar el impacto directo del desbalance de clases en la robustez de las explicaciones
-   estructurales, comparando cuantitativamente GNNExplainer, PGExplainer y GNNShap a través de
-   escenarios incrementales de desbalance.
-2. Comparar la resiliencia topológica de GCN, GraphSAGE, GAT y TAGCN, midiendo la consistencia
-   de los subgrafos explicativos bajo estrés de datos.
-3. Analizar el impacto colateral de las estrategias de mitigación del desbalance (ponderación de
-   clases y focal loss) sobre la estabilidad/fidelidad de la interpretación topológica.
-4. Construir y validar una matriz de recomendación técnica que articule rendimiento predictivo y
-   estabilidad explicativa (tríada arquitectura–explicador–balanceo).
+1. Evaluar el impacto del desbalance de clases sobre la robustez de las explicaciones, comparando
+   GNNExplainer, PGExplainer y GNNShap a través de escenarios incrementales de desbalance.
+2. Comparar la resiliencia de GCN, GraphSAGE, GAT y TAGCN, midiendo la consistencia de los
+   subgrafos y rankings explicativos bajo estrés de datos.
+3. Analizar el impacto de las estrategias de mitigación del desbalance (ponderación de clases y
+   focal loss) sobre la estabilidad y la fidelidad de la interpretación.
+4. Construir una matriz de recomendación técnica que articule rendimiento predictivo y estabilidad
+   explicativa (tríada arquitectura–explicador–balanceo).
 
 ---
 
@@ -73,36 +75,50 @@ de balanceo que garanticen explicaciones robustas, consistentes y auditables en 
 
 > El estudio se articula en **dos ejes**: **Elliptic real** (validez externa) y un **grafo sintético
 > propio** con *ground-truth* de tipologías (validez interna, donde vive la evidencia estadística
-> fuerte). Hallazgos vigentes (manuscrito):
+> fuerte). Los hallazgos vigentes, tras corregir la métrica de estabilidad, son:
 
-1. **Tres dimensiones independientes:** estabilidad, plausibilidad y fidelidad de las explicaciones
-   son **empíricamente independientes** — no covarían entre sí.
-2. **Puente estabilidad→plausibilidad NULO** (hipótesis central de la tesis, *refutada*): una
-   explicación estable no es más plausible (GNNExplainer r ≈ −0,01; IC bootstrap incluye 0). Un
-   no-resultado reportado honestamente como resultado.
-3. **Disociación plausibilidad ↔ fidelidad:** **PGExplainer** domina la plausibilidad de aristas
-   (0,80 vs 0,50; Wilcoxon p ≈ 2,6×10⁻³⁵) pero **colapsa en fidelidad** (0,11 vs 0,56 de
-   GNNExplainer). El explicador más "plausible" no es el más fiel.
-4. **El balanceo es prácticamente irrelevante** para las tres dimensiones (η² < 0,02).
-5. **La estabilidad por arquitectura depende del régimen del grafo:** en el grafo denso sintético
-   GCN/GAT lideran (Spearman ≈ 0,96); el orden difiere respecto al eje Elliptic disperso. *(La
-   estabilidad del eje Elliptic se está recomputando tras corregir la métrica de Spearman — ver
-   [RUNBOOK_CONSOLIDACION.md](RUNBOOK_CONSOLIDACION.md).)*
-6. **Contribución metodológica:** dos bugs en el PGExplainer de PyTorch Geometric 2.7 — ver
+1. **Tres dimensiones independientes.** La estabilidad, la plausibilidad y la fidelidad de las
+   explicaciones son dimensiones distintas que no se implican entre sí. Reportar una sola y llamarla
+   "calidad" oculta compromisos decisivos según el propósito de la auditoría.
+2. **Puente estabilidad→plausibilidad nulo** (hipótesis central de la tesis, *refutada con
+   honestidad*): una explicación estable no es por ello más plausible (GNNExplainer r ≈ −0,01; IC
+   bootstrap incluye el cero).
+3. **Disociación plausibilidad ↔ fidelidad.** PGExplainer domina la plausibilidad de aristas
+   (0,80 vs 0,50 de GNNExplainer; Wilcoxon p ≈ 2,6×10⁻³⁵) pero **colapsa en fidelidad** (0,11 vs 0,56).
+   El explicador más plausible no es el más fiel.
+4. **El balanceo y el nivel de desbalance son secundarios.** El balanceo tiene tamaño de efecto
+   despreciable sobre las tres dimensiones (η² < 0,02), y el perfil de estabilidad por escenario de
+   desbalance es esencialmente plano. La palanca dominante es el explicador.
+5. **Estabilidad por arquitectura: concordancia entre regímenes.** Con la métrica corregida, **GAT y
+   GCN encabezan la estabilidad tanto en el grafo denso sintético como en el disperso de Elliptic**
+   (Elliptic: GAT 0,780 / GCN 0,778 / GraphSAGE 0,735 / TAGCN 0,580; sintético: GCN/GAT ≈ 0,96). La
+   correlación de rangos entre ambos regímenes es de **+0,80**. La diferencia GAT vs GraphSAGE no es
+   estadísticamente significativa (Wilcoxon p = 0,375), de modo que se afirma que GAT y GCN encabezan
+   y TAGCN queda atrás, sin sobre-ordenar la parte alta.
+6. **Contribución metodológica: dos artefactos de evaluación corregidos.** Un fallo de memoria
+   (cálculo sobre el grafo completo con OOM silencioso en GAT) y un truncamiento en la métrica de
+   Spearman, cada uno suficiente por sí solo para producir una conclusión comparativa falsa. Además,
+   dos bugs en el PGExplainer de PyTorch Geometric — ver
    [§ Bugs metodológicos corregidos](#bugs-metodológicos-corregidos).
+7. **Rigor métrico bajo desbalance.** El ROC-AUC es engañosamente alto bajo desbalance extremo
+   (validación 0,88 vs test 0,65) mientras que PR-AUC y precision@k revelan la dificultad real
+   (validación 0,37 vs test 0,02). Por eso PR-AUC y precision@k son las métricas primarias, no F1 ni
+   ROC-AUC.
 
-> ⚠️ **Narrativa retractada:** las afirmaciones previas de este README (pico-y-colapso
-> 0,42→0,59→0,24, paradoja del régimen nativo, trade-off −0,20, "GAT lidera explicación", pico
-> TAGCN·1:50 = 0,789) fueron **retractadas** en el manuscrito tras la auditoría y **ya no son
-> válidas**. Provenían de una métrica de estabilidad con bug (ya corregida) y de una corrida con
-> fallos de memoria silenciosos en GAT.
+> ⚠️ **Narrativa retractada.** Versiones anteriores de este README y del manuscrito afirmaron una
+> **"inversión por densidad"** (GraphSAGE más estable en Elliptic, orden invertido en el sintético) y
+> un **liderazgo de GraphSAGE**. Ambas afirmaciones se **retractaron**: eran artefactos de una métrica
+> de Spearman con un bug de truncamiento (ya corregido) y de una corrida con fallos de memoria en GAT.
+> Corregidos ambos, el orden de estabilidad **concuerda** entre regímenes en lugar de invertirse. La
+> correlación de rangos entre ejes pasó de **−0,20 (con bug) a +0,80 (corregida)**. Retractar estas
+> conclusiones no debilitó la tesis: la hizo más sólida.
 
 ---
 
 ## Diseño experimental
 
 Diseño factorial sobre la tríada **arquitectura × explicador × balanceo**, cruzada con escenarios
-de desbalance:
+de desbalance, sobre **dos ejes** (Elliptic real y grafo sintético con *ground-truth*):
 
 | Factor | Niveles |
 |---|---|
@@ -112,10 +128,11 @@ de desbalance:
 | **Escenarios (5)** | 1:1 · 1:10 · **1:30 nativo** · 1:50 · 1:100 |
 
 - **Desbalance extremo** se define operativamente como razón ilícito:lícito ≥ 1:50 (prevalencia ≤ 2 %).
-- El escenario **1:30 nativo** preserva la distribución natural del dataset (baseline Weber 2019),
-  sin manipular la máscara.
-- Los experimentos se distribuyen en **2 máquinas** (la 4090 quedó sin acceso): cada máquina cubre
-  un subconjunto de arquitecturas — ver [§ Configuración por máquina](#configuración-por-máquina).
+- El escenario **1:30 nativo** preserva la distribución natural del dataset (baseline Weber 2019).
+- Cada explicación se repite **5 veces con semillas distintas** para medir estabilidad; el eje
+  sintético añade robustez con **3 semillas de modelo × 3 grafos independientes** y estadística
+  (Kruskal-Wallis, Wilcoxon, intervalos por bootstrap).
+- Los experimentos se distribuyen en **2 máquinas** — ver [§ Configuración por máquina](#configuración-por-máquina).
 
 ---
 
@@ -123,21 +140,23 @@ de desbalance:
 
 ```
 gnns_thesis/
+├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 102 pp, 8 caps)
+│   ├── main.tex · chapter_1..8/ · tables/ · bibliografia.bib
+│   └── main.pdf                        # PDF compilado y versionado
+├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa.tex + .pdf, 26 slides)
+├── docs/                              # guiones y material de defensa
+├── CAMBIOS_CONSOLIDACION_2026-07-22.md # registro detallado de la consolidación (punto de entrada)
+├── RUNBOOK_CONSOLIDACION.md           # plan operativo de la consolidación
 ├── configs/
 │   ├── experiment_machineB_v3.yaml     # ← config vigente Máquina B (RTX 4060): GCN, GraphSAGE
 │   ├── experiment_machineC_v3.yaml     # ← config vigente Máquina C (RTX 3050): GAT, TAGCN
-│   ├── experiment_machineB_v2.yaml     # iteración v2 (histórico)
-│   ├── experiment_machineB_pgonly.yaml # solo PGExplainer (debugging)
-│   └── experiment_machine{A,B,C}.yaml  # configs v1 (legacy)
+│   └── experiment_machine*.yaml        # configs v1/v2 (legacy)
 ├── scripts/
 │   ├── train_matrix.py          # ← Pipeline v3 · Paso 1: entrena la matriz + quality gate
 │   ├── explain_matrix.py        # ← Pipeline v3 · Paso 2: explainers + estabilidad
-│   ├── smoke_test.py            # validación end-to-end (~10 min, 13-15 checks)
-│   ├── merge_results.py         # unifica CSVs de ambas máquinas
-│   ├── run_full_pipeline.py     # orquestador monolítico v1/v2 (LEGACY — no usar para v3)
-│   ├── run_training.py / run_explain.py / run_stability.py   # etapas standalone
-│   ├── debug_pgexplainer*.py    # diagnósticos de PGExplainer sobre Cora
-│   └── add_native_figures.py    # genera figuras del escenario 1:30 nativo
+│   ├── smoke_test.py            # validación end-to-end (~10 min, 15 checks)
+│   ├── consolidacion/           # scripts de la consolidación (regenerar tablas/figuras, ROC-AUC)
+│   └── ...                      # etapas standalone + diagnósticos de PGExplainer
 ├── src/
 │   ├── models/        # GCN, GraphSAGE, GAT, TAGCN (interfaz común)
 │   ├── data/          # carga Elliptic, split temporal, escenarios de desbalance
@@ -146,15 +165,17 @@ gnns_thesis/
 │   ├── explainability/# runners de GNNExplainer/PGExplainer y GNNShap + extracción
 │   ├── stability/     # réplicas estocásticas, perturbación, métricas (Jaccard/Spearman)
 │   └── analysis/      # tracking MLflow+CSV, ANOVA factorial, matriz de recomendación
-├── data/              # dataset Elliptic (auto-descargado por PyG, ~300MB · NO en git)
+├── phase1/            # eje sintético (grafos + CSVs de resultados) — NO re-correr
+├── results_v3/        # CSVs de estabilidad + reeval_metrics.csv (provenance versionada)
 ├── results_models_v3/ # checkpoints *_best.pt + *_meta.json (NO en git)
-├── results_v3/        # CSVs del explain stage + MLflow artifacts (NO en git)
+├── data/              # dataset Elliptic (auto-descargado por PyG, ~300MB · NO en git)
 ├── pyproject.toml     # dependencias (gestionado con uv)
 └── README.md
 ```
 
-> **Nota:** `data/`, `results_*/`, `checkpoints/`, `mlruns/` y `*.pt` están en `.gitignore` — se
-> generan al correr el pipeline y no se versionan.
+> **Nota:** `data/`, `results_models_v3/`, `mlruns/` y `*.pt` están en `.gitignore`. Los CSVs de
+> provenance de la consolidación (`results_v3/xai-gnn-stability-B-v3.csv`, `results_v3/reeval_metrics.csv`)
+> sí se versionan de forma explícita para respaldar las tablas del manuscrito.
 
 ---
 
@@ -172,14 +193,21 @@ uv sync          # instala dependencias desde uv.lock
 `scikit-learn>=1.5`, `scipy>=1.14`, `statsmodels>=0.14`, `pandas>=2.2`, `matplotlib`, `seaborn`.
 
 El **dataset Elliptic** (~300 MB) se descarga automáticamente en `./data/` la primera vez que se
-corre el pipeline (requiere conexión a internet, desde `data.pyg.org`). Sin internet, copiar
-manualmente la carpeta `data/` desde otra máquina.
+corre el pipeline (desde `data.pyg.org`). Sin internet, copiar manualmente la carpeta `data/`.
+
+Para **compilar el manuscrito** (requiere una distribución LaTeX con `biber`, p.ej. TinyTeX):
+
+```bash
+cd tesis_latex
+pdflatex -interaction=nonstopmode main.tex && biber main \
+  && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode main.tex
+```
 
 ---
 
 ## Pipeline v3 (workflow)
 
-El pipeline está **dividido en dos scripts** para poder iterar sobre la calidad del modelo de forma
+El pipeline está **dividido en dos scripts** para iterar sobre la calidad del modelo de forma
 independiente de los explicadores. La v2 producía modelos con F1 ~0,02–0,08; la v3 corrigió tres
 bugs centrales (focal loss, early stopping, search space de Optuna) y agregó un quality gate.
 
@@ -189,10 +217,10 @@ bugs centrales (focal loss, early stopping, search space de Optuna) y agregó un
 uv run python scripts/smoke_test.py --config configs/experiment_machineB_v3.yaml
 ```
 
-Corre una config mínima (1:10 · GCN · class_weighting) end-to-end y valida 13–15 checks (estructura
-de config, integridad del dataset, escenario de desbalance, entrenamiento, los 3 explicadores sin
-crash/OOM, schema CSV, semántica del alpha de FocalLoss, warm-start priors, métrica PR-AUC,
-calibración de threshold, schema del metadata JSON).
+Corre una config mínima end-to-end y valida 15 checks (estructura de config, dataset, escenario de
+desbalance, entrenamiento, los 3 explicadores sin crash/OOM, schema CSV, semántica del alpha de
+FocalLoss, warm-start priors, PR-AUC, calibración de threshold, schema del metadata JSON, y el fix
+de la métrica de Spearman).
 
 ### 1. Entrenar la matriz
 
@@ -203,10 +231,8 @@ uv run python scripts/train_matrix.py --config configs/experiment_machineB_v3.ya
 - Corre **Optuna con warm-start** (prior de literatura como trial 0) + búsqueda bayesiana (TPE).
 - Entrena el modelo final, **calibra el threshold** sobre validación (remuestreando val a la
   prevalencia de test, para corregir el covariate shift temporal).
-- Aplica el **quality gate** sobre validación y persiste `*_best.pt` + `*_meta.json` en
-  `results_models_v3/`. **No corre explainers.**
-- Flags: `--resume` (saltea configs con `meta.json` ya guardado), `--quick`, `--arch`, `--scenario`,
-  `--balancing`, `--device auto`, `--max-hours`, `--no-warm-start`.
+- Aplica el **quality gate** sobre validación y persiste `*_best.pt` + `*_meta.json`. **No corre explainers.**
+- Flags: `--resume`, `--quick`, `--arch`, `--scenario`, `--balancing`, `--device auto`, `--max-hours`.
 
 ### 2. Explicar solo los modelos que aprendieron
 
@@ -215,19 +241,15 @@ uv run python scripts/explain_matrix.py --config configs/experiment_machineB_v3.
 ```
 
 - Lee los `*_meta.json`, filtra por `quality_passed=True` (`--force` ignora el gate).
-- Corre **GNNExplainer + PGExplainer + GNNShap** + estabilidad (**5 réplicas estocásticas**) sobre
-  nodos ilícitos de test.
+- Corre **GNNExplainer + PGExplainer + GNNShap** + estabilidad (**5 réplicas**) sobre nodos de test.
 - Escribe `results_v3/xai-gnn-stability-B-v3.csv` + MLflow nested runs.
 - Flags: `--arch`, `--scenario`, `--balancing`, `--explainer`, `--force`, `--resume`, `--max-hours`.
 
-### 3. Merge final (cuando ambas máquinas terminan)
-
-```bash
-uv run python scripts/merge_results.py
-```
-
-Unifica los CSVs de B y C, deduplica por `[scenario, architecture, balancing, explainer]` y genera
-`results/results_merged.csv`.
+> **Nota de reproducibilidad (consolidación):** para evitar OOM en GPUs de 8 GB, la estabilidad se
+> recomputó lanzando **un proceso fresco por configuración** (troceando la matriz por
+> `--arch/--scenario/--balancing`), de modo que la memoria se libera entre configs. Las tablas y
+> figuras de Elliptic se regeneran de forma determinista con `scripts/consolidacion/finalize_elliptic.py`,
+> y las métricas ROC-AUC/precision@k con `scripts/consolidacion/reeval_rocauc.py`.
 
 ### Monitoreo
 
@@ -239,14 +261,13 @@ uv run mlflow ui --backend-store-uri sqlite:///mlruns.db   # UI de MLflow en viv
 
 ## Configuración por máquina
 
-Los experimentos se reparten en dos GPUs. Ambas configs comparten la estructura (`data`, `scenarios`,
-`models`, `training`, `balancing`, `explainability`, `stability`, `analysis`, `tracking`) y los mismos
-5 escenarios y 3 técnicas de balanceo; difieren en arquitecturas y presupuesto de cómputo:
+Los experimentos se reparten en dos GPUs. Ambas configs comparten estructura y los mismos 5
+escenarios y 3 técnicas de balanceo; difieren en arquitecturas y presupuesto de cómputo:
 
 | Campo | **Máquina B** (RTX 4060, 8 GB) | **Máquina C** (RTX 3050, 4 GB) |
 |---|---|---|
 | Arquitecturas | **GCN, GraphSAGE** | **GAT, TAGCN** |
-| `data.root` | `./data` | `./dataset` |
+| `data.root` | `./data` | `./data` |
 | `hidden_dim` choices | `[64,128,140,211,256]` | `[64,128,148]` (cap por VRAM) |
 | `optuna_trials` | **50** | **8** |
 | `training.epochs` | **600** | **150** |
@@ -254,8 +275,9 @@ Los experimentos se reparten en dos GPUs. Ambas configs comparten la estructura 
 | GNNShap `num_samples` | **50** | **25** |
 | `experiment_name` | `xai-gnn-stability-B-v3` | `xai-gnn-stability-C-v3` |
 
-Matriz por máquina = 5 escenarios × 2 arquitecturas × 3 balanceos = **30 configs de training**
-(60 entre ambas) × 3 explicadores = 90 runs de explain.
+Matriz total = 5 escenarios × 4 arquitecturas × 3 balanceos = **60 configuraciones de training**.
+Como `explain_matrix.py` recorre todos los `*_meta.json`, un solo config de explain cubre las 4
+arquitecturas. De las 60, **23 superan el quality gate** y reciben el estudio completo de estabilidad.
 
 ---
 
@@ -263,9 +285,8 @@ Matriz por máquina = 5 escenarios × 2 arquitecturas × 3 balanceos = **30 conf
 
 ### Modelos (`src/models/`)
 
-Las cuatro arquitecturas comparten interfaz
-`__init__(in_channels, hidden_channels=128, num_layers=2, dropout=0.3, num_classes=2)` y
-`forward(x, edge_index)`, con patrón `Conv → activación → Dropout`:
+Interfaz común `__init__(in_channels, hidden_channels=128, num_layers=2, dropout=0.3, num_classes=2)`
+y `forward(x, edge_index)`, con patrón `Conv → activación → Dropout`:
 
 | Modelo | Capa PyG | Activación | Extra |
 |---|---|---|---|
@@ -280,84 +301,74 @@ Instanciadas vía `build_model()` (factory en `src/training/trainer.py`).
 
 - **Carga** (`loader.py`): `EllipticBitcoinDataset` de PyG; labels remapeados a
   `0=lícito, 1=ilícito, -1=unknown`.
-- **Split temporal causal** (`preprocessing.py`): train = time-steps 1–34, val = 35–42, test = 43–49
-  (solo nodos etiquetados). Features normalizadas con **RobustScaler** ajustado solo en train
-  (anti-leakage) y clip a [-10, 10].
+- **Split temporal causal** (`preprocessing.py`): train = time-steps 1–34, val = 35–42, test = 43–49.
+  Features normalizadas con **RobustScaler** ajustado solo en train (anti-leakage) y clip a [-10, 10].
 - **Escenarios de desbalance** (`imbalance.py`): por *undersampling*, modificando solo `train_mask`
-  (val/test intactos). `None` → nativo; ratio ≥ 0,1 → subsamplea lícitas; ratio < 0,1 → subsamplea
-  ilícitas.
+  (val/test intactos).
 
 ### Entrenamiento (`src/training/`)
 
-- **`Trainer`**: full-batch transductivo, early stopping configurable (`early_stop_metric` ∈
-  `{f1, mcc, pr_auc}`, default **F1**). `evaluate()` devuelve `loss, f1, mcc, pr_auc`. Calibra el
-  threshold barriendo 101 puntos y maximizando F1, con opción de remuestrear val a la prevalencia de
-  test. Guarda best checkpoint + recovery por epoch (con RNG state → reanudable).
-- **`hyperopt.py`** (Optuna): **warm-start priors** de literatura (arXiv:2602.23599) como trial 0;
-  search space sobre `hidden_dim, num_layers, dropout, lr, weight_decay` (+ `heads` para GAT, `K` para
-  TAGCN); `TPESampler` + `MedianPruner`; métrica objetivo por default **PR-AUC**.
+- **`Trainer`**: full-batch transductivo, early stopping configurable (`early_stop_metric` default
+  **F1**). `evaluate()` devuelve `loss, f1, mcc, pr_auc`. Calibra el threshold barriendo 101 puntos,
+  con opción de remuestrear val a la prevalencia de test. Best checkpoint reanudable (RNG state).
+- **`hyperopt.py`** (Optuna): **warm-start priors** de literatura como trial 0; `TPESampler` +
+  `MedianPruner`; métrica objetivo por default **PR-AUC**.
 
 ### Balanceo (`src/balancing/`)
 
-- **FocalLoss** `FL = -α_t·(1-p_t)^γ·log(p_t)` con `α=0.75, γ=2.0`. **Semántica v3:** `alpha` es el
-  peso de la **clase rara** (internamente `[1-alpha, alpha]`) → la clase ilícita recibe 3× el peso.
-- **`get_loss_function()`**: `none` → CrossEntropy; `class_weighting` → CE con pesos inversos a
-  frecuencia; `focal_loss` → FocalLoss.
-- **GraphSMOTE** (`graphsmote.py`): implementado (Zhao et al. 2021) pero **no cableado** en los
-  configs v3 — queda como trabajo futuro.
-
-### Explicabilidad (`src/explainability/`)
-
-- **GNNExplainer / PGExplainer** (`explainer_runner.py`): vía la API nativa `torch_geometric.explain`.
-  PGExplainer se entrena con gradient clipping y rollback por epoch ante NaN.
-- **GNNShap** (`shap_runner.py`): SHAP por permutación sobre el k-hop subgraph (`num_hops=3`), con
-  manejo automático de CUDA OOM (halve num_samples y reintenta).
+- **FocalLoss** con `α=0.75, γ=2.0`. **Semántica v3:** `alpha` es el peso de la **clase rara** → la
+  clase ilícita recibe 3× el peso.
+- **GraphSMOTE** implementado (Zhao et al. 2021) pero **no cableado** en los configs v3.
 
 ### Estabilidad (`src/stability/`)
 
 - **Réplicas estocásticas** (`stochastic_test.py`): re-ejecuta cada explicador con seeds
-  determinísticas (`42 + replica·17`). **En v3 → `num_replicas=5`.** PGExplainer, por ser un modelo
-  global paramétrico, se reentrena una vez por réplica.
-- **Perturbación** (`perturbation.py`): ruido gaussiano sobre las features con niveles
-  `[0.01, 0.05, 0.10]`.
+  determinísticas; en v3 → `num_replicas=5`. PGExplainer, por ser paramétrico global, se reentrena
+  una vez por réplica.
 - **Métricas** (`metrics.py`): **Spearman** (acuerdo de rankings de importancia — *primaria*),
-  **Jaccard** (intersección/unión de aristas — secundaria, satura por el top-K), **SHAP concentration**
-  (parsimonia).
+  **Jaccard** (aristas — secundaria, satura por el top-K). La función `spearman_rank_agreement` se
+  corrigió en la consolidación: dimensiona el vector de rangos por el número real de features, no por
+  `top_k` (el bug truncaba los rankings y distorsionaba la estabilidad de Elliptic).
 
 ### Análisis (`src/analysis/`)
 
-- **`tracking.py`**: `ExperimentTracker` sobre MLflow (`sqlite:///mlruns.db`) con fallback CSV de
-  schema fijo (`CSV_SCHEMA_FIELDS`, anti-corrupción) y escritura atómica (`tmp → os.replace()`).
-- **`factorial.py`**: ANOVA factorial (statsmodels) con interacciones + Tukey HSD.
-- **`recommendation.py`**: matriz de recomendación con bootstrap CIs.
+- **`tracking.py`**: `ExperimentTracker` sobre MLflow con fallback CSV de schema fijo y escritura
+  atómica. **`factorial.py`**: ANOVA factorial (statsmodels) + Tukey HSD. **`recommendation.py`**:
+  matriz de recomendación con bootstrap CIs.
 
 ### Quality gate
 
-> ⚠️ **Valor efectivo:** el gate que decide `quality_passed` se lee del YAML
-> (`analysis.quality_gate`): **F1 ≥ 0,30 y MCC ≥ 0,15** (recalibrado tras la calibración de threshold).
-> Los defaults de fallback en el código son 0,70 / 0,40, pero **el YAML los sobrescribe**. El gate se
-> evalúa sobre **validación**, no test (por el covariate shift temporal "dark market shutdown" entre
-> train y test).
-
-Aparte, `analysis.thresholds` (F1 ≥ 0,80, MCC ≥ 0,70, Jaccard ≥ 0,70) son los **criterios ideales de
-éxito** para la matriz de recomendación — ninguna configuración los alcanza (umbral regulatorio ideal).
+> ⚠️ **Valor efectivo:** el gate que decide `quality_passed` se lee del YAML: **F1 ≥ 0,30 y MCC ≥ 0,15**
+> sobre **validación** (no test, por el covariate shift temporal "dark market shutdown"). Los defaults
+> de fallback en el código (0,70 / 0,40) son sobrescritos por el YAML. De las 60 configuraciones,
+> **23 pasan** y sobre ese subconjunto se afirman las conclusiones de estabilidad.
 
 ---
 
 ## Bugs metodológicos corregidos
 
-Contribución metodológica de la tesis: **dos defectos en PGExplainer de PyTorch Geometric 2.7** que
-contaminan cualquier benchmark que use los defaults, reportados upstream.
+### Artefactos de evaluación (contribución central de la tesis)
+
+Dos defectos en el **protocolo de medición** (no en los métodos) que, cada uno por separado, bastaban
+para invertir la conclusión sobre qué arquitectura es más estable:
+
+| Artefacto | Síntoma | A quién favorecía | Fix |
+|---|---|---|---|
+| **Memoria / grafo completo** | 13 configs de GAT fallaban por OOM silencioso; sus filas quedaban vacías y el promedio de GAT se calculaba solo sobre las que terminaban | GAT | calcular sobre el **subgrafo receptivo** (7,5 GiB → 0,02 GiB) |
+| **Truncamiento de Spearman (R1)** | la métrica descartaba features con índice ≥ `top_k` y mutilaba los rankings, deprimiendo más a las arquitecturas de importancia repartida | GraphSAGE | dimensionar el vector de rangos por nº real de features (`src/stability/metrics.py`) |
+
+Corregidos ambos, el ranking de estabilidad se estabiliza (GAT/GCN líderes) y **concuerda** con el
+eje sintético. Conecta con la advertencia de Kosan et al. sobre la sensibilidad de las conclusiones al
+protocolo de evaluación.
+
+### Bugs en PGExplainer de PyTorch Geometric 2.7 (reportados upstream)
 
 | Bug | Síntoma | Fix |
 |---|---|---|
-| `edge_size=0.05` (default) | *mode collapse* universal: toda la masa de atribución en una sola arista | `edge_size=0.005` |
+| `edge_size=0.05` (default) | *mode collapse*: toda la masa de atribución en una sola arista | `edge_size=0.005` |
 | `temp=[5.0,2.0]` (default) | *overflow* numérico → ~99 % de épocas con loss NaN en grafos grandes | `temp=[1.0,1.0]` + gradient clipping |
 
-Los scripts `scripts/debug_pgexplainer*.py` reproducen y aíslan estos bugs sobre Cora (grafo
-balanceado) para distinguir defecto de software vs hallazgo dataset-específico.
-
-**Otros bugs corregidos en `src/` (no revertir):**
+### Otros bugs corregidos en `src/` (no revertir)
 
 | Bug | Archivo | Fix |
 |---|---|---|
@@ -370,75 +381,70 @@ balanceado) para distinguir defecto de software vs hallazgo dataset-específico.
 
 ## Resultados y artefactos
 
-- **Predictivos:** F1, MCC, PR-AUC. GraphSAGE lidera (F1≈0,53; ~73 % pass-rate en escenarios
-  forzados). Pass-rate del gate con pico en 1:10 (67 %) y colapso en 1:100 (8 %).
-- **Estabilidad:** Spearman observado 0,24–0,79 (consistente con Agarwal 2022: 0,30–0,80). Pico
-  absoluto TAGCN · 1:50 · focal loss = 0,789.
-- **Estadística:** Kruskal-Wallis entre escenarios (H=4,31, p=0,23, no significativo por N limitado en
-  1:100) + Cohen d entre regímenes extremos (efecto grande respaldando el patrón cualitativo).
-- **Costos:** pipeline completo RTX 4060 ≈ 4,65 h (train 3,12 h + XAI 1,53 h) vs RTX 3050 ≈ 29,4 h
-  (fase XAI 15,7× más lenta; cuello de botella = memoria). GNNShap es el explicador más costoso.
+**Estabilidad por arquitectura (Spearman de GNNExplainer, métrica corregida):**
 
-Salidas generadas (no versionadas): `results_models_v3/*_meta.json` (con `best_params`,
-`test_metrics`, `calibrated_threshold`, `quality_passed`), `results_v3/*.csv`, y la base MLflow
-`mlruns.db`.
+| Arquitectura | Corrida completa (60) | Corrida con filtro (23) | Sintético (denso) |
+|---|---|---|---|
+| GAT | **0,780** | 0,779 (n=7) | 0,964 |
+| GCN | **0,778** | 0,833 (n=1) | 0,966 |
+| GraphSAGE | 0,735 | 0,743 (n=11) | 0,884 |
+| TAGCN | 0,580 | 0,641 (n=4) | 0,888 |
+
+- **Concordancia entre regímenes:** correlación de rangos Elliptic ↔ sintético = **+0,80** (con la
+  métrica defectuosa era −0,20). GAT vs GraphSAGE **no** es significativo (Wilcoxon p = 0,375; IC95 %
+  solapados). Se afirma que GAT/GCN encabezan y TAGCN queda atrás.
+- **Explicadores:** PGExplainer domina plausibilidad (0,80 vs 0,50) pero colapsa en fidelidad
+  (0,11 vs 0,56 de GNNExplainer); GNNShap es el más estable internamente. Puente
+  estabilidad→plausibilidad nulo (r ≈ −0,01).
+- **Rendimiento predictivo:** los modelos aprenden en validación (PR-AUC ≈ 0,37) pero colapsan en
+  test (PR-AUC ≈ 0,02) por el desplazamiento temporal del dataset. El ROC-AUC se ve engañosamente
+  alto bajo desbalance (0,88 en validación), por lo que se usan **PR-AUC y precision@k** como
+  primarias. La estabilidad se estudia sobre verdaderos positivos de validación, donde el modelo
+  discrimina, y se declara de forma transparente.
+
+**Artefactos versionados:** `results_v3/xai-gnn-stability-B-v3.csv` (estabilidad),
+`results_v3/reeval_metrics.csv` (ROC-AUC/PR-AUC/precision@k por checkpoint y partición), las tablas
+y figuras del manuscrito en `tesis_latex/`, y los scripts de regeneración en `scripts/consolidacion/`.
+Los checkpoints (`results_models_v3/*_best.pt`) y la base MLflow no se versionan.
 
 ---
 
-## 📄 Manuscrito
+## Manuscrito y defensa
 
-El manuscrito, la presentación de sustentación y el material de planeación viven en un repositorio
-aparte (fuera de este repo de código):
+El manuscrito y el material de defensa viven **en este repositorio**:
 
-```
-thesis manuscritus/thesis_ppt/
-├── tesis_final_v16.pdf              # ← manuscrito final vigente (105 pp, 8 capítulos)
-├── tesis_final_v{4..15}.pdf         # cadena de versiones histórica
-├── overleaf_thesis_v4.zip           # fuente LaTeX (biblatex/biber, ~52 refs en Mendeley)
-├── Sustentacion Tesis v4.0.pptx     # presentación de sustentación (26 slides, ~40 min)
-├── Sustentacion Tesis v4.0.pdf      # render de referencia de la sustentación
-├── speaker_notes_v4.0.md            # notas del ponente por slide
-├── Ultimo anteproyecto.docx         # anteproyecto firmado por el director
-├── CHANGELOG.md · CAMBIOS_v*.md     # bitácora de cambios v4–v16
-├── 0_research_and_planning/         # EDA inicial + figuras
-├── secciones_nuevas/                # markdown de caps 5–8 + figuras de resultados
-└── docs_v3.1/                       # conclusiones, literatura, figuras
-```
+| Artefacto | Ubicación |
+|---|---|
+| **Manuscrito (fuente LaTeX)** | [`tesis_latex/`](tesis_latex/) — `main.tex` + 8 capítulos + `tables/` + `bibliografia.bib` |
+| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 102 páginas |
+| **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) — 26 slides |
+| **Guiones de defensa** | `docs/GUION_defensa_por_capitulo.md`, `docs/ESQUELETO_presentacion_defensa.md`, `docs/DEFENSA_R2_evidencia_sintetica.md` |
 
-### Estructura del manuscrito (8 capítulos, v16)
+### Estructura del manuscrito (8 capítulos)
 
-| # | Capítulo | Pág |
-|---|---|---|
-| 1 | Introducción (planteamiento, estado del arte, brecha, objetivos, justificación, alcance) | 1 |
-| 2 | Marco Contextual | 13 |
-| 3 | Fundamentos de IA para Detección de Fraude Financiero | 24 |
-| 4 | Metodología (dataset, escenarios, arquitecturas, balanceo, explicadores, protocolo de estabilidad, métricas, Optuna, infraestructura, análisis estadístico) | 39 |
-| 5 | Resultados | 51 |
-| 6 | Discusión | 72 |
-| 7 | Conclusiones | 82 |
-| 8 | Perspectivas Futuras y Anexos | 87 |
-| — | Referencias | 92 |
-
-### Evolución reciente
-
-- **v14** (102 pp): feedback del revisor externo (33 issues, 26 aplicados).
-- **v15** (104 pp): revisión del director — TAGCN reformulado como filtro espacial (no ChebNet),
-  Fidelity+/− separadas, definición operativa de "desbalance extremo".
-- **v16** (105 pp, final): índice general reparado para incluir los 8 capítulos; 579/579 hipervínculos
-  resueltos.
-- **Sustentación v4.0:** deck académico formal UTP, 26 slides, ~40 min, defensa a dos voces.
+| # | Capítulo |
+|---|---|
+| 1 | Introducción (planteamiento, estado del arte, brecha, objetivos, hipótesis) |
+| 2 | Marco Contextual (AML, sistemas de monitoreo) |
+| 3 | Fundamentos de IA y GNNs para detección de fraude |
+| 4 | Diseño experimental y resultados sobre Elliptic (EDA, colapso val→test, dos correcciones) |
+| 5 | Eje sintético (plausibilidad, fidelidad, análisis estadístico) |
+| 6 | Discusión (lectura conjunta, tres dimensiones, contribuciones, limitaciones) |
+| 7 | Conclusiones y perspectivas futuras |
+| 8 | Anexos (hiperparámetros, resultados completos, entorno de cómputo) |
 
 ---
 
 ## Limitaciones y trabajo futuro
 
-**Pendientes documentados** (requieren re-correr el pipeline): múltiples semillas en 1:100,
-evaluación sobre test set, explainers con 100 nodos (vs 30), baselines tabulares (XGBoost/RF), ANOVA
-con celdas vacías.
+**Limitaciones declaradas:** la evidencia inferencial más fuerte proviene del eje sintético (único
+donde plausibilidad y fidelidad son medibles); el clasificador colapsa en test por el desplazamiento
+temporal; en Elliptic se trabaja con una sola semilla de modelo; y el bajo número de configuraciones
+que superan el gate limita el ordenamiento fino entre arquitecturas.
 
-**Perspectivas futuras** (Cap 8): replicación en Elliptic2 (Bellei 2024), GNNs temporales
-(EvolveGCN), estabilización específica de PGExplainer en grafos densos, GraphSMOTE, y generalización a
-otros datasets de fraude.
+**Perspectivas futuras (Cap 7–8):** extender el eje real a datasets con atributos no anonimizados
+(Elliptic2, Bellei 2024), incorporar desplazamiento temporal al grafo sintético, GNNs temporales
+(EvolveGCN), estabilización específica de PGExplainer en grafos densos, y GraphSMOTE.
 
 ---
 
