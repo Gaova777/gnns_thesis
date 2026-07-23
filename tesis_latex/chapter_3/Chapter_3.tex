@@ -36,7 +36,7 @@ En el contexto de detección AML, el DL ofrece dos ventajas fundamentales: prime
 
 No obstante, esta potencia representacional introduce un desafío crítico: la opacidad. Los modelos de DL operan como "cajas negras" cuyo proceso interno de decisión es difícil de interpretar, generando una tensión entre desempeño predictivo y auditabilidad en dominios regulados como AML \cite{Gawantka2024AExplanations}.
 
-Esta tensión entre potencia y opacidad es especialmente aguda en el dominio financiero, donde las decisiones automatizadas están sujetas a escrutinio regulatorio. Un modelo tabular simple, como un árbol de decisión, ofrece una interpretabilidad casi total a costa de una capacidad limitada para capturar patrones complejos, mientras que una red profunda invierte esa relación. El aprendizaje profundo sobre grafos hereda esta tensión y le añade una dificultad propia, la de explicar no solo qué atributos influyen en una predicción, sino también qué relaciones estructurales lo hacen. Esta doble opacidad, sobre features y sobre estructura, es la que motiva el desarrollo de métodos de explicabilidad específicos para grafos, y la que sitúa el estudio de su estabilidad en el centro de la agenda de la IA explicable aplicada a las finanzas.
+Esta tensión entre potencia y opacidad es especialmente aguda en el dominio financiero, donde las decisiones automatizadas están sujetas a escrutinio regulatorio. Un modelo tabular simple, como un árbol de decisión, ofrece una interpretabilidad casi total a costa de una capacidad limitada para capturar patrones complejos, mientras que una red profunda invierte esa relación. El aprendizaje profundo sobre grafos hereda esta tensión y le añade una dificultad propia, la de explicar qué atributos influyen en una predicción y qué relaciones estructurales lo hacen. Esta doble opacidad, sobre features y sobre estructura, es la que motiva el desarrollo de métodos de explicabilidad específicos para grafos, y la que sitúa el estudio de su estabilidad en el centro de la agenda de la IA explicable aplicada a las finanzas.
 
 \section{Graph Neural Networks: Fundamentos Conceptuales}
 
@@ -79,7 +79,7 @@ Este proceso se repite por $K$ capas, permitiendo que cada nodo agregue informac
 
 El número de capas define así el campo receptivo del modelo, es decir el conjunto de nodos que pueden influir en la predicción de un nodo dado. Esta noción es central para la explicabilidad, ya que una explicación estructural solo puede señalar elementos que se encuentren dentro del campo receptivo, y su tamaño depende tanto del número de capas como de la densidad del grafo. En grafos densos, un campo receptivo de dos saltos puede abarcar decenas o cientos de nodos, mientras que en grafos dispersos como el \textit{Elliptic Dataset} ese mismo campo receptivo se reduce a unos pocos nodos, lo que limita de raíz lo que una explicación puede expresar. El aumento del número de capas tampoco es una solución sin costo, puesto que apilar demasiadas capas provoca el fenómeno de sobre-suavizado, en el que las representaciones de nodos distintos convergen y pierden capacidad discriminativa. Estas consideraciones justifican que las arquitecturas de esta tesis empleen un número reducido de capas y que las explicaciones se calculen sobre el campo receptivo real de cada nodo, un punto que el Capítulo 4 desarrolla con detalle.
 
-Un ejemplo concreto ilustra cómo el paso de mensajes captura patrones de lavado. Considérese una cuenta que recibe transferencias de numerosas cuentas de origen y las consolida, una configuración característica de la tipología de recolección. En la primera capa, la representación de la cuenta consolidadora agrega la información de sus vecinos inmediatos, de modo que incorpora la señal de recibir muchos flujos entrantes. En la segunda capa, esa representación ya enriquecida se combina con la de vecinos a dos saltos, lo que permite al modelo reconocer no solo que la cuenta recibe muchos flujos, sino que esos flujos provienen a su vez de estructuras dispersas. De esta manera, dos capas de paso de mensajes bastan para que el modelo distinga una consolidación legítima de una que forma parte de una estructura de recolección más amplia, algo que un modelo tabular, al observar la cuenta de forma aislada, no podría lograr.
+Un ejemplo concreto ilustra cómo el paso de mensajes captura patrones de lavado. Considérese una cuenta que recibe transferencias de numerosas cuentas de origen y las consolida, una configuración característica de la tipología de recolección. En la primera capa, la representación de la cuenta consolidadora agrega la información de sus vecinos inmediatos, de modo que incorpora la señal de recibir muchos flujos entrantes. En la segunda capa, esa representación ya enriquecida se combina con la de vecinos a dos saltos, lo que permite al modelo reconocer que la cuenta recibe muchos flujos y que esos flujos provienen, a su vez, de estructuras dispersas. De esta manera, dos capas de paso de mensajes bastan para que el modelo distinga una consolidación legítima de una que forma parte de una estructura de recolección más amplia, algo que un modelo tabular, al observar la cuenta de forma aislada, no podría lograr.
 
 \subsection{Ventajas de las GNNs en Detección AML}
 
@@ -208,8 +208,8 @@ La arquitectura TAGCN empleada en esta investigación sigue la formulación est�
 \begin{itemize}
     \item \textbf{Estructura de Capas}: Se emplea una arquitectura de dos capas:
     \begin{itemize}
-        \item Primera capa: entrada de 166 características $\rightarrow$ 64 unidades ocultas con ReLU.
-        \item Segunda capa: 64 unidades ocultas $\rightarrow$ 2 clases (lícita/ilícita) con softmax.
+        \item Primera capa: de las 166 características de entrada a 64 unidades ocultas con ReLU.
+        \item Segunda capa: de las 64 unidades ocultas a 2 clases (lícita/ilícita) con softmax.
     \end{itemize}
     \item \textbf{Filtro Polinomial}: Orden $K=3$, capturando dependencias hasta 2 saltos en el grafo.
     \item \textbf{Normalización}: Se emplea normalización simétrica de la matriz de adyacencia:
@@ -296,15 +296,15 @@ GraphSMOTE constituye una adaptación del algoritmo SMOTE (\textit{Synthetic Min
 A diferencia de SMOTE tabular que genera instancias sintéticas mediante interpolación lineal en el espacio de características, GraphSMOTE considera tanto los atributos de los nodos como la topología del grafo. El algoritmo opera en tres etapas:
 
 \begin{itemize}
-    \item \textbf{Etapa 1 - Identificación de Nodos Frontera}: Identifica nodos de la clase minoritaria que tienen al menos un vecino de la clase mayoritaria. Estos nodos frontera son candidatos prioritarios para sobremuestreo, pues se encuentran en regiones donde la separación entre clases es ambigua.
-    \item \textbf{Etapa 2 - Generación de Nodos Sintéticos}: Para cada nodo frontera $v_i$ de la clase minoritaria:
+    \item \textbf{Etapa 1. Identificación de Nodos Frontera}: Identifica nodos de la clase minoritaria que tienen al menos un vecino de la clase mayoritaria. Estos nodos frontera son candidatos prioritarios para sobremuestreo, pues se encuentran en regiones donde la separación entre clases es ambigua.
+    \item \textbf{Etapa 2. Generación de Nodos Sintéticos}: Para cada nodo frontera $v_i$ de la clase minoritaria:
     \begin{enumerate}
         \item Selecciona $k$ vecinos más cercanos dentro de la clase minoritaria (topológicamente y en espacio de características).
         \item Elige aleatoriamente uno de estos vecinos $v_j$.
         \item Genera un nodo sintético mediante interpolación:
         \[ \mathbf{x}_{\text{syn}} = \mathbf{x}_i + \lambda (\mathbf{x}_j - \mathbf{x}_i), \quad \lambda \sim U(0,1) \]
     \end{enumerate}
-    \item \textbf{Etapa 3 - Inserción en el Grafo}: El nodo sintético se conecta a sus $k'$ vecinos más cercanos en el espacio de características, actualizando la estructura del grafo.
+    \item \textbf{Etapa 3. Inserción en el Grafo}: El nodo sintético se conecta a sus $k'$ vecinos más cercanos en el espacio de características, actualizando la estructura del grafo.
 \end{itemize}
 
 GraphSMOTE ha demostrado efectividad en balancear \textit{datasets} de grafos, pero introduce dos preguntas críticas para esta investigación: ¿Los nodos sintéticos mejoran o distorsionan las explicaciones? ¿La topología modificada refleja patrones reales de fraude o artefactos del algoritmo?

@@ -14,18 +14,23 @@ clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100), complementado con un **grafo sint�
 | **Institución** | Universidad Tecnológica de Pereira (UTP) — Facultad de Ingenierías — Maestría en Ingeniería en Sistemas y Computación (MISC) |
 | **Lugar / Año** | Pereira, Colombia · 2026 |
 | **Dataset** | Elliptic Bitcoin Dataset (~203k nodos, ~234k aristas, 166 features, 49 time-steps) + grafo sintético propio |
-| **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 102 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
+| **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 103 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
 | **Defensa** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) (26 slides) |
 
 ---
 
 > ### ✅ Estado (2026-07-22): consolidación completada
 > La **fuente de verdad de los hallazgos es el manuscrito** ([`tesis_latex/`](tesis_latex/)), que
-> compila a 102 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
+> compila a 103 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
 > integral se corrigieron **dos artefactos de evaluación** que invertían conclusiones sobre
 > estabilidad; los números de este README ya reflejan la versión corregida. El registro detallado de
 > los cambios está en **[CAMBIOS_CONSOLIDACION_2026-07-22.md](CAMBIOS_CONSOLIDACION_2026-07-22.md)** y
 > el plan operativo en **[RUNBOOK_CONSOLIDACION.md](RUNBOOK_CONSOLIDACION.md)**.
+>
+> **Revisión de estilo (2026-07-23):** se auditó el PDF completo en busca de marcas tipográficas
+> y giros de redacción ajenos al estilo de los autores (rayas, flechas, comillas curvas, muletillas).
+> El manuscrito quedó sin rayas ni flechas en prosa y se redujo el uso repetido de la construcción
+> «no solo… sino también» de 19 a 4 apariciones.
 
 ---
 
@@ -140,7 +145,7 @@ de desbalance, sobre **dos ejes** (Elliptic real y grafo sintético con *ground-
 
 ```
 gnns_thesis/
-├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 102 pp, 8 caps)
+├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 103 pp, 8 caps)
 │   ├── main.tex · chapter_1..8/ · tables/ · bibliografia.bib
 │   └── main.pdf                        # PDF compilado y versionado
 ├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa.tex + .pdf, 26 slides)
@@ -416,7 +421,7 @@ El manuscrito y el material de defensa viven **en este repositorio**:
 | Artefacto | Ubicación |
 |---|---|
 | **Manuscrito (fuente LaTeX)** | [`tesis_latex/`](tesis_latex/) — `main.tex` + 8 capítulos + `tables/` + `bibliografia.bib` |
-| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 102 páginas |
+| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 103 páginas |
 | **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) — 26 slides |
 | **Guiones de defensa** | `docs/GUION_defensa_por_capitulo.md`, `docs/ESQUELETO_presentacion_defensa.md`, `docs/DEFENSA_R2_evidencia_sintetica.md` |
 
