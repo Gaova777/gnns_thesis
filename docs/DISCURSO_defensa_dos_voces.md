@@ -26,6 +26,35 @@
 - Los tiempos suman unos 23 minutos, dejando margen para respirar y para el jurado.
 - Donde dice *(pausa)* conviene un silencio corto de uno a dos segundos: da peso a la idea.
 
+### Mapa del slide del guion a la pagina del PDF
+
+> **Atencion: la numeracion del guion no coincide con el numero de pagina del PDF.** El guion tiene
+> 21 slides de contenido; `presentacion_latex/beamer_defensa.pdf` tiene **26 paginas**, porque
+> intercala **5 separadores de seccion** (laminas oscuras con el numero y el nombre del bloque). Los
+> separadores no se hablan: se pasan mientras se dice la frase de transicion. Esta tabla dice en que
+> pagina del PDF esta cada slide del guion.
+
+| Guion | Pagina PDF | Guion | Pagina PDF |
+|---|---|---|---|
+| 1. Portada | **1** | 12. Metricas | **15** |
+| 2. Contenido | **2** | *(separador "4. Resultados")* | *16* |
+| *(separador "1. Problema y motivacion")* | *3* | 13. Dos artefactos | **17** |
+| 3. El problema | **4** | 14. Ranking por arquitectura | **18** |
+| 4. Pregunta, objetivos e hipotesis | **5** | 15. Concordancia entre regimenes | **19** |
+| 5. La brecha | **6** | 16. Disociacion plausibilidad y fidelidad | **20** |
+| *(separador "2. Marco conceptual")* | *7* | 17. Puente nulo, desbalance y balanceo | **21** |
+| 6. Marco conceptual | **8** | 18. Colapso validacion a test | **22** |
+| 7. Tres propiedades | **9** | *(separador "5. Conclusiones")* | *23* |
+| *(separador "3. Metodologia")* | *10* | 19. Matriz de recomendacion | **24** |
+| 8. Dos ejes | **11** | 20. Contribuciones y limitaciones | **25** |
+| 9. Diseno factorial | **12** | 21. Conclusiones y cierre | **26** |
+| 10. Elliptic | **13** | | |
+| 11. Sintetico | **14** | | |
+
+**El [RELEVO] cae en la pagina 16**, que es justamente el separador "4. Resultados": Alejandro cierra
+en la 15 (Metricas), pasa a la 16 mientras dice la frase de entrega, y Juan Diego arranca ya con la
+17 en pantalla. Es el punto de cambio mas limpio posible; aprovechenlo.
+
 ---
 
 ## BLOQUE A: Alejandro Gomez (slides 1 a 12, aprox. 11 min)
@@ -374,6 +403,20 @@ atentos a sus preguntas.
   eje real aporta la validez externa que el sintetico no puede dar. Apoyarse en `DEFENSA_R2_evidencia_sintetica.md`.
 - **"Por que GAT y GCN y no una sola?"** Respuesta: porque la diferencia entre las de la parte alta no
   es estadisticamente significativa (Wilcoxon 0,37); afirmar un unico ganador seria sobre-interpretar.
+- **"En la tabla filtrada, GCN tiene una sola configuracion. Como sostienen que GCN encabeza?"**
+  (la segunda mas filosa, y la unica que ataca directo el Slide 14; ensayenla). Respuesta: "Tiene
+  razon en que el n es desigual, y por eso el ranking que afirmamos es el de la corrida completa de
+  sesenta configuraciones, donde las cuatro arquitecturas tienen soporte comparable: ahi GAT queda en
+  cero coma setenta y ocho, GCN en cero coma setenta y ocho, GraphSAGE en cero coma setenta y tres y
+  TAGCN en cero coma cincuenta y ocho. La columna filtrada la reportamos como control de robustez, no
+  como estimacion: su valor es que no invierte el orden. Con una sola configuracion, el cero coma
+  ochenta y tres de GCN no admite lectura inferencial, y no lo presentamos como tal. Por eso la
+  conclusion se enuncia en grueso, GAT y GCN encabezan y TAGCN queda atras, y nunca como un
+  ordenamiento fino entre los primeros. Es la misma prudencia con la que declaramos que GAT y
+  GraphSAGE son indistinguibles."
+  *(Si insisten, la carta fuerte: el eje sintetico, que si tiene replicacion con tres grafos por tres
+  semillas, pone a GCN y GAT arriba con cero coma noventa y seis. Son dos regimenes independientes
+  apuntando al mismo sitio, y esa concordancia es lo que sostiene la conclusion, no una celda.)*
 - **"Sobre la bibliografia, la referencia de 2026 existe?"** Respuesta: si, esta verificada en Crossref
   (DOI resuelve, revista Springer indexada); tengan el DOI a la mano.
 

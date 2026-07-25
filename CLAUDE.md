@@ -2,190 +2,201 @@
 
 ## Qué es este proyecto
 
-Tesis de maestría. Estudiamos la **estabilidad de métodos XAI** (GNNExplainer, PGExplainer, GNNShap)
-aplicados a GNNs (GCN, GraphSAGE, GAT, TAGCN) entrenadas para detectar transacciones ilícitas
-en el dataset Elliptic, bajo distintos niveles de imbalance de clases (1:1, 1:10, 1:50, 1:100).
+Tesis de maestría (UTP, MISC, 2026) de Alejandro Gómez Huertas y Juan Diego Garzón Ovalle, dirigida
+por el Ph.D. Cristian Rosero Arias. Estudia la **estabilidad de métodos XAI** (GNNExplainer,
+PGExplainer, GNNShap) aplicados a GNNs (GCN, GraphSAGE, GAT, TAGCN) entrenadas para detectar
+transacciones ilícitas en el dataset Elliptic, bajo distintos niveles de desbalance de clases
+(1:1, 1:10, 1:30 nativo, 1:50, 1:100).
 
-## Estado actual (2026-04-14)
+El estudio se articula en **dos ejes**: Elliptic real (validez externa, solo permite medir
+estabilidad) y un **grafo sintético propio con ground-truth por arista** (`phase1/`, validez interna,
+donde sí se pueden medir plausibilidad y fidelidad).
 
-Los experimentos corren distribuidos en **2 máquinas**. La 4090 quedó sin acceso.
+> **La fuente de verdad de los hallazgos es el manuscrito**, no este archivo ni los CSV sueltos:
+> `tesis_latex/main.pdf` (103 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
 
-| Máquina | GPU | Architectures | Escenarios | Config v3 |
-|---------|-----|---------------|------------|-----------|
-| **B** | RTX 4060 8GB | GCN, GraphSAGE | 1:1, 1:10, 1:50, 1:100 | `configs/experiment_machineB_v3.yaml` |
-| **C** | RTX 3050 4GB | GAT, TAGCN | 1:1, 1:10, 1:50, 1:100 | `configs/experiment_machineC_v3.yaml` |
+## Estado actual (2026-07-23)
 
-## Pipeline v3 — dividido en dos scripts (2026-04-14)
+La consolidación posterior a la auditoría está **cerrada**. La rama `consolidacion-auditoria` se
+integró a `main` por fast-forward: **ambas apuntan al mismo commit y `main` es la rama de trabajo.**
+La rama de consolidación se conserva solo como registro histórico.
 
-La v2 produjo modelos con F1 ~0.02-0.08 (literatura reporta 0.70-0.85). Se
-diagnosticaron tres bugs centrales y se dividió el pipeline en dos etapas
-para poder iterar sobre calidad del modelo independientemente de los explainers.
+### ⚠️ Narrativa retractada (no reintroducir)
 
-### Bugs corregidos en src/ (no volver atrás)
+Versiones anteriores del README y del manuscrito afirmaban **"inversión por densidad"** y un
+**liderazgo de GraphSAGE** en estabilidad. Ambas se **retractaron**: eran artefactos de medición. Si
+encuentras esas afirmaciones en algún documento del repo, está desactualizado. Lo vigente:
 
-| Bug | Archivo | Fix |
-|-----|---------|-----|
-| FocalLoss alpha invertido (daba peso menor a la clase rara) | `src/balancing/losses.py` | alpha ahora = peso clase rara; default 0.75 |
-| Early stopping en MCC es ruidoso en imbalance extremo | `src/training/trainer.py` | Param `early_stop_metric` (default F1); evaluate ahora devuelve pr_auc |
-| Optuna sin prior de literatura, search space estrecho | `src/training/hyperopt.py` | `get_warm_start_priors()` con arXiv:2602.23599 + rango expandido |
-| Métrica Optuna MCC (no ideal para imbalance) | `src/training/hyperopt.py` | Default PR-AUC, métrica configurable |
+- Estabilidad Elliptic (Spearman de GNNExplainer, corrida completa de 60): **GAT 0,780 · GCN 0,778 ·
+  GraphSAGE 0,735 · TAGCN 0,580**. Concuerda con el eje sintético (correlación de rangos **+0,80**;
+  con la métrica defectuosa daba −0,20).
+- GAT vs GraphSAGE **no** es significativo (Wilcoxon p = 0,375). Se afirma "GAT y GCN encabezan,
+  TAGCN queda atrás", nunca un ordenamiento fino.
+- En la corrida filtrada (23 configs que pasan el gate) el soporte es desigual (**GCN n=1**): es
+  control de robustez, no estimación.
 
-### Workflow v3 (reemplaza `run_full_pipeline.py`)
+## Los dos artefactos de evaluación (contribución central)
 
-**Paso 1 — entrenar matriz con calidad garantizada:**
+Dos defectos del **protocolo de medición**, cada uno suficiente por sí solo para invertir la
+conclusión sobre qué arquitectura es más estable:
 
-```bash
-uv run python scripts/train_matrix.py --config configs/experiment_machineB_v3.yaml --max-hours 9
-```
+| Artefacto | Síntoma | Favorecía a | Fix |
+|---|---|---|---|
+| Memoria / grafo completo | 13 configs de GAT con OOM silencioso; filas vacías promediadas solo sobre las que terminaban | GAT | calcular sobre el **subgrafo receptivo** (7,5 GiB → 0,02 GiB) |
+| **Truncamiento de Spearman (fix R1)** | dimensionaba el vector de rangos por `top_k`, descartando toda feature con índice ≥ `top_k`: con `top_k=20` sobre 166 features sobrevivían ~2-3 | GraphSAGE | dimensionar por nº real de features (`src/stability/metrics.py::spearman_rank_agreement`) |
 
-- Corre Optuna con warm-start (prior literatura como trial 0) + 50 trials totales
-- Entrena final con `epochs=600`, `patience=50`, early-stop F1
-- Quality gate (real, definido en config): **VAL F1 ≥ 0.30 y VAL MCC ≥ 0.15** para
-  marcar `quality_passed=True` — evaluado sobre **validación**, no test. (Los valores
-  0.70/0.40 son solo los defaults del código en `train_matrix.py`; los configs v3 los
-  bajan a 0.30/0.15.) NOTA (encuadre "estabilidad sobre modelos que aprenden en val"):
-  en futuros reentrenamientos conviene gate sobre **VAL PR-AUC** (~0.34), no F1/MCC en
-  argmax-0.5, que son degenerados bajo imbalance extremo.
-- Produce `results_models_v3/{run_id}_best.pt` + `{run_id}_meta.json`
-- Retomable: `--resume` saltea configs con meta.json ya guardado
+**No revertir el fix R1.** No tiene test de regresión y el smoke test no lo cubre; el eje sintético
+no está afectado porque usa `top_k=None`.
 
-**Paso 2 — explicar sólo modelos que aprendieron:**
+## Reglas duras
 
-```bash
-uv run python scripts/explain_matrix.py --config configs/experiment_machineB_v3.yaml
-```
+- **`phase1/` (eje sintético) NO se re-corre.** Sus CSV ya coinciden con el Capítulo 5; regenerarlos
+  solo puede desincronizar el manuscrito.
+- **La estabilidad se mide sobre los verdaderos positivos de validación** (`mask_name="val_mask"` en
+  `scripts/explain_matrix.py`), no sobre test: el clasificador colapsa en test por el shift temporal
+  y explicar predicciones erradas no informa. Está declarado abiertamente en el manuscrito (§4.4).
+- **PR-AUC y precision@k son las métricas primarias**, no F1 ni ROC-AUC (el ROC-AUC se ve
+  engañosamente alto bajo desbalance: 0,88 en validación contra PR-AUC 0,37).
 
-- Lee `*_meta.json`, filtra por `quality_passed=True` (usar `--force` para ignorar)
-- Corre GNNExplainer + PGExplainer + GNNShap + estabilidad (5 réplicas)
-- Escribe `results_v3/xai-gnn-stability-B-v3.csv` + MLflow nested runs
-- Flags útiles: `--arch GCN`, `--scenario "1:1"`, `--balancing focal_loss`, `--explainer PGExplainer`
+## Pipeline v3 — dividido en dos scripts
 
-### Validación pre-run v3
+La v2 producía modelos con F1 ~0,02-0,08 (la literatura reporta 0,70-0,85). Se corrigieron tres bugs
+centrales y se dividió el pipeline en dos etapas para iterar sobre la calidad del modelo de forma
+independiente de los explainers.
+
+### 0. Validar (smoke test, ~10 min)
 
 ```bash
 uv run python scripts/smoke_test.py --config configs/experiment_machineB_v3.yaml
 ```
 
-Debe pasar 14/14 checks (10 originales + 4 nuevos: focal alpha, warm-start priors, pr_auc, metadata JSON).
+Debe pasar **15/15 checks**: estructura de config, quality gate, dataset, escenario de desbalance,
+entrenamiento, selección de nodos, los 3 explicadores sin crash/OOM, schema CSV, semántica del alpha
+de FocalLoss, warm-start priors, PR-AUC, schema del metadata JSON y calibración de threshold.
 
-### Directorios
-
-- `results_models_v3/` — checkpoints + metadata JSON (nuevo, separado de `results/`)
-- `results_v3/` — CSV y MLflow artifacts del explain stage
-
-## Lo que hay que hacer en Machine B (RTX 4060)
-
-### 1. Clonar / pullear el repo
+### 1. Entrenar la matriz
 
 ```bash
-git pull origin main
+uv run python scripts/train_matrix.py --config configs/experiment_machineB_v3.yaml --max-hours 9
 ```
 
-### 2. Crear el entorno (si es la primera vez)
+- Optuna con warm-start (prior de literatura como trial 0) + TPE.
+- Entrena el final con `epochs=600`, `patience=50`, early-stop F1; calibra el threshold sobre
+  validación remuestreada a la prevalencia de test.
+- **Quality gate real (del YAML): VAL F1 ≥ 0,30 y VAL MCC ≥ 0,15** para marcar `quality_passed=True`,
+  evaluado sobre **validación**. Los 0,70/0,40 del código son defaults que el YAML sobrescribe.
+  De las 60 configuraciones, **23 pasan**.
+- Produce `results_models_v3/{run_id}_best.pt` + `{run_id}_meta.json`. Retomable con `--resume`.
 
-```powershell
-uv venv
-uv sync
+> Nota para futuros reentrenamientos: conviene gate sobre **VAL PR-AUC** (~0,34), no F1/MCC en
+> argmax-0.5, que son degenerados bajo desbalance extremo.
+
+### 2. Explicar solo los modelos que aprendieron
+
+```bash
+uv run python scripts/explain_matrix.py --config configs/experiment_machineB_v3.yaml
 ```
 
-### 3. Validar con el smoke test (~3 min)
+- Lee los `*_meta.json`, filtra por `quality_passed=True` (`--force` ignora el gate).
+- Corre GNNExplainer + PGExplainer + GNNShap + estabilidad (5 réplicas).
+- Escribe `results_v3/xai-gnn-stability-B-v3.csv` + MLflow nested runs.
+- Flags: `--arch`, `--scenario`, `--balancing`, `--explainer`, `--force`, `--resume`, `--max-hours`.
 
-```powershell
-uv run python scripts/smoke_test.py --config configs/experiment_machineB.yaml
+> **Reproducibilidad:** para evitar OOM en GPUs de 8 GB, la estabilidad se recomputó lanzando **un
+> proceso fresco por configuración** (troceando por `--arch/--scenario/--balancing`). El OOM previo
+> venía de correr las 60 en un solo proceso.
+
+### Regenerar tablas y figuras (sin GPU)
+
+```bash
+uv run python scripts/consolidacion/finalize_elliptic.py   # tablas + figuras desde el CSV
+uv run python scripts/consolidacion/reeval_rocauc.py       # ROC-AUC / precision@k (usa checkpoints)
 ```
 
-Debe mostrar **10/10 checks passed**. Si algo falla, reportar el error antes de continuar.
+## Máquinas
 
-### 4. Lanzar el pipeline completo
+| Máquina | GPU | Arquitecturas | Config |
+|---------|-----|---------------|--------|
+| **B** | RTX 4060 8GB | GCN, GraphSAGE | `configs/experiment_machineB_v3.yaml` |
+| **C** | RTX 3050 4GB | GAT, TAGCN | `configs/experiment_machineC_v3.yaml` |
 
-```powershell
-uv run python scripts/run_full_pipeline.py --config configs/experiment_machineB.yaml --max-hours 9.5
-```
-
-Para correr desatendido toda la noche y guardar el log:
-
-```powershell
-uv run python scripts/run_full_pipeline.py --config configs/experiment_machineB.yaml --max-hours 9.5 | Tee-Object -FilePath logs/machineB.log
-```
-
-### 5. Si se interrumpe, retomar
-
-```powershell
-uv run python scripts/run_full_pipeline.py --config configs/experiment_machineB.yaml --resume --max-hours 9.5
-```
+Difieren en `hidden_dim` (cap por VRAM), `optuna_trials` (50 vs 8), `epochs` (600 vs 150) y
+`num_samples` de GNNShap (50 vs 25). Matriz total = 5 escenarios × 4 arquitecturas × 3 balanceos = 60.
 
 ## Estructura del proyecto
 
 ```
 gnns_thesis/
-├── configs/
-│   ├── experiment_machineB.yaml   ← config para esta máquina (4060)
-│   └── experiment_machineC.yaml   ← config para la 3050
+├── tesis_latex/            ← MANUSCRITO (main.tex + 8 capítulos + tables/ + bibliografia.bib)
+│   └── main.pdf              103 páginas, versionado
+├── presentacion_latex/     ← defensa en Beamer (.tex + .pdf, 26 páginas)
+├── docs/                   ← material de defensa (ver abajo)
+├── configs/                ← *_v3.yaml son los vigentes; el resto es legacy
 ├── scripts/
-│   ├── run_full_pipeline.py       ← pipeline principal (usar este)
-│   ├── smoke_test.py              ← validación pre-run (~3 min)
-│   └── merge_results.py           ← merge de resultados de ambas máquinas
+│   ├── train_matrix.py       Paso 1 (entrena + quality gate)
+│   ├── explain_matrix.py     Paso 2 (explainers + estabilidad)
+│   ├── smoke_test.py         validación pre-run (15 checks)
+│   └── consolidacion/        regeneración determinista de tablas/figuras/métricas
 ├── src/
-│   ├── models/                    ← GCN, GraphSAGE, GAT, TAGCN
-│   ├── data/                      ← loader, preprocessing, imbalance
-│   ├── training/                  ← trainer, hyperopt (Optuna)
-│   ├── explainability/            ← GNNExplainer, PGExplainer, GNNShap
-│   ├── stability/                 ← stochastic replicas, perturbation, metrics
-│   ├── balancing/                 ← class_weighting, focal_loss, GraphSMOTE
-│   └── analysis/                  ← tracking (MLflow + CSV), factorial, recommendation
-├── data/                          ← dataset Elliptic (auto-descargado por PyG, ~300MB)
-│                                     ⚠ NO está en git — se descarga al correr el pipeline
-└── results_machineB/              ← resultados generados (NO en git)
+│   ├── models/               GCN, GraphSAGE, GAT, TAGCN (interfaz común)
+│   ├── data/                 loader Elliptic, split temporal causal, escenarios de desbalance
+│   ├── training/             trainer, hyperopt (Optuna)
+│   ├── explainability/       GNNExplainer, PGExplainer, GNNShap
+│   ├── stability/            réplicas estocásticas, perturbación, métricas (Jaccard/Spearman)
+│   ├── balancing/            class weighting, focal loss, GraphSMOTE (no cableado en v3)
+│   └── analysis/             tracking (MLflow + CSV), factorial, recommendation
+├── phase1/                 ← eje sintético (generador + CSV de resultados). NO RE-CORRER
+├── results_v3/             ← CSV de provenance (versionados)
+├── results_models_v3/      ← checkpoints (NO en git)
+└── data/                   ← Elliptic, auto-descargado por PyG (~300MB, NO en git)
 ```
 
-## Dataset
+## Material de defensa
 
-El dataset Elliptic se descarga automáticamente en `./data/` la primera vez que corra el pipeline.
-Requiere conexión a internet (~300MB desde data.pyg.org).
+| Archivo | Qué es |
+|---|---|
+| `docs/DISCURSO_defensa_dos_voces.md` | Guion hablado, 21 slides a dos voces (Alejandro 1-12, Juan Diego 13-21), con tiempos, mapa slide→página del PDF y respuestas ensayadas |
+| `docs/GUION_defensa_por_capitulo.md` | Mapa slide→capítulo/sección + preguntas del jurado |
+| `docs/DEFENSA_R2_evidencia_sintetica.md` | Respuesta a la objeción de circularidad del eje sintético |
+| `docs/ESQUELETO_presentacion_defensa.md` | Esqueleto slide por slide con las figuras |
 
-Si no hay internet, copiar manualmente la carpeta `data/` desde otra máquina que ya lo tenga.
+El PDF de la presentación tiene **26 páginas** para **21 slides de contenido**: intercala 5
+separadores de sección. La numeración del guion no es la del PDF (tabla de equivalencia en el
+DISCURSO).
 
-## Qué hace el pipeline
+## Bugs corregidos (no revertir sin entender)
 
-Para cada combinación de (scenario × architecture × balancing):
-1. **Hyperopt** — Optuna busca mejores hiperparámetros (hidden_dim, num_layers, dropout, lr)
-2. **Training** — Entrena el GNN con los mejores HPs, guarda checkpoint
-3. **Quality gate** — Si F1 < 0.05 y MCC < 0.02, salta los explainers (modelo no aprendió)
-4. **Explainability** — GNNExplainer, PGExplainer, GNNShap sobre nodos de test
-5. **Stability** — Repite la explicación N veces con distintas seeds, calcula Jaccard y Spearman
+### En PGExplainer de PyTorch Geometric 2.7 (reportados upstream)
 
-Resultados se guardan en `results_machineB/xai-gnn-stability-B.csv` y en MLflow.
+| Bug | Síntoma | Fix |
+|-----|---------|-----|
+| `edge_size=0.05` (default) | mode collapse: toda la atribución en una arista | `edge_size=0.005` |
+| `temp=[5.0,2.0]` (default) | overflow → ~99% de épocas con loss NaN | `temp=[1.0,1.0]` + gradient clipping |
 
-## Merge final (cuando ambas máquinas terminen)
-
-Copiar `results_machineC/xai-gnn-stability-C.csv` a esta máquina y correr:
-
-```powershell
-uv run python scripts/merge_results.py
-```
-
-Genera `results/results_merged.csv` con los 144 configs de ambas máquinas.
-
-## Bugs corregidos (no tocar sin entender)
-
-Estos bugs estaban en el código anterior y ya están fixeados:
+### En `src/`
 
 | Bug | Archivo | Fix |
 |-----|---------|-----|
-| CSV corruption — error embebido en columna numérica | `src/analysis/tracking.py` | `CSV_SCHEMA_FIELDS` fijo |
-| PGExplainer crash cuando training falla | `src/stability/stochastic_test.py:71` | `if not success: continue` |
-| `--resume` ignoraba el CSV, solo leía MLflow | `src/analysis/tracking.py` | CSV fallback en `get_completed_runs` |
-| Optuna leía `optuna_trials_fast` en vez de `optuna_trials` | `scripts/run_full_pipeline.py:204` | Lee `optuna_trials` primero |
+| Truncamiento de Spearman (fix R1) | `src/stability/metrics.py` | dimensionar rangos por nº de features |
+| FocalLoss alpha invertido (sub-pesaba la clase rara) | `src/balancing/losses.py` | `alpha` = peso clase rara; default 0,75 |
+| Early stopping en MCC ruidoso bajo imbalance | `src/training/trainer.py` | `early_stop_metric` configurable (default F1) |
+| Optuna sin prior de literatura, search space estrecho | `src/training/hyperopt.py` | `get_warm_start_priors()` + rango expandido |
+| CSV corruption (error embebido en columna numérica) | `src/analysis/tracking.py` | `CSV_SCHEMA_FIELDS` fijo + escritura atómica |
+| PGExplainer crash cuando el training falla | `src/stability/stochastic_test.py:71` | `if not success: continue` |
+| `--resume` ignoraba el CSV, solo leía MLflow | `src/analysis/tracking.py` | fallback CSV en `get_completed_runs` |
 
-## Comandos útiles
+## Entorno y comandos útiles
 
-```powershell
-# Ver progreso en MLflow UI (mientras corre)
-uv run mlflow ui --backend-store-uri sqlite:///mlruns.db
+Requiere Python ≥ 3.12 y `uv`. El dataset Elliptic se descarga solo en `./data/` la primera vez.
 
-# Quick test (2 min, parámetros mínimos)
-uv run python scripts/run_full_pipeline.py --config configs/experiment_machineB.yaml --quick
+```bash
+uv venv && uv sync                                          # entorno
+uv run mlflow ui --backend-store-uri sqlite:///mlruns.db    # monitoreo en vivo
+```
 
-# Ver cuántos configs completaron
-python -c "import pandas as pd; df = pd.read_csv('results_machineB/xai-gnn-stability-B.csv'); print(df.groupby(['scenario','architecture','balancing','explainer']).size())"
+Compilar el manuscrito (TinyTeX + biber):
+
+```bash
+cd tesis_latex && pdflatex -interaction=nonstopmode main.tex && biber main \
+  && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode main.tex
 ```

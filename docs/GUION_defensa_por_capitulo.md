@@ -8,6 +8,12 @@
 
 ## Parte A · Mapa slide → capítulo y sección
 
+> **Ojo con la numeración:** el número de slide de esta tabla es el del guion (21 slides de
+> contenido), **no** el número de página del PDF de la presentación (26 páginas, con 5 separadores
+> de sección intercalados). La equivalencia slide ↔ página está en
+> [`DISCURSO_defensa_dos_voces.md`](DISCURSO_defensa_dos_voces.md), sección *Mapa del slide del guion
+> a la pagina del PDF*.
+
 | Slide | Enunciado / qué se dice | Dónde está en la tesis |
 |---|---|---|
 | **1** Portada | Título y autores | Portada · Cap. 1 |
@@ -44,6 +50,7 @@
 | *¿No es circular medir plausibilidad contra un ground-truth propio?* | No: el ground-truth es ciego al explicador y el diseño refutó nuestra hipótesis del puente. | Cap. 5 · **§5.5** (puente nulo) y **§5.2** (construcción) |
 | *¿Cuál es el aporte metodológico?* | Dos artefactos de evaluación corregidos + dos bugs de PGExplainer + tres dimensiones independientes. | Cap. 4 · **§4.5** · Cap. 6 · **§6.4** |
 | *¿Por qué ahora lideran GAT/GCN y no GraphSAGE?* | El truncamiento del Spearman favorecía a GraphSAGE; corregido, el orden se invierte. | Cap. 4 · **§4.5** (tabla `tab:ranking`) |
+| *En la tabla filtrada GCN tiene n=1. ¿Cómo sostienen que encabeza?* | El ranking que se afirma es el de la corrida completa (60), con soporte comparable entre arquitecturas; la columna filtrada es control de robustez (no invierte el orden), no una estimación. El eje sintético, con replicación 3×3, concuerda. | Cap. 4 · **§4.5** (tabla `tab:ranking`) · Cap. 5 · **§5.3** · Cap. 6 · **§6.8** (límites) · respuesta ensayada en `DISCURSO_defensa_dos_voces.md` |
 | *¿El balanceo realmente no importa?* | η² < 0,02 en las tres dimensiones; es un factor secundario. | Cap. 5 · **§5.4** · Cap. 6 · **§6.3** |
 | *¿Por qué PGExplainer no da estabilidad en Elliptic?* | Degenera en grafos dispersos (mode collapse); se reporta como hallazgo, no como dato. | Cap. 4 · **§4.6** *Degeneración de PGExplainer en un Grafo Disperso* |
 | *¿Se cumplieron los objetivos?* | Sí; se responden uno a uno, incluidas las hipótesis refutadas. | Cap. 7 · **§7.1** *Respuestas a los Objetivos de Investigación* |

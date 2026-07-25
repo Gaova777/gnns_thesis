@@ -107,7 +107,7 @@ a GAT 0,779 > GraphSAGE 0,739 (fixed).
 
 ## Artefactos nuevos en el repo
 
-- `tesis_latex/main.pdf` (102 páginas) y los `.tex`/tablas/figuras actualizados.
+- `tesis_latex/main.pdf` (103 páginas) y los `.tex`/tablas/figuras actualizados.
 - `results_v3/xai-gnn-stability-B-v3.csv` — estabilidad recomputada (provenance).
 - `results_v3/reeval_metrics.csv` — ROC-AUC / PR-AUC / precision@k por checkpoint y partición.
 - `scripts/consolidacion/finalize_elliptic.py` — regenera tablas y figuras desde el CSV (sin GPU).
@@ -121,5 +121,7 @@ a GAT 0,779 > GraphSAGE 0,739 (fixed).
 
 ## Estado del repo
 
-- Rama `consolidacion-auditoria`, commit `b8afa68`, pusheado a `origin` (Gaova777).
+- La consolidación se desarrolló en la rama `consolidacion-auditoria` (commit de partida `b8afa68`)
+  y **se integró a `main` por fast-forward**: desde entonces ambas ramas apuntan al mismo commit y
+  `main` es la rama de trabajo. La rama de consolidación se conserva solo como registro histórico.
 - Working tree limpio; PDF y fuentes al día; el manuscrito completo (41 archivos) está trackeado.

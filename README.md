@@ -222,10 +222,13 @@ bugs centrales (focal loss, early stopping, search space de Optuna) y agregó un
 uv run python scripts/smoke_test.py --config configs/experiment_machineB_v3.yaml
 ```
 
-Corre una config mínima end-to-end y valida 15 checks (estructura de config, dataset, escenario de
-desbalance, entrenamiento, los 3 explicadores sin crash/OOM, schema CSV, semántica del alpha de
-FocalLoss, warm-start priors, PR-AUC, calibración de threshold, schema del metadata JSON, y el fix
-de la métrica de Spearman).
+Corre una config mínima end-to-end y valida 15 checks (estructura de config, quality gate, dataset,
+escenario de desbalance, entrenamiento, selección de nodos, los 3 explicadores sin crash/OOM, schema
+CSV, semántica del alpha de FocalLoss, warm-start priors, PR-AUC, schema del metadata JSON y
+calibración de threshold).
+
+> El smoke test **no** cubre el fix R1 de `spearman_rank_agreement`: esa corrección no tiene test de
+> regresión (ver [§ Bugs metodológicos corregidos](#bugs-metodológicos-corregidos)).
 
 ### 1. Entrenar la matriz
 
@@ -246,7 +249,10 @@ uv run python scripts/explain_matrix.py --config configs/experiment_machineB_v3.
 ```
 
 - Lee los `*_meta.json`, filtra por `quality_passed=True` (`--force` ignora el gate).
-- Corre **GNNExplainer + PGExplainer + GNNShap** + estabilidad (**5 réplicas**) sobre nodos de test.
+- Corre **GNNExplainer + PGExplainer + GNNShap** + estabilidad (**5 réplicas**) sobre los
+  **verdaderos positivos de validación** (`mask_name="val_mask"` en `explain_matrix.py`), no sobre
+  test: el clasificador colapsa en test por el shift temporal y explicar predicciones erradas no
+  informa. Está declarado de forma abierta en el manuscrito (Cap. 4, §4.4).
 - Escribe `results_v3/xai-gnn-stability-B-v3.csv` + MLflow nested runs.
 - Flags: `--arch`, `--scenario`, `--balancing`, `--explainer`, `--force`, `--resume`, `--max-hours`.
 
@@ -398,6 +404,12 @@ protocolo de evaluación.
 - **Concordancia entre regímenes:** correlación de rangos Elliptic ↔ sintético = **+0,80** (con la
   métrica defectuosa era −0,20). GAT vs GraphSAGE **no** es significativo (Wilcoxon p = 0,375; IC95 %
   solapados). Se afirma que GAT/GCN encabezan y TAGCN queda atrás.
+- ⚠️ **Cómo leer la columna filtrada.** El soporte por arquitectura es muy desigual (GCN n=1,
+  TAGCN n=4, GAT n=7, GraphSAGE n=11): el 0,833 de GCN descansa sobre **una sola** configuración y no
+  admite lectura inferencial. El ranking que se afirma es el de la **corrida completa (60)**, donde
+  las cuatro arquitecturas tienen soporte comparable; la columna filtrada se reporta como control de
+  robustez, y su valor es que **no invierte** el orden, no que lo cuantifique. Por eso la conclusión
+  se enuncia como "GAT y GCN encabezan, TAGCN queda atrás" y nunca como un ordenamiento fino.
 - **Explicadores:** PGExplainer domina plausibilidad (0,80 vs 0,50) pero colapsa en fidelidad
   (0,11 vs 0,56 de GNNExplainer); GNNShap es el más estable internamente. Puente
   estabilidad→plausibilidad nulo (r ≈ −0,01).
