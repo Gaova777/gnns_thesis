@@ -244,17 +244,20 @@ todo esto y volvimos a medir. Lo que sigue son los numeros corregidos.
 > **En la tesis:** Cap. 4, seccion 4.5 (De un Artefacto de Computo a un Artefacto de Medida: dos Correcciones Metodologicas); Cap. 6, seccion 6.4 (Contribuciones Metodologicas).
 
 ### Slide 14: Ranking por arquitectura  ·  [JD]  ·  75 s
-Con la metrica corregida, este es el ranking de estabilidad por arquitectura. GAT y GCN lideran,
-practicamente empatados, en cero coma setenta y ocho. GraphSAGE queda en el medio, en cero coma setenta
-y tres, y TAGCN ultimo, en cero coma cincuenta y ocho. *(pausa)* Aqui cierro nuestra segunda hipotesis:
-esperabamos que TAGCN, por su alcance multi-hop, fuera la mas estable, y resulta ser la ultima. La
-hipotesis se cae, y lo decimos sin rodeos. *(pausa)* Quiero ser muy honesto tambien con el primer lugar,
-porque cambio respecto a una version anterior de la tesis. Antes, con la metrica que tenia el bug,
-GraphSAGE parecia el mas estable. Corregido el truncamiento, ese liderazgo se disuelve y emergen GAT y
-GCN. Y hay un matiz que preferimos declarar antes de que lo pregunten: la diferencia entre GAT y
-GraphSAGE no es estadisticamente significativa, la prueba de Wilcoxon da un valor de cero coma treinta
-y siete. Es decir, no afirmamos que GAT sea el mejor de forma tajante; afirmamos que GAT y GCN encabezan
-y que TAGCN queda claramente atras. Esa prudencia es deliberada.
+Con la metrica corregida, y replicando el entrenamiento completo con tres semillas de modelo, lo que
+encontramos no es un ranking de cuatro puestos sino una particion en dos grupos. Un grupo alto, con GAT
+en cero coma setenta y ocho y GCN en cero coma setenta y seis, y un grupo bajo, con GraphSAGE en cero
+coma setenta y tres y TAGCN en cero coma sesenta y ocho. *(pausa)* Y lo importante es donde estan las
+diferencias: entre los dos grupos son estadisticamente significativas, y dentro de cada grupo no lo son.
+El Kruskal-Wallis global da un valor p del orden de diez elevado a menos cinco, pero al preguntarlo
+dentro del grupo alto, o dentro del grupo bajo, la igualdad no se rechaza. *(pausa)* Aqui cierro nuestra
+segunda hipotesis: esperabamos que TAGCN, por su alcance multi-hop, fuera la mas estable, y aparece de
+forma consistente en el grupo bajo en las tres semillas. La hipotesis se cae, y lo decimos sin rodeos.
+*(pausa)* Quiero ser honesto con dos cosas mas. La primera, que el liderazgo de GraphSAGE que reportaba
+una version anterior de la tesis era un artefacto del truncamiento de la metrica, y corregido se
+disuelve. La segunda, que GAT y GCN se permutan entre semillas, asi que no afirmamos que ninguna de las
+dos sea la mejor: afirmamos que las dos forman el grupo alto. Decir menos seria impreciso, y decir mas
+seria sobre-interpretar.
 
 
 > **En la tesis:** Cap. 4, seccion 4.5 (tabla tab:ranking); Cap. 8, seccion 8.2 (Resultados Completos por Configuracion sobre el Elliptic Dataset).
@@ -378,7 +381,7 @@ atentos a sus preguntas.
 
 - **Ritmo:** el bloque de resultados (slides 13 a 18) es el mas cargado. No lean la slide; miren al
   jurado y usen la slide como respaldo. El discurso ya dice lo esencial; la slide tiene el detalle.
-- **Los numeros que deben salir sin dudar:** ranking 0,780 / 0,778 / 0,735 / 0,580; puente r = menos
+- **Los numeros que deben salir sin dudar:** grupo alto GAT 0,78 y GCN 0,76 frente a grupo bajo GraphSAGE 0,73 y TAGCN 0,68, con diferencias significativas entre grupos y no dentro; puente r = menos
   0,01; disociacion plausibilidad 0,80 contra fidelidad 0,11 para PGExplainer; concordancia menos 0,20
   a mas 0,80; PR-AUC 0,37 en validacion a 0,02 en test.
 - **Si se ponen nerviosos con una cifra,** digan el orden de magnitud y la direccion ("alrededor de
@@ -407,8 +410,9 @@ atentos a sus preguntas.
   (la segunda mas filosa, y la unica que ataca directo el Slide 14; ensayenla). Respuesta: "Tiene
   razon en que el n es desigual, y por eso el ranking que afirmamos es el de la corrida completa de
   sesenta configuraciones, donde las cuatro arquitecturas tienen soporte comparable: ahi GAT queda en
-  cero coma setenta y ocho, GCN en cero coma setenta y ocho, GraphSAGE en cero coma setenta y tres y
-  TAGCN en cero coma cincuenta y ocho. La columna filtrada la reportamos como control de robustez, no
+  cero coma setenta y ocho, GCN en cero coma setenta y seis, GraphSAGE en cero coma setenta y tres y
+  TAGCN en cero coma sesenta y ocho, sobre tres semillas de modelo. La columna filtrada de la version
+  de una sola semilla la reportabamos como control de robustez, no
   como estimacion: su valor es que no invierte el orden. Con una sola configuracion, el cero coma
   ochenta y tres de GCN no admite lectura inferencial, y no lo presentamos como tal. Por eso la
   conclusion se enuncia en grueso, GAT y GCN encabezan y TAGCN queda atras, y nunca como un

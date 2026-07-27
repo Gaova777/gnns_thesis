@@ -94,12 +94,12 @@ robustas, consistentes y auditables en entornos regulados.
 4. **El balanceo y el nivel de desbalance son secundarios.** El balanceo tiene tamaño de efecto
    despreciable sobre las tres dimensiones (η² < 0,02), y el perfil de estabilidad por escenario de
    desbalance es esencialmente plano. La palanca dominante es el explicador.
-5. **Estabilidad por arquitectura: concordancia entre regímenes.** Con la métrica corregida, **GAT y
-   GCN encabezan la estabilidad tanto en el grafo denso sintético como en el disperso de Elliptic**
-   (Elliptic: GAT 0,780 / GCN 0,778 / GraphSAGE 0,735 / TAGCN 0,580; sintético: GCN/GAT ≈ 0,96). La
-   correlación de rangos entre ambos regímenes es de **+0,80**. La diferencia GAT vs GraphSAGE no es
-   estadísticamente significativa (Wilcoxon p = 0,375), de modo que se afirma que GAT y GCN encabezan
-   y TAGCN queda atrás, sin sobre-ordenar la parte alta.
+5. **Estabilidad por arquitectura: dos grupos, concordantes entre regímenes.** Con la métrica
+   corregida y **replicando el entrenamiento con 3 semillas de modelo** (180 modelos en Elliptic), la
+   estabilidad no ordena a las cuatro arquitecturas en cuatro posiciones distinguibles: las separa en
+   un **grupo alto (GAT, GCN)** y un **grupo bajo (GraphSAGE, TAGCN)**, con diferencias significativas
+   entre grupos y no dentro de ellos. La misma partición emerge de forma independiente en el grafo
+   sintético denso. Detalle en [§ Resultados](#resultados-y-artefactos).
 6. **Contribución metodológica: dos artefactos de evaluación corregidos.** Un fallo de memoria
    (cálculo sobre el grafo completo con OOM silencioso en GAT) y un truncamiento en la métrica de
    Spearman, cada uno suficiente por sí solo para producir una conclusión comparativa falsa. Además,
@@ -392,14 +392,31 @@ protocolo de evaluación.
 
 ## Resultados y artefactos
 
-**Estabilidad por arquitectura (Spearman de GNNExplainer, métrica corregida):**
+**Estabilidad por arquitectura (Spearman de GNNExplainer, métrica corregida, 3 semillas de modelo):**
 
-| Arquitectura | Corrida completa (60) | Corrida con filtro (23) | Sintético (denso) |
-|---|---|---|---|
-| GAT | **0,780** | 0,779 (n=7) | 0,964 |
-| GCN | **0,778** | 0,833 (n=1) | 0,966 |
-| GraphSAGE | 0,735 | 0,743 (n=11) | 0,884 |
-| TAGCN | 0,580 | 0,641 (n=4) | 0,888 |
+| Arquitectura | Elliptic (media ± dt) | IC95 % bootstrap | Sintético (denso) | Grupo |
+|---|---|---|---|---|
+| GAT | **0,782** ± 0,013 | [0,758; 0,805] | 0,960 | alto |
+| GCN | **0,758** ± 0,025 | [0,724; 0,787] | 0,968 | alto |
+| GraphSAGE | 0,735 ± 0,022 | [0,710; 0,756] | 0,888 | bajo |
+| TAGCN | 0,676 ± 0,077 | [0,632; 0,717] | 0,886 | bajo |
+
+> Los valores del eje sintético provienen de la matriz robusta (`phase1/results_robust.csv`, 3 semillas),
+> que es la fuente que usa el manuscrito. Una versión anterior de esta tabla citaba la matriz factorial
+> de una sola semilla, donde GraphSAGE y TAGCN aparecen invertidos por 0,003.
+
+**Estructura en dos grupos (Wilcoxon pareado sobre celdas comunes):**
+
+| Comparación | Elliptic | Sintético |
+|---|---|---|
+| Dentro del grupo alto (GAT vs GCN) | p = 0,165 | p = 0,0013 |
+| Dentro del grupo bajo (GraphSAGE vs TAGCN) | p = 0,096 | p = 0,519 |
+| Entre grupos | p ≤ 0,047 en las 4 comparaciones | p < 0,0001 |
+
+Kruskal-Wallis global sobre Elliptic: H = 23,79, p = 2,8×10⁻⁵, η² = 0,125. Dentro de cada grupo la
+igualdad no se rechaza (p = 0,192 y p = 0,080); entre grupos, Mann-Whitney da p = 1,4×10⁻⁶. La única
+diferencia intragrupo que alcanza significación es GCN sobre GAT en el eje sintético, por un margen de
+0,006 sin relevancia práctica.
 
 - **Concordancia entre regímenes:** correlación de rangos Elliptic ↔ sintético = **+0,80** (con la
   métrica defectuosa era −0,20). GAT vs GraphSAGE **no** es significativo (Wilcoxon p = 0,375; IC95 %
@@ -456,8 +473,14 @@ El manuscrito y el material de defensa viven **en este repositorio**:
 
 **Limitaciones declaradas:** la evidencia inferencial más fuerte proviene del eje sintético (único
 donde plausibilidad y fidelidad son medibles); el clasificador colapsa en test por el desplazamiento
-temporal; en Elliptic se trabaja con una sola semilla de modelo; y el bajo número de configuraciones
-que superan el gate limita el ordenamiento fino entre arquitecturas.
+temporal; el eje real se apoya en un solo dataset anonimizado; y con 3 semillas la evidencia sostiene
+la pertenencia a un grupo, no un ordenamiento fino dentro de él (TAGCN, con dt 0,077, es el caso más
+sensible).
+
+**Reproducibilidad, en sentido preciso:** el pipeline **no es determinista a nivel de pesos**, porque
+los *scatter* del message passing en GPU acumulan con sumas atómicas de orden indeterminado. Lo que sí
+se reproduce son las conclusiones: un reentrenamiento independiente de las 60 configuraciones devolvió
+25 sobre el gate frente a 23, y la misma partición de estabilidad.
 
 **Perspectivas futuras (Cap 7–8):** extender el eje real a datasets con atributos no anonimizados
 (Elliptic2, Bellei 2024), incorporar desplazamiento temporal al grafo sintético, GNNs temporales

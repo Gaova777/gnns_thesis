@@ -147,7 +147,7 @@ donde AGG puede ser:
 
 \subsection{Graph Attention Networks (GAT)}
 
-Las \textit{Graph Attention Networks}, introducidas por Velickovic et al., incorporan mecanismos de atención que permiten asignar pesos aprendibles a diferentes vecinos, superando la limitación isotrópica de GCN \cite{Velickovic2018GraphNetworks}.
+Las \textit{Graph Attention Networks}, introducidas por Velickovic y colaboradores, incorporan mecanismos de atención que permiten asignar pesos aprendibles a diferentes vecinos, superando la limitación isotrópica de GCN \cite{Velickovic2018GraphNetworks}.
 
 El mecanismo de atención en GAT se define como:
 \[ \alpha_{ij} = \frac{\exp(\text{LeakyReLU}(\mathbf{a}^T[\mathbf{W}\mathbf{h}_i \, \| \, \mathbf{W}\mathbf{h}_j]))}{\sum_{k \in \mathcal{N}(v_i)} \exp(\text{LeakyReLU}(\mathbf{a}^T[\mathbf{W}\mathbf{h}_i \, \| \, \mathbf{W}\mathbf{h}_k]))} \]
@@ -248,7 +248,7 @@ La Inteligencia Artificial Explicable (\textit{Explainable AI}, XAI) surge como 
 En el contexto de GNNs, las explicaciones típicamente buscan identificar qué subgrafo (conjunto de nodos y aristas) es más relevante para la predicción de un nodo específico. Los tres métodos principales considerados en esta investigación son:
 
 \begin{itemize}
-    \item \textbf{GNNExplainer}: Propuesto por Ying et al., formula la explicación como un problema de optimización que identifica el subgrafo más compacto que maximiza la predicción del modelo para la clase objetivo \cite{Ying2019Gnnexplainer:Networks}. Matemáticamente:
+    \item \textbf{GNNExplainer}: Propuesto por Ying y colaboradores, formula la explicación como un problema de optimización que identifica el subgrafo más compacto que maximiza la predicción del modelo para la clase objetivo \cite{Ying2019Gnnexplainer:Networks}. Matemáticamente:
     \[ \max_{G_S} MI(Y, (G_S, X_S)) = H(Y) - H(Y | G = G_S, X = X_S) \]
     donde $G_S$ es el subgrafo explicativo, $X_S$ son las características relevantes, y $MI$ denota información mutua. GNNExplainer aprende una máscara sobre aristas y características mediante optimización basada en gradientes.
     
@@ -271,7 +271,7 @@ Estas diferencias tienen consecuencias directas para el estudio de estabilidad q
 
 Estudios recientes han revelado que las explicaciones generadas por métodos XAI para GNNs pueden ser altamente inestables: explicaciones para la misma instancia varían significativamente entre ejecuciones, bajo pequeñas perturbaciones del modelo o frente a cambios mínimos en los datos \cite{Gawantka2024AExplanations, Agarwal2022ProbingMethods, Kosan2023GNNX-BENCH:Benchmarking}.
 
-Gawantka et al. propusieron métricas formales para cuantificar esta inestabilidad, mostrando que explicadores ampliamente usados exhiben variabilidad preocupante en sus salidas \cite{Gawantka2024AExplanations}. Agarwal et al. demostraron que muchas explicaciones consideradas "plausibles" no son necesariamente fieles al mecanismo interno del modelo \cite{Agarwal2022ProbingMethods}. Kosan et al., mediante un \textit{benchmark} exhaustivo, evidenciaron que el desempeño de explicadores depende fuertemente del protocolo de evaluación \cite{Kosan2023GNNX-BENCH:Benchmarking}.
+Gawantka et al. propusieron métricas formales para cuantificar esta inestabilidad, mostrando que explicadores ampliamente usados exhiben variabilidad preocupante en sus salidas \cite{Gawantka2024AExplanations}. Agarwal et al. demostraron que muchas explicaciones consideradas "plausibles" no son necesariamente fieles al mecanismo interno del modelo \cite{Agarwal2022ProbingMethods}. Kosan y colaboradores, mediante un \textit{benchmark} exhaustivo, evidenciaron que el desempeño de explicadores depende fuertemente del protocolo de evaluación \cite{Kosan2023GNNX-BENCH:Benchmarking}.
 
 En el contexto AML, esta inestabilidad es particularmente problemática. Una explicación inestable carece de valor operativo: si el subgrafo explicativo cambia radicalmente en cada ejecución, ¿cuál de ellas debe ser considerada por el analista? ¿Cómo puede justificarse una decisión regulatoria basada en evidencia que no es reproducible?
 
@@ -342,7 +342,7 @@ En los problemas de clasificación binaria, como la detección de fraude, el ren
     \[ \text{Specificity} = \frac{TN}{TN + FP} \]
 \end{itemize}
 
-Aunque estas métricas proporcionan información valiosa sobre el comportamiento del modelo, evaluarlas de manera aislada o depender de la exactitud global (\textit{accuracy}) resulta altamente engañoso en contextos de desbalance extremo (e.g., 1:1000). En estos escenarios, un clasificador trivial que prediga siempre la clase mayoritaria obtendría una exactitud casi perfecta y una alta especificidad, pero su utilidad operativa para detectar el lavado de dinero sería nula. De igual forma, centrarse únicamente en maximizar la precisión suele reducir drásticamente la exhaustividad, dejando pasar operaciones ilícitas críticas \cite{Rai2025EvaluatingData}.
+Aunque estas métricas proporcionan información valiosa sobre el comportamiento del modelo, evaluarlas de manera aislada o depender de la exactitud global (\textit{accuracy}) resulta altamente engañoso en contextos de desbalance extremo (por ejemplo, 1:1000). En estos escenarios, un clasificador trivial que prediga siempre la clase mayoritaria obtendría una exactitud casi perfecta y una alta especificidad, pero su utilidad operativa para detectar el lavado de dinero sería nula. De igual forma, centrarse únicamente en maximizar la precisión suele reducir drásticamente la exhaustividad, dejando pasar operaciones ilícitas críticas \cite{Rai2025EvaluatingData}.
 
 \subsection{Métricas de Rendimiento Predictivo en Escenarios de Desbalance}
 

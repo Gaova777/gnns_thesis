@@ -44,7 +44,7 @@ En orden — el detalle completo está en las secciones numeradas más abajo:
 - **Paso A · verificación** → `scripts/smoke_test.py` para validar el fix R1 (rápido, valida que no rompió nada).
 - **Paso B** → **recomputar la estabilidad del eje Elliptic** con la métrica corregida. Es el proceso
   pesado: etapa *explain* sobre las 4 arquitecturas (reusa checkpoints si existen; si no, entrena
-  primero — determinista, `seed=42`). **Este es el único paso que realmente necesita GPU.**
+  primero; ver la nota sobre determinismo al final). **Este es el único paso que realmente necesita GPU.**
 - **Paso C** → unificar los CSV de Elliptic.
 - **Paso D** → si el Paso B cambió los números, regenerar las tablas de Elliptic (y verificar si el
   ranking de arquitecturas del Cap. 4 sobrevive; ver §9 Impacto).
@@ -103,7 +103,7 @@ PY
 Interpretación:
 - **`*_best.pt` ≈ 60** → tienes los modelos entrenados. En el Paso B **solo corres *explain*** (barato, ~1.5 h).
 - **`*_best.pt` = 0** → hay que **entrenar primero**. El entrenamiento está sembrado (`seed=42`), así que
-  reproduce los **mismos modelos** de forma determinista; solo cuesta tiempo (~3 h en la 4060).
+  reproduce **las mismas conclusiones**, aunque no los mismos pesos bit a bit; solo cuesta tiempo (~2 h en la 4060 para GCN/GraphSAGE, ~8 h para GAT/TAGCN).
 - **`phase1/*.pt` = 0 pero `phase1/results_*.csv` presentes** → **es lo esperado y está bien**: los CSV
   sintéticos ya contienen todos los resultados del Cap. 5. No necesitas los `.pt`.
 
@@ -187,7 +187,7 @@ uv run python scripts/explain_matrix.py --config configs/experiment_machineC_v3.
 ### Caso 2 — no hay checkpoints: entrenar y luego explicar
 
 ```bash
-# 1) entrenar la matriz (determinista, seed 42) — repite para el config C
+# 1) entrenar la matriz (seed 42) — repite para el config C
 uv run python scripts/train_matrix.py   --config configs/experiment_machineB_v3.yaml --max-hours 9 --resume
 uv run python scripts/train_matrix.py   --config configs/experiment_machineC_v3.yaml --max-hours 9 --resume
 
@@ -329,3 +329,29 @@ Elliptic (GraphSAGE > GAT > GCN > TAGCN) **podría cambiar o diluirse**. Pero:
 ---
 
 *Runbook generado en la auditoría de consolidación · 2026-07-21*
+
+
+---
+
+## Nota sobre determinismo (verificada 2026-07-27)
+
+El entrenamiento **no es determinista a nivel de pesos**, aunque se fije `seed=42`. Las operaciones
+*scatter* que implementan el message passing de PyG sobre GPU acumulan con sumas atómicas cuyo orden
+no está determinado, y `train_matrix.py` siembra `torch.manual_seed` pero no numpy, el RNG de Python,
+ni `cudnn.deterministic`. Además `hyperopt.py` fija `TPESampler(seed=42)` de forma independiente de la
+semilla del run.
+
+Comprobado empíricamente: reentrenar las 60 configuraciones con `seed=42` devolvió **25 configs sobre
+el quality gate frente a 23**, y ninguna reprodujo su PR-AUC de test de forma exacta (25 de 30 dentro
+de 0,01). Lo que **sí** se reproduce es la partición de estabilidad entre arquitecturas.
+
+Léase como reproducibilidad de conclusiones, no de decimales. Es una propiedad conocida del cómputo
+sobre aceleradores gráficos, no un defecto del diseño.
+
+## Requisitos de entorno (Windows)
+
+- **`PYTHONUTF8=1` es obligatorio.** Los YAML de `configs/` tienen caracteres no ASCII en comentarios
+  y los scripts escriben `≥` a stdout; sin modo UTF-8, Python con locale cp1252 falla al cargar el
+  config y aborta a mitad de config al imprimir.
+- LaTeX: MiKTeX con `biber`. **No usar `-output-directory`**, que en MiKTeX no busca el `.aux` en el
+  directorio de salida y produce decenas de referencias sin resolver falsas.

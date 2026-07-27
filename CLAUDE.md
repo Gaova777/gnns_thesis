@@ -27,13 +27,16 @@ Versiones anteriores del README y del manuscrito afirmaban **"inversión por den
 **liderazgo de GraphSAGE** en estabilidad. Ambas se **retractaron**: eran artefactos de medición. Si
 encuentras esas afirmaciones en algún documento del repo, está desactualizado. Lo vigente:
 
-- Estabilidad Elliptic (Spearman de GNNExplainer, corrida completa de 60): **GAT 0,780 · GCN 0,778 ·
-  GraphSAGE 0,735 · TAGCN 0,580**. Concuerda con el eje sintético (correlación de rangos **+0,80**;
-  con la métrica defectuosa daba −0,20).
-- GAT vs GraphSAGE **no** es significativo (Wilcoxon p = 0,375). Se afirma "GAT y GCN encabezan,
-  TAGCN queda atrás", nunca un ordenamiento fino.
-- En la corrida filtrada (23 configs que pasan el gate) el soporte es desigual (**GCN n=1**): es
-  control de robustez, no estimación.
+- Estabilidad Elliptic (Spearman de GNNExplainer, **3 semillas de modelo, 180 modelos**):
+  **GAT 0,782 · GCN 0,758 · GraphSAGE 0,735 · TAGCN 0,676**.
+- La afirmación correcta es una **partición en dos grupos**, no un ranking de cuatro: grupo alto
+  (GAT, GCN) y grupo bajo (GraphSAGE, TAGCN), con diferencias significativas entre grupos y no dentro.
+  Kruskal-Wallis global p = 2,8×10⁻⁵; dentro de cada grupo no se rechaza la igualdad.
+- La misma partición aparece en el eje sintético, medido de forma independiente. La correlación de
+  rangos entre regímenes sigue siendo **+0,80** (el orden de las 4 arquitecturas no cambió).
+- **Nunca decir "GAT es la más estable"**: GAT y GCN se permutan entre semillas.
+- El pipeline **no es determinista a nivel de pesos** (scatter con atómicos en GPU). Reproduce
+  conclusiones, no decimales: el reentrenamiento dio 25/60 sobre el gate frente a 23/60.
 
 ## Los dos artefactos de evaluación (contribución central)
 

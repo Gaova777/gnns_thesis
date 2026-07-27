@@ -130,30 +130,82 @@ Al recomputar la estabilidad con la métrica corregida sobre el subconjunto de v
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{chapter_4/images_ch4/ranking_khop.png}
-    \caption{Estabilidad de las explicaciones por arquitectura sobre el subgrafo receptivo y con la métrica de Spearman corregida, en la corrida con filtro de calidad. GAT y GraphSAGE quedan indistinguibles en la parte alta, y la reparación de la métrica elevó a GAT y TAGCN mucho más que a GraphSAGE, lo que revela que la anterior ventaja de GraphSAGE era un artefacto del truncamiento de la métrica.}
+    \caption{Estabilidad de las explicaciones por arquitectura sobre el subgrafo receptivo y con la métrica de Spearman corregida, promediada sobre las tres semillas de modelo, con barras de error que representan la desviación típica entre semillas. La prueba de rangos con signo separa un grupo alto formado por GAT y GCN de un grupo bajo formado por GraphSAGE y TAGCN, con diferencias significativas entre grupos y no dentro del grupo bajo. La mayor dispersión de TAGCN advierte contra fijar su valor central con demasiada precisión.}
     \label{fig:ranking}
 \end{figure}
 
 La lectura que esta tesis afirma como robusta debe revisarse a la luz de la métrica corregida, y el resultado es más prudente que el de la versión anterior. Ninguna arquitectura domina la estabilidad de forma transversal, y la superioridad de GraphSAGE sobre GAT que la versión previa reportaba no sobrevive a la reparación de la métrica. Sobre el subconjunto con calidad garantizada, GAT y GraphSAGE resultan prácticamente indistinguibles, con una diferencia de cuatro centésimas sostenida sobre siete y once configuraciones, mientras que GCN se apoya en una sola configuración y TAGCN en cuatro, un soporte insuficiente para fijar su posición relativa. La afirmación que sí se sostiene, y que gana fuerza al contrastarse con el eje sintético del Capítulo 5, es que el orden de estabilidad corregido en Elliptic concuerda con el del grafo denso, en el que GCN y GAT encabezan la estabilidad de GNNExplainer, de modo que la resiliencia de estas arquitecturas se manifiesta con relativa independencia de la densidad del grafo.
 
-La prudencia de esta lectura se apoya en un contraste estadístico explícito. La diferencia de estabilidad entre GAT y GraphSAGE sobre las siete configuraciones en que ambos superan el filtro, de apenas cuatro centésimas, no alcanza significación estadística, ni con la prueba de rangos con signo de Wilcoxon, que arroja un valor p de 0,375, ni con la prueba t pareada, con un valor p de 0,380. Los intervalos de confianza al noventa y cinco por ciento de sus medias se solapan de forma amplia, de 0,705 a 0,853 para GAT y de 0,720 a 0,766 para GraphSAGE, lo que refuerza que ambas arquitecturas resultan estadísticamente indistinguibles en cuanto a estabilidad. Esta cautela cuantitativa es coherente con el reducido número de configuraciones que superan el filtro de calidad y evita atribuir a una diferencia de cuatro centésimas un significado del que carece.
+La prudencia de esta lectura se apoya en un contraste estadístico explícito. La diferencia de estabilidad entre GAT y GraphSAGE sobre las siete configuraciones en que ambos superan el filtro, de apenas cuatro centésimas, no alcanza significación estadística, ni con la prueba de rangos con signo de Wilcoxon, que arroja un valor p de 0,375, ni con la prueba t pareada, con un valor p de 0,380. Los intervalos de confianza al noventa y cinco por ciento de sus medias se solapan de forma amplia, de 0,705 a 0,853 para GAT y de 0,720 a 0,766 para GraphSAGE. Conviene subrayar el origen de esta indeterminación, que no reside en que las arquitecturas sean equivalentes sino en que una sola inicialización sobre un soporte reducido carece de potencia para separarlas. La sección siguiente levanta precisamente esa limitación mediante una replicación con tres semillas de modelo, y con ella la comparación entre GAT y GraphSAGE sí alcanza significación, de manera que la cautela expresada aquí debe leerse como una restricción del diseño de una sola semilla y no como una conclusión sobre las arquitecturas.
 
-La sucesión de las dos correcciones encierra un valor metodológico que trasciende el resultado puntual. Un primer artefacto, de naturaleza computacional, favorecía a GAT mediante un cálculo sobre el grafo completo que fallaba de forma silenciosa y dejaba fuera sus configuraciones más costosas; un segundo artefacto, de naturaleza métrica, favorecía a GraphSAGE mediante un truncamiento que mutilaba los rankings de features y penalizaba con más fuerza a las arquitecturas de importancia más repartida. Cada uno de ellos, por separado, bastaba para producir una conclusión comparativa llamativa y falsa, y solo la corrección de ambos permite una lectura estable de los datos. Este doble episodio ilustra de forma concreta la advertencia de Kosan et al. sobre la sensibilidad de las conclusiones al protocolo de evaluación, y refuerza la necesidad de auditar las condiciones de cómputo y de medida con el mismo rigor que se aplica a los métodos \cite{Kosan2023GNNX-BENCH:Benchmarking}.
+La sucesión de las dos correcciones encierra un valor metodológico que trasciende el resultado puntual. Un primer artefacto, de naturaleza computacional, favorecía a GAT mediante un cálculo sobre el grafo completo que fallaba de forma silenciosa y dejaba fuera sus configuraciones más costosas; un segundo artefacto, de naturaleza métrica, favorecía a GraphSAGE mediante un truncamiento que mutilaba los rankings de features y penalizaba con más fuerza a las arquitecturas de importancia más repartida. Cada uno de ellos, por separado, bastaba para producir una conclusión comparativa llamativa y falsa, y solo la corrección de ambos permite una lectura estable de los datos. Este doble episodio ilustra de forma concreta la advertencia de Kosan y colaboradores sobre la sensibilidad de las conclusiones al protocolo de evaluación, y refuerza la necesidad de auditar las condiciones de cómputo y de medida con el mismo rigor que se aplica a los métodos \cite{Kosan2023GNNX-BENCH:Benchmarking}.
+
+\section{Replicación con Múltiples Semillas y Estructura en Dos Grupos}
+
+Las conclusiones expuestas hasta aquí descansaban sobre una única inicialización del entrenamiento, lo que impedía separar una diferencia real entre arquitecturas del ruido propio de un ajuste concreto. Para levantar esa limitación, la matriz completa de sesenta configuraciones se reentrenó con tres semillas de modelo independientes, cada una ejecutando el procedimiento entero, incluida su propia búsqueda de hiperparámetros, hasta totalizar ciento ochenta modelos sobre los que se recalculó la estabilidad de GNNExplainer. Mantener la búsqueda dentro de la replicación, en lugar de reutilizar los hiperparámetros de la primera semilla, responde al propósito de medir la variabilidad del procedimiento completo y no solo la de la inicialización de los pesos, que es la pregunta pertinente cuando lo que se desea establecer es si una conclusión depende de una corrida particular.
+
+La replicación arroja en primer término un resultado sobre reproducibilidad que conviene declarar con precisión. Reentrenar con la misma semilla no devuelve modelos idénticos, ya que las operaciones de dispersión que implementan el paso de mensajes sobre la unidad de procesamiento gráfico emplean sumas atómicas cuyo orden no es determinista, de modo que la reproducibilidad exacta a nivel de pesos no es alcanzable sin renunciar al rendimiento. Lo que sí se reproduce, y es lo que importa para una afirmación científica, son las conclusiones, puesto que el reentrenamiento independiente de la matriz devolvió el mismo filtro de calidad, con veinticinco configuraciones superándolo frente a las veintitrés originales, y el mismo orden de estabilidad entre arquitecturas. La distinción entre reproducibilidad de los pesos y reproducibilidad de las conclusiones es pertinente para cualquier trabajo que entrene redes sobre grafos en aceleradores gráficos, y omitirla induce expectativas que el cómputo no puede satisfacer.
+
+Los valores medios por arquitectura y semilla, que recoge la Tabla \ref{tab:seeds}, sostienen el orden reportado en la sección anterior y a la vez precisan su lectura. GAT encabeza con una media de 0,782 y una desviación típica de 0,013, seguido de GCN con 0,757, GraphSAGE con 0,735 y TAGCN con 0,672. Las dos primeras posiciones se permutan entre semillas, ya que GCN encabeza en una de ellas y GAT en las otras dos, lo que confirma de forma empírica la cautela con la que la sección anterior se negaba a nombrar una única arquitectura ganadora. TAGCN, por su parte, resulta ser la arquitectura con mayor dispersión entre semillas con diferencia, con una desviación típica de 0,077 frente a valores comprendidos entre 0,013 y 0,025 en las restantes, de manera que el valor de 0,580 que arrojaba la semilla única correspondía al extremo bajo de su rango y no a su comportamiento típico.
 
 \begin{table}[htbp]
     \centering
     \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{lcc}
+    \begin{tabular}{lccccc}
     \toprule
-    \textbf{Arquitectura} & \textbf{Corrida completa (n)} & \textbf{Corrida con filtro (n)} \\
+    \textbf{Arquitectura} & \textbf{Semilla 42} & \textbf{Semilla 43} & \textbf{Semilla 44} & \textbf{Media} & \textbf{Desv. típica} \\
     \midrule
-    GAT       & 0,780 (15) & 0,779 (7) \\
-    GraphSAGE & 0,735 (15) & 0,743 (11) \\
-    GCN       & 0,778 (15) & 0,833 (1) \\
-    TAGCN     & 0,580 (12) & 0,641 (4) \\
+    GAT       & 0,766 & 0,789 & 0,790 & 0,782 & 0,013 \\
+    GCN       & 0,783 & 0,733 & 0,757 & 0,757 & 0,025 \\
+    GraphSAGE & 0,756 & 0,713 & 0,738 & 0,735 & 0,022 \\
+    TAGCN     & 0,586 & 0,693 & 0,736 & 0,672 & 0,077 \\
     \bottomrule
     \end{tabular}
-    \caption{Estabilidad de las explicaciones (correlación de Spearman) por arquitectura sobre el subgrafo receptivo y con la métrica corregida, con el número de configuraciones de soporte entre paréntesis. Con la métrica reparada, GAT y GCN encabezan ambas corridas y la anterior ventaja de GraphSAGE no se sostiene; en la corrida con filtro, GCN se apoya en una única configuración y TAGCN en cuatro, un soporte insuficiente para ordenarlos con confianza. Ambas corridas coinciden en situar a GAT y GCN en la parte alta y a GraphSAGE por debajo, de modo que la conclusión no depende del filtro de calidad.}
+    \caption{Estabilidad media de las explicaciones de GNNExplainer por arquitectura y semilla de modelo sobre el Elliptic Dataset, con la métrica de Spearman corregida. Las dos primeras posiciones se permutan entre semillas, mientras que TAGCN exhibe una dispersión tres veces mayor que la de cualquier otra arquitectura.}
+    \label{tab:seeds}
+\end{table}
+
+La potencia inferencial que aporta la replicación permite sustituir un ordenamiento de cuatro posiciones por una estructura más simple y mejor sostenida. Sobre las celdas comunes de escenario, balanceo y semilla, la prueba de rangos con signo de Wilcoxon separa con claridad dos grupos. GAT y GCN resultan indistinguibles entre sí, con un valor p de 0,165, y ambos superan de forma significativa a GraphSAGE, con valores p de 0,0033 y 0,047 respectivamente, y a TAGCN, con valores p inferiores a 0,0001 y de 0,0067. En el extremo opuesto, GraphSAGE y TAGCN tampoco se distinguen entre sí, con un valor p de 0,096. La lectura correcta de la estabilidad por arquitectura en Elliptic no es, por tanto, un ranking de cuatro puestos sino una partición en un grupo alto formado por GAT y GCN y un grupo bajo formado por GraphSAGE y TAGCN, con diferencias significativas entre grupos y no dentro de ellos.
+
+La partición resiste además el contraste con una familia de pruebas distinta de la empleada hasta aquí, lo que descarta que sea un artefacto del diseño pareado. La prueba de Kruskal-Wallis sobre las cuatro arquitecturas rechaza la hipótesis de igualdad con un estadístico de 23,79 y un valor p de 2,8 por diez elevado a menos cinco, con un tamaño de efecto epsilon cuadrado de 0,125 que corresponde a una magnitud media. Al aplicar la misma prueba dentro de cada grupo, en cambio, la igualdad no se rechaza, ni entre GAT y GCN, con un valor p de 0,192, ni entre GraphSAGE y TAGCN, con un valor p de 0,080. La comparación no pareada entre el conjunto de las dos arquitecturas del grupo alto y el de las dos del grupo bajo, mediante la prueba de Mann-Whitney, arroja un valor p de 1,4 por diez elevado a menos seis. El patrón es por tanto consistente, ya que la variabilidad entre arquitecturas se concentra entre grupos y no dentro de ellos.
+
+Los intervalos de confianza bootstrap que recoge la Tabla \ref{tab:ic} ofrecen la misma lectura en forma de estimación por intervalo. El intervalo de GAT, de 0,758 a 0,805, y el de GCN, de 0,724 a 0,787, se solapan de forma amplia, al igual que el de GraphSAGE, de 0,710 a 0,756, con el de TAGCN, de 0,632 a 0,717. Entre grupos, en cambio, los intervalos de GAT y de GraphSAGE apenas se tocan, y el de TAGCN es el más ancho de los cuatro, con una amplitud de 0,085 que casi duplica la de GAT y que refleja la mayor dispersión entre semillas ya señalada.
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Arquitectura} & \textbf{n} & \textbf{Media} & \textbf{IC95 inferior} & \textbf{IC95 superior} \\
+    \midrule
+    GAT       & 45 & 0,782 & 0,758 & 0,805 \\
+    GCN       & 44 & 0,758 & 0,724 & 0,787 \\
+    GraphSAGE & 42 & 0,735 & 0,710 & 0,756 \\
+    TAGCN     & 40 & 0,676 & 0,632 & 0,717 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Estabilidad media por arquitectura sobre el Elliptic Dataset e intervalos de confianza al noventa y cinco por ciento obtenidos por remuestreo bootstrap con diez mil réplicas, agregando las tres semillas de modelo. Los intervalos se solapan dentro de cada grupo y apenas se tocan entre grupos, en coherencia con las pruebas de hipótesis. La mayor amplitud del intervalo de TAGCN refleja su elevada dispersión entre semillas.}
+    \label{tab:ic}
+\end{table}
+
+Esta estructura corrige y a la vez fortalece lo afirmado con una sola semilla. Fortalece, porque la comparación entre GAT y GraphSAGE, que con una semilla no alcanzaba significación y obligaba a una formulación cautelosa, pasa a ser significativa con un valor p de 0,0033, de modo que ahora puede sostenerse que el grupo alto supera al resto y no solamente que lo encabeza. Corrige, porque la afirmación de que TAGCN quedaba netamente rezagada no sobrevive a la replicación, dado que su distancia respecto de GraphSAGE no alcanza significación estadística. Lo que sí se mantiene, y es lo que la hipótesis de trabajo comprometía, es que TAGCN no resulta la arquitectura más estable pese a su alcance multisalto, ya que aparece de forma consistente en el grupo bajo en las tres semillas.
+
+Un último aspecto refuerza la solidez de esta partición. El eje sintético del Capítulo 5, medido de forma independiente sobre un régimen de densidad opuesto y con su propia replicación, exhibe exactamente la misma estructura, con GCN en 0,965 y GAT en 0,960 muy por encima de GraphSAGE en 0,889 y TAGCN en 0,886, valores que separan dos grupos con la misma composición y con diferencias internas mínimas. Que dos regímenes tan distintos, medidos con datos y con pipelines separados, converjan en la misma partición constituye un respaldo considerablemente más fuerte que la coincidencia de un orden entre cuatro posiciones, y refuerza la lectura conjunta que desarrolla el Capítulo 6.
+
+\begin{table}[htbp]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{lccc}
+    \toprule
+    \textbf{Arquitectura} & \textbf{Corrida completa (n)} & \textbf{Corrida con filtro (n)} & \textbf{Tres semillas} \\
+    \midrule
+    GAT       & 0,780 (15) & 0,779 (7)  & 0,782 $\pm$ 0,013 \\
+    GCN       & 0,778 (15) & 0,833 (1)  & 0,757 $\pm$ 0,025 \\
+    GraphSAGE & 0,735 (15) & 0,743 (11) & 0,735 $\pm$ 0,022 \\
+    TAGCN     & 0,580 (12) & 0,641 (4)  & 0,672 $\pm$ 0,077 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Estabilidad de las explicaciones (correlación de Spearman) por arquitectura sobre el subgrafo receptivo y con la métrica corregida. Las dos primeras columnas corresponden a la semilla original, con el número de configuraciones de soporte entre paréntesis, y la tercera a la media y la desviación típica sobre las tres semillas de la replicación descrita en la sección siguiente. Con la métrica reparada, GAT y GCN encabezan las tres columnas y la anterior ventaja de GraphSAGE no se sostiene. El soporte de la corrida con filtro es desigual, ya que GCN se apoya en una única configuración y TAGCN en cuatro, de modo que esa columna se reporta como control de consistencia y no como estimación. La replicación resuelve esa limitación y sitúa a TAGCN en 0,672, bastante por encima del valor que arrojaba la semilla única, además de revelar que es la arquitectura con mayor dispersión entre semillas.}
     \label{tab:ranking}
 \end{table}
 

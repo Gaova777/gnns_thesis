@@ -77,7 +77,7 @@
 - Visual: antes/después del ranking.
 
 ### 14 · Resultado 1 — estabilidad por arquitectura
-- Con la métrica corregida: **GAT (0,780) y GCN (0,778)** lideran; GraphSAGE (0,735) al medio; TAGCN (0,580).
+- Con la métrica corregida y 3 semillas de modelo: **dos grupos**, alto (GAT 0,782 · GCN 0,758) y bajo (GraphSAGE 0,735 · TAGCN 0,676). Significativo entre grupos, no dentro.
 - GAT vs GraphSAGE **no significativo** (Wilcoxon p=0,375) → ninguna domina en absoluto.
 - Visual: `chapter_4/images_ch4/ranking_khop.png`.
 

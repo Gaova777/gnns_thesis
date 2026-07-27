@@ -70,6 +70,13 @@ def parse_args():
     p.add_argument("--max-hours", type=float, default=10.0)
     p.add_argument("--no-warm-start", action="store_true",
                    help="Disable Optuna warm-start (random exploration only)")
+    p.add_argument("--seed", type=int, default=None,
+                   help="Train only this model seed (default: every seed in config training.seeds). "
+                        "Useful to split the seed sweep across sessions or machines.")
+    p.add_argument("--reuse-hp", action="store_true",
+                   help="For non-canonical seeds, reuse the hyperparameters found for the canonical "
+                        "seed instead of re-running Optuna. Isolates seed variance from search "
+                        "variance and cuts most of the cost of a seed sweep.")
     return p.parse_args()
 
 
@@ -94,7 +101,9 @@ def main():
     signal.signal(signal.SIGTERM, _signal_handler)
     signal.signal(signal.SIGINT, _signal_handler)
 
-    with open(args.config, "r") as f:
+    # encoding is explicit: the YAML configs contain non-ASCII characters in comments, and on a
+    # default-locale Windows Python (cp1252) an implicit open() raises UnicodeDecodeError.
+    with open(args.config, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     device = "cuda" if args.device == "auto" and torch.cuda.is_available() else "cpu"
@@ -132,25 +141,40 @@ def main():
     archs = [m["name"] for m in config["models"]["architectures"]]
     balances = [t["name"] for t in config["balancing"]["techniques"]]
 
+    # Model seeds. The FIRST seed declared in the config is the CANONICAL one: its artifacts
+    # keep the historical un-suffixed run_id, so the published run (checkpoints, meta.json and
+    # the CSV rows backing the manuscript) keeps its exact identity and --resume still finds
+    # it. Every additional seed gets its own namespace via a _s{seed} suffix. Seeds are the
+    # outer loop so an interrupted sweep still leaves whole seeds finished, not fragments.
+    config_seeds = config["training"].get("seeds", [42]) or [42]
+    canonical_seed = config_seeds[0]
+    seeds = [args.seed] if args.seed is not None else list(config_seeds)
+
     all_configs = []
-    for scenario_name, ratio in scenarios.items():
-        if args.scenario and scenario_name != args.scenario:
-            continue
-        for arch_name in archs:
-            if args.arch and arch_name != args.arch:
+    for seed in seeds:
+        for scenario_name, ratio in scenarios.items():
+            if args.scenario and scenario_name != args.scenario:
                 continue
-            for balance_name in balances:
-                if args.balancing and balance_name != args.balancing:
+            for arch_name in archs:
+                if args.arch and arch_name != args.arch:
                     continue
-                run_id = f"{scenario_name}_{arch_name}_{balance_name}"
-                all_configs.append((scenario_name, ratio, arch_name, balance_name, run_id))
+                for balance_name in balances:
+                    if args.balancing and balance_name != args.balancing:
+                        continue
+                    run_id = f"{scenario_name}_{arch_name}_{balance_name}"
+                    if seed != canonical_seed:
+                        run_id = f"{run_id}_s{seed}"
+                    all_configs.append(
+                        (scenario_name, ratio, arch_name, balance_name, seed, run_id)
+                    )
 
     if not all_configs:
         print("No configs matched the given filters. Nothing to do.")
         return
 
     total = len(all_configs)
-    print(f"\nTraining matrix: {total} configs")
+    print(f"\nTraining matrix: {total} configs "
+          f"({len(seeds)} seed(s): {', '.join(str(s) for s in seeds)})")
 
     hyp_cfg = config["models"]["hyperparameter_search"]
     opt_trials = hyp_cfg.get("optuna_trials", 50)
@@ -161,7 +185,7 @@ def main():
     epochs = train_cfg.get("epochs", 600)
     patience = train_cfg.get("patience", 50)
     early_stop_metric = train_cfg.get("early_stop_metric", "f1")
-    seed = train_cfg.get("seeds", [42])[0]
+    # NOTE: `seed` is per-config now (see the matrix build above), not a single global.
 
     gate_cfg = config.get("analysis", {}).get("quality_gate", {})
     gate_f1 = gate_cfg.get("f1_min", 0.70)
@@ -173,7 +197,7 @@ def main():
     pbar = tqdm(all_configs, desc="Train matrix", unit="config",
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]")
 
-    for scenario_name, ratio, arch_name, balance_name, run_id in pbar:
+    for scenario_name, ratio, arch_name, balance_name, seed, run_id in pbar:
         if _interrupted:
             tqdm.write("  Interrupt — stopping.")
             break
@@ -200,7 +224,30 @@ def main():
         data = create_imbalance_scenario(data_raw, ratio, seed=seed)
 
         # ── Hyperopt (Optuna with warm-start) ──────────────────────────────────
-        if args.quick or opt_trials == 0:
+        # --reuse-hp: for a non-canonical seed, take the hyperparameters already found for the
+        # canonical seed instead of re-running the search. This is the cheaper AND cleaner way
+        # to run a seed sweep: holding the hyperparameters fixed isolates the variance due to
+        # model initialisation and data subsampling, which is what the sweep is measuring, from
+        # the variance of the search itself. (The search is near-invariant across seeds anyway:
+        # hyperopt.py pins TPESampler(seed=42) regardless of the run seed.)
+        reuse_hp_src = None
+        if args.reuse_hp and seed != canonical_seed:
+            base_run_id = f"{scenario_name}_{arch_name}_{balance_name}"
+            base_meta = _meta_path(models_dir, base_run_id)
+            if not base_meta.exists():
+                tqdm.write(f"  SKIP (--reuse-hp: missing {base_meta.name} for seed "
+                           f"{canonical_seed}): {run_id}")
+                summary["failed"].append(f"{run_id} (no canonical HP)")
+                continue
+            with open(base_meta, encoding="utf-8") as f:
+                reuse_hp_src = json.load(f)
+
+        if reuse_hp_src is not None:
+            best_hp = reuse_hp_src["best_params"]
+            best_score = reuse_hp_src.get("optuna_best_score")
+            tqdm.write(f"  Hyperparams: reused from seed {canonical_seed} "
+                       f"({base_meta.name}): {best_hp}")
+        elif args.quick or opt_trials == 0:
             best_hp = {
                 "hidden_dim": 64, "num_layers": 2,
                 "dropout": 0.3, "lr": 0.001, "weight_decay": 5e-4,
@@ -377,6 +424,10 @@ def main():
             "best_params": best_hp,
             "optuna_best_score": best_score,
             "optuna_metric": opt_metric,
+            # provenance of best_params: "optuna" (search ran here), "reused:<seed>" (inherited
+            # from the canonical seed via --reuse-hp), or "defaults" (quick / trials=0).
+            "hp_source": (f"reused:{canonical_seed}" if reuse_hp_src is not None
+                          else ("defaults" if (args.quick or opt_trials == 0) else "optuna")),
             "early_stop_metric": early_stop_metric,
             "best_epoch": results["best_epoch"],
             "best_val_score": results["best_val_score"],
@@ -396,7 +447,7 @@ def main():
             "checkpoint": str(_ckpt_path(models_dir, run_id).name),
             "config_path": args.config,
         }
-        with open(meta_file, "w") as f:
+        with open(meta_file, "w", encoding="utf-8") as f:
             json.dump(meta, f, indent=2)
         tqdm.write(f"  Saved metadata: {meta_file}")
 

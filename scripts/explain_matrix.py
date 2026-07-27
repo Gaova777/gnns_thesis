@@ -90,7 +90,7 @@ def _load_meta_files(models_dir: Path) -> list[dict]:
     metas = []
     for path in sorted(models_dir.glob("*_meta.json")):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 meta = json.load(f)
             meta["_meta_path"] = str(path)
             metas.append(meta)
@@ -99,21 +99,29 @@ def _load_meta_files(models_dir: Path) -> list[dict]:
     return metas
 
 
-def _completed_pairs_from_csv(tracker: ExperimentTracker) -> set[tuple[str, str]]:
-    """Return set of (run_id, explainer) already in the results CSV."""
+def _completed_pairs_from_csv(tracker: ExperimentTracker) -> set[tuple]:
+    """Return set of (scenario, architecture, balancing, seed, explainer) already in the CSV.
+
+    The key includes the SEED. It used to rebuild a run_id as "{scenario}_{arch}_{balancing}",
+    which is not unique once a seed sweep is running: every seed of the same cell collapsed to
+    the same key, so seed-suffixed runs never matched and --resume re-ran them on every pass,
+    appending duplicate rows. The CSV carries a `seed` column, so key on it directly instead of
+    reconstructing an identifier the CSV does not store.
+    """
     csv_path = Path(tracker.results_dir) / f"{tracker.experiment_name}.csv"
     if not csv_path.exists():
         return set()
     try:
         import pandas as pd
         df = pd.read_csv(csv_path)
-        if not {"scenario", "architecture", "balancing", "explainer"}.issubset(df.columns):
+        needed = {"scenario", "architecture", "balancing", "seed", "explainer"}
+        if not needed.issubset(df.columns):
             return set()
-        pairs = set()
-        for _, row in df.iterrows():
-            rid = f"{row['scenario']}_{row['architecture']}_{row['balancing']}"
-            pairs.add((rid, str(row["explainer"])))
-        return pairs
+        return {
+            (str(r["scenario"]), str(r["architecture"]), str(r["balancing"]),
+             str(r["seed"]), str(r["explainer"]))
+            for _, r in df.iterrows()
+        }
     except Exception:
         return set()
 
@@ -215,7 +223,8 @@ def main():
     signal.signal(signal.SIGTERM, _signal_handler)
     signal.signal(signal.SIGINT, _signal_handler)
 
-    with open(args.config, "r") as f:
+    # encoding is explicit: see the note in train_matrix.py (non-ASCII in the YAML comments).
+    with open(args.config, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     device = "cuda" if args.device == "auto" and torch.cuda.is_available() else "cpu"
@@ -275,7 +284,11 @@ def main():
     gate_f1 = gate_cfg.get("f1_min", 0.70)
     gate_mcc = gate_cfg.get("mcc_min", 0.40)
 
-    seed = config.get("training", {}).get("seeds", [42])[0]
+    # Fallback only. The seed that matters is the one each checkpoint was TRAINED with, read
+    # per-meta below: it drives create_imbalance_scenario(), so taking it from the config would
+    # rebuild a different train/val/test split than the model actually saw whenever the sweep
+    # covers more than one seed.
+    default_seed = config.get("training", {}).get("seeds", [42])[0]
 
     total_cfgs = len(metas)
     print(f"\nExplain matrix: {total_cfgs} checkpoints × {len(explainer_methods)} explainers "
@@ -295,6 +308,7 @@ def main():
             break
 
         run_id = meta["run_id"]
+        seed = meta.get("seed", default_seed)
         pbar.set_postfix_str(run_id, refresh=True)
 
         # Quality gate
@@ -413,7 +427,9 @@ def main():
             tracker.log_test_metrics(pred_metrics)
             for ex_cfg in explainer_methods:
                 ex_name = ex_cfg["name"]
-                if args.resume and (run_id, ex_name) in completed_pairs:
+                resume_key = (str(meta["scenario"]), str(meta["architecture"]),
+                              str(meta["balancing"]), str(seed), ex_name)
+                if args.resume and resume_key in completed_pairs:
                     tqdm.write(f"  SKIP (resume): {run_id} / {ex_name}")
                     continue
 

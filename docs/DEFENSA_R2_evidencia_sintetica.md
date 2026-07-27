@@ -90,6 +90,14 @@ layering, fan-in y fan-out—, no patrones exóticos elegidos para favorecer a u
   de los pares. σ entre semillas ≈ 0,007.
 - Grafo: ≈9.500 nodos, ≈1.530 ilícitos, ≈31.000 aristas, 4 tipologías estándar.
 
+> ⚠️ **Precisión que conviene tener clara antes de decirlo en voz alta.** La cobertura de los tres
+> grafos es **asimétrica**: g0 trae el factorial completo (540 filas), mientras que g1 y g2 cubren solo
+> un corte reducido, escenarios 1:1 y natural con balanceo `none` (144 filas). El Wilcoxon de
+> p ≈ 2,6×10⁻³⁵ **sí** se calcula sobre la unión de los tres grafos, así que la cifra es correcta. Pero
+> si preguntan "¿la disociación se replica en los tres grafos?", la respuesta honesta es: en el corte
+> que g1 y g2 cubren, sí; el factorial completo está replicado sobre g0 con tres semillas de modelo.
+> Decirlo ustedes es más fuerte que dejar que lo descubran.
+
 ### Pilar 5 — La construcción es neutral al explicador
 
 **Qué decir:** *"El ground-truth lo fija el generador, que es completamente ciego a qué explicador se
