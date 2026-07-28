@@ -4,8 +4,8 @@
 > Networks para la Deteccion de Lavado de Dinero bajo Desbalance Extremo". UTP, MISC, 2026.
 > Autores: Alejandro Gomez Huertas y Juan Diego Garzon Ovalle. Director: Ph.D. Cristian Rosero Arias.
 >
-> **Duracion objetivo:** 22 a 25 minutos. **Reparto:** Alejandro presenta el Bloque A (contexto y
-> metodologia, slides 1 a 12); Juan Diego presenta el Bloque B (resultados y cierre, slides 13 a 21).
+> **Duracion objetivo:** 23 a 26 minutos (la slide 14b anade unos 55 s al Bloque B). **Reparto:** Alejandro presenta el Bloque A (contexto y
+> metodologia, slides 1 a 12); Juan Diego presenta el Bloque B (resultados y cierre, slides 13 a 21, incluida la 14b).
 > Cada slide indica quien habla, el tiempo objetivo, el guion hablado y el gesto de transicion.
 >
 > Escrito sin guiones largos ni medios. Los numeros son la version corregida (post fix R1).
@@ -29,31 +29,37 @@
 ### Mapa del slide del guion a la pagina del PDF
 
 > **Atencion: la numeracion del guion no coincide con el numero de pagina del PDF.** El guion tiene
-> 21 slides de contenido; `presentacion_latex/beamer_defensa.pdf` tiene **26 paginas**, porque
-> intercala **5 separadores de seccion** (laminas oscuras con el numero y el nombre del bloque). Los
-> separadores no se hablan: se pasan mientras se dice la frase de transicion. Esta tabla dice en que
-> pagina del PDF esta cada slide del guion.
+> 22 slides de contenido; `presentacion_latex/beamer_defensa.pdf` tiene **33 paginas**, porque
+> intercala **5 separadores de seccion** (laminas oscuras con el numero y el nombre del bloque) y
+> anade al final **5 diapositivas de respaldo** que no se presentan. Los separadores no se hablan: se
+> pasan mientras se dice la frase de transicion. Esta tabla dice en que pagina del PDF esta cada slide.
 
 | Guion | Pagina PDF | Guion | Pagina PDF |
 |---|---|---|---|
-| 1. Portada | **1** | 12. Metricas | **15** |
-| 2. Contenido | **2** | *(separador "4. Resultados")* | *16* |
-| *(separador "1. Problema y motivacion")* | *3* | 13. Dos artefactos | **17** |
-| 3. El problema | **4** | 14. Ranking por arquitectura | **18** |
-| 4. Pregunta, objetivos e hipotesis | **5** | 15. Concordancia entre regimenes | **19** |
-| 5. La brecha | **6** | 16. Disociacion plausibilidad y fidelidad | **20** |
-| *(separador "2. Marco conceptual")* | *7* | 17. Puente nulo, desbalance y balanceo | **21** |
-| 6. Marco conceptual | **8** | 18. Colapso validacion a test | **22** |
-| 7. Tres propiedades | **9** | *(separador "5. Conclusiones")* | *23* |
-| *(separador "3. Metodologia")* | *10* | 19. Matriz de recomendacion | **24** |
-| 8. Dos ejes | **11** | 20. Contribuciones y limitaciones | **25** |
-| 9. Diseno factorial | **12** | 21. Conclusiones y cierre | **26** |
-| 10. Elliptic | **13** | | |
-| 11. Sintetico | **14** | | |
+| 1. Portada | **1** | *(separador "4. Resultados")* | *16* |
+| 2. Contenido | **2** | 13. Dos artefactos | **17** |
+| *(separador "1. Problema y motivacion")* | *3* | 14. Ranking, dos grupos | **18** |
+| 3. El problema | **4** | **14b. Robustez** *(nueva)* | **19** |
+| 4. Pregunta, objetivos e hipotesis | **5** | 15. Concordancia entre regimenes | **20** |
+| 5. La brecha | **6** | 16. Disociacion plausibilidad y fidelidad | **21** |
+| *(separador "2. Marco conceptual")* | *7* | 17. Puente nulo, desbalance y balanceo | **22** |
+| 6. Marco conceptual | **8** | 18. Colapso validacion a test | **23** |
+| 7. Tres propiedades | **9** | *(separador "5. Conclusiones")* | *24* |
+| *(separador "3. Metodologia")* | *10* | 19. Matriz de recomendacion | **25** |
+| 8. Dos ejes | **11** | 20. Contribuciones y limitaciones | **26** |
+| 9. Diseno factorial | **12** | 21. Conclusiones y cierre | **27** |
+| 10. Elliptic | **13** | *(separador "Respaldo")* | *28* |
+| 11. Sintetico | **14** | R1 a R5. Respaldo | *29 a 33* |
+| 12. Metricas | **15** | | |
 
 **El [RELEVO] cae en la pagina 16**, que es justamente el separador "4. Resultados": Alejandro cierra
 en la 15 (Metricas), pasa a la 16 mientras dice la frase de entrega, y Juan Diego arranca ya con la
 17 en pantalla. Es el punto de cambio mas limpio posible; aprovechenlo.
+
+**Las paginas 28 a 33 son respaldo y no se presentan.** Se abren solo si el jurado pregunta:
+R1 el bug de Spearman en detalle, R2 la estabilidad por semilla, R3 el detalle estadistico de la
+particion, R4 por que PR-AUC y no ROC-AUC, R5 como se construyo el grafo sintetico. Conviene que
+sepan de memoria en que pagina esta cada una, para llegar sin buscar.
 
 ---
 
@@ -222,7 +228,7 @@ mesa, le paso la palabra a Juan Diego para los resultados.
 
 ---
 
-## BLOQUE B: Juan Diego Garzon (slides 13 a 21, aprox. 12 min)
+## BLOQUE B: Juan Diego Garzon (slides 13 a 21 mas la 14b, aprox. 13 min)
 
 
 ### Slide 13: Dos artefactos de evaluacion  ·  [JD]  ·  85 s
@@ -260,7 +266,28 @@ dos sea la mejor: afirmamos que las dos forman el grupo alto. Decir menos seria 
 seria sobre-interpretar.
 
 
-> **En la tesis:** Cap. 4, seccion 4.5 (tabla tab:ranking); Cap. 8, seccion 8.2 (Resultados Completos por Configuracion sobre el Elliptic Dataset).
+> **En la tesis:** Cap. 4, seccion 4.5 (tabla tab:ranking); Cap. 4, seccion 4.6 (Replicacion con Multiples Semillas y Estructura en Dos Grupos); Cap. 8, seccion 8.2.
+
+### Slide 14b: Robustez de la particion  ·  [JD]  ·  55 s
+Me detengo un momento en que sostiene esa particion, porque es la diferencia entre una observacion y
+un resultado. *(pausa)* Reentrenamos la matriz completa de sesenta configuraciones tres veces, con tres
+semillas distintas, ciento ochenta modelos, y en cada una corrimos el procedimiento entero incluida su
+propia busqueda de hiperparametros. Sobre eso, la prueba global de Kruskal-Wallis rechaza la igualdad
+entre las cuatro arquitecturas con un valor p del orden de diez elevado a menos cinco. Pero cuando
+hacemos la misma pregunta dentro del grupo alto, o dentro del grupo bajo, la igualdad no se rechaza.
+Toda la variabilidad esta entre grupos, ninguna dentro. Y los intervalos de confianza por bootstrap
+cuentan lo mismo: se solapan dentro de cada grupo y apenas se tocan entre ellos. *(pausa)* Hay un
+segundo hallazgo aqui que queremos declarar, porque es una contribucion en si misma. Al reentrenar
+descubrimos que el pipeline no es reproducible bit a bit: las operaciones de agregacion sobre la
+tarjeta grafica suman en un orden que no esta determinado, asi que los pesos nunca salen identicos.
+Lo que si se reproduce son las conclusiones, veinticinco configuraciones sobre el filtro de calidad
+frente a veintitres, y exactamente la misma particion. Distinguir la reproducibilidad de los pesos de
+la reproducibilidad de las conclusiones es algo que la literatura rara vez explicita, y creemos que
+deberia hacerlo.
+
+
+> **En la tesis:** Cap. 4, seccion 4.6 (tablas tab:seeds y tab:ic); Cap. 6, seccion 6.4
+> (Contribuciones Metodologicas); Cap. 8, seccion 8.5 (Reproducibilidad y Entorno de Computo).
 
 ### Slide 15: Concordancia entre regimenes  ·  [JD]  ·  70 s
 Este resultado es uno de los que mas me gustan, porque nacio de un error corregido. En una version
@@ -427,5 +454,7 @@ atentos a sus preguntas.
 ### Reparto de preguntas
 - Cada quien responde con solvencia el tema del bloque que presento; el otro complementa. Tengan a mano
   el mapa de `GUION_defensa_por_capitulo.md` (parte B).
-- **Slides de respaldo sugeridas (backup, despues de la 21):** tabla factorial completa, detalle
-  estadistico con intervalos, y el bug de Spearman ilustrado. Solo se muestran si el jurado los pide.
+- **Slides de respaldo (ya creadas, paginas 29 a 33 del PDF):** R1 el bug de Spearman en detalle,
+  R2 la estabilidad por semilla, R3 el detalle estadistico de la particion, R4 por que PR-AUC y no
+  ROC-AUC, R5 la construccion del grafo sintetico. Solo se muestran si el jurado las pide; sepan de
+  memoria en que pagina esta cada una.

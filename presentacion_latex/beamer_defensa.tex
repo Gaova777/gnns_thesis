@@ -297,20 +297,61 @@
 \end{frame}
 
 % ===== 14. RANKING =====
-\begin{frame}{Resultado 1 — estabilidad por arquitectura}
+\begin{frame}{Resultado 1 — la estabilidad separa dos grupos, no cuatro puestos}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{itemize}\small
-  \item[\textcolor{teal}{$\blacksquare$}] \textbf{GAT} \hfill 0,780
-  \item[\textcolor{teal}{$\blacksquare$}] \textbf{GCN} \hfill 0,778
-  \item[\textcolor{seafoam}{$\blacksquare$}] GraphSAGE \hfill 0,735
-  \item[\textcolor{muted}{$\blacksquare$}] TAGCN \hfill 0,580
+  \item[\textcolor{teal}{$\blacksquare$}] \textbf{GAT} \hfill $0{,}782 \pm 0{,}013$
+  \item[\textcolor{teal}{$\blacksquare$}] \textbf{GCN} \hfill $0{,}758 \pm 0{,}025$
 \end{itemize}
-\vspace{4pt}
-\small \textbf{GAT y GCN lideran} (ya no GraphSAGE, que era artefacto). GAT vs GraphSAGE: \textit{no significativo} (Wilcoxon $p=0{,}375$).
+\vspace{2pt}
+{\footnotesize\color{muted}\hspace{6pt}$-$ diferencia significativa $-$}
+\vspace{2pt}
+\begin{itemize}\small
+  \item[\textcolor{muted}{$\blacksquare$}] GraphSAGE \hfill $0{,}735 \pm 0{,}022$
+  \item[\textcolor{muted}{$\blacksquare$}] TAGCN \hfill $0{,}676 \pm 0{,}077$
+\end{itemize}
+\vspace{5pt}
+\small Media de \textbf{3 semillas} de modelo (180 modelos). Significativo \textbf{entre} grupos, \textbf{no dentro}: GAT vs GCN $p=0{,}17$; GraphSAGE vs TAGCN $p=0{,}10$.
 \end{column}
 \begin{column}{0.5\textwidth}
 \includegraphics[width=\linewidth]{chapter_4/images_ch4/ranking_khop.png}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ===== 14b. REPLICACION Y ROBUSTEZ =====
+\begin{frame}{Robustez: qué sostiene esa partición}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\footnotesize
+\begin{tabular}{lcc}
+\toprule
+\textbf{Contraste} & \textbf{Estadístico} & \textbf{$p$} \\
+\midrule
+Global (4 arquitecturas) & Kruskal-Wallis & $2{,}8\!\times\!10^{-5}$ \\
+Grupo alto vs bajo & Mann-Whitney & $1{,}4\!\times\!10^{-6}$ \\
+\midrule
+Dentro del grupo alto & Kruskal-Wallis & $0{,}19$ \\
+Dentro del grupo bajo & Kruskal-Wallis & $0{,}08$ \\
+\bottomrule
+\end{tabular}
+\vspace{7pt}
+\begin{itemize}\footnotesize
+  \item Tamaño de efecto $\eta^2 = 0{,}125$.
+  \item IC95\,\% bootstrap: se solapan \textbf{dentro} de cada grupo, apenas se tocan \textbf{entre} grupos.
+\end{itemize}
+\end{column}
+\begin{column}{0.44\textwidth}
+\setbeamercolor{block body}{bg=panel}
+\begin{block}{}
+\footnotesize
+\textbf{Reproducibilidad, en sentido preciso}\\[3pt]
+Reentrenamos la matriz completa desde cero. Los \textbf{pesos no} se reproducen bit a bit (los \textit{scatter} en GPU acumulan con sumas atómicas).\\[4pt]
+Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, y la \textbf{misma partición}.
+\end{block}
+\vspace{2pt}
+{\footnotesize\color{muted} Distinguir ambas cosas es, en sí mismo, una contribución metodológica.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -322,12 +363,14 @@
 \begin{itemize}\small
   \item La ``inversión por densidad'' era un \textbf{artefacto} de la métrica.
   \item Corregida, Elliptic (disperso) \textbf{concuerda} con el sintético (denso).
+  \item Y la coincidencia no es solo de orden: el eje sintético separa \textbf{los mismos dos grupos}, medido sobre datos y \textit{pipeline} independientes.
 \end{itemize}
-\vspace{6pt}
+\vspace{4pt}
 \begin{center}
-\small Correlación de rangos entre regímenes\\[4pt]
+\small Correlación de rangos entre regímenes\\[3pt]
 {\color{coral}\Large\textbf{$-0{,}20$}} \; $\rightarrow$ \; {\color{amber}\Large\textbf{$+0{,}80$}}\\[2pt]
-{\footnotesize métrica con bug \; $\rightarrow$ \; métrica corregida}
+{\footnotesize métrica con bug \; $\rightarrow$ \; métrica corregida}\\[5pt]
+{\footnotesize\color{muted} Sintético: GCN 0,97 y GAT 0,96 \; frente a \; GraphSAGE 0,89 y TAGCN 0,89}
 \end{center}
 \end{column}
 \begin{column}{0.5\textwidth}
@@ -399,12 +442,14 @@ La estabilidad se estudia sobre verdaderos positivos de \textbf{validación} (en
 \toprule
 \textbf{Objetivo operativo} & \textbf{Configuración} \\
 \midrule
-Auditabilidad / estabilidad & \textcolor{teal}{\textbf{GAT} o \textbf{GCN}} \\
+Auditabilidad / estabilidad & \textcolor{teal}{\textbf{grupo alto: GAT o GCN}} \\
 Recuperar el patrón (plausibilidad) & \textcolor{seafoam}{\textbf{PGExplainer}} \\
 Fidelidad al modelo & \textcolor{amber}{\textbf{GNNExplainer}} \\
 Estabilidad interna del método & \textcolor{coral}{\textbf{GNNShap}} \\
 \bottomrule
 \end{tabular}
+\\[8pt]
+{\footnotesize\color{muted} La recomendación de arquitectura es \textbf{de grupo}, no de una arquitectura concreta:\\dentro del grupo alto la evidencia no distingue, así que la elección puede atender a coste o disponibilidad.}
 \end{center}
 \end{frame}
 
@@ -417,7 +462,8 @@ Estabilidad interna del método & \textcolor{coral}{\textbf{GNNShap}} \\
   \item Tres dimensiones independientes.
   \item Corrección de dos artefactos + dos \textit{bugs} de PGExplainer.
   \item Generador sintético con \textit{ground-truth} por arista.
-  \item Matriz de recomendación.
+  \item Reproducibilidad de \textbf{pesos} frente a la de \textbf{conclusiones}.
+  \item Matriz de recomendación por objetivo.
 \end{itemize}
 \end{block}
 \end{column}
@@ -426,7 +472,8 @@ Estabilidad interna del método & \textcolor{coral}{\textbf{GNNShap}} \\
 \begin{itemize}\small
   \item La inferencia fuerte proviene del eje sintético.
   \item El clasificador colapsa en test (\textit{shift} temporal).
-  \item Una sola semilla de modelo en Elliptic.
+  \item Un solo \textit{dataset} real, anonimizado.
+  \item Con 3 semillas se sostiene el \textbf{grupo}, no el orden fino dentro de él.
 \end{itemize}
 \end{alertblock}
 \end{column}
@@ -453,5 +500,134 @@ Estabilidad interna del método & \textcolor{coral}{\textbf{GNNShap}} \\
 {\color{white!80}\small Alejandro Gómez Huertas \textperiodcentered\ Juan Diego Garzón Ovalle}
 \end{center}
 \end{frame}}
+
+% ============================================================
+% DIAPOSITIVAS DE RESPALDO
+% No se presentan. Se muestran solo si el jurado pregunta.
+% ============================================================
+
+\seccion{Respaldo \textperiodcentered\ solo si se pregunta}
+
+% ===== R1. EL BUG DE SPEARMAN =====
+\begin{frame}{Respaldo · el segundo artefacto, en detalle}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\footnotesize
+La métrica dimensionaba el vector de rangos por \texttt{top\_k} en vez de por el número real de \textit{features}.\\[5pt]
+Con \texttt{top\_k}$=20$ sobre \textbf{166 features}, toda \textit{feature} con índice $\geq 20$ se descartaba: sobrevivían 2 o 3 de las 20 y el resto quedaba empatado en cero.\\[6pt]
+El truncamiento \textbf{no penaliza por igual}: castiga más a las arquitecturas cuya importancia se reparte sobre muchas \textit{features}.\\[4pt]
+{\color{muted}Por eso deprimía a GAT ($+0{,}24$ al corregir) y a TAGCN ($+0{,}28$) mucho más que a GraphSAGE ($+0{,}10$), y fabricaba un liderazgo falso.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\setbeamercolor{block body}{bg=panel}
+\begin{block}{}
+\footnotesize
+\textbf{Los dos artefactos, juntos}\\[4pt]
+1. \textbf{Memoria}: 13 configs de GAT fallaban por OOM silencioso; su media se calculaba solo sobre las que terminaban. \textit{Favorecía a GAT.}\\[4pt]
+2. \textbf{Métrica}: el truncamiento anterior. \textit{Favorecía a GraphSAGE.}\\[5pt]
+Cada uno \textbf{por separado} bastaba para una conclusión comparativa falsa.
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ===== R2. ESTABILIDAD POR SEMILLA =====
+\begin{frame}{Respaldo · estabilidad por semilla de modelo}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Arquitectura} & \textbf{s42} & \textbf{s43} & \textbf{s44} & \textbf{Media} & \textbf{IC95\,\%} \\
+\midrule
+GAT       & 0,766 & 0,789 & 0,790 & \textbf{0,782} & [0,758; 0,805] \\
+GCN       & 0,783 & 0,733 & 0,757 & \textbf{0,758} & [0,724; 0,787] \\
+GraphSAGE & 0,756 & 0,713 & 0,738 & 0,735 & [0,710; 0,756] \\
+TAGCN     & 0,586 & 0,693 & 0,736 & 0,676 & [0,632; 0,717] \\
+\bottomrule
+\end{tabular}
+\\[9pt]
+\footnotesize
+\textbf{GAT y GCN se permutan} entre semillas: por eso no nombramos un ganador único.\\
+\textbf{TAGCN} tiene la mayor dispersión (dt $0{,}077$, el triple que las demás): su lugar en el grupo bajo\\es firme, su valor central admite margen.
+\end{center}
+\end{frame}
+
+% ===== R3. DETALLE ESTADISTICO =====
+\begin{frame}{Respaldo · detalle estadístico de la partición}
+\begin{center}
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Wilcoxon pareado} & \textbf{Elliptic} & \textbf{Sintético} \\
+\midrule
+GAT vs GCN \hfill \textit{(dentro del grupo alto)} & 0,165 & 0,0013 \\
+GraphSAGE vs TAGCN \hfill \textit{(dentro del grupo bajo)} & 0,096 & 0,519 \\
+\midrule
+GAT vs GraphSAGE & 0,0033 & $<10^{-4}$ \\
+GAT vs TAGCN & $<10^{-4}$ & $<10^{-4}$ \\
+GCN vs GraphSAGE & 0,047 & $<10^{-4}$ \\
+GCN vs TAGCN & 0,0067 & $<10^{-4}$ \\
+\bottomrule
+\end{tabular}
+\\[8pt]
+\footnotesize
+La única diferencia intragrupo significativa es GCN sobre GAT en el eje sintético,\\
+por un margen de \textbf{0,006} sin relevancia práctica, detectable solo por el mayor $n$ de ese eje.
+\end{center}
+\end{frame}
+
+% ===== R4. COLAPSO Y METRICAS =====
+\begin{frame}{Respaldo · por qué PR-AUC y no ROC-AUC}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Métrica de ordenamiento} & \textbf{Validación} & \textbf{Test} \\
+\midrule
+ROC-AUC & 0,884 & 0,653 \\
+\textbf{PR-AUC} & \textbf{0,367} & \textbf{0,017} \\
+Precisión en los primeros 50 & 0,657 & 0,020 \\
+Precisión en los primeros 100 & 0,640 & 0,022 \\
+\bottomrule
+\end{tabular}
+\\[9pt]
+\footnotesize
+El ROC-AUC de 0,884 sugeriría un clasificador casi excelente. El PR-AUC de 0,367 sobre los mismos\\
+modelos revela la dificultad real: bajo desbalance extremo, el eje de falsos positivos queda\\
+dominado por la clase mayoritaria y permanece bajo aunque el modelo no distinga la clase rara.
+\end{center}
+\end{frame}
+
+% ===== R5. EL GRAFO SINTETICO =====
+\begin{frame}{Respaldo · cómo se construyó el grafo sintético}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\footnotesize
+\textbf{Decisiones que endurecen la prueba}
+\begin{itemize}
+  \item \textbf{Simetrización} de aristas: sin ella el campo receptivo cae a $\sim$2 nodos y la plausibilidad de subgrafo no es medible.
+  \item \textbf{Aristas distractoras} ($n=3$ por nodo de patrón): sin ellas cualquier selección \textit{top-k} acertaría.
+  \item \textbf{Firma de \textit{features} atenuada} de $+4$ a $+1{,}5$: evita que la tarea se resuelva sola.
+\end{itemize}
+\vspace{3pt}
+{\color{muted}El \textit{ground-truth} se fija en la construcción, \textbf{antes} de correr ningún explicador.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\footnotesize
+\textbf{Escala y replicación}
+\begin{itemize}
+  \item $\approx$9.500 nodos, $\approx$1.530 ilícitos, $\approx$31.000 aristas.
+  \item 4 tipologías canónicas: \textit{structuring}, \textit{layering}, \textit{fan-in}, \textit{fan-out}.
+  \item Grafo g0: factorial completo $\times$ 3 semillas de modelo (540 filas).
+  \item Grafos g1 y g2: corte de verificación, escenarios 1:1 y nativo (144 filas).
+\end{itemize}
+\vspace{3pt}
+{\color{muted}El contraste principal se calcula sobre la unión de los tres grafos.}
+\end{column}
+\end{columns}
+\end{frame}
 
 \end{document}
