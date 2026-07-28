@@ -23,7 +23,7 @@
 ## Convenciones
 
 - **[A]** habla Alejandro. **[JD]** habla Juan Diego. **[RELEVO]** marca el cambio de voz.
-- Los tiempos suman unos 23 minutos, dejando margen para respirar y para el jurado.
+- Los tiempos suman unos 24 minutos, dejando margen para respirar y para el jurado.
 - Donde dice *(pausa)* conviene un silencio corto de uno a dos segundos: da peso a la idea.
 
 ### Mapa del slide del guion a la pagina del PDF
