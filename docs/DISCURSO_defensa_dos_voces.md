@@ -4,8 +4,8 @@
 > Networks para la Deteccion de Lavado de Dinero bajo Desbalance Extremo". UTP, MISC, 2026.
 > Autores: Alejandro Gomez Huertas y Juan Diego Garzon Ovalle. Director: Ph.D. Cristian Rosero Arias.
 >
-> **Duracion objetivo:** 23 a 26 minutos (la slide 14b anade unos 55 s al Bloque B). **Reparto:** Alejandro presenta el Bloque A (contexto y
-> metodologia, slides 1 a 12); Juan Diego presenta el Bloque B (resultados y cierre, slides 13 a 21, incluida la 14b).
+> **Duracion objetivo:** 33 a 36 minutos, dentro de una franja de 40. **Reparto:** Alejandro presenta el Bloque A (contexto y
+> metodologia, paginas 1 a 17); Juan Diego presenta el Bloque B (resultados y cierre, paginas 19 a 34).
 > Cada slide indica quien habla, el tiempo objetivo, el guion hablado y el gesto de transicion.
 >
 > Escrito sin guiones largos ni medios. Los numeros son la version corregida (post fix R1).
@@ -23,47 +23,64 @@
 ## Convenciones
 
 - **[A]** habla Alejandro. **[JD]** habla Juan Diego. **[RELEVO]** marca el cambio de voz.
-- Los tiempos suman unos 24 minutos, dejando margen para respirar y para el jurado.
+- Los tiempos suman unos 34 minutos, dejando margen para respirar y para el jurado.
 - Donde dice *(pausa)* conviene un silencio corto de uno a dos segundos: da peso a la idea.
 
 ### Mapa del slide del guion a la pagina del PDF
 
-> **Atencion: la numeracion del guion no coincide con el numero de pagina del PDF.** El guion tiene
-> 22 slides de contenido; `presentacion_latex/beamer_defensa.pdf` tiene **33 paginas**, porque
-> intercala **5 separadores de seccion** (laminas oscuras con el numero y el nombre del bloque) y
-> anade al final **5 diapositivas de respaldo** que no se presentan. Los separadores no se hablan: se
-> pasan mientras se dice la frase de transicion. Esta tabla dice en que pagina del PDF esta cada slide.
+> **La numeracion del PDF es la que manda.** `presentacion_latex/beamer_defensa.pdf` tiene **37
+> paginas**: 29 de contenido, 5 separadores de seccion (laminas oscuras, no se hablan, se pasan
+> mientras se dice la frase de transicion), 1 separador de respaldo y 2 laminas de respaldo que solo
+> se abren si el jurado pregunta. Duracion estimada: **33 a 36 minutos**.
 
-| Guion | Pagina PDF | Guion | Pagina PDF |
-|---|---|---|---|
-| 1. Portada | **1** | *(separador "4. Resultados")* | *16* |
-| 2. Contenido | **2** | 13. Dos artefactos | **17** |
-| *(separador "1. Problema y motivacion")* | *3* | 14. Ranking, dos grupos | **18** |
-| 3. El problema | **4** | **14b. Robustez** *(nueva)* | **19** |
-| 4. Pregunta, objetivos e hipotesis | **5** | 15. Concordancia entre regimenes | **20** |
-| 5. La brecha | **6** | 16. Disociacion plausibilidad y fidelidad | **21** |
-| *(separador "2. Marco conceptual")* | *7* | 17. Puente nulo, desbalance y balanceo | **22** |
-| 6. Marco conceptual | **8** | 18. Colapso validacion a test | **23** |
-| 7. Tres propiedades | **9** | *(separador "5. Conclusiones")* | *24* |
-| *(separador "3. Metodologia")* | *10* | 19. Matriz de recomendacion | **25** |
-| 8. Dos ejes | **11** | 20. Contribuciones y limitaciones | **26** |
-| 9. Diseno factorial | **12** | 21. Conclusiones y cierre | **27** |
-| 10. Elliptic | **13** | *(separador "Respaldo")* | *28* |
-| 11. Sintetico | **14** | R1 a R5. Respaldo | *29 a 33* |
-| 12. Metricas | **15** | | |
+| Pag. | Lamina | Voz |
+|---|---|---|
+| **1** | Portada | A |
+| **2** | Contenido | A |
+| *3* | *separador: Problema y motivacion* | |
+| **4** | El problema | A |
+| **5** | Pregunta y objetivos | A |
+| **6** | La brecha | A |
+| *7* | *separador: Marco conceptual* | |
+| **8** | Marco: GNN y explicabilidad | A |
+| **9** | Tres propiedades | A |
+| *10* | *separador: Metodologia* | |
+| **11** | **Que produce un explicador** *(nueva)* | A |
+| **12** | Metodologia: dos ejes | A |
+| **13** | Diseno factorial | A |
+| **14** | Eje 1: Elliptic | A |
+| **15** | Eje 2: grafo sintetico | A |
+| **16** | **Como se construyo el grafo sintetico** *(nueva)* | A |
+| **17** | Metricas y protocolo estadistico | A |
+| *18* | *separador: Resultados* | **[RELEVO]** |
+| **19** | Dos artefactos de evaluacion | JD |
+| **20** | **El segundo artefacto en detalle** *(nueva)* | JD |
+| **21** | Resultado 1: dos grupos | JD |
+| **22** | **Robustez de la particion** *(nueva)* | JD |
+| **23** | Resultado 1b: concordancia entre regimenes | JD |
+| **24** | Resultado 2: disociacion | JD |
+| **25** | Resultado 3: el puente que no existe | JD |
+| **26** | **Resultado 4: el desbalance no gobierna** *(nueva)* | JD |
+| **27** | Colapso validacion a test | JD |
+| **28** | **Rigor metrico: PR-AUC y no ROC-AUC** *(nueva)* | JD |
+| **29** | **Las tres hipotesis y su veredicto** *(nueva)* | JD |
+| *30* | *separador: Conclusiones* | |
+| **31** | **Los cuatro objetivos, respondidos** *(nueva)* | JD |
+| **32** | Matriz de recomendacion | JD |
+| **33** | Contribuciones y limitaciones | JD |
+| **34** | Conclusiones y cierre | JD |
+| *35 a 37* | *respaldo: solo si preguntan* | |
 
-**El [RELEVO] cae en la pagina 16**, que es justamente el separador "4. Resultados": Alejandro cierra
-en la 15 (Metricas), pasa a la 16 mientras dice la frase de entrega, y Juan Diego arranca ya con la
-17 en pantalla. Es el punto de cambio mas limpio posible; aprovechenlo.
+**El [RELEVO] cae en la pagina 18**, el separador "4. Resultados": Alejandro cierra en la 17
+(Metricas), pasa a la 18 mientras dice la frase de entrega, y Juan Diego arranca con la 19 en
+pantalla. Es el punto de cambio mas limpio posible.
 
-**Las paginas 28 a 33 son respaldo y no se presentan.** Se abren solo si el jurado pregunta:
-R1 el bug de Spearman en detalle, R2 la estabilidad por semilla, R3 el detalle estadistico de la
-particion, R4 por que PR-AUC y no ROC-AUC, R5 como se construyo el grafo sintetico. Conviene que
-sepan de memoria en que pagina esta cada una, para llegar sin buscar.
+**Respaldo (paginas 36 y 37):** estabilidad por semilla de modelo, y detalle estadistico completo de
+la particion en los dos ejes. Sepan de memoria en que pagina esta cada una para llegar sin buscar.
 
 ---
 
-## BLOQUE A: Alejandro Gomez (slides 1 a 12, aprox. 11 min)
+## BLOQUE A: Alejandro Gomez (paginas 1 a 17, aprox. 15 min)
 
 
 ### Slide 1: Portada  ·  [A]  ·  40 s
@@ -158,6 +175,23 @@ mostrar, con datos, que hay que medir las tres por separado.
 
 > **En la tesis:** Cap. 3, seccion 3.8.4 (Metricas de Estabilidad y Fidelidad Explicativa); Cap. 6, seccion 6.2 (Estabilidad, Plausibilidad y Fidelidad como Tres Dimensiones Independientes).
 
+### Pagina 11: Que produce un explicador  ·  [A]  ·  60 s
+Antes de entrar en la metodologia quiero aterrizar que es, en concreto, una explicacion, porque toda la
+tesis mide propiedades de este objeto. *(pausa)* Cuando el modelo marca una transaccion como ilicita y
+le pedimos al explicador que justifique esa decision, lo que devuelve son dos cosas. Primero, una
+mascara de aristas: de todas las conexiones del vecindario de esa transaccion, cuales sostienen la
+prediccion, que son las que ven resaltadas en el diagrama. Y segundo, un ranking de atributos: de las
+ciento sesenta y seis features que tiene cada nodo, cuales pesaron mas. *(pausa)* Sobre ese objeto se
+definen las tres preguntas de la lamina anterior. La estabilidad pregunta si al repetir el calculo sale
+la misma mascara y el mismo ranking. La plausibilidad, si eso coincide con el patron real de lavado. Y
+la fidelidad, si es de verdad lo que el modelo uso. *(pausa)* Un detalle que va a explicar varias cosas
+mas adelante: en Elliptic el vecindario tipico tiene una mediana de unos dos nodos, asi que la mascara
+de aristas es casi trivial y solo el ranking de atributos discrimina. Por eso ahi medimos estabilidad
+con Spearman sobre features.
+
+
+> **En la tesis:** Cap. 3, seccion 3.6.2 (Metodos XAI para GNNs) y seccion 3.8.4; Cap. 4, seccion 4.1.2 (Dispersion de la Topologia).
+
 ### Slide 8: Dos ejes  ·  [A]  ·  70 s
 Como se prueba algo asi. Con un diseno de dos ejes, que es la decision metodologica mas importante de
 la tesis. *(pausa)* El primer eje es Elliptic, el dataset real de transacciones de Bitcoin. Nos da
@@ -211,6 +245,25 @@ en la construccion del grafo, antes de correr ningun metodo. No lo ajustamos par
 
 > **En la tesis:** Cap. 5, seccion 5.1 (Por que se Construye un Grafo Sintetico) y seccion 5.2 (Construccion del Grafo Sintetico y sus Tipologias).
 
+### Pagina 16: Como se construyo el grafo sintetico  ·  [A]  ·  70 s
+Me detengo en la construccion, porque es donde se juega la credibilidad de todo el eje sintetico y
+prefiero exponerla nosotros antes de que se pregunte. *(pausa)* El grafo tiene unos nueve mil quinientos
+nodos, de los cuales unos mil quinientos son ilicitos, y unas treinta y un mil aristas, con las cuatro
+tipologias canonicas plantadas dentro. Pero lo importante no es el tamano, son tres decisiones que
+tomamos deliberadamente para que la prueba fuera dificil. *(pausa)* La primera, simetrizar las aristas.
+Con el grafo dirigido el campo receptivo cae a unos dos nodos y los patrones de estrella y de cadena
+quedan invisibles al paso de mensajes, con lo que la plausibilidad de subgrafo no seria medible. La
+segunda, anadir aristas distractoras desde cada nodo de patron hacia el fondo licito. Sin ellas el
+subgrafo seria cien por cien patron y cualquier seleccion acertaria, con lo que la metrica no
+discriminaria nada. Y la tercera, atenuar la firma de los atributos de mas cuatro a mas uno coma cinco,
+para que el problema no se resolviera solo. *(pausa)* Las tres decisiones endurecen la prueba, no la
+inflan. Y el punto que quiero dejar fijado: el patron verdadero lo fija el generador, que es
+completamente ciego a que explicador se va a evaluar despues. Que PGExplainer gane en plausibilidad no
+esta cableado en ninguna parte.
+
+
+> **En la tesis:** Cap. 5, seccion 5.2 (Construccion del Grafo Sintetico y sus Tipologias); Cap. 8, seccion 8.5. Material de apoyo: `docs/DEFENSA_R2_evidencia_sintetica.md`, pilares 4 y 5.
+
 ### Slide 12: Metricas  ·  [A]  ·  55 s
 Cierro mi bloque con las metricas. La estabilidad la medimos con la correlacion de Spearman entre los
 rankings de atributos, que es nuestra metrica primaria. La plausibilidad, como coincidencia con el
@@ -228,7 +281,7 @@ mesa, le paso la palabra a Juan Diego para los resultados.
 
 ---
 
-## BLOQUE B: Juan Diego Garzon (slides 13 a 21 mas la 14b, aprox. 13 min)
+## BLOQUE B: Juan Diego Garzon (paginas 19 a 34, aprox. 19 min)
 
 
 ### Slide 13: Dos artefactos de evaluacion  ·  [JD]  ·  85 s
@@ -248,6 +301,23 @@ todo esto y volvimos a medir. Lo que sigue son los numeros corregidos.
 
 
 > **En la tesis:** Cap. 4, seccion 4.5 (De un Artefacto de Computo a un Artefacto de Medida: dos Correcciones Metodologicas); Cap. 6, seccion 6.4 (Contribuciones Metodologicas).
+
+### Pagina 20: El segundo artefacto en detalle  ·  [JD]  ·  60 s
+Me detengo en el segundo artefacto porque es el mas instructivo de los dos. *(pausa)* La metrica de
+Spearman dimensionaba el vector de rangos por el parametro de truncamiento, que estaba fijado en veinte,
+en lugar de por el numero real de atributos, que son ciento sesenta y seis. El efecto es que toda
+feature con indice mayor que veinte se descartaba en silencio. De las veinte del top sobrevivian dos o
+tres, y todo lo demas quedaba empatado en cero. Estabamos comparando rankings mutilados. *(pausa)* Y
+aqui esta lo importante, que no es el bug sino su asimetria: el truncamiento no castiga por igual a
+todas las arquitecturas. Castiga mas a aquellas cuya importancia se reparte sobre muchos atributos. Por
+eso al corregirlo GAT sube veinticuatro centesimas y TAGCN veintiocho, mientras que GraphSAGE sube solo
+diez. El liderazgo de GraphSAGE que reportaba la version anterior no era un hallazgo, era el perfil de
+sensibilidad de la metrica rota. *(pausa)* Sumado al fallo de memoria de la lamina anterior, tenemos dos
+defectos del protocolo de medida que apuntaban en direcciones opuestas y cada uno bastaba, por si solo,
+para una conclusion comparativa falsa.
+
+
+> **En la tesis:** Cap. 4, seccion 4.5; Cap. 6, seccion 6.5 (Relacion con el Estado del Arte, la leccion de Kosan).
 
 ### Slide 14: Ranking por arquitectura  ·  [JD]  ·  75 s
 Con la metrica corregida, y replicando el entrenamiento completo con tres semillas de modelo, lo que
@@ -340,7 +410,22 @@ coma cero dos en las tres dimensiones. En la practica, esto significa que el bal
 rendimiento, sin temor a degradar la interpretabilidad.
 
 
-> **En la tesis:** Cap. 5, seccion 5.5 (La Ausencia de un Puente entre Estabilidad y Plausibilidad); Cap. 4, seccion 4.5 (perfil por escenario); Cap. 6, seccion 6.3 (El Papel Secundario del Balanceo y de la Arquitectura).
+> **En la tesis:** Cap. 5, seccion 5.5 (La Ausencia de un Puente entre Estabilidad y Plausibilidad).
+
+### Pagina 26: El desbalance no gobierna la estabilidad  ·  [JD]  ·  55 s
+Cierro la primera hipotesis, y tambien se cae. *(pausa)* Esperabamos que la estabilidad se degradara a
+medida que el desbalance se agravara, y que hubiera algun punto de quiebre. El perfil es plano. De uno a
+uno hasta uno a cien, la estabilidad media va de cero coma setenta y uno a cero coma setenta y cuatro:
+una amplitud total de tres centesimas a lo largo de todo el rango. No hay deterioro monotono, no hay
+pico en el escenario uno a cincuenta, y no hay paradoja del escenario nativo. Ningun punto destaca sobre
+los demas. *(pausa)* Y en la misma linea, la estrategia de balanceo, que suele recibir mucha atencion en
+la literatura, resulta practicamente irrelevante: su tamano de efecto es menor a cero coma cero dos en
+las tres dimensiones. *(pausa)* Esto tiene una implicacion practica que me parece la mas util de toda la
+tesis para un equipo de cumplimiento: el balanceo pueden elegirlo por rendimiento predictivo, sin temer
+que al hacerlo esten degradando la interpretabilidad. Son decisiones que se pueden tomar por separado.
+
+
+> **En la tesis:** Cap. 4, seccion 4.5 (perfil por escenario, tabla tab:elliptic-stab-scen); Cap. 6, seccion 6.3 (El Papel Secundario del Balanceo y de la Arquitectura); Cap. 7, seccion 7.1 (O1 y O3).
 
 ### Slide 18: Colapso validacion a test  ·  [JD]  ·  70 s
 Un resultado de rendimiento que debemos declarar con transparencia, porque enmarca todo lo anterior.
@@ -357,6 +442,40 @@ y lo declaramos de forma abierta. No es esconder el colapso, es medir donde la p
 
 > **En la tesis:** Cap. 4, seccion 4.4 (Rendimiento Predictivo y el Colapso de Validacion a Test); Cap. 3, seccion 3.8.2.
 
+### Pagina 28: Rigor metrico, PR-AUC y no ROC-AUC  ·  [JD]  ·  55 s
+Esta lamina desarrolla el punto metodologico que acabo de mencionar, porque creo que merece detenerse.
+*(pausa)* Miren la tabla. Sobre validacion, el ROC-AUC da cero coma ochenta y ocho. Si reportaramos solo
+esa cifra, cualquiera concluiria que tenemos un clasificador casi excelente. Pero sobre exactamente los
+mismos modelos, el area de precision y exhaustividad da cero coma treinta y siete, y la precision en los
+primeros cincuenta nodos cero coma sesenta y seis. Es una tarea mucho mas dificil de lo que el ROC-AUC
+insinua. *(pausa)* Y sobre test la disociacion se vuelve extrema: el ROC-AUC se mantiene en cero coma
+sesenta y cinco, que parecerian un modelo mediocre pero funcional, mientras que el area de precision y
+exhaustividad se desploma a cero coma cero dos. *(pausa)* La razon es estructural: bajo desbalance
+extremo, el eje de tasa de falsos positivos del ROC queda dominado por la enorme clase mayoritaria y
+permanece bajo aunque el modelo no distinga la clase rara. Por eso nuestras metricas primarias son el
+area de precision y exhaustividad y la precision en los primeros nodos, que ademas son las que gobiernan
+el trabajo real de un analista, que revisa una lista acotada de alertas y no todo el universo de
+transacciones.
+
+
+> **En la tesis:** Cap. 4, seccion 4.4 (tabla tab:elliptic-rocauc); Cap. 3, seccion 3.8.2 (Metricas en Escenarios de Desbalance).
+
+### Pagina 29: Las tres hipotesis y su veredicto  ·  [JD]  ·  60 s
+Antes de pasar a las conclusiones quiero cerrar el circulo que abrio mi companero al principio. *(pausa)*
+Nos comprometimos con tres predicciones falsables antes de ver los datos. La primera, que la estabilidad
+se degradaria al agravarse el desbalance: refutada, el perfil es plano. La segunda, que TAGCN seria la
+mas estable por su alcance multi-hop: refutada, aparece en el grupo bajo en las tres semillas. Y la
+tercera, que un explicador mas estable senalaria mejor el patron: refutada, el puente es nulo. *(pausa)*
+Las tres se cayeron. Ninguna se oculto. *(pausa)* Y quiero explicar por que presentamos esto como un
+resultado y no como un fracaso. Comprometerse con predicciones concretas antes de mirar los datos es lo
+que hace que refutarlas signifique algo. Si hubieramos formulado hipotesis vagas, o las hubieramos
+ajustado despues de ver los numeros, no habriamos aprendido nada. Lo que estas tres refutaciones nos
+dicen es que la intuicion dominante en el campo, la de que existe una nocion unica de buena explicacion
+que todas las metricas capturan a la vez, es falsa. Y ese es el hallazgo central de la tesis.
+
+
+> **En la tesis:** Cap. 1, seccion 1.5.3 (Hipotesis de Trabajo); Cap. 7, seccion 7.1 (Respuestas a los Objetivos de Investigacion).
+
 ### Slide 19: Matriz de recomendacion  ·  [JD]  ·  60 s
 Todo lo anterior se condensa en esta matriz de recomendacion, que responde al cuarto objetivo. La idea
 es que no existe una combinacion unica que sea la mejor para todo, precisamente porque las tres
@@ -369,6 +488,23 @@ la herramienta.
 
 
 > **En la tesis:** Cap. 7, seccion 7.1 (Respuestas a los Objetivos de Investigacion, O4); Cap. 6, seccion 6.6 (Implicaciones para la Practica de Auditoria en Entornos Regulados).
+
+### Pagina 31: Los cuatro objetivos, respondidos  ·  [JD]  ·  70 s
+Esta lamina responde uno a uno los objetivos que planteamos, para que quede explicito en que medida cada
+uno quedo atendido. *(pausa)* El primero, el impacto del desbalance sobre la robustez explicativa. La
+respuesta es que no es el factor dominante que suponiamos: el perfil es plano y el balanceo tiene efecto
+despreciable. La palanca real resulto ser el explicador, y eso reorienta la pregunta original. *(pausa)*
+El segundo, la resiliencia comparada de las cuatro arquitecturas. La respuesta es que no hay cuatro
+posiciones, hay dos grupos, y esa particion se replica en los dos regimenes de densidad. *(pausa)* El
+tercero, el impacto de las estrategias de balanceo. Despreciable sobre las tres dimensiones, lo que
+permite elegirlas por rendimiento. *(pausa)* Y el cuarto, la matriz de recomendacion. Aqui la respuesta
+es que no existe una triada optima unica, precisamente porque las tres dimensiones son independientes, y
+por eso la recomendacion es condicional al proposito de la auditoria, que es lo que veran en la
+siguiente lamina. *(pausa)* Los cuatro objetivos quedaron respondidos, aunque dos de ellos con una
+respuesta distinta de la que esperabamos al formularlos.
+
+
+> **En la tesis:** Cap. 7, seccion 7.1 completa (Respuestas a los Objetivos de Investigacion).
 
 ### Slide 20: Contribuciones y limitaciones  ·  [JD]  ·  70 s
 Recapitulo aportes y limites, con la misma honestidad. *(pausa)* Contribuciones: mostramos que

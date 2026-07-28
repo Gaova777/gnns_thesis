@@ -191,6 +191,61 @@
 
 \seccion{3 \textperiodcentered\ Metodología}
 
+% ===== 7b. QUE ES UNA EXPLICACION =====
+\begin{frame}{Qué produce, en concreto, un explicador}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.83, every node/.style={transform shape}]
+  \tikzset{
+    nodo/.style={circle,draw=muted,fill=white,minimum size=13pt,inner sep=0pt,line width=0.6pt},
+    foco/.style={circle,draw=coral,fill=coral!22,minimum size=16pt,inner sep=0pt,line width=1.1pt},
+    rel/.style={draw=amber,line width=2.1pt},
+    irr/.style={draw=muted!45,line width=0.7pt}
+  }
+  \node[foco] (c) at (0,0) {};
+  \node[nodo] (a) at (-1.55,0.95) {};
+  \node[nodo] (b) at (-1.75,-0.55) {};
+  \node[nodo] (d) at (1.55,0.9) {};
+  \node[nodo] (e) at (1.7,-0.65) {};
+  \node[nodo] (f) at (0.15,-1.6) {};
+  \node[nodo] (g) at (-2.9,0.35) {};
+  \node[nodo] (h) at (2.85,0.1) {};
+  \draw[rel] (c) -- (a);
+  \draw[rel] (c) -- (d);
+  \draw[rel] (a) -- (g);
+  \draw[irr] (c) -- (b);
+  \draw[irr] (c) -- (e);
+  \draw[irr] (c) -- (f);
+  \draw[irr] (d) -- (h);
+  \draw[irr] (b) -- (f);
+  \node[font=\tiny,text=coral] at (0,0.42) {};
+\end{tikzpicture}
+\\[3pt]
+{\footnotesize \textcolor{coral}{$\bullet$} nodo a explicar \quad \textcolor{amber}{\rule[2pt]{9pt}{2pt}} aristas relevantes}
+\end{column}
+\begin{column}{0.52\textwidth}
+\footnotesize
+Ante una transacción marcada como ilícita, el explicador devuelve dos cosas:
+\vspace{4pt}
+\begin{enumerate}
+  \item Una \textbf{máscara de aristas}: qué conexiones del vecindario sostienen la predicción.
+  \item Un \textbf{ranking de \textit{features}}: qué atributos del nodo pesaron más, de los 166 disponibles.
+\end{enumerate}
+\vspace{6pt}
+\setbeamercolor{block body}{bg=panel}
+\begin{block}{}
+Sobre eso se definen las tres preguntas:\\[3pt]
+\textbf{Estabilidad}: ¿sale lo mismo al repetir?\\
+\textbf{Plausibilidad}: ¿coincide con el patrón real?\\
+\textbf{Fidelidad}: ¿es lo que el modelo usó?
+\end{block}
+\vspace{3pt}
+{\color{muted}En Elliptic el vecindario tiene una mediana de $\sim$2 nodos, así que ahí solo el ranking de \textit{features} discrimina.}
+\end{column}
+\end{columns}
+\end{frame}
+
 % ===== 8. DOS EJES =====
 \begin{frame}{Metodología: un diseño de dos ejes}
 \begin{columns}[T]
@@ -262,6 +317,35 @@
 \end{columns}
 \end{frame}
 
+% ===== R5. EL GRAFO SINTETICO =====
+\begin{frame}{Cómo se construyó el grafo sintético}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\footnotesize
+\textbf{Decisiones que endurecen la prueba}
+\begin{itemize}
+  \item \textbf{Simetrización} de aristas: sin ella el campo receptivo cae a $\sim$2 nodos y la plausibilidad de subgrafo no es medible.
+  \item \textbf{Aristas distractoras} ($n=3$ por nodo de patrón): sin ellas cualquier selección \textit{top-k} acertaría.
+  \item \textbf{Firma de \textit{features} atenuada} de $+4$ a $+1{,}5$: evita que la tarea se resuelva sola.
+\end{itemize}
+\vspace{3pt}
+{\color{muted}El \textit{ground-truth} se fija en la construcción, \textbf{antes} de correr ningún explicador.}
+\end{column}
+\begin{column}{0.5\textwidth}
+\footnotesize
+\textbf{Escala y replicación}
+\begin{itemize}
+  \item $\approx$9.500 nodos, $\approx$1.530 ilícitos, $\approx$31.000 aristas.
+  \item 4 tipologías canónicas: \textit{structuring}, \textit{layering}, \textit{fan-in}, \textit{fan-out}.
+  \item Grafo g0: factorial completo $\times$ 3 semillas de modelo (540 filas).
+  \item Grafos g1 y g2: corte de verificación, escenarios 1:1 y nativo (144 filas).
+\end{itemize}
+\vspace{3pt}
+{\color{muted}El contraste principal se calcula sobre la unión de los tres grafos.}
+\end{column}
+\end{columns}
+\end{frame}
+
 % ===== 12. METRICAS =====
 \begin{frame}{Métricas y protocolo estadístico}
 \begin{itemize}
@@ -294,6 +378,29 @@
 \begin{center}\small
 \textcolor{navy}{\textbf{Cada uno bastaba para una conclusión comparativa falsa.}} La estabilidad depende del protocolo de medición.\\ Además: dos \textit{bugs} reportables en el PGExplainer de PyG 2.7.
 \end{center}
+\end{frame}
+
+% ===== R1. EL BUG DE SPEARMAN =====
+\begin{frame}{El segundo artefacto: el truncamiento de la métrica}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\footnotesize
+La métrica dimensionaba el vector de rangos por \texttt{top\_k} en vez de por el número real de \textit{features}.\\[5pt]
+Con \texttt{top\_k}$=20$ sobre \textbf{166 features}, toda \textit{feature} con índice $\geq 20$ se descartaba: sobrevivían 2 o 3 de las 20 y el resto quedaba empatado en cero.\\[6pt]
+El truncamiento \textbf{no penaliza por igual}: castiga más a las arquitecturas cuya importancia se reparte sobre muchas \textit{features}.\\[4pt]
+{\color{muted}Por eso deprimía a GAT ($+0{,}24$ al corregir) y a TAGCN ($+0{,}28$) mucho más que a GraphSAGE ($+0{,}10$), y fabricaba un liderazgo falso.}
+\end{column}
+\begin{column}{0.46\textwidth}
+\setbeamercolor{block body}{bg=panel}
+\begin{block}{}
+\footnotesize
+\textbf{Los dos artefactos, juntos}\\[4pt]
+1. \textbf{Memoria}: 13 configs de GAT fallaban por OOM silencioso; su media se calculaba solo sobre las que terminaban. \textit{Favorecía a GAT.}\\[4pt]
+2. \textbf{Métrica}: el truncamiento anterior. \textit{Favorecía a GraphSAGE.}\\[5pt]
+Cada uno \textbf{por separado} bastaba para una conclusión comparativa falsa.
+\end{block}
+\end{column}
+\end{columns}
 \end{frame}
 
 % ===== 14. RANKING =====
@@ -396,18 +503,41 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{frame}
 
 % ===== 17. PUENTE NULO =====
-\begin{frame}{Resultado 3 — puente nulo y balanceo irrelevante}
+\begin{frame}{Resultado 3 — el puente que no existe}
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
 \begin{itemize}\small
-  \item Hipótesis central (estable $\Rightarrow$ plausible): \textbf{\color{coral}refutada}.
-  \item Correlación estabilidad--plausibilidad $r=-0{,}01$ (IC 95\% incluye el cero).
-  \item El balanceo es prácticamente \textbf{irrelevante} ($\eta^2 < 0{,}02$).
-  \item \textit{Un no-resultado, reportado con honestidad.}
+  \item Nuestra hipótesis central: una explicación más estable señalaría mejor el patrón real.
+  \item El dato dice que \textbf{no}. Correlación estabilidad--plausibilidad $r=-0{,}01$, con IC 95\,\% de $-0{,}038$ a $+0{,}011$.
+  \item El intervalo \textbf{incluye el cero}: no hay relación, ni positiva ni negativa.
 \end{itemize}
+\vspace{4pt}
+\small\textit{Es un no-resultado, y lo reportamos precisamente porque contradice lo que esperábamos.}
 \end{column}
 \begin{column}{0.48\textwidth}
 \includegraphics[width=\linewidth]{chapter_5/images_ch5/puente_nulo.png}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ===== 17b. DESBALANCE Y BALANCEO =====
+\begin{frame}{Resultado 4 — el desbalance no gobierna la estabilidad}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{itemize}\small
+  \item Esperábamos degradación al agravarse el desbalance. El perfil es \textbf{plano}.
+  \item De 1:1 a 1:100, la estabilidad media va de $0{,}709$ a $0{,}741$: una amplitud total de \textbf{tres centésimas}.
+  \item Sin punto de quiebre, sin pico en 1:50, sin paradoja del escenario nativo.
+  \item El \textbf{balanceo} tampoco pesa: $\eta^2 < 0{,}02$ en las tres dimensiones.
+\end{itemize}
+\vspace{5pt}
+\setbeamercolor{block body}{bg=panel}
+\begin{block}{}
+\footnotesize Implicación práctica: el balanceo puede elegirse por \textbf{rendimiento}, sin temer que degrade la interpretabilidad.
+\end{block}
+\end{column}
+\begin{column}{0.5\textwidth}
+\includegraphics[width=\linewidth]{chapter_4/images_ch4/estabilidad_escenario.png}
 \end{column}
 \end{columns}
 \end{frame}
@@ -432,7 +562,70 @@ La estabilidad se estudia sobre verdaderos positivos de \textbf{validación} (en
 \end{center}
 \end{frame}
 
+% ===== R4. COLAPSO Y METRICAS =====
+\begin{frame}{Rigor métrico: por qué PR-AUC y no ROC-AUC}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Métrica de ordenamiento} & \textbf{Validación} & \textbf{Test} \\
+\midrule
+ROC-AUC & 0,884 & 0,653 \\
+\textbf{PR-AUC} & \textbf{0,367} & \textbf{0,017} \\
+Precisión en los primeros 50 & 0,657 & 0,020 \\
+Precisión en los primeros 100 & 0,640 & 0,022 \\
+\bottomrule
+\end{tabular}
+\\[9pt]
+\footnotesize
+El ROC-AUC de 0,884 sugeriría un clasificador casi excelente. El PR-AUC de 0,367 sobre los mismos\\
+modelos revela la dificultad real: bajo desbalance extremo, el eje de falsos positivos queda\\
+dominado por la clase mayoritaria y permanece bajo aunque el modelo no distinga la clase rara.
+\end{center}
+\end{frame}
+
+% ===== 18b. LAS TRES HIPOTESIS =====
+\begin{frame}{Las tres hipótesis, y qué pasó con cada una}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.7}
+\begin{tabular}{p{0.44\textwidth}p{0.17\textwidth}p{0.30\textwidth}}
+\toprule
+\textbf{Lo que predijimos} & \textbf{Veredicto} & \textbf{La evidencia} \\
+\midrule
+\textbf{H1.} La estabilidad se degradaría al agravarse el desbalance. & \textcolor{coral}{\textbf{Refutada}} & Perfil plano: amplitud total de 0,03 entre 1:1 y 1:100. \\
+\textbf{H2.} TAGCN sería la más estable, por su alcance multi-hop. & \textcolor{coral}{\textbf{Refutada}} & TAGCN queda en el grupo bajo en las 3 semillas. \\
+\textbf{H3.} Un explicador más estable señalaría mejor el patrón. & \textcolor{coral}{\textbf{Refutada}} & Puente nulo: $r=-0{,}01$, IC incluye el cero. \\
+\bottomrule
+\end{tabular}
+\\[10pt]
+\footnotesize
+Las tres se cayeron. \textbf{Ninguna se ocultó.}\\
+Comprometerse con predicciones falsables antes de ver los datos es lo que permite que\\
+refutarlas sea un resultado, y no un fracaso.
+\end{center}
+\end{frame}
+
 \seccion{5 \textperiodcentered\ Conclusiones}
+
+% ===== 18c. OBJETIVOS Y RESPUESTAS =====
+\begin{frame}{Los cuatro objetivos, respondidos}
+\begin{center}
+\footnotesize
+\renewcommand{\arraystretch}{1.55}
+\begin{tabular}{p{0.30\textwidth}p{0.62\textwidth}}
+\toprule
+\textbf{Objetivo} & \textbf{Respuesta} \\
+\midrule
+\textbf{O1.} Impacto del desbalance sobre la robustez explicativa & No es el factor dominante. El perfil es plano y el balanceo tiene efecto despreciable. La palanca real es el \textbf{explicador}. \\
+\textbf{O2.} Resiliencia comparada de las 4 arquitecturas & No hay cuatro posiciones, hay \textbf{dos grupos}: alto (GAT, GCN) y bajo (GraphSAGE, TAGCN). La partición se replica en ambos regímenes de densidad. \\
+\textbf{O3.} Impacto de las estrategias de balanceo & Despreciable sobre las tres dimensiones ($\eta^2 < 0{,}02$). Puede elegirse por rendimiento. \\
+\textbf{O4.} Matriz de recomendación técnica & No existe una tríada óptima única. La recomendación es \textbf{condicional al propósito} de la auditoría. \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
 
 % ===== 19. MATRIZ DE RECOMENDACION =====
 \begin{frame}{Matriz de recomendación}
@@ -508,29 +701,6 @@ Estabilidad interna del método & \textcolor{coral}{\textbf{GNNShap}} \\
 
 \seccion{Respaldo \textperiodcentered\ solo si se pregunta}
 
-% ===== R1. EL BUG DE SPEARMAN =====
-\begin{frame}{Respaldo · el segundo artefacto, en detalle}
-\begin{columns}[T]
-\begin{column}{0.52\textwidth}
-\footnotesize
-La métrica dimensionaba el vector de rangos por \texttt{top\_k} en vez de por el número real de \textit{features}.\\[5pt]
-Con \texttt{top\_k}$=20$ sobre \textbf{166 features}, toda \textit{feature} con índice $\geq 20$ se descartaba: sobrevivían 2 o 3 de las 20 y el resto quedaba empatado en cero.\\[6pt]
-El truncamiento \textbf{no penaliza por igual}: castiga más a las arquitecturas cuya importancia se reparte sobre muchas \textit{features}.\\[4pt]
-{\color{muted}Por eso deprimía a GAT ($+0{,}24$ al corregir) y a TAGCN ($+0{,}28$) mucho más que a GraphSAGE ($+0{,}10$), y fabricaba un liderazgo falso.}
-\end{column}
-\begin{column}{0.46\textwidth}
-\setbeamercolor{block body}{bg=panel}
-\begin{block}{}
-\footnotesize
-\textbf{Los dos artefactos, juntos}\\[4pt]
-1. \textbf{Memoria}: 13 configs de GAT fallaban por OOM silencioso; su media se calculaba solo sobre las que terminaban. \textit{Favorecía a GAT.}\\[4pt]
-2. \textbf{Métrica}: el truncamiento anterior. \textit{Favorecía a GraphSAGE.}\\[5pt]
-Cada uno \textbf{por separado} bastaba para una conclusión comparativa falsa.
-\end{block}
-\end{column}
-\end{columns}
-\end{frame}
-
 % ===== R2. ESTABILIDAD POR SEMILLA =====
 \begin{frame}{Respaldo · estabilidad por semilla de modelo}
 \begin{center}
@@ -576,58 +746,6 @@ GCN vs TAGCN & 0,0067 & $<10^{-4}$ \\
 La única diferencia intragrupo significativa es GCN sobre GAT en el eje sintético,\\
 por un margen de \textbf{0,006} sin relevancia práctica, detectable solo por el mayor $n$ de ese eje.
 \end{center}
-\end{frame}
-
-% ===== R4. COLAPSO Y METRICAS =====
-\begin{frame}{Respaldo · por qué PR-AUC y no ROC-AUC}
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.35}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Métrica de ordenamiento} & \textbf{Validación} & \textbf{Test} \\
-\midrule
-ROC-AUC & 0,884 & 0,653 \\
-\textbf{PR-AUC} & \textbf{0,367} & \textbf{0,017} \\
-Precisión en los primeros 50 & 0,657 & 0,020 \\
-Precisión en los primeros 100 & 0,640 & 0,022 \\
-\bottomrule
-\end{tabular}
-\\[9pt]
-\footnotesize
-El ROC-AUC de 0,884 sugeriría un clasificador casi excelente. El PR-AUC de 0,367 sobre los mismos\\
-modelos revela la dificultad real: bajo desbalance extremo, el eje de falsos positivos queda\\
-dominado por la clase mayoritaria y permanece bajo aunque el modelo no distinga la clase rara.
-\end{center}
-\end{frame}
-
-% ===== R5. EL GRAFO SINTETICO =====
-\begin{frame}{Respaldo · cómo se construyó el grafo sintético}
-\begin{columns}[T]
-\begin{column}{0.5\textwidth}
-\footnotesize
-\textbf{Decisiones que endurecen la prueba}
-\begin{itemize}
-  \item \textbf{Simetrización} de aristas: sin ella el campo receptivo cae a $\sim$2 nodos y la plausibilidad de subgrafo no es medible.
-  \item \textbf{Aristas distractoras} ($n=3$ por nodo de patrón): sin ellas cualquier selección \textit{top-k} acertaría.
-  \item \textbf{Firma de \textit{features} atenuada} de $+4$ a $+1{,}5$: evita que la tarea se resuelva sola.
-\end{itemize}
-\vspace{3pt}
-{\color{muted}El \textit{ground-truth} se fija en la construcción, \textbf{antes} de correr ningún explicador.}
-\end{column}
-\begin{column}{0.5\textwidth}
-\footnotesize
-\textbf{Escala y replicación}
-\begin{itemize}
-  \item $\approx$9.500 nodos, $\approx$1.530 ilícitos, $\approx$31.000 aristas.
-  \item 4 tipologías canónicas: \textit{structuring}, \textit{layering}, \textit{fan-in}, \textit{fan-out}.
-  \item Grafo g0: factorial completo $\times$ 3 semillas de modelo (540 filas).
-  \item Grafos g1 y g2: corte de verificación, escenarios 1:1 y nativo (144 filas).
-\end{itemize}
-\vspace{3pt}
-{\color{muted}El contraste principal se calcula sobre la unión de los tres grafos.}
-\end{column}
-\end{columns}
 \end{frame}
 
 \end{document}
