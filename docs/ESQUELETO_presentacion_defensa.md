@@ -1,5 +1,11 @@
 # Esqueleto — Presentación de defensa (PowerPoint)
 
+> ⚠️ **ESQUELETO SUPERADO (boceto de 21 slides).** El mazo vigente creció a **37 páginas / 29
+> diapositivas de contenido** e incluye 7 láminas nuevas ausentes de este esqueleto. La fuente
+> maestra del guion es [`DISCURSO_defensa_dos_voces.md`](DISCURSO_defensa_dos_voces.md) (v2, reparto
+> Alejandro págs. 1-17 · Juan Diego 19-34). Usa este archivo solo como referencia histórica del
+> boceto inicial.
+
 > Guion slide por slide para la sustentación. ~21 slides · ~22-25 min · defensa a dos voces
 > (Alejandro Gómez · Juan Diego Garzón). Números = versión **corregida** (post fix R1). Cada slide
 > indica título, puntos clave y qué figura/visual va. Pendiente de tu aprobación antes de generar el `.pptx`.
@@ -10,7 +16,7 @@
 ---
 
 ### 1 · Portada
-- Título de la tesis; autores; director Ph.D. Cristian Rosero; UTP — MISC; Pereira, 2026.
+- Título de la tesis; autores; director Ph.D. Cristian Rosero Arias; UTP — MISC; Pereira, 2026.
 - Visual: logo UTP + imagen sobria de grafo/red.
 
 ### 2 · Contenido

@@ -1,5 +1,11 @@
 # Fase 1 — Resultados (dataset sintético + plausibilidad). Para la sesión de análisis.
 
+> 🔴 **Registro histórico (v1).** El ranking de estabilidad de Elliptic de las primeras corridas
+> ("GraphSAGE lideraba") quedó SUPERADO por la consolidación del 2026-07-22 (fix R1 + 3 semillas de
+> modelo): el hallazgo vigente es la **partición en dos grupos** (alto: GAT 0,782, GCN 0,758; bajo:
+> GraphSAGE 0,735, TAGCN 0,676), y los dos regímenes **concuerdan** (rank-corr +0,80). Los resultados
+> del eje sintético de este archivo siguen vigentes. Fuente de verdad: `tesis_latex/main.pdf` y `README.md`.
+
 **Fecha:** 2026-07-16
 **Qué es:** ejecución completa del `ENCARGO_claude_code_fase1_completo.md` (Pasos 1-5) sobre el generador
 sintético (AMLSim quedó bloqueado: MASON v20 sin distribución + graphviz/sudo — declarado como limitación).

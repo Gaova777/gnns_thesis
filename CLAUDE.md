@@ -132,7 +132,7 @@ Difieren en `hidden_dim` (cap por VRAM), `optuna_trials` (50 vs 8), `epochs` (60
 gnns_thesis/
 ├── tesis_latex/            ← MANUSCRITO (main.tex + 8 capítulos + tables/ + bibliografia.bib)
 │   └── main.pdf              103 páginas, versionado
-├── presentacion_latex/     ← defensa en Beamer (.tex + .pdf, 26 páginas)
+├── presentacion_latex/     ← defensa en Beamer (.tex + .pdf, 37 páginas)
 ├── docs/                   ← material de defensa (ver abajo)
 ├── configs/                ← *_v3.yaml son los vigentes; el resto es legacy
 ├── scripts/
@@ -158,14 +158,14 @@ gnns_thesis/
 
 | Archivo | Qué es |
 |---|---|
-| `docs/DISCURSO_defensa_dos_voces.md` | Guion hablado, 21 slides a dos voces (Alejandro 1-12, Juan Diego 13-21), con tiempos, mapa slide→página del PDF y respuestas ensayadas |
+| `docs/DISCURSO_defensa_dos_voces.md` | Guion hablado (v2), 29 diapositivas de contenido a dos voces (Alejandro págs. 1-17, Juan Diego 19-34), con tiempos, mapa slide→página del PDF y respuestas ensayadas |
 | `docs/GUION_defensa_por_capitulo.md` | Mapa slide→capítulo/sección + preguntas del jurado |
 | `docs/DEFENSA_R2_evidencia_sintetica.md` | Respuesta a la objeción de circularidad del eje sintético |
 | `docs/ESQUELETO_presentacion_defensa.md` | Esqueleto slide por slide con las figuras |
 
-El PDF de la presentación tiene **26 páginas** para **21 slides de contenido**: intercala 5
-separadores de sección. La numeración del guion no es la del PDF (tabla de equivalencia en el
-DISCURSO).
+El PDF de la presentación tiene **37 páginas** para **29 diapositivas de contenido**: intercala 5
+separadores de sección, 1 separador de respaldo y 2 láminas de respaldo. En el DISCURSO v2 la
+numeración del guion ya coincide con la del PDF (tabla de equivalencia en el DISCURSO).
 
 ## Bugs corregidos (no revertir sin entender)
 

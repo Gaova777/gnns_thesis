@@ -10,12 +10,12 @@ clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100), complementado con un **grafo sint�
 | | |
 |---|---|
 | **Autores** | Alejandro Gómez Huertas · Juan Diego Garzón Ovalle |
-| **Director** | Ph.D. Cristian Rosero |
+| **Director** | Ph.D. Cristian Rosero Arias |
 | **Institución** | Universidad Tecnológica de Pereira (UTP) — Facultad de Ingenierías — Maestría en Ingeniería en Sistemas y Computación (MISC) |
 | **Lugar / Año** | Pereira, Colombia · 2026 |
 | **Dataset** | Elliptic Bitcoin Dataset (~203k nodos, ~234k aristas, 166 features, 49 time-steps) + grafo sintético propio |
 | **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 103 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
-| **Defensa** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) (26 slides) |
+| **Defensa** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) (37 páginas · 29 diapositivas de contenido) |
 
 ---
 
@@ -148,7 +148,7 @@ gnns_thesis/
 ├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 103 pp, 8 caps)
 │   ├── main.tex · chapter_1..8/ · tables/ · bibliografia.bib
 │   └── main.pdf                        # PDF compilado y versionado
-├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa.tex + .pdf, 26 slides)
+├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa.tex + .pdf, 37 páginas)
 ├── docs/                              # guiones y material de defensa
 ├── CAMBIOS_CONSOLIDACION_2026-07-22.md # registro detallado de la consolidación (punto de entrada)
 ├── RUNBOOK_CONSOLIDACION.md           # plan operativo de la consolidación
@@ -451,7 +451,7 @@ El manuscrito y el material de defensa viven **en este repositorio**:
 |---|---|
 | **Manuscrito (fuente LaTeX)** | [`tesis_latex/`](tesis_latex/) — `main.tex` + 8 capítulos + `tables/` + `bibliografia.bib` |
 | **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 103 páginas |
-| **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) — 26 slides |
+| **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) — 37 páginas (29 de contenido) |
 | **Guiones de defensa** | `docs/GUION_defensa_por_capitulo.md`, `docs/ESQUELETO_presentacion_defensa.md`, `docs/DEFENSA_R2_evidencia_sintetica.md` |
 
 ### Estructura del manuscrito (8 capítulos)

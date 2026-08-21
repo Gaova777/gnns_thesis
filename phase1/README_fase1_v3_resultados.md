@@ -1,5 +1,12 @@
 # Fase 1 v3 — Firma de features atenuada (re-corrida B) + Elliptic k-hop definitivo (re-corrida A)
 
+> 🔴 **El ranking de Elliptic de este documento (una sola semilla) está SUPERADO.** La "re-corrida A"
+> reporta "GraphSAGE 0,630 > GAT 0,486 > GCN 0,468 > TAGCN 0,270 / GraphSAGE es el más estable": esa
+> conclusión fue **retractada** en la consolidación del 2026-07-22 (fix R1 + 3 semillas de modelo). El
+> hallazgo vigente es una **partición en dos grupos** (alto: GAT 0,782, GCN 0,758; bajo: GraphSAGE
+> 0,735, TAGCN 0,676). Los resultados del **eje sintético** de este archivo sí siguen vigentes (usan
+> `top_k=None`, no afectados por el fix R1). Fuente de verdad: `tesis_latex/main.pdf` y `README.md`.
+
 **Fecha:** 2026-07-16
 **Encargo:** `ENCARGO_recorrer_matrices.md`. Dos re-corridas independientes con el pipeline corregido.
 

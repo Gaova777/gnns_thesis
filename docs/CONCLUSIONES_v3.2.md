@@ -1,5 +1,13 @@
 # CONCLUSIONES v3.2 — Estabilidad de la explicabilidad en GNNs sobre Elliptic
 
+> 🔴 **NÚMEROS SUPERADOS — NO USAR EN LA DEFENSA.** Este documento (2026-07-15) refleja una corrida
+> de **una sola semilla** con la métrica de Spearman aún truncada, y concluye que "GraphSAGE es la
+> más estable" (0,630 / 0,486 / 0,468 / 0,270). Esa conclusión fue **retractada** en la consolidación
+> del 2026-07-22 (fix R1: truncamiento de Spearman) y al replicar con **3 semillas de modelo**. El
+> hallazgo vigente es una **partición en dos grupos** — alto: GAT (0,782) y GCN (0,758); bajo:
+> GraphSAGE (0,735) y TAGCN (0,676) — sin un ranking de cuatro puestos. **Fuente de verdad:**
+> `tesis_latex/main.pdf` y el `README.md` de la raíz. Se conserva solo como registro histórico.
+
 Fecha: 2026-07-15
 Estado: reemplaza los hallazgos cuantitativos de CONCLUSIONES_v3.1.md, que quedaron
 invalidados tras la corrección de los bugs de medición, la resolución del OOM de GAT y

@@ -1,5 +1,15 @@
 # Verificación de citas (búsqueda web + lectura de PDFs) — 2026-07-16
 
+> 🟢 **ACTUALIZACIÓN (2026-08-19): la alerta sobre "He et al. (2026)" quedó SUPERADA.** Cuando se
+> escribió esta nota el paper aún no estaba indexado y se marcó como inexistente. Hoy el DOI
+> **`10.1007/s10489-026-07138-9`** está registrado en Crossref: *"An explainable graph neural network
+> framework for illicit financial transaction detection"*, He, Huang, Ma, He y Li, *Applied
+> Intelligence* vol. 56 (2026); el artículo es real y trata de GNN explicable para detección de
+> transacciones ilícitas sobre Elliptic. **Matiz que sigue vigente:** citar a He et al. por lo que el
+> PDF realmente reporta (verificar en el propio artículo los valores 98,14 % / 90,05 % / 0,8913 antes
+> de atribuirlos) y nunca como resultados propios de esta tesis. El resto de la nota (Lawal, Weber,
+> Du) sigue siendo válido. Ver también el Paso E de `RUNBOOK_CONSOLIDACION.md`.
+
 Se buscaron y **se leyeron los PDFs reales** (no snippets) para verificar cada cita. Regla del estudiante:
 deben existir, con DOI real (no inventado) y de tipo article. Resultado abajo.
 

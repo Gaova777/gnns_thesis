@@ -1,5 +1,11 @@
 # Guion de defensa con referencia a capítulo y sección
 
+> ⚠️ **Numeración parcialmente desactualizada.** El mazo vigente tiene **37 páginas / 29 diapositivas
+> de contenido**; la tabla de la Parte A todavía refleja el guion anterior de 21 slides y no incluye
+> las 7 láminas nuevas. El mapa slide↔página vigente está en
+> [`DISCURSO_defensa_dos_voces.md`](DISCURSO_defensa_dos_voces.md). El mapa slide→capítulo de abajo
+> sigue siendo válido para las láminas que sí aparecen.
+
 > Para cada slide de la sustentación y para cada afirmación clave, dónde se encuentra el enunciado
 > en el manuscrito (`tesis_latex/main.pdf`). Títulos de sección tomados literalmente del manuscrito.
 > Úsalo para responder al jurado "¿en qué parte de la tesis está esto?" señalando el capítulo y la sección.
@@ -9,7 +15,7 @@
 ## Parte A · Mapa slide → capítulo y sección
 
 > **Ojo con la numeración:** el número de slide de esta tabla es el del guion (21 slides de
-> contenido), **no** el número de página del PDF de la presentación (26 páginas, con 5 separadores
+> contenido), **no** el número de página del PDF de la presentación (37 páginas, con 5 separadores
 > de sección intercalados). La equivalencia slide ↔ página está en
 > [`DISCURSO_defensa_dos_voces.md`](DISCURSO_defensa_dos_voces.md), sección *Mapa del slide del guion
 > a la pagina del PDF*.

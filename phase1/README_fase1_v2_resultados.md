@@ -1,5 +1,11 @@
 # Fase 1 v2 — Resultados (re-corrida con generador v4 + análisis por-tipología). Para el auditor.
 
+> 🔴 **La lectura de "inversión por densidad" de este documento está RETRACTADA.** Afirmar que el
+> sintético denso invierte el orden de Elliptic disperso era un artefacto de la métrica de Spearman
+> truncada (fix R1, consolidación 2026-07-22). Corregida, los dos regímenes **concuerdan**
+> (correlación de rangos +0,80, antes −0,20): en ambos, el grupo alto es GAT/GCN y el bajo
+> GraphSAGE/TAGCN. Fuente de verdad: `tesis_latex/main.pdf` y `README.md`.
+
 **Fecha:** 2026-07-16
 **Encargo:** `ENCARGO_claude_code_fase1_v2.md`. Re-ejecución con el generador v4 (LAYERING balanceado +
 features-firma) y el runner extendido (plausibilidad de features). Aborda los 3 puntos de tu auditoría.
