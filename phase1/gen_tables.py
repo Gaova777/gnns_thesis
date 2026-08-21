@@ -80,7 +80,7 @@ def build_synth_factorial(rows):
         r"\bottomrule",
         r"\end{tabular}",
         r"\caption{Resultados de la matriz factorial sintetica por arquitectura y explicador "
-        r"(media sobre 3 semillas de modelo, grafo g0). Los valores n/d corresponden a metricas que "
+        r"(media sobre 3 semillas de modelo, grafo g0). Los valores n/d corresponden a métricas que "
         r"un explicador no produce por diseno. Fidelity+ se calcula con la definicion manual uniforme "
         r"(caida de probabilidad al retirar el top-k) para los tres explicadores. PGExplainer domina "
         r"la plausibilidad de aristas, GNNExplainer la de features y la fidelidad, y GNNShap la estabilidad.}",

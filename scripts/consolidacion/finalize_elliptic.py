@@ -46,7 +46,7 @@ def fmt(x, nd=3):
 # ---------- 1) elliptic_full.tex (60 filas) ----------
 lines = [
  r"\begin{longtable}{lllccc}",
- r"\caption{Resultados completos por configuracion sobre el \textit{Elliptic Dataset} con la metrica de estabilidad corregida: estabilidad (Spearman de GNNExplainer), F1 en test y numero de verdaderos positivos de validacion empleados. Una fila por combinacion de escenario, arquitectura y balanceo.}\label{tab:elliptic-full}\\",
+ r"\caption{Resultados completos por configuración sobre el \textit{Elliptic Dataset} con la métrica de estabilidad corregida: estabilidad (Spearman de GNNExplainer), F1 en test y número de verdaderos positivos de validación empleados. Una fila por combinación de escenario, arquitectura y balanceo.}\label{tab:elliptic-full}\\",
  r"\toprule",
  r"\textbf{Escenario} & \textbf{Arquitectura} & \textbf{Balanceo} & \textbf{Spearman} & \textbf{F1 test} & \textbf{n TP} \\",
  r"\midrule", r"\endfirsthead",
@@ -101,7 +101,7 @@ for a in ARCHS:
     lines.append(f"{a} & {fmt(jm)} & {fmt(sm)} \\\\")
 lines += [
  r"\bottomrule", r"\end{tabular}",
- r"\caption{Comparacion entre el indice de Jaccard de aristas y la correlacion de Spearman de features (GNNExplainer) como metricas de estabilidad sobre el \textit{Elliptic Dataset}, con la metrica corregida. El Jaccard se satura hacia valores altos por la dispersion del grafo, mientras que la correlacion de Spearman conserva capacidad de discriminacion entre arquitecturas.}",
+ r"\caption{Comparación entre el índice de Jaccard de aristas y la correlación de Spearman de features (GNNExplainer) como métricas de estabilidad sobre el \textit{Elliptic Dataset}, con la métrica corregida. El Jaccard se satura hacia valores altos por la dispersión del grafo, mientras que la correlación de Spearman conserva capacidad de discriminacion entre arquitecturas.}",
  r"\label{tab:jaccard}", r"\end{table}",
 ]
 open(f"{TEX}/tables/elliptic_jaccard.tex","w").write("\n".join(lines)+"\n")
@@ -126,7 +126,7 @@ for a in ARCHS:
     lines.append(f"{a} & {cells} \\\\")
 lines += [
  r"\bottomrule", r"\end{tabular}",
- r"\caption{Estabilidad de las explicaciones (correlacion de Spearman de GNNExplainer) por arquitectura y escenario de desbalance sobre el subgrafo receptivo, con la metrica corregida. GCN y GAT encabezan la estabilidad de forma transversal a los escenarios.}",
+ r"\caption{Estabilidad de las explicaciones (correlación de Spearman de GNNExplainer) por arquitectura y escenario de desbalance sobre el subgrafo receptivo, con la métrica corregida. GCN y GAT encabezan la estabilidad de forma transversal a los escenarios.}",
  r"\label{tab:elliptic-stab-scen}", r"\end{table}",
 ]
 open(f"{TEX}/tables/elliptic_stab_scenario.tex","w").write("\n".join(lines)+"\n")
@@ -151,7 +151,7 @@ filt = [ (np.mean(sp_filt[a]) if sp_filt[a] else 0) for a in ARCHS]
 ax.bar(x-w/2, comp, w, label="Corrida completa (60)", color="#4C72B0")
 ax.bar(x+w/2, filt, w, label="Corrida con filtro (23)", color="#DD8452")
 ax.set_xticks(x); ax.set_xticklabels(ARCHS); ax.set_ylabel("Spearman medio")
-ax.set_ylim(0,1); ax.legend(); ax.set_title("Estabilidad por arquitectura (metrica corregida)")
+ax.set_ylim(0,1); ax.legend(); ax.set_title("Estabilidad por arquitectura (métrica corregida)")
 for i,(c,fl) in enumerate(zip(comp,filt)):
     ax.text(i-w/2,c+0.01,f"{c:.2f}".replace(".",","),ha="center",fontsize=9)
     ax.text(i+w/2,fl+0.01,f"{fl:.2f}".replace(".",","),ha="center",fontsize=9)
@@ -164,7 +164,7 @@ xs = [SCEN_LABEL[s] for s in SCEN_ORDER]
 ys = [scen_means[s] or 0 for s in SCEN_ORDER]
 ax.plot(xs, ys, "o-", color="#4C72B0", linewidth=2, markersize=8)
 ax.set_ylabel("Spearman medio"); ax.set_xlabel("Escenario de desbalance")
-ax.set_ylim(0,1); ax.grid(alpha=0.3); ax.set_title("Estabilidad por escenario (metrica corregida)")
+ax.set_ylim(0,1); ax.grid(alpha=0.3); ax.set_title("Estabilidad por escenario (métrica corregida)")
 for xi,yi in zip(xs,ys): ax.text(xi,yi+0.02,f"{yi:.2f}".replace(".",","),ha="center",fontsize=9)
 plt.tight_layout(); plt.savefig(f"{IMG4}/estabilidad_escenario.png", dpi=150); plt.close()
 print("[ok] estabilidad_escenario.png")
