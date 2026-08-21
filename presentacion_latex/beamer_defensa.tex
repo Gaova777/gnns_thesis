@@ -1,4 +1,4 @@
-% Presentacion de defensa (Beamer) — version LaTeX del deck de sustentacion.
+% Presentacion de defensa (Beamer): version LaTeX del deck de sustentacion.
 % Numeros = version corregida (post fix R1). Compilar: pdflatex beamer_defensa.tex
 \documentclass[aspectratio=169,10pt]{beamer}
 \usepackage[utf8]{inputenc}
@@ -74,11 +74,11 @@
 % ===== 2. AGENDA =====
 \begin{frame}{Contenido}
 \begin{enumerate}
-  \item[\textcolor{teal}{\textbf{1}}] \textbf{Problema y motivación} — detección de lavado y la opacidad de las GNN
+  \item[\textcolor{teal}{\textbf{1}}] \textbf{Problema y motivación}: detección de lavado y la opacidad de las GNN
   \item[\textcolor{teal}{\textbf{2}}] \textbf{Pregunta y objetivos}
-  \item[\textcolor{teal}{\textbf{3}}] \textbf{Metodología: dos ejes} — Elliptic real + grafo sintético con \textit{ground-truth}
-  \item[\textcolor{teal}{\textbf{4}}] \textbf{Resultados} — estabilidad, plausibilidad, fidelidad y sus relaciones
-  \item[\textcolor{teal}{\textbf{5}}] \textbf{Conclusiones} — aportes, límites y trabajo futuro
+  \item[\textcolor{teal}{\textbf{3}}] \textbf{Metodología: dos ejes} (Elliptic real + grafo sintético con \textit{ground-truth})
+  \item[\textcolor{teal}{\textbf{4}}] \textbf{Resultados}: estabilidad, plausibilidad, fidelidad y sus relaciones
+  \item[\textcolor{teal}{\textbf{5}}] \textbf{Conclusiones}: aportes, límites y trabajo futuro
 \end{enumerate}
 \end{frame}
 
@@ -153,18 +153,18 @@
 \begin{column}{0.5\textwidth}
 \textbf{\color{navy}4 arquitecturas GNN}
 \begin{itemize}\small
-  \item \textbf{GCN} — convolución espectral (1 salto)
-  \item \textbf{GraphSAGE} — muestreo + agregación inductiva
-  \item \textbf{GAT} — atención multi-cabeza
-  \item \textbf{TAGCN} — filtros polinómicos de orden $K$
+  \item \textbf{GCN}: convolución espectral (1 salto)
+  \item \textbf{GraphSAGE}: muestreo + agregación inductiva
+  \item \textbf{GAT}: atención multi-cabeza
+  \item \textbf{TAGCN}: filtros polinómicos de orden $K$
 \end{itemize}
 \end{column}
 \begin{column}{0.5\textwidth}
 \textbf{\color{navy}3 explicadores XAI (post-hoc)}
 \begin{itemize}\small
-  \item \textbf{GNNExplainer} — máscara por instancia
-  \item \textbf{PGExplainer} — red generativa entrenada
-  \item \textbf{GNNShap} — valores de Shapley por muestreo
+  \item \textbf{GNNExplainer}: máscara por instancia
+  \item \textbf{PGExplainer}: red generativa entrenada
+  \item \textbf{GNNShap}: valores de Shapley por muestreo
 \end{itemize}
 \end{column}
 \end{columns}
@@ -284,7 +284,7 @@ Sobre eso se definen las tres preguntas:\\[3pt]
 \end{frame}
 
 % ===== 10. ELLIPTIC =====
-\begin{frame}{Eje 1 — Elliptic Bitcoin Dataset}
+\begin{frame}{Eje 1: Elliptic Bitcoin Dataset}
 \begin{columns}[T]
 \begin{column}{0.54\textwidth}
 \begin{itemize}\small
@@ -301,11 +301,11 @@ Sobre eso se definen las tres preguntas:\\[3pt]
 \end{frame}
 
 % ===== 11. SINTETICO =====
-\begin{frame}{Eje 2 — grafo sintético con ground-truth}
+\begin{frame}{Eje 2: grafo sintético con ground-truth}
 \begin{columns}[T]
 \begin{column}{0.54\textwidth}
 \begin{itemize}\small
-  \item \textbf{¿Por qué?} medir plausibilidad exige saber cuál subgrafo es el patrón — Elliptic no lo da.
+  \item \textbf{¿Por qué?} medir plausibilidad exige saber cuál subgrafo es el patrón: Elliptic no lo da.
   \item 4 tipologías: \textit{structuring}, \textit{layering}, \textit{fan-in}, \textit{fan-out}.
   \item Aristas distractoras + firma atenuada $\Rightarrow$ la métrica discrimina.
   \item \textit{Ground-truth} ciego al explicador; 3 realizaciones.
@@ -349,10 +349,10 @@ Sobre eso se definen las tres preguntas:\\[3pt]
 % ===== 12. METRICAS =====
 \begin{frame}{Métricas y protocolo estadístico}
 \begin{itemize}
-  \item \textbf{\color{teal}Estabilidad} — correlación de Spearman entre rankings de features (primaria).
-  \item \textbf{\color{seafoam}Plausibilidad} — coincidencia con el \textit{ground-truth} de la tipología.
-  \item \textbf{\color{amber}Fidelidad} — caída de la predicción al retirar lo importante.
-  \item \textbf{\color{coral}Rendimiento} — PR-AUC como métrica primaria (el F1 en umbral es degenerado bajo desbalance).
+  \item \textbf{\color{teal}Estabilidad}: correlación de Spearman entre rankings de features (primaria).
+  \item \textbf{\color{seafoam}Plausibilidad}: coincidencia con el \textit{ground-truth} de la tipología.
+  \item \textbf{\color{amber}Fidelidad}: caída de la predicción al retirar lo importante.
+  \item \textbf{\color{coral}Rendimiento}: PR-AUC como métrica primaria (el F1 en umbral es degenerado bajo desbalance).
 \end{itemize}
 \vspace{3pt}
 \small Estadística: Kruskal-Wallis, Wilcoxon, intervalos de confianza \textit{bootstrap}.
@@ -404,7 +404,7 @@ Cada uno \textbf{por separado} bastaba para una conclusión comparativa falsa.
 \end{frame}
 
 % ===== 14. RANKING =====
-\begin{frame}{Resultado 1 — la estabilidad separa dos grupos, no cuatro puestos}
+\begin{frame}{Resultado 1: la estabilidad separa dos grupos, no cuatro puestos}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{itemize}\small
@@ -464,7 +464,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{frame}
 
 % ===== 15. CONCORDANCIA =====
-\begin{frame}{Resultado 1b — concordancia entre regímenes}
+\begin{frame}{Resultado 1b: concordancia entre regímenes}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{itemize}\small
@@ -487,7 +487,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{frame}
 
 % ===== 16. DISOCIACION =====
-\begin{frame}{Resultado 2 — disociación plausibilidad / fidelidad}
+\begin{frame}{Resultado 2: disociación plausibilidad / fidelidad}
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
 \begin{itemize}\small
@@ -503,7 +503,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{frame}
 
 % ===== 17. PUENTE NULO =====
-\begin{frame}{Resultado 3 — el puente que no existe}
+\begin{frame}{Resultado 3: el puente que no existe}
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
 \begin{itemize}\small
@@ -521,7 +521,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{frame}
 
 % ===== 17b. DESBALANCE Y BALANCEO =====
-\begin{frame}{Resultado 4 — el desbalance no gobierna la estabilidad}
+\begin{frame}{Resultado 4: el desbalance no gobierna la estabilidad}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{itemize}\small

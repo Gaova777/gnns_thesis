@@ -346,8 +346,10 @@ propia busqueda de hiperparametros. Sobre eso, la prueba global de Kruskal-Walli
 entre las cuatro arquitecturas con un valor p del orden de diez elevado a menos cinco. Pero cuando
 hacemos la misma pregunta dentro del grupo alto, o dentro del grupo bajo, la igualdad no se rechaza.
 Toda la variabilidad esta entre grupos, ninguna dentro. Y los intervalos de confianza por bootstrap
-cuentan lo mismo: se solapan dentro de cada grupo y apenas se tocan entre ellos. *(pausa)* Hay un
-segundo hallazgo aqui que queremos declarar, porque es una contribucion en si misma. Al reentrenar
+cuentan lo mismo: se solapan dentro de cada grupo y apenas se tocan entre ellos. Y por si preguntan si
+esto es un efecto de hacer muchas pruebas, la separacion entre grupos aguanta la correccion de Holm por
+comparaciones multiples, asi que la particion no es un artefacto de la multiplicidad de contrastes.
+*(pausa)* Hay un segundo hallazgo aqui que queremos declarar, porque es una contribucion en si misma. Al reentrenar
 descubrimos que el pipeline no es reproducible bit a bit: las operaciones de agregacion sobre la
 tarjeta grafica suman en un orden que no esta determinado, asi que los pesos nunca salen identicos.
 Lo que si se reproduce son las conclusiones, veinticinco configuraciones sobre el filtro de calidad
@@ -591,6 +593,13 @@ atentos a sus preguntas.
   *(Si insisten, la carta fuerte: el eje sintetico, que si tiene replicacion con tres grafos por tres
   semillas, pone a GCN y GAT arriba con cero coma noventa y seis. Son dos regimenes independientes
   apuntando al mismo sitio, y esa concordancia es lo que sostiene la conclusion, no una celda.)*
+- **"Por que el ranking por arquitectura solo usa GNNExplainer?"** Respuesta: porque en Elliptic es el
+  unico de los tres explicadores que discrimina entre arquitecturas. PGExplainer degenera y da una
+  correlacion de Spearman nula para las cuatro, y GNNShap se satura cerca de cero coma noventa y cinco,
+  indistinguible entre arquitecturas, igual que el indice de Jaccard. GNNExplainer es el unico con senal
+  medible en este eje, y ademas es el explicador comun a los dos ejes, lo que hace directamente
+  comparable la particion entre Elliptic y el sintetico. La eleccion no es arbitraria: es la unica que
+  permite el contraste.
 - **"Sobre la bibliografia, la referencia de 2026 existe?"** Respuesta: si, esta verificada en Crossref
   (DOI resuelve, revista Springer indexada); tengan el DOI a la mano.
 
