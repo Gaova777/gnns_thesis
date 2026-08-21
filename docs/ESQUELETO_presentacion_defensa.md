@@ -1,4 +1,4 @@
-# Esqueleto — Presentación de defensa (PowerPoint)
+# Esqueleto · Presentación de defensa (PowerPoint)
 
 > ⚠️ **ESQUELETO SUPERADO (boceto de 21 slides).** El mazo vigente creció a **37 páginas / 29
 > diapositivas de contenido** e incluye 7 láminas nuevas ausentes de este esqueleto. La fuente
@@ -16,7 +16,7 @@
 ---
 
 ### 1 · Portada
-- Título de la tesis; autores; director Ph.D. Cristian Rosero Arias; UTP — MISC; Pereira, 2026.
+- Título de la tesis; autores; director Ph.D. Cristian Rosero Arias; UTP · MISC; Pereira, 2026.
 - Visual: logo UTP + imagen sobria de grafo/red.
 
 ### 2 · Contenido
@@ -46,7 +46,7 @@
 
 ### 7 · Tres propiedades que NO son lo mismo
 - **Estabilidad** (reproducibilidad entre semillas) · **Plausibilidad** (¿apunta al patrón real?) · **Fidelidad** (¿refleja la decisión del modelo?).
-- Tesis central: son **independientes** — un explicador puede tener una y no las otras.
+- Tesis central: son **independientes** · un explicador puede tener una y no las otras.
 - Visual: diagrama de 3 círculos NO solapados.
 
 ### 8 · Metodología: diseño de dos ejes
@@ -59,13 +59,13 @@
 - Estabilidad = 5 réplicas estocásticas; robustez = 3 semillas de modelo × 3 grafos (eje sintético).
 - Visual: `chapter_5/images_ch5/heatmap_factorial.png`.
 
-### 10 · Eje 1 — Elliptic Bitcoin Dataset
+### 10 · Eje 1 · Elliptic Bitcoin Dataset
 - 203.769 nodos, 234.355 aristas, 166 features, 49 pasos; ilícitas 2,2% (1:9 etiquetado).
 - Split temporal causal; **campo receptivo minúsculo** (mediana ~2 nodos).
 - Visual: `chapter_4/images_ch4/dispersion_elliptic.png` + `eda_clases_timestep.png`.
 
-### 11 · Eje 2 — grafo sintético con ground-truth
-- Por qué: para medir plausibilidad/fidelidad se necesita saber **cuál** subgrafo es el patrón — Elliptic no lo da.
+### 11 · Eje 2 · grafo sintético con ground-truth
+- Por qué: para medir plausibilidad/fidelidad se necesita saber **cuál** subgrafo es el patrón · Elliptic no lo da.
 - 4 tipologías estándar (structuring, layering, fan-in, fan-out); aristas distractoras; firma atenuada; 3 realizaciones.
 - Visual: `chapter_5/images_ch5/hallazgo_estrella.png`.
 
@@ -82,22 +82,23 @@
 - + Dos bugs reportables en el PGExplainer de PyG 2.7.
 - Visual: antes/después del ranking.
 
-### 14 · Resultado 1 — estabilidad por arquitectura
+### 14 · Resultado 1 · estabilidad por arquitectura
 - Con la métrica corregida y 3 semillas de modelo: **dos grupos**, alto (GAT 0,782 · GCN 0,758) y bajo (GraphSAGE 0,735 · TAGCN 0,672). Significativo entre grupos, no dentro.
 - GAT vs GraphSAGE **no significativo** (Wilcoxon p=0,375) → ninguna domina en absoluto.
 - Visual: `chapter_4/images_ch4/ranking_khop.png`.
 
-### 15 · Resultado 1b — concordancia entre regímenes de densidad
+### 15 · Resultado 1b · concordancia entre regímenes de densidad
 - La "inversión por densidad" era un **artefacto**: corregida, Elliptic (disperso) **concuerda** con el sintético (denso).
 - Correlación de rangos entre regímenes: **−0,20 → +0,80**.
 - Visual: `chapter_5/images_ch5/contraste_regimen.png`.
 
-### 16 · Resultado 2 — disociación plausibilidad ↔ fidelidad
+### 16 · Resultado 2 · disociación plausibilidad ↔ fidelidad
 - **PGExplainer** recupera mejor el patrón (plausibilidad aristas 0,80 vs 0,50; Wilcoxon p≈2,6×10⁻³⁵)…
+- Ancla de azar (mismo protocolo): plausibilidad de aristas al azar **0,40** → PGExplainer duplica el azar, GNNExplainer apenas lo supera.
 - …pero **colapsa en fidelidad** (0,11 vs 0,56 de GNNExplainer). El más "plausible" no es el más fiel.
 - Visual: `chapter_5/images_ch5/disociacion.png` + `fidelidad_arq.png`.
 
-### 17 · Resultado 3 — puente nulo y balanceo irrelevante
+### 17 · Resultado 3 · puente nulo y balanceo irrelevante
 - Hipótesis central (estable ⇒ plausible): **refutada**, r = −0,01 (IC incluye 0). Un no-resultado, honesto.
 - Balanceo prácticamente **irrelevante** para las tres dimensiones (η² < 0,02).
 - Visual: `chapter_5/images_ch5/puente_nulo.png` + `balanceo_irrelevante.png`.

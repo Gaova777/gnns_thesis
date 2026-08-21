@@ -66,13 +66,13 @@
 
 ## Parte C · Índice rápido de la tesis (referencia)
 
-- **Cap. 1 · Introducción** — 1.1 Planteamiento · 1.2 Revisión de Literatura · 1.3 La Arista de Investigación · 1.4 Formulación · 1.5 Objetivos (+Hipótesis) · 1.6 Justificación · 1.7 Alcance · 1.8 Estructura.
-- **Cap. 2 · Marco Contextual** — 2.1 Lavado global · 2.2 Marco Regulatorio · 2.3 Sistemas por reglas · 2.4 Criptomonedas · 2.5 Tipologías · 2.6 Desafíos · 2.7 Hacia enfoques estructurales.
-- **Cap. 3 · Fundamentos de IA** — 3.1 ML→DL · 3.2 GNN fundamentos · 3.3 Arquitecturas · 3.4 TAGCN · 3.5 Propiedades del aprendizaje sobre grafos · 3.6 Explicabilidad en GNNs · 3.7 Mitigación del desbalance · 3.8 Formalización de métricas · 3.9 Preparación.
-- **Cap. 4 · Diseño Experimental y Resultados (Elliptic)** — 4.1 Preprocesamiento y AE · 4.2 Pipeline y espacio factorial · 4.3 Escenarios de desbalance · 4.4 Colapso val→test · 4.5 Dos correcciones metodológicas · 4.6 Degeneración de PGExplainer · 4.7 Síntesis.
-- **Cap. 5 · El Eje Sintético** — 5.1 Por qué el grafo sintético · 5.2 Construcción y tipologías · 5.3 Matriz factorial · 5.4 Análisis estadístico de robustez · 5.5 Ausencia de puente · 5.6 Disociación plausibilidad/fidelidad · 5.7 Síntesis.
-- **Cap. 6 · Discusión** — 6.1 Lectura conjunta · 6.2 Tres dimensiones independientes · 6.3 Papel secundario del balanceo y la arquitectura · 6.4 Contribuciones metodológicas · 6.5 Relación con el estado del arte · 6.6 Implicaciones para auditoría · 6.7 Implicaciones más amplias · 6.8 Limitaciones.
-- **Cap. 7 · Conclusiones y Perspectivas** — 7.1 Respuestas a los objetivos · 7.2 Aportes principales · 7.3 Limitaciones · 7.4 Perspectivas futuras · 7.5 Reflexión final.
-- **Cap. 8 · Anexos** — 8.1 Hiperparámetros · 8.2 Resultados completos Elliptic · 8.3 Matriz factorial sintética · 8.4 Matriz robusta · 8.5 Reproducibilidad.
+- **Cap. 1 · Introducción** · 1.1 Planteamiento · 1.2 Revisión de Literatura · 1.3 La Arista de Investigación · 1.4 Formulación · 1.5 Objetivos (+Hipótesis) · 1.6 Justificación · 1.7 Alcance · 1.8 Estructura.
+- **Cap. 2 · Marco Contextual** · 2.1 Lavado global · 2.2 Marco Regulatorio · 2.3 Sistemas por reglas · 2.4 Criptomonedas · 2.5 Tipologías · 2.6 Desafíos · 2.7 Hacia enfoques estructurales.
+- **Cap. 3 · Fundamentos de IA** · 3.1 ML→DL · 3.2 GNN fundamentos · 3.3 Arquitecturas · 3.4 TAGCN · 3.5 Propiedades del aprendizaje sobre grafos · 3.6 Explicabilidad en GNNs · 3.7 Mitigación del desbalance · 3.8 Formalización de métricas · 3.9 Preparación.
+- **Cap. 4 · Diseño Experimental y Resultados (Elliptic)** · 4.1 Preprocesamiento y AE · 4.2 Pipeline y espacio factorial · 4.3 Escenarios de desbalance · 4.4 Colapso val→test · 4.5 Dos correcciones metodológicas · 4.6 Degeneración de PGExplainer · 4.7 Síntesis.
+- **Cap. 5 · El Eje Sintético** · 5.1 Por qué el grafo sintético · 5.2 Construcción y tipologías · 5.3 Matriz factorial · 5.4 Análisis estadístico de robustez · 5.5 Ausencia de puente · 5.6 Disociación plausibilidad/fidelidad · 5.7 Síntesis.
+- **Cap. 6 · Discusión** · 6.1 Lectura conjunta · 6.2 Tres dimensiones independientes · 6.3 Papel secundario del balanceo y la arquitectura · 6.4 Contribuciones metodológicas · 6.5 Relación con el estado del arte · 6.6 Implicaciones para auditoría · 6.7 Implicaciones más amplias · 6.8 Limitaciones.
+- **Cap. 7 · Conclusiones y Perspectivas** · 7.1 Respuestas a los objetivos · 7.2 Aportes principales · 7.3 Limitaciones · 7.4 Perspectivas futuras · 7.5 Reflexión final.
+- **Cap. 8 · Anexos** · 8.1 Hiperparámetros · 8.2 Resultados completos Elliptic · 8.3 Matriz factorial sintética · 8.4 Matriz robusta · 8.5 Reproducibilidad.
 
 > Nota: los números de sección corresponden al orden del manuscrito; confirma el número impreso contra el índice del `main.pdf` recompilado (los títulos son exactos).

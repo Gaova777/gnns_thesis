@@ -14,14 +14,14 @@ clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100), complementado con un **grafo sint�
 | **Institución** | Universidad Tecnológica de Pereira (UTP) — Facultad de Ingenierías — Maestría en Ingeniería en Sistemas y Computación (MISC) |
 | **Lugar / Año** | Pereira, Colombia · 2026 |
 | **Dataset** | Elliptic Bitcoin Dataset (~203k nodos, ~234k aristas, 166 features, 49 time-steps) + grafo sintético propio |
-| **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 103 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
+| **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 111 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
 | **Defensa** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) (37 páginas · 29 diapositivas de contenido) |
 
 ---
 
 > ### ✅ Estado (2026-07-22): consolidación completada
 > La **fuente de verdad de los hallazgos es el manuscrito** ([`tesis_latex/`](tesis_latex/)), que
-> compila a 103 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
+> compila a 111 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
 > integral se corrigieron **dos artefactos de evaluación** que invertían conclusiones sobre
 > estabilidad; los números de este README ya reflejan la versión corregida. El registro detallado de
 > los cambios está en **[CAMBIOS_CONSOLIDACION_2026-07-22.md](CAMBIOS_CONSOLIDACION_2026-07-22.md)** y
@@ -145,7 +145,7 @@ de desbalance, sobre **dos ejes** (Elliptic real y grafo sintético con *ground-
 
 ```
 gnns_thesis/
-├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 103 pp, 8 caps)
+├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 111 pp, 8 caps)
 │   ├── main.tex · chapter_1..8/ · tables/ · bibliografia.bib
 │   └── main.pdf                        # PDF compilado y versionado
 ├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa.tex + .pdf, 37 páginas)
@@ -427,7 +427,7 @@ diferencia intragrupo que alcanza significación es GCN sobre GAT en el eje sint
   las cuatro arquitecturas tienen soporte comparable; la columna filtrada se reporta como control de
   robustez, y su valor es que **no invierte** el orden, no que lo cuantifique. Por eso la conclusión
   se enuncia como "GAT y GCN encabezan, TAGCN queda atrás" y nunca como un ordenamiento fino.
-- **Explicadores:** PGExplainer domina plausibilidad (0,80 vs 0,50) pero colapsa en fidelidad
+- **Explicadores:** PGExplainer domina plausibilidad (0,80 vs 0,50; azar 0,40) pero colapsa en fidelidad
   (0,11 vs 0,56 de GNNExplainer); GNNShap es el más estable internamente. Puente
   estabilidad→plausibilidad nulo (r ≈ −0,01).
 - **Rendimiento predictivo:** los modelos aprenden en validación (PR-AUC ≈ 0,37) pero colapsan en
@@ -450,7 +450,7 @@ El manuscrito y el material de defensa viven **en este repositorio**:
 | Artefacto | Ubicación |
 |---|---|
 | **Manuscrito (fuente LaTeX)** | [`tesis_latex/`](tesis_latex/) — `main.tex` + 8 capítulos + `tables/` + `bibliografia.bib` |
-| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 103 páginas |
+| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 111 páginas |
 | **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) — 37 páginas (29 de contenido) |
 | **Guiones de defensa** | `docs/GUION_defensa_por_capitulo.md`, `docs/ESQUELETO_presentacion_defensa.md`, `docs/DEFENSA_R2_evidencia_sintetica.md` |
 

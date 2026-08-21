@@ -378,7 +378,11 @@ el diseno.
 Ahora el hallazgo central sobre los explicadores, y es un resultado con dos caras. *(pausa)* Por un
 lado, PGExplainer es claramente el que mejor recupera el patron real: su plausibilidad de aristas es de
 cero coma ochenta, frente a cero coma cincuenta de GNNExplainer, y la diferencia es enorme
-estadisticamente, con un valor de significancia del orden de diez elevado a menos treinta y cinco. Es
+estadisticamente, con un valor de significancia del orden de diez elevado a menos treinta y cinco. Y
+para que estas cifras signifiquen algo, las contrastamos con el azar: un explicador que eligiera las
+aristas al azar, con el mismo protocolo, obtiene cero coma cuarenta. PGExplainer duplica ese nivel,
+mientras que GNNExplainer apenas lo supera, lo que ya anticipa la disociacion que viene: el fuerte de
+GNNExplainer no es recuperar el patron, sino la fidelidad al modelo. Es
 decir, si el objetivo es senalar el patron de lavado, PGExplainer gana sin discusion. *(pausa)* Pero
 por otro lado, ese mismo PGExplainer colapsa en fidelidad: cuando medimos cuanto depende la prediccion
 del modelo de las aristas que PGExplainer marca, el valor cae a cero coma once, frente a cero coma
@@ -548,7 +552,7 @@ atentos a sus preguntas.
 - **Ritmo:** el bloque de resultados (slides 13 a 18) es el mas cargado. No lean la slide; miren al
   jurado y usen la slide como respaldo. El discurso ya dice lo esencial; la slide tiene el detalle.
 - **Los numeros que deben salir sin dudar:** grupo alto GAT 0,78 y GCN 0,76 frente a grupo bajo GraphSAGE 0,73 y TAGCN 0,68, con diferencias significativas entre grupos y no dentro; puente r = menos
-  0,01; disociacion plausibilidad 0,80 contra fidelidad 0,11 para PGExplainer; concordancia menos 0,20
+  0,01; disociacion plausibilidad 0,80 (azar 0,40) contra fidelidad 0,11 para PGExplainer; concordancia menos 0,20
   a mas 0,80; PR-AUC 0,37 en validacion a 0,02 en test.
 - **Si se ponen nerviosos con una cifra,** digan el orden de magnitud y la direccion ("alrededor de
   cero coma ocho, muy por encima del otro"): el jurado valora que entiendan el resultado, no que
