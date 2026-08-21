@@ -5,7 +5,7 @@
 > más estable" (0,630 / 0,486 / 0,468 / 0,270). Esa conclusión fue **retractada** en la consolidación
 > del 2026-07-22 (fix R1: truncamiento de Spearman) y al replicar con **3 semillas de modelo**. El
 > hallazgo vigente es una **partición en dos grupos** — alto: GAT (0,782) y GCN (0,758); bajo:
-> GraphSAGE (0,735) y TAGCN (0,676) — sin un ranking de cuatro puestos. **Fuente de verdad:**
+> GraphSAGE (0,735) y TAGCN (0,672) — sin un ranking de cuatro puestos. **Fuente de verdad:**
 > `tesis_latex/main.pdf` y el `README.md` de la raíz. Se conserva solo como registro histórico.
 
 Fecha: 2026-07-15

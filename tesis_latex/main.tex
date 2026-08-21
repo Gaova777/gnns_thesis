@@ -210,6 +210,28 @@ Pereira, Colombia \\
 
 \pagenumbering{roman}
 
+% =================================================
+% RESUMEN / ABSTRACT
+% =================================================
+
+\chapter*{Resumen}
+\addcontentsline{toc}{chapter}{Resumen}
+
+La adopción de Graph Neural Networks (GNN) para la detección de lavado de dinero exige que sus predicciones sean explicables y que esas explicaciones resulten confiables en entornos regulados. Esta tesis estudia la estabilidad de tres métodos de explicabilidad post-hoc, GNNExplainer, PGExplainer y GNNShap, aplicados a cuatro arquitecturas, GCN, GraphSAGE, GAT y TAGCN, bajo niveles crecientes de desbalance de clases. Para superar la imposibilidad de medir la plausibilidad de las explicaciones sobre datos reales anonimizados, el trabajo adopta un diseño de dos ejes complementarios, el \textit{Elliptic Bitcoin Dataset}, que aporta validez externa, y un grafo sintético con \textit{ground-truth} por nodo y por arista, que aporta validez interna. Sobre una matriz factorial de sesenta configuraciones por eje, replicada con tres semillas de modelo y contrastada con pruebas no paramétricas e intervalos de confianza \textit{bootstrap}, se establecen tres resultados principales. Primero, la estabilidad, la plausibilidad y la fidelidad de las explicaciones son dimensiones empíricamente independientes, por lo que el mejor explicador depende del objetivo de la auditoría. Segundo, la estabilidad por arquitectura se organiza en dos grupos, uno alto formado por GAT y GCN y uno bajo por GraphSAGE y TAGCN, una partición que se reproduce de forma concordante en los dos regímenes de densidad. Tercero, el explicador más plausible no es el más fiel, una disociación que solo un régimen sintético controlado permite exhibir. El estudio corrige además dos artefactos de evaluación que invertían conclusiones sobre estabilidad, y condensa sus hallazgos en una matriz de recomendación según el objetivo operativo de la auditoría.
+
+\vspace{0.4cm}
+\noindent\textbf{Palabras clave:} redes neuronales de grafos; explicabilidad; estabilidad de las explicaciones; detección de lavado de dinero; desbalance de clases; \textit{Elliptic Bitcoin Dataset}; plausibilidad; fidelidad.
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+The adoption of Graph Neural Networks (GNNs) for money laundering detection requires their predictions to be explainable and those explanations to be trustworthy in regulated settings. This thesis studies the stability of three post-hoc explainability methods, GNNExplainer, PGExplainer, and GNNShap, applied to four architectures, GCN, GraphSAGE, GAT, and TAGCN, under increasing levels of class imbalance. To overcome the impossibility of measuring explanation plausibility on anonymized real data, the work adopts a two-axis design, the \textit{Elliptic Bitcoin Dataset}, which provides external validity, and a synthetic graph with per-node and per-edge \textit{ground-truth}, which provides internal validity. Over a factorial matrix of sixty configurations per axis, replicated with three model seeds and assessed with nonparametric tests and \textit{bootstrap} confidence intervals, three main results are established. First, the stability, plausibility, and fidelity of explanations are empirically independent dimensions, so the best explainer depends on the auditing goal. Second, architecture stability organizes into two groups, a high group formed by GAT and GCN and a low group by GraphSAGE and TAGCN, a partition that reproduces concordantly across both density regimes. Third, the most plausible explainer is not the most faithful, a dissociation that only a controlled synthetic regime can exhibit. The study further corrects two evaluation artifacts that had inverted stability conclusions, and condenses its findings into a recommendation matrix by operational auditing objective.
+
+\vspace{0.4cm}
+\noindent\textbf{Keywords:} graph neural networks; explainability; explanation stability; money laundering detection; class imbalance; \textit{Elliptic Bitcoin Dataset}; plausibility; fidelity.
+
+\clearpage
+
 \tableofcontents
 
 \newpage

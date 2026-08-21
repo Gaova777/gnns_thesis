@@ -397,9 +397,9 @@ protocolo de evaluación.
 | Arquitectura | Elliptic (media ± dt) | IC95 % bootstrap | Sintético (denso) | Grupo |
 |---|---|---|---|---|
 | GAT | **0,782** ± 0,013 | [0,758; 0,805] | 0,960 | alto |
-| GCN | **0,758** ± 0,025 | [0,724; 0,787] | 0,968 | alto |
-| GraphSAGE | 0,735 ± 0,022 | [0,710; 0,756] | 0,888 | bajo |
-| TAGCN | 0,676 ± 0,077 | [0,632; 0,717] | 0,886 | bajo |
+| GCN | **0,758** ± 0,025 | [0,724; 0,787] | 0,965 | alto |
+| GraphSAGE | 0,735 ± 0,022 | [0,710; 0,756] | 0,889 | bajo |
+| TAGCN | 0,672 ± 0,077 | [0,632; 0,717] | 0,886 | bajo |
 
 > Los valores del eje sintético provienen de la matriz robusta (`phase1/results_robust.csv`, 3 semillas),
 > que es la fuente que usa el manuscrito. Una versión anterior de esta tabla citaba la matriz factorial

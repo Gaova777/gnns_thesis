@@ -416,7 +416,7 @@ Cada uno \textbf{por separado} bastaba para una conclusión comparativa falsa.
 \vspace{2pt}
 \begin{itemize}\small
   \item[\textcolor{muted}{$\blacksquare$}] GraphSAGE \hfill $0{,}735 \pm 0{,}022$
-  \item[\textcolor{muted}{$\blacksquare$}] TAGCN \hfill $0{,}676 \pm 0{,}077$
+  \item[\textcolor{muted}{$\blacksquare$}] TAGCN \hfill $0{,}672 \pm 0{,}077$
 \end{itemize}
 \vspace{5pt}
 \small Media de \textbf{3 semillas} de modelo (180 modelos). Significativo \textbf{entre} grupos, \textbf{no dentro}: GAT vs GCN $p=0{,}17$; GraphSAGE vs TAGCN $p=0{,}10$.
@@ -445,7 +445,7 @@ Dentro del grupo bajo & Kruskal-Wallis & $0{,}08$ \\
 \end{tabular}
 \vspace{7pt}
 \begin{itemize}\footnotesize
-  \item Tamaño de efecto $\eta^2 = 0{,}125$.
+  \item Tamaño de efecto $\varepsilon^2 = 0{,}125$.
   \item IC95\,\% bootstrap: se solapan \textbf{dentro} de cada grupo, apenas se tocan \textbf{entre} grupos.
 \end{itemize}
 \end{column}
@@ -526,7 +526,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \begin{column}{0.5\textwidth}
 \begin{itemize}\small
   \item Esperábamos degradación al agravarse el desbalance. El perfil es \textbf{plano}.
-  \item De 1:1 a 1:100, la estabilidad media va de $0{,}709$ a $0{,}741$: una amplitud total de \textbf{tres centésimas}.
+  \item Entre escenarios la estabilidad media apenas se mueve, de $0{,}709$ en el nativo a $0{,}741$ en 1:100: una amplitud total de \textbf{tres centésimas}.
   \item Sin punto de quiebre, sin pico en 1:50, sin paradoja del escenario nativo.
   \item El \textbf{balanceo} tampoco pesa: $\eta^2 < 0{,}02$ en las tres dimensiones.
 \end{itemize}
@@ -594,7 +594,7 @@ dominado por la clase mayoritaria y permanece bajo aunque el modelo no distinga 
 \toprule
 \textbf{Lo que predijimos} & \textbf{Veredicto} & \textbf{La evidencia} \\
 \midrule
-\textbf{H1.} La estabilidad se degradaría al agravarse el desbalance. & \textcolor{coral}{\textbf{Refutada}} & Perfil plano: amplitud total de 0,03 entre 1:1 y 1:100. \\
+\textbf{H1.} La estabilidad se degradaría al agravarse el desbalance. & \textcolor{coral}{\textbf{Refutada}} & Perfil plano: amplitud total de 0,03 entre escenarios (mín. 0,709 nativo, máx. 0,741 en 1:100). \\
 \textbf{H2.} TAGCN sería la más estable, por su alcance multi-hop. & \textcolor{coral}{\textbf{Refutada}} & TAGCN queda en el grupo bajo en las 3 semillas. \\
 \textbf{H3.} Un explicador más estable señalaría mejor el patrón. & \textcolor{coral}{\textbf{Refutada}} & Puente nulo: $r=-0{,}01$, IC incluye el cero. \\
 \bottomrule
@@ -713,7 +713,7 @@ Estabilidad interna del método & \textcolor{coral}{\textbf{GNNShap}} \\
 GAT       & 0,766 & 0,789 & 0,790 & \textbf{0,782} & [0,758; 0,805] \\
 GCN       & 0,783 & 0,733 & 0,757 & \textbf{0,758} & [0,724; 0,787] \\
 GraphSAGE & 0,756 & 0,713 & 0,738 & 0,735 & [0,710; 0,756] \\
-TAGCN     & 0,586 & 0,693 & 0,736 & 0,676 & [0,632; 0,717] \\
+TAGCN     & 0,586 & 0,693 & 0,736 & 0,672 & [0,632; 0,717] \\
 \bottomrule
 \end{tabular}
 \\[9pt]

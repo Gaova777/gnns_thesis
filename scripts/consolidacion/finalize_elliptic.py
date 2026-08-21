@@ -170,7 +170,7 @@ plt.tight_layout(); plt.savefig(f"{IMG4}/estabilidad_escenario.png", dpi=150); p
 print("[ok] estabilidad_escenario.png")
 
 # contraste_regimen: Elliptic (filtro) vs sintetico
-SYN = {"GCN":0.966,"GAT":0.964,"GraphSAGE":0.884,"TAGCN":0.888}
+SYN = {"GCN":0.965,"GAT":0.960,"GraphSAGE":0.889,"TAGCN":0.886}
 fig, ax = plt.subplots(figsize=(8,5))
 order = ["GCN","GAT","GraphSAGE","TAGCN"]
 x = np.arange(len(order)); w=0.38

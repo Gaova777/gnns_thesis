@@ -513,8 +513,11 @@ dos artefactos de evaluacion y reportamos dos bugs de PGExplainer; construimos u
 con patron verdadero por arista; y entregamos la matriz de recomendacion. *(pausa)* Limitaciones, y las
 decimos sin rodeos porque el jurado las va a ver: la evidencia inferencial mas fuerte proviene del eje
 sintetico, que es el unico donde plausibilidad y fidelidad son medibles; el clasificador colapsa en test
-por el desplazamiento temporal; y en Elliptic trabajamos con una sola semilla de modelo. Ninguna de
-estas invalida los hallazgos, pero delimitan con honestidad hasta donde llegan.
+por el desplazamiento temporal; y aunque replicamos el entrenamiento con tres semillas de modelo en
+ambos ejes, el numero de entrenamientos por celda sigue siendo modesto, suficiente para separar los dos
+grupos de arquitecturas pero no para ordenar dentro de cada grupo, algo especialmente cierto en TAGCN
+sobre Elliptic, cuya dispersion entre semillas es la mayor de las cuatro. Ninguna de estas invalida los
+hallazgos, pero delimitan con honestidad hasta donde llegan.
 
 
 > **En la tesis:** Cap. 6, secciones 6.4 (Contribuciones) y 6.8 (Limitaciones); Cap. 7, secciones 7.2 (Aportes Principales) y 7.3 (Limitaciones).
