@@ -196,12 +196,29 @@ def curve_points_on_grid(probs: np.ndarray, labels: np.ndarray, n: int = 101):
     # PR curve — sklearn returns recall in decreasing order; sort ascending so
     # np.interp gets a monotonically increasing x-axis.
     precision, recall, _ = precision_recall_curve(labels, probs, pos_label=1)
-    order = np.argsort(recall)
-    pr_precision = np.interp(grid, recall[order], precision[order])
-    # ROC curve — fpr is already non-decreasing.
+    pr_precision = np.interp(grid, *_dedupe_x(recall, precision))
+    # ROC curve — fpr is already non-decreasing, but it also carries ties.
     fpr, tpr, _ = roc_curve(labels, probs, pos_label=1)
-    roc_tpr = np.interp(grid, fpr, tpr)
+    roc_tpr = np.interp(grid, *_dedupe_x(fpr, tpr))
     return grid, pr_precision, roc_tpr
+
+
+def _dedupe_x(x: np.ndarray, y: np.ndarray):
+    """Sort by x and collapse repeated x values keeping the highest y.
+
+    `np.interp` needs a strictly increasing x-axis: with duplicates it silently
+    returns the y of the LAST occurrence, which on a PR curve is the wrong one.
+    sklearn emits two points at recall = 0, the sentinel (0, precision=1) and a
+    degenerate (0, precision=0); without this collapse the resampled curve
+    starts at precision 0 instead of 1 and the left edge of the plot, which is
+    exactly where the eye lands, comes out upside down. Keeping the maximum y
+    per x is also the usual convention for both curves, since it is the
+    attainable precision (or TPR) at that operating point.
+    """
+    order = np.argsort(x, kind="stable")
+    xs, ys = np.asarray(x, float)[order], np.asarray(y, float)[order]
+    starts = np.flatnonzero(np.r_[True, xs[1:] != xs[:-1]])
+    return xs[starts], np.maximum.reduceat(ys, starts)
 
 
 @torch.no_grad()

@@ -181,6 +181,7 @@ gnns_thesis/
 | `docs/GUION_defensa_por_capitulo.md` | Mapa slide→capítulo/sección + preguntas del jurado |
 | `docs/DEFENSA_R2_evidencia_sintetica.md` | Respuesta a la objeción de circularidad del eje sintético |
 | `docs/ESQUELETO_presentacion_defensa.md` | Esqueleto slide por slide con las figuras |
+| `docs/PENDIENTE_curvas_pr_roc.md` | Traspaso de las curvas PR/ROC: requieren los checkpoints, que no estan en git |
 
 **El deck vigente es `beamer_defensa_v3.tex`** (tema Metropolis oscuro, se compila con **LuaLaTeX** y
 necesita el paquete `beamertheme-metropolis`). Tiene **41 páginas** para **34 láminas de contenido**:
@@ -241,4 +242,13 @@ Regenerar las figuras del deck y el analisis por escenario (sin GPU, desde los C
 uv run python scripts/make_figs_deck.py                       # ranking + disociacion, con IC 95%
 uv run python scripts/make_fig_colapso.py                     # colapso validacion -> test
 uv run python scripts/consolidacion/escenario_3semillas.py    # tabla + figura por escenario (3 semillas)
+```
+
+Las curvas PR/ROC **si** necesitan los checkpoints (`results_models_v3/`, que no estan en git), asi
+que solo corren en la maquina con GPU. Ver `docs/PENDIENTE_curvas_pr_roc.md`:
+
+```bash
+uv run python scripts/consolidacion/check_curvas.py      # verifica el codigo, sin GPU ni checkpoints
+uv run python scripts/consolidacion/reeval_rocauc.py --dump-curves
+uv run python scripts/make_fig_curves.py
 ```
