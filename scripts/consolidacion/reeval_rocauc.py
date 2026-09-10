@@ -19,9 +19,15 @@ validating the inference is correct.
 Usage:
     ~/.local/bin/uv run python reeval_rocauc.py --limit 1 --device cpu
     ~/.local/bin/uv run python reeval_rocauc.py                # all 60 on GPU (auto)
+    # Also dump PR/ROC curve points (for plotting the real curves):
+    ~/.local/bin/uv run python reeval_rocauc.py --dump-curves
 
 Output:
-    results_v3/reeval_metrics.csv
+    results_v3/reeval_metrics.csv                 (always)
+    results_v3/reeval_curves.csv                  (only with --dump-curves)
+
+The repo root is auto-detected (two levels up from this file); override it with
+the GNN_REPO_ROOT environment variable if needed.
 """
 
 import argparse
@@ -31,8 +37,10 @@ import sys
 from pathlib import Path
 
 # Project root importable (so `src.*` resolves), mirroring explain_matrix.py.
-# This file lives in a scratchpad, so we locate the repo explicitly.
-REPO_ROOT = Path("/home/juan/Escritorio/gnn_thesis/gnns_thesis")
+# The script now lives in scripts/consolidacion/, so the repo root is two levels
+# up. Override with the GNN_REPO_ROOT env var if you run it from elsewhere.
+import os
+REPO_ROOT = Path(os.environ.get("GNN_REPO_ROOT", Path(__file__).resolve().parents[2]))
 sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
@@ -43,6 +51,7 @@ from sklearn.metrics import (
     roc_auc_score,
     average_precision_score,
     precision_recall_curve,
+    roc_curve,
     auc,
 )
 
@@ -70,6 +79,22 @@ CSV_FIELDS = [
     "prec_at_npos",
 ]
 
+# Columns for the OPTIONAL curve-points CSV (long format). One block of
+# `grid_x` values per (run_id, split): for the PR curve grid_x is recall and
+# the y is pr_precision; for the ROC curve grid_x is the false-positive rate and
+# the y is roc_tpr. Both curves share the same 0..1 grid so they average cleanly.
+CURVE_FIELDS = [
+    "run_id",
+    "scenario",
+    "architecture",
+    "balancing",
+    "quality_passed",
+    "split",
+    "grid_x",
+    "pr_precision",
+    "roc_tpr",
+]
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="Re-evaluate checkpoints (inference only)")
@@ -81,6 +106,14 @@ def parse_args():
                    help="'auto' | 'cpu' | 'cuda'. Force 'cpu' to avoid a busy GPU.")
     p.add_argument("--limit", type=int, default=None,
                    help="Process only the first N checkpoints (validation runs).")
+    p.add_argument("--dump-curves", action="store_true",
+                   help="Also write PR/ROC curve points (interpolated on a 0..1 "
+                        "grid) for every processed checkpoint and split.")
+    p.add_argument("--curves-out", type=str,
+                   default=str(REPO_ROOT / "results_v3" / "reeval_curves.csv"),
+                   help="Where to write the curve points when --dump-curves is set.")
+    p.add_argument("--curve-points", type=int, default=101,
+                   help="Number of grid points (0..1) per curve. Default 101.")
     return p.parse_args()
 
 
@@ -146,6 +179,31 @@ def compute_split_metrics(probs: np.ndarray, labels: np.ndarray) -> dict:
     }
 
 
+def curve_points_on_grid(probs: np.ndarray, labels: np.ndarray, n: int = 101):
+    """PR and ROC curves resampled onto a shared 0..1 grid of `n` points.
+
+    Returns (grid, pr_precision, roc_tpr):
+      - PR curve: precision interpolated at each recall = grid value.
+      - ROC curve: true-positive rate interpolated at each fpr = grid value.
+    Resampling onto a fixed grid keeps the file small AND lets several
+    configurations be averaged point-by-point later. Degenerate splits (a
+    single class or no positives) yield NaN arrays.
+    """
+    grid = np.linspace(0.0, 1.0, n)
+    if len(np.unique(labels)) < 2 or int(labels.sum()) == 0:
+        nan = np.full(n, np.nan)
+        return grid, nan, nan
+    # PR curve — sklearn returns recall in decreasing order; sort ascending so
+    # np.interp gets a monotonically increasing x-axis.
+    precision, recall, _ = precision_recall_curve(labels, probs, pos_label=1)
+    order = np.argsort(recall)
+    pr_precision = np.interp(grid, recall[order], precision[order])
+    # ROC curve — fpr is already non-decreasing.
+    fpr, tpr, _ = roc_curve(labels, probs, pos_label=1)
+    roc_tpr = np.interp(grid, fpr, tpr)
+    return grid, pr_precision, roc_tpr
+
+
 @torch.no_grad()
 def scores_for_split(model, data, mask_name: str, device: str):
     """Replicate trainer.evaluate() scoring for one split.
@@ -198,6 +256,7 @@ def main():
     preprocess(data_raw)
 
     rows = []
+    curve_rows = []
     for i, meta_file in enumerate(meta_files, 1):
         with open(meta_file) as f:
             meta = json.load(f)
@@ -251,6 +310,23 @@ def main():
             }
             rows.append(row)
 
+            if args.dump_curves:
+                grid, pr_prec, roc_tpr = curve_points_on_grid(
+                    probs, labels, n=args.curve_points
+                )
+                for gx, pp, rt in zip(grid, pr_prec, roc_tpr):
+                    curve_rows.append({
+                        "run_id": run_id,
+                        "scenario": meta["scenario"],
+                        "architecture": arch,
+                        "balancing": meta["balancing"],
+                        "quality_passed": meta.get("quality_passed", False),
+                        "split": split,
+                        "grid_x": f"{gx:.4f}",
+                        "pr_precision": "" if np.isnan(pp) else f"{pp:.6f}",
+                        "roc_tpr": "" if np.isnan(rt) else f"{rt:.6f}",
+                    })
+
             def _fmt(x):
                 return "None" if x is None else f"{x:.6f}"
 
@@ -282,6 +358,17 @@ def main():
         for r in rows:
             writer.writerow(r)
     print(f"\nWrote {len(rows)} rows ({len(rows)//2} checkpoints × 2 splits) -> {out_path}")
+
+    # Write curve points CSV (optional).
+    if args.dump_curves:
+        curves_path = Path(args.curves_out)
+        curves_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(curves_path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=CURVE_FIELDS)
+            writer.writeheader()
+            for r in curve_rows:
+                writer.writerow(r)
+        print(f"Wrote {len(curve_rows)} curve points -> {curves_path}")
 
 
 if __name__ == "__main__":
