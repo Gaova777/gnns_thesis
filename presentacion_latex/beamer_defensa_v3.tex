@@ -412,7 +412,7 @@ Cada uno \textbf{por separado} bastaba para una conclusión falsa.
   \item[\textcolor{muted}{$\blacksquare$}] TAGCN \hfill $0{,}672 \pm 0{,}077$
 \end{itemize}
 \vspace{0.5em}
-\small Media de \textbf{3 semillas} (180 modelos). Significativo \textbf{entre} grupos, \textbf{no dentro}: GAT vs GCN $p=0{,}17$; GraphSAGE vs TAGCN $p=0{,}10$.
+\small Media de \textbf{3 semillas} (180 modelos); el $\pm$ es la \textbf{desviación típica entre semillas}, no el intervalo de confianza de la figura. Significativo \textbf{entre} grupos, \textbf{no dentro}: Wilcoxon pareado GAT vs GCN $p=0{,}17$; GraphSAGE vs TAGCN $p=0{,}10$.
 \end{column}
 \begin{column}{0.5\textwidth}\centering
 \figcard{ranking_khop_eb.png}
@@ -439,9 +439,10 @@ Dentro grupo bajo & Kruskal-Wallis & $0{,}08$ \\
 \end{tabular}
 \vspace{0.5em}
 \begin{itemize}\footnotesize
-  \item Tamaño de efecto $\varepsilon^2 = 0{,}125$.
+  \item Tamaño de efecto $\eta^2 = 0{,}13$ (grande), el mismo estadístico que reporta la tesis en el eje sintético.
   \item IC95\,\% bootstrap: se solapan \textbf{dentro}, apenas se tocan \textbf{entre} grupos.
   \item Sobrevive la corrección de \textbf{Holm} por comparaciones múltiples.
+  \item Los contrastes \emph{dentro} de grupo son no pareados; los $p$ de la lámina anterior ($0{,}17$ y $0{,}10$) son el Wilcoxon \textbf{pareado} sobre celdas comunes. Ambas vías no rechazan.
 \end{itemize}
 \end{column}
 \begin{column}{0.44\textwidth}
@@ -487,11 +488,11 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
   \item \emph{El explicador más ``plausible'' no es el más fiel.}
 \end{itemize}
 \vspace{0.3em}
-{\scriptsize\color{muted} Valores exactos e IC en la Tabla de respaldo (anexo).}
+{\scriptsize\color{muted} La figura compara los dos explicadores que producen máscara de aristas. GNNShap no la produce por diseño: su plausibilidad es de \emph{features}, con otra escala y otra línea base, y va en la lámina de respaldo.}
 \end{column}
 \begin{column}{0.48\textwidth}\centering
 \figcard{disociacion_eb.png}
-\figcap{Plausibilidad de aristas vs Fidelity+ por explicador (eje sintético; IC 95\%; azar de plausibilidad $=0{,}40$). \emph{Fuente: elaboración propia.}}
+\figcap{Plausibilidad de aristas frente a Fidelity+ (eje sintético; IC 95\%; azar de plausibilidad de aristas $=0{,}40$). \emph{Fuente: elaboración propia.}}
 \end{column}
 \end{columns}
 \end{frame}
@@ -518,19 +519,20 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{itemize}\small
-  \item Esperábamos degradación al agravarse el desbalance. El perfil es \textbf{plano}.
-  \item De 1:1 a 1:100, la estabilidad media va de $0{,}709$ (nativo) a $0{,}741$: amplitud de \textbf{tres centésimas}.
-  \item Sin punto de quiebre, sin pico en 1:50, sin paradoja del nativo.
-  \item El \textbf{balanceo} tampoco pesa: $\eta^2 < 0{,}02$ en las tres dimensiones.
+  \item Esperábamos degradación al agravarse el desbalance. \textbf{No la hay.}
+  \item Rango estrecho: de $0{,}696$ (1:1) a $0{,}765$ (1:50), amplitud de \textbf{siete centésimas}, menor que las once que separan a las arquitecturas.
+  \item \textbf{Kruskal-Wallis $p = 0{,}18$}: no se rechaza la igualdad entre los cinco escenarios. Tamaño de efecto $\eta^2 = 0{,}05$, pequeño frente al $0{,}13$ de la arquitectura.
+  \item El valor \textbf{más bajo} es 1:1, el más equilibrado: la variación no tiene dirección.
+  \item El \textbf{balanceo} tampoco pesa: $\eta^2 \le 0{,}01$ en las tres dimensiones.
 \end{itemize}
-\vspace{0.5em}
+\vspace{0.4em}
 \begin{block}{}
 \footnotesize Implicación práctica: el balanceo puede elegirse por \textbf{rendimiento}, sin temer que degrade la interpretabilidad.
 \end{block}
 \end{column}
 \begin{column}{0.5\textwidth}\centering
 \figcard{chapter_4/images_ch4/estabilidad_escenario.png}
-\figcap{Estabilidad media por escenario de desbalance (1:1 a 1:100). \emph{Fuente: elaboración propia.}}
+\figcap{Estabilidad media por escenario de desbalance sobre Elliptic, promediada sobre las 3 semillas de modelo. \emph{Fuente: elaboración propia.}}
 \end{column}
 \end{columns}
 \end{frame}
@@ -582,7 +584,7 @@ Precisión en los primeros 100 & 0,640 & 0,022 \\
 \toprule
 \textbf{Lo que predijimos} & \textbf{Veredicto} & \textbf{La evidencia} \\
 \midrule
-\textbf{H1.} La estabilidad se degradaría con el desbalance. & \textcolor{coral}{\textbf{Refutada}} & Perfil plano: amplitud 0,03 (0,709 nativo a 0,741). \\
+\textbf{H1.} La estabilidad se degradaría con el desbalance. & \textcolor{coral}{\textbf{Refutada}} & Variación sin dirección: $p = 0{,}18$, mínimo en 1:1 (el más equilibrado). \\
 \textbf{H2.} TAGCN sería la más estable (alcance multi-hop). & \textcolor{coral}{\textbf{Refutada}} & TAGCN en el grupo bajo en las 3 semillas. \\
 \textbf{H3.} Un explicador más estable señalaría mejor el patrón. & \textcolor{coral}{\textbf{Refutada}} & Puente nulo: $r=-0{,}01$, IC incluye el cero. \\
 \bottomrule
@@ -599,7 +601,7 @@ Precisión en los primeros 100 & 0,640 & 0,022 \\
 \begin{enumerate}\small
   \item \textbf{\color{amber}Tres dimensiones independientes} (estabilidad, plausibilidad, fidelidad): no existe una única ``buena explicación''; el mejor explicador depende del objetivo de la auditoría.
   \item \textbf{\color{amber}La estabilidad por arquitectura son dos grupos} (alto: GAT/GCN; bajo: GraphSAGE/TAGCN), y la partición \textbf{concuerda} entre datos reales y sintéticos.
-  \item \textbf{\color{amber}El explicador es la palanca dominante}; el desbalance y el balanceo son secundarios ($\eta^2 < 0{,}02$).
+  \item \textbf{\color{amber}El explicador es la palanca dominante} ($\eta^2$ de $0{,}36$ a $0{,}64$); el balanceo es despreciable ($\eta^2 \le 0{,}01$) y el escenario de desbalance, pequeño y no significativo ($\eta^2 \le 0{,}05$).
   \item \textbf{\color{amber}El más plausible no es el más fiel} (PGExplainer vs GNNExplainer): elegir según se quiera \emph{reconocer el patrón} o \emph{auditar el modelo}.
   \item \textbf{\color{amber}Aporte metodológico}: dos artefactos de medición corregidos + distinguir reproducibilidad de \emph{pesos} vs de \emph{conclusiones}.
   \item \textbf{\color{amber}Las tres hipótesis se refutaron con honestidad}: no debilitó la tesis, la fortaleció.
@@ -615,9 +617,9 @@ Precisión en los primeros 100 & 0,640 & 0,022 \\
 \toprule
 \textbf{Objetivo} & \textbf{Respuesta} \\
 \midrule
-\textbf{O1.} Desbalance vs robustez explicativa & No es el factor dominante. Perfil plano, balanceo despreciable. La palanca real es el \textbf{explicador}. \\
+\textbf{O1.} Desbalance vs robustez explicativa & No es el factor dominante. Variación sin dirección entre escenarios ($p = 0{,}18$) y balanceo despreciable. La palanca real es el \textbf{explicador}. \\
 \textbf{O2.} Resiliencia de las 4 arquitecturas & No hay cuatro posiciones, hay \textbf{dos grupos}. Se replica en ambos regímenes de densidad. \\
-\textbf{O3.} Estrategias de balanceo & Despreciable en las tres dimensiones ($\eta^2 < 0{,}02$). Elegible por rendimiento. \\
+\textbf{O3.} Estrategias de balanceo & Despreciable en las tres dimensiones ($\eta^2 \le 0{,}01$). Elegible por rendimiento. \\
 \textbf{O4.} Matriz de recomendación & No existe tríada óptima única. Recomendación \textbf{condicional al propósito}. \\
 \bottomrule
 \end{tabular}
@@ -707,22 +709,22 @@ Trabajo futuro: Elliptic2, AMLSim, GNNs temporales, GraphSMOTE.}
 \begin{frame}{Respaldo \textperiodcentered\ disociación: valores exactos}
 \begin{center}
 \small
-\tabcap{Plausibilidad de aristas y Fidelity+ por explicador (eje sintético, g0, 3 semillas).}
+\tabcap{Plausibilidad y Fidelity+ por explicador (eje sintético, g0, 3 semillas). Cada explicador se compara contra la línea base de azar de su propia métrica.}
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{lcc}
+\begin{tabular}{lccc}
 \toprule
-\textbf{Explicador} & \textbf{Plausibilidad (aristas)} & \textbf{Fidelity+} \\
+\textbf{Explicador} & \textbf{Plaus. aristas} & \textbf{Plaus. features} & \textbf{Fidelity+} \\
 \midrule
-GNNExplainer & 0,50 & \textbf{0,56} \\
-PGExplainer & \textbf{0,80} & 0,11 \\
-GNNShap & 0,15 & 0,46 \\
+GNNExplainer & 0,50 & \textbf{0,45} & \textbf{0,56} \\
+PGExplainer & \textbf{0,80} & n/d & 0,11 \\
+GNNShap & n/d & 0,15 & 0,46 \\
 \midrule
-Azar (baseline) & 0,40 & --- \\
+\emph{Azar (línea base)} & \emph{0,40} & \emph{0,08} & --- \\
 \bottomrule
 \end{tabular}
 \end{center}
-\vspace{0.5em}
-{\footnotesize PGExplainer supera a GNNExplainer en plausibilidad: Wilcoxon pareado $p\approx 2{,}6\times10^{-35}$ ($n=225$ parejas). \textbf{GNNShap} es el más estable internamente entre ejecuciones, aunque no lidere plausibilidad ni fidelidad.}
+\vspace{0.4em}
+{\footnotesize Las celdas n/d corresponden a métricas que el explicador no produce por diseño: PGExplainer no ordena \emph{features} y GNNShap no genera máscara de aristas. Contra su propia línea base, PGExplainer duplica el azar en aristas y GNNExplainer lo sextuplica en \emph{features}. PGExplainer supera a GNNExplainer en plausibilidad de aristas: Wilcoxon pareado $p\approx 2{,}6\times10^{-35}$ ($n=225$ parejas). \textbf{GNNShap} es el más estable internamente entre ejecuciones ($0{,}98$), aunque no lidere plausibilidad ni fidelidad.}
 \end{frame}
 
 \begin{frame}{Respaldo \textperiodcentered\ estabilidad por semilla de modelo}

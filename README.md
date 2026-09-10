@@ -15,13 +15,13 @@ clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100), complementado con un **grafo sint�
 | **Lugar / Año** | Pereira, Colombia · 2026 |
 | **Dataset** | Elliptic Bitcoin Dataset (~203k nodos, ~234k aristas, 166 features, 49 time-steps) + grafo sintético propio |
 | **Manuscrito** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 111 pp, 8 capítulos (fuente LaTeX en `tesis_latex/`) |
-| **Defensa** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) (37 páginas · 29 diapositivas de contenido) |
+| **Defensa** | [`presentacion_latex/beamer_defensa_v3.pdf`](presentacion_latex/beamer_defensa_v3.pdf) (41 páginas · 34 láminas de contenido) |
 
 ---
 
 > ### ✅ Estado (2026-07-22): consolidación completada
 > La **fuente de verdad de los hallazgos es el manuscrito** ([`tesis_latex/`](tesis_latex/)), que
-> compila a 111 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
+> compila a 114 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
 > integral se corrigieron **dos artefactos de evaluación** que invertían conclusiones sobre
 > estabilidad; los números de este README ya reflejan la versión corregida. El registro detallado de
 > los cambios está en **[CAMBIOS_CONSOLIDACION_2026-07-22.md](CAMBIOS_CONSOLIDACION_2026-07-22.md)** y
@@ -148,7 +148,7 @@ gnns_thesis/
 ├── tesis_latex/                       # ← MANUSCRITO (fuente LaTeX + main.pdf, 111 pp, 8 caps)
 │   ├── main.tex · chapter_1..8/ · tables/ · bibliografia.bib
 │   └── main.pdf                        # PDF compilado y versionado
-├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa.tex + .pdf, 37 páginas)
+├── presentacion_latex/                # ← DEFENSA en Beamer (beamer_defensa_v3.tex + .pdf, 41 páginas)
 ├── docs/                              # guiones y material de defensa
 ├── CAMBIOS_CONSOLIDACION_2026-07-22.md # registro detallado de la consolidación (punto de entrada)
 ├── RUNBOOK_CONSOLIDACION.md           # plan operativo de la consolidación
@@ -450,8 +450,8 @@ El manuscrito y el material de defensa viven **en este repositorio**:
 | Artefacto | Ubicación |
 |---|---|
 | **Manuscrito (fuente LaTeX)** | [`tesis_latex/`](tesis_latex/) — `main.tex` + 8 capítulos + `tables/` + `bibliografia.bib` |
-| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 111 páginas |
-| **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa.pdf`](presentacion_latex/beamer_defensa.pdf) — 37 páginas (29 de contenido) |
+| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 114 páginas |
+| **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa_v3.pdf`](presentacion_latex/beamer_defensa_v3.pdf) — 41 páginas (34 de contenido) |
 | **Guiones de defensa** | `docs/GUION_defensa_por_capitulo.md`, `docs/ESQUELETO_presentacion_defensa.md`, `docs/DEFENSA_R2_evidencia_sintetica.md` |
 
 ### Estructura del manuscrito (8 capítulos)

@@ -23,7 +23,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-REPO = os.environ.get("GNN_REPO_ROOT", r"E:\pryectos\thesisgnn\gnns_thesis")
+from pathlib import Path
+REPO = os.environ.get("GNN_REPO_ROOT", str(Path(__file__).resolve().parents[1]))
 CURVES = os.path.join(REPO, "results_v3", "reeval_curves.csv")
 METRICS = os.path.join(REPO, "results_v3", "reeval_metrics.csv")
 OUT = os.path.join(REPO, "presentacion_latex", "fig", "curvas_pr_roc.png")

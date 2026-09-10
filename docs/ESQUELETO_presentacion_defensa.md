@@ -100,7 +100,7 @@
 
 ### 17 · Resultado 3 · puente nulo y balanceo irrelevante
 - Hipótesis central (estable ⇒ plausible): **refutada**, r = −0,01 (IC incluye 0). Un no-resultado, honesto.
-- Balanceo prácticamente **irrelevante** para las tres dimensiones (η² < 0,02).
+- Balanceo prácticamente **irrelevante** para las tres dimensiones (η² ≤ 0,01). El escenario de desbalance, también secundario: Kruskal-Wallis p = 0,18 en Elliptic, η² ≤ 0,05.
 - Visual: `chapter_5/images_ch5/puente_nulo.png` + `balanceo_irrelevante.png`.
 
 ### 18 · Rendimiento predictivo y colapso validación→test

@@ -9,7 +9,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-OUT = r"E:\pryectos\thesisgnn\gnns_thesis\presentacion_latex\fig"
+from pathlib import Path
+# La raiz del repo se autodetecta; se puede forzar con GNN_REPO_ROOT.
+REPO = Path(os.environ.get("GNN_REPO_ROOT", Path(__file__).resolve().parents[1]))
+OUT = str(REPO / "presentacion_latex" / "fig")
 os.makedirs(OUT, exist_ok=True)
 plt.rcParams.update({"font.size": 10, "axes.edgecolor": "0.3"})
 

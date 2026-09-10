@@ -74,6 +74,11 @@ incómodos, no confirmatorios."*
 - Ancla de azar (baseline aleatorio con el mismo protocolo): plausibilidad de aristas al azar = 0,40.
   PGExplainer (0,80) duplica el azar; GNNExplainer (0,50) apenas lo supera. Refuerza la disociación:
   el fuerte de GNNExplainer es la fidelidad, no recuperar el patrón.
+- Cada métrica tiene su propia línea base y no deben mezclarse. La plausibilidad de **features** tiene
+  un azar de 0,075, no de 0,40: GNNExplainer (0,45) lo sextuplica y GNNShap (0,15) lo duplica. Por eso
+  la lámina de disociación compara solo a los dos explicadores que producen máscara de aristas, y los
+  valores de GNNShap van en la de respaldo con la métrica etiquetada. Comparar el 0,15 de GNNShap
+  contra el 0,40 de aristas lo haría parecer peor que el azar, y es lo contrario.
 - Ambos van CONTRA la narrativa original del anteproyecto (que esperaba a TAGCN dominando y un puente
   positivo).
 

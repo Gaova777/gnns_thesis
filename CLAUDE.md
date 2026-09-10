@@ -13,7 +13,7 @@ estabilidad) y un **grafo sintético propio con ground-truth por arista** (`phas
 donde sí se pueden medir plausibilidad y fidelidad).
 
 > **La fuente de verdad de los hallazgos es el manuscrito**, no este archivo ni los CSV sueltos:
-> `tesis_latex/main.pdf` (111 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
+> `tesis_latex/main.pdf` (114 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
 
 ## Estado actual (2026-07-23)
 
@@ -34,6 +34,25 @@ encuentras esas afirmaciones en algún documento del repo, está desactualizado.
   Kruskal-Wallis global p = 2,8×10⁻⁵; dentro de cada grupo no se rechaza la igualdad.
 - La misma partición aparece en el eje sintético, medido de forma independiente. La correlación de
   rangos entre regímenes sigue siendo **+0,80** (el orden de las 4 arquitecturas no cambió).
+- **Qué tabla usa una semilla y cuál usa tres.** El Capítulo 4 es deliberadamente progresivo: la
+  corrida completa (`tab:elliptic-full`), el Jaccard (`tab:jaccard`) y las dos primeras columnas de
+  `tab:ranking` son de la **semilla 42** (`results_v3/xai-gnn-stability-B-v3.csv`), y el capítulo
+  explica por qué esa evidencia era insuficiente antes de replicar. Todo lo que se afirma como
+  conclusión sale de las **3 semillas** (`results_seedsweep/`): la partición por arquitectura, los IC
+  y el **análisis por escenario**. Este último estuvo apoyado en una sola semilla hasta 2026-09-10 y
+  se recalculó con `scripts/consolidacion/escenario_3semillas.py`.
+- **El escenario de desbalance no es significativo.** Kruskal-Wallis sobre el factor escenario:
+  H = 6,29, **p = 0,178**, η² = 0,051 (Elliptic, 3 semillas). Medias: 1:1 0,696 · 1:10 0,736 ·
+  1:50 0,765 · 1:100 0,745 · nativo 0,760. El mínimo está en 1:1, el escenario más equilibrado, o sea
+  que lo poco que varía va en contra de H1. **No decir "perfil plano de tres centésimas"**: eso venía
+  de la semilla única. La amplitud real es de siete centésimas y el argumento fuerte es el contraste,
+  no la amplitud.
+- **Los tamaños de efecto que publica la tesis son η² de ANOVA**, no ε² de Kruskal-Wallis, aunque la
+  variable del código (`analyze_robust.py::eff_sizes`) se llame `eps2`. El estadístico H sí es el de
+  Kruskal-Wallis. Está declarado en el pie de `tab:synth-stats`. No mezclar los dos símbolos.
+- **La plausibilidad de GNNShap es de features, no de aristas**, y su línea base de azar es **0,075**,
+  no 0,40. GNNShap no produce máscara de aristas por diseño. Nunca ponerla en la misma figura ni en la
+  misma columna que la plausibilidad de aristas de GNNExplainer y PGExplainer.
 - **Nunca decir "GAT es la más estable"**: GAT y GCN se permutan entre semillas.
 - El pipeline **no es determinista a nivel de pesos** (scatter con atómicos en GPU). Reproduce
   conclusiones, no decimales: el reentrenamiento dio 25/60 sobre el gate frente a 23/60.
@@ -131,8 +150,8 @@ Difieren en `hidden_dim` (cap por VRAM), `optuna_trials` (50 vs 8), `epochs` (60
 ```
 gnns_thesis/
 ├── tesis_latex/            ← MANUSCRITO (main.tex + 8 capítulos + tables/ + bibliografia.bib)
-│   └── main.pdf              111 páginas, versionado
-├── presentacion_latex/     ← defensa en Beamer (.tex + .pdf, 37 páginas)
+│   └── main.pdf              114 páginas, versionado
+├── presentacion_latex/     ← defensa en Beamer (beamer_defensa_v3 es el vigente, 41 páginas)
 ├── docs/                   ← material de defensa (ver abajo)
 ├── configs/                ← *_v3.yaml son los vigentes; el resto es legacy
 ├── scripts/
@@ -158,14 +177,17 @@ gnns_thesis/
 
 | Archivo | Qué es |
 |---|---|
-| `docs/DISCURSO_defensa_dos_voces.md` | Guion hablado (v2), 29 diapositivas de contenido a dos voces (Alejandro págs. 1-17, Juan Diego 19-34), con tiempos, mapa slide→página del PDF y respuestas ensayadas |
+| `docs/DISCURSO_defensa_dos_voces.md` | Guion hablado, 34 láminas de contenido a dos voces (Alejandro págs. 1-17, Juan Diego 19-35), con tiempos, mapa a la página del PDF y respuestas ensayadas |
 | `docs/GUION_defensa_por_capitulo.md` | Mapa slide→capítulo/sección + preguntas del jurado |
 | `docs/DEFENSA_R2_evidencia_sintetica.md` | Respuesta a la objeción de circularidad del eje sintético |
 | `docs/ESQUELETO_presentacion_defensa.md` | Esqueleto slide por slide con las figuras |
 
-El PDF de la presentación tiene **37 páginas** para **29 diapositivas de contenido**: intercala 5
-separadores de sección, 1 separador de respaldo y 2 láminas de respaldo. En el DISCURSO v2 la
-numeración del guion ya coincide con la del PDF (tabla de equivalencia en el DISCURSO).
+**El deck vigente es `beamer_defensa_v3.tex`** (tema Metropolis oscuro, se compila con **LuaLaTeX** y
+necesita el paquete `beamertheme-metropolis`). Tiene **41 páginas** para **34 láminas de contenido**:
+intercala 5 separadores de sección, 1 lámina de cierre, 2 de referencias y 4 de respaldo. Los
+encabezados del DISCURSO usan ya esa numeración de página. Los decks `beamer_defensa.tex` (v1) y
+`beamer_defensa_v2.tex` quedan como registro histórico y **no** llevan las correcciones posteriores:
+no usarlos para ensayar.
 
 ## Bugs corregidos (no revertir sin entender)
 
@@ -202,4 +224,21 @@ Compilar el manuscrito (TinyTeX + biber):
 ```bash
 cd tesis_latex && pdflatex -interaction=nonstopmode main.tex && biber main \
   && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode main.tex
+```
+
+Compilar la presentacion vigente (LuaLaTeX, dos pasadas; requiere `beamertheme-metropolis`, que se
+instala con `tlmgr install beamertheme-metropolis`):
+
+```bash
+cd presentacion_latex
+lualatex -interaction=nonstopmode beamer_defensa_v3.tex
+lualatex -interaction=nonstopmode beamer_defensa_v3.tex
+```
+
+Regenerar las figuras del deck y el analisis por escenario (sin GPU, desde los CSV versionados):
+
+```bash
+uv run python scripts/make_figs_deck.py                       # ranking + disociacion, con IC 95%
+uv run python scripts/make_fig_colapso.py                     # colapso validacion -> test
+uv run python scripts/consolidacion/escenario_3semillas.py    # tabla + figura por escenario (3 semillas)
 ```
