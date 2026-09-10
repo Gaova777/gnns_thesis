@@ -536,22 +536,21 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{frame}
 
 \begin{frame}{Rendimiento y colapso validación $\rightarrow$ test}
-\begin{columns}[T]
-\begin{column}{0.33\textwidth}
-\begin{block}{PR-AUC}\centering 0,367 \\ {\footnotesize\color{muted}validación}\\ $\rightarrow$ test \textbf{\color{coral}0,017}\end{block}
+\begin{columns}[c]
+\begin{column}{0.60\textwidth}
+\centering
+\figcard[\linewidth]{colapso_val_test.png}
+\figcap{Rendimiento en validación y test sobre los mismos modelos: PR-AUC y precisión@50 colapsan; el ROC-AUC apenas cae. \emph{Fuente: elaboración propia.}}
 \end{column}
-\begin{column}{0.33\textwidth}
-\begin{block}{ROC-AUC}\centering 0,884 \\ {\footnotesize\color{muted}validación}\\ $\rightarrow$ test \textbf{\color{coral}0,653}\end{block}
-\end{column}
-\begin{column}{0.33\textwidth}
-\begin{block}{Precision@50}\centering 0,657 \\ {\footnotesize\color{muted}validación}\\ $\rightarrow$ test \textbf{\color{coral}0,020}\end{block}
+\begin{column}{0.40\textwidth}
+\small
+\begin{itemize}
+\item El modelo \textbf{aprende en validación} y \textbf{colapsa en test}: es el \emph{shift} temporal del dataset (los patrones de lavado cambian con el tiempo). Propiedad del dato, no del método.
+\item El \textbf{ROC-AUC engaña} bajo desbalance ($0{,}88$): tomamos \textbf{PR-AUC} y \textbf{precisión@k} como primarias.
+\item La estabilidad se estudia sobre \textbf{verdaderos positivos de validación} (encuadre declarado).
+\end{itemize}
 \end{column}
 \end{columns}
-\vspace{0.8em}
-\begin{center}\small
-El \textbf{ROC-AUC es engañoso} bajo desbalance: PR-AUC y precision@k como primarias.\\
-La estabilidad se estudia sobre verdaderos positivos de \textbf{validación} (encuadre declarado).
-\end{center}
 \end{frame}
 
 \begin{frame}{Rigor métrico: por qué PR-AUC y no ROC-AUC}
