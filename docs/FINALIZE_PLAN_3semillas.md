@@ -119,9 +119,10 @@ sirve tal cual, sin cambios. Insertarla siguiendo los TRES huecos de
 ## 3. Recompilar y verificar
 
 ```bash
-cd tesis_latex && pdflatex -interaction=nonstopmode main.tex && biber main \
+export PATH="$HOME/.TinyTeX/bin/x86_64-linux:$PATH"   # CRÍTICO: TinyTeX no está en el PATH; sin esto pdflatex/biber/lualatex dan "command not found" (exit 127)
+cd /home/juan/Escritorio/gnn_thesis/gnns_thesis/tesis_latex && pdflatex -interaction=nonstopmode main.tex && biber main \
   && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode main.tex
-cd ../presentacion_latex && lualatex -interaction=nonstopmode beamer_defensa_v3.tex \
+cd /home/juan/Escritorio/gnn_thesis/gnns_thesis/presentacion_latex && lualatex -interaction=nonstopmode beamer_defensa_v3.tex \
   && lualatex -interaction=nonstopmode beamer_defensa_v3.tex
 ```
 
@@ -134,7 +135,7 @@ nota en `FINALIZE_BLOCKED.md` con el error y abortar.
 
 ```bash
 cd /home/juan/Escritorio/gnn_thesis/gnns_thesis
-git add tesis_latex/chapter_4/Chapter_4.tex tesis_latex/tables/elliptic_robustez_3semillas.tex \
+git add tesis_latex/chapter_3/Chapter_3.tex tesis_latex/chapter_4/Chapter_4.tex tesis_latex/tables/elliptic_robustez_3semillas.tex \
         tesis_latex/tables/elliptic_stab_scenario.tex tesis_latex/chapter_4/images_ch4/ \
         tesis_latex/main.pdf presentacion_latex/beamer_defensa_v3.tex presentacion_latex/beamer_defensa_v3.pdf \
         docs/DISCURSO_defensa_dos_voces.md presentacion_latex/fig/curvas_pr_roc.png \
