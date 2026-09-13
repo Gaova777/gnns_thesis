@@ -330,8 +330,9 @@ encontramos no es un ranking de cuatro puestos sino una particion en dos grupos.
 en cero coma setenta y ocho y GCN en cero coma setenta y seis, y un grupo bajo, con GraphSAGE en cero
 coma setenta y tres y TAGCN en cero coma sesenta y ocho. *(pausa)* Y lo importante es donde estan las
 diferencias: entre los dos grupos son estadisticamente significativas, y dentro de cada grupo no lo son.
-El Kruskal-Wallis global da un valor p del orden de diez elevado a menos cinco, pero al preguntarlo
-dentro del grupo alto, o dentro del grupo bajo, la igualdad no se rechaza. *(pausa)* Aqui cierro nuestra
+La prueba estadistica que compara los cuatro grupos nos dice que la probabilidad de que esta
+separacion sea pura casualidad es diminuta, menos de una en cien mil; pero al preguntar lo mismo
+dentro del grupo alto, o dentro del grupo bajo, ahi las diferencias si podrian ser azar. *(pausa)* Aqui cierro nuestra
 segunda hipotesis: esperabamos que TAGCN, por su alcance multi-hop, fuera la mas estable, y aparece de
 forma consistente en el grupo bajo en las tres semillas. La hipotesis se cae, y lo decimos sin rodeos.
 *(pausa)* Quiero ser honesto con dos cosas mas. La primera, que el liderazgo de GraphSAGE que reportaba
@@ -347,13 +348,18 @@ seria sobre-interpretar.
 Me detengo un momento en que sostiene esa particion, porque es la diferencia entre una observacion y
 un resultado. *(pausa)* Reentrenamos la matriz completa de sesenta configuraciones tres veces, con tres
 semillas distintas, ciento ochenta modelos, y en cada una corrimos el procedimiento entero incluida su
-propia busqueda de hiperparametros. Sobre eso, la prueba global de Kruskal-Wallis rechaza la igualdad
-entre las cuatro arquitecturas con un valor p del orden de diez elevado a menos cinco. Pero cuando
-hacemos la misma pregunta dentro del grupo alto, o dentro del grupo bajo, la igualdad no se rechaza.
-Toda la variabilidad esta entre grupos, ninguna dentro. Y los intervalos de confianza por bootstrap
-cuentan lo mismo: se solapan dentro de cada grupo y apenas se tocan entre ellos. Y por si preguntan si
-esto es un efecto de hacer muchas pruebas, la separacion entre grupos aguanta la correccion de Holm por
-comparaciones multiples, asi que la particion no es un artefacto de la multiplicidad de contrastes.
+propia busqueda de hiperparametros. Sobre esos ciento ochenta modelos, la pregunta es simple: las diferencias que vemos, ¿son reales o
+podrian ser casualidad? Una prueba estadistica estandar responde que la separacion entre el grupo alto
+y el bajo es real, la probabilidad de que sea azar es menor de una en diez mil. En cambio, dentro de
+cada grupo las diferencias si podrian ser casualidad. Dicho de otro modo, toda la variacion esta entre
+grupos, ninguna dentro. Los margenes de error, calculados repitiendo el analisis muchas veces con
+remuestreo, cuentan lo mismo: se solapan dentro de cada grupo y apenas se tocan entre ellos. Y por si
+preguntan si esto sale de haber hecho muchas comparaciones a la vez, aplicamos el ajuste habitual para
+ese caso y la separacion aguanta. *(pausa)* Y esa replicacion no se limito a GNNExplainer: tambien
+corrimos GNNShap y PGExplainer en las tres semillas para GCN y GraphSAGE, y confirman su patron,
+GNNShap muy estable pero sin distinguir arquitecturas y PGExplainer degenerado; GAT y TAGCN, cuyos
+pesos no caben para reentrenar en la tarjeta de ocho gigabytes, quedan en la semilla de referencia,
+donde ya muestran lo mismo.
 *(pausa)* Hay un segundo hallazgo aqui que queremos declarar, porque es una contribucion en si misma. Al reentrenar
 descubrimos que el pipeline no es reproducible bit a bit: las operaciones de agregacion sobre la
 tarjeta grafica suman en un orden que no esta determinado, asi que los pesos nunca salen identicos.
@@ -384,8 +390,8 @@ el diseno.
 ### Pagina 24: Disociacion plausibilidad y fidelidad  ·  [JD]  ·  85 s
 Ahora el hallazgo central sobre los explicadores, y es un resultado con dos caras. *(pausa)* Por un
 lado, PGExplainer es claramente el que mejor recupera el patron real: su plausibilidad de aristas es de
-cero coma ochenta, frente a cero coma cincuenta de GNNExplainer, y la diferencia es enorme
-estadisticamente, con un valor de significancia del orden de diez elevado a menos treinta y cinco. Y
+cero coma ochenta, frente a cero coma cincuenta de GNNExplainer, y la diferencia es
+estadisticamente abrumadora, practicamente imposible de atribuir al azar. Y
 para que estas cifras signifiquen algo, las contrastamos con el azar: un explicador que eligiera las
 aristas al azar, con el mismo protocolo, obtiene cero coma cuarenta. PGExplainer duplica ese nivel,
 mientras que GNNExplainer apenas lo supera, lo que ya anticipa la disociacion que viene: el fuerte de
@@ -413,7 +419,7 @@ Esta lamina cierra nuestra hipotesis central, y tambien se cae. *(pausa)* Espera
 mas estable fuera tambien mas plausible, es decir que la consistencia entre ejecuciones implicara acierto
 sobre el patron real. Es una intuicion que esta implicita en buena parte de la literatura y nunca se
 habia contrastado de frente, porque para contrastarla hace falta medir las dos cosas a la vez sobre las
-mismas explicaciones, y eso exige un ground-truth. *(pausa)* Los datos dicen que no. La correlacion entre
+mismas explicaciones, y eso exige conocer de antemano cual es el patron verdadero, algo que los datos reales no dan y el grafo sintetico si. *(pausa)* Los datos dicen que no. La correlacion entre
 estabilidad y plausibilidad es de menos cero coma cero uno, con un intervalo de confianza que va de menos
 cero coma cero treinta y ocho a mas cero coma cero once, o sea que incluye el cero. Es un puente nulo. Un
 explicador estable no es por ello mas acertado sobre el patron real, y ambas propiedades hay que medirlas
@@ -432,10 +438,9 @@ medida que el desbalance se agravara, y que hubiera algun punto de quiebre. No o
 cosas. Sobre las tres semillas, la estabilidad media recorre un rango estrecho, de cero coma sesenta y
 nueve seis en el escenario uno a uno a cero coma setenta y seis cinco en el uno a cincuenta: siete
 centesimas en total, menos que las once centesimas que separan a las arquitecturas entre si. Y lo
-decisivo es que esa variacion no supera la prueba formal: Kruskal-Wallis sobre el factor escenario da un
-valor p de cero coma dieciocho, de modo que no podemos rechazar que los cinco escenarios sean iguales.
-El tamano de efecto es de cero coma cero cinco, pequeno, frente al cero coma trece de la arquitectura
-sobre la misma metrica. *(pausa)* Y conviene mirar hacia donde apunta lo poco que se mueve, porque
+decisivo es que esa variacion no pasa la prueba estadistica: la diferencia entre los cinco escenarios es
+perfectamente compatible con el azar. Ademas, el escenario explica apenas un cinco por ciento de la
+variacion, mientras que la arquitectura explica el trece por ciento sobre la misma medida. *(pausa)* Y conviene mirar hacia donde apunta lo poco que se mueve, porque
 apunta al reves de lo que esperabamos: el valor mas bajo esta en el escenario uno a uno, que es el mas
 equilibrado de todos, y los escenarios de desbalance acentuado quedan por encima. No hay deterioro
 monotono, no hay pico en el escenario uno a cincuenta, y el escenario nativo no se comporta de forma
@@ -456,7 +461,7 @@ patrones de lavado cambian entre los primeros y los ultimos pasos, y un modelo e
 encuentra en el futuro una distribucion distinta. Es una propiedad del dato, no un defecto de nuestro
 metodo. Aqui hay un punto metodologico que quisimos remarcar: el ROC-AUC se ve enganosamente alto bajo
 desbalance extremo, cero coma ochenta y ocho en validacion, y por eso no lo usamos como metrica
-principal; usamos PR-AUC y precision at k, que no se dejan enganar. *(pausa)* Como consecuencia, la
+principal; usamos el area de precision y exhaustividad y la precision en los primeros de la lista, que no se dejan enganar. *(pausa)* Como consecuencia, la
 estabilidad la estudiamos sobre los verdaderos positivos de validacion, donde el modelo si discrimina,
 y lo declaramos de forma abierta. No es esconder el colapso, es medir donde la pregunta tiene sentido.
 
