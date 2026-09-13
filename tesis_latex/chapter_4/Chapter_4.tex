@@ -113,6 +113,15 @@ Precisión en los primeros 100 & 0,640 & 0,022 \\
 \label{tab:elliptic-rocauc}
 \end{table}
 
+Esta disociación entre un ROC-AUC engañosamente alto y una precisión que se desploma se aprecia con mayor nitidez en las curvas completas de la Figura \ref{fig:curvas}, que confrontan validación y test para ambas familias de métricas y muestran cómo, en test, la curva de precisión y exhaustividad cae casi a la tasa base de la clase ilícita mientras la curva ROC se mantiene visiblemente por encima de la diagonal.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{chapter_4/images_ch4/curvas_pr_roc.png}
+    \caption{Curvas ROC y de precisión y exhaustividad sobre validación y test, promediadas punto a punto sobre las veintitrés configuraciones que superan el filtro de calidad en la semilla de referencia. El contraste entre ambos paneles hace visible lo que las medias de la Tabla \ref{tab:elliptic-rocauc} resumen, a saber que el ROC-AUC se sostiene mientras la precisión se desploma para cualquier nivel de cobertura.}
+    \label{fig:curvas}
+\end{figure}
+
 La causa del colapso no reside en un defecto del método sino en una propiedad estructural del dato, el desplazamiento temporal entre las particiones. El \textit{Elliptic Dataset} ordena las transacciones por pasos temporales, y los patrones que caracterizan la actividad ilícita en los primeros pasos difieren de los que aparecen en los últimos, de modo que un modelo ajustado sobre el periodo de validación encuentra en test una distribución distinta a la que aprendió \cite{Menezes2025SemanticDetectors}. Trabajos previos sobre el mismo conjunto de datos han documentado la fragilidad de los detectores basados en grafos ante este tipo de desplazamiento, lo que refuerza que se trata de una limitación del dato y no de la implementación \cite{Lawal2025AnDataset}. Reconocer esta limitación de forma explícita es preferible a ocultarla, ya que delimita con honestidad el alcance de las conclusiones. En consecuencia, y puesto que el objeto de la tesis es la estabilidad de las explicaciones y no el rendimiento predictivo en test, el estudio de estabilidad se realiza sobre los nodos de la partición de validación que el modelo clasifica correctamente como ilícitos.
 
 Conviene precisar el sentido de esta decisión para evitar malentendidos. Estudiar la estabilidad sobre validación no busca disimular el colapso, sino situar el análisis allí donde el modelo efectivamente discrimina y donde, por tanto, la pregunta por la estabilidad de una explicación tiene sentido. Un modelo que no detecta ninguna transacción ilícita en test no genera predicciones positivas cuya explicación pueda evaluarse, de manera que forzar la medición sobre test produciría explicaciones de predicciones erróneas y carentes de interés analítico. La estabilidad reportada en las secciones siguientes se refiere, por tanto, a las explicaciones de verdaderos positivos sobre validación, un encuadre que se declara de forma transparente y que constituye una respuesta metodológica honesta ante una limitación estructural del dato.
@@ -221,6 +230,17 @@ La comparación formal entre escenarios respalda esa lectura. La prueba de Krusk
 \end{figure}
 
 \input{tables/elliptic_stab_scenario.tex}
+
+La replicación con tres semillas se extendió también a GNNShap y a PGExplainer, para las dos arquitecturas cuyo reentrenamiento cabía en la GPU de ocho gigabytes disponible, GCN y GraphSAGE. GNNShap reproduce su saturación en las tres semillas, con una correlación de Spearman de \textit{features} que promedia 0,950 en GraphSAGE y 0,971 en GCN, con intervalos de confianza muy estrechos, tal como ilustran la Figura \ref{fig:robustez} y la Tabla \ref{tab:elliptic-robustez-3s}; ello ratifica que su altísima estabilidad convive con la incapacidad de ordenar arquitecturas, puesto que apenas las distingue. GAT y TAGCN, cuyos pesos, con ocho cabezas de atención sobre el grafo completo, no cabían para reentrenarse en esa tarjeta, se reportan sobre la semilla de referencia, en la que exhiben la misma saturación, con valores de 0,968 y 0,967 respectivamente, de modo que la observación es transversal a las cuatro arquitecturas aunque la replicación formal cubra dos. PGExplainer mantiene su comportamiento degenerado también entre semillas, con un índice de Jaccard de aristas próximo a la unidad en las cuatro arquitecturas, un artefacto de la extrema dispersión del grafo, en el que las escasas aristas del subgrafo receptivo se repiten casi idénticas entre réplicas y no porque el explicador capture una estructura estable.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{chapter_4/images_ch4/robustez_explicadores.png}
+    \caption{Estabilidad de las explicaciones por arquitectura, medida como correlación de Spearman sobre el ranking de \textit{features}. GNNExplainer, en azul, distingue entre arquitecturas y reproduce la partición en dos grupos, con GAT y GCN por encima de GraphSAGE y TAGCN. GNNShap, en naranja, se satura en valores próximos a la unidad para las cuatro y no las separa. Las barras con trama y asterisco corresponden a GNNShap sobre GAT y TAGCN, reportadas sobre la semilla de referencia por la limitación de memoria ya descrita.}
+    \label{fig:robustez}
+\end{figure}
+
+\input{tables/elliptic_robustez_3semillas.tex}
 
 La corrección obliga además a retractar el supuesto compromiso entre exactitud y estabilidad que la versión anterior reportaba con una correlación cercana a -0,20. Al haberse recomputado la estabilidad con una métrica corregida, aquella correlación deja de ser válida tal como se reportó y no puede sostenerse como un hallazgo del estudio. La lectura prudente es que el rendimiento en test colapsa de forma transversal en las cuatro arquitecturas, de modo que no existe una base sólida para afirmar una disyuntiva entre exactitud y estabilidad. Este episodio ilustra, además, un riesgo metodológico general en la evaluación de explicadores, el de que fallos silenciosos de cómputo o de medida se confundan con propiedades genuinas de las arquitecturas.
 

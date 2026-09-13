@@ -176,27 +176,38 @@ def escribir_tabla(spear):
     TAB.write_text(tex, encoding="utf-8")
     print("\nescrito:", TAB)
 
-    # figura: barras con IC por arquitectura (barra de error solo si >=2 semillas)
+    # figura: barras con etiqueta de valor encima; barra de error solo si >=2 semillas,
+    # y las barras de una sola semilla se marcan con trama y un asterisco.
     x = np.arange(len(ARQ))
     w = 0.8 / max(1, len(cols))
-    fig, ax = plt.subplots(figsize=(6.8, 4.0))
+    fig, ax = plt.subplots(figsize=(7.8, 4.7))
     colores = {"GNNExplainer": "#1C7293", "GNNShap": "#E07A5F"}
     for j, e in enumerate(cols):
-        ys, errs = [], []
-        for a in ARQ:
+        for k, a in enumerate(ARQ):
+            xi = x[k] + j * w - 0.4 + w / 2
             m, lo, hi, n, nseeds = spear[e].get(a, (np.nan, np.nan, np.nan, 0, 0))
-            ys.append(m)
-            errs.append((m - lo) if nseeds >= 2 and pd.notna(lo) else 0.0)
-        ax.bar(x + j * w - 0.4 + w / 2, ys, w, yerr=errs, capsize=3,
-               label=e, color=colores.get(e, None), zorder=3)
+            if pd.isna(m):
+                continue
+            err = [[m - lo], [hi - m]] if nseeds >= 2 and pd.notna(lo) else None
+            ax.bar(xi, m, w, yerr=err, capsize=4, color=colores.get(e), zorder=3,
+                   label=e if k == 0 else None,
+                   hatch="//" if nseeds < 2 else None, edgecolor="white", linewidth=0.7)
+            top = hi if (nseeds >= 2 and pd.notna(hi)) else m
+            ax.annotate(com(m, 2) + ("*" if nseeds < 2 else ""), (xi, top),
+                        textcoords="offset points", xytext=(0, 5), ha="center",
+                        va="bottom", fontsize=9.5, fontweight="bold", color="0.15")
     ax.set_xticks(x)
-    ax.set_xticklabels(ARQ)
-    ax.set_ylabel("Spearman de features")
-    ax.set_ylim(0, 1.0)
+    ax.set_xticklabels(ARQ, fontsize=11.5)
+    ax.set_ylabel("Estabilidad (Spearman de features)", fontsize=11)
+    ax.set_ylim(0, 1.15)
     ax.grid(axis="y", ls=":", color="0.85", zorder=0)
-    ax.legend()
-    ax.set_title("Estabilidad de explicadores de features (GAT/TAGCN: solo seed 42)", fontsize=10)
-    plt.tight_layout()
+    ax.legend(loc="lower center", ncol=2, fontsize=10.5, framealpha=0.95)
+    ax.set_title("Estabilidad por arquitectura: GNNExplainer distingue, GNNShap satura",
+                 fontsize=11.5, pad=12)
+    fig.text(0.5, 0.01,
+             "Barra de error: IC 95 % sobre 3 semillas.  * GNNShap en GAT y TAGCN: valor de una sola semilla (42).",
+             ha="center", fontsize=8.2, color="0.4")
+    plt.tight_layout(rect=(0, 0.05, 1, 1))
     FIG.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(FIG, dpi=300)
     plt.close()

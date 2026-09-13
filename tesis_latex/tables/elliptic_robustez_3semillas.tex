@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Arquitectura} & \textbf{GNNExplainer} & \textbf{GNNShap} \\
+\midrule
+GraphSAGE & 0,735 [0,711; 0,760] & 0,950 [0,942; 0,959] \\
+GAT & 0,782 [0,758; 0,806] & 0,968 (s42) \\
+GCN & 0,758 [0,725; 0,791] & 0,971 [0,964; 0,978] \\
+TAGCN & 0,676 [0,632; 0,720] & 0,967 (s42) \\
+\bottomrule
+\end{tabular}
+\caption{Estabilidad de las explicaciones medida como correlación de Spearman sobre el ranking de \textit{features}. Ambos explicadores atribuyen importancia a \textit{features} y comparten escala, pero su lectura difiere. GNNExplainer discrimina entre arquitecturas y reproduce la partición en dos grupos, con GAT y GCN por encima de GraphSAGE y TAGCN. GNNShap, en cambio, se satura en valores próximos a la unidad para las cuatro arquitecturas, de modo que su estabilidad es alta pero no separa arquitecturas. Las celdas con intervalo de confianza al 95\% se promedian sobre las tres semillas de modelo; las marcadas \textup{(s42)} corresponden a GAT y TAGCN, cuyos pesos de las semillas adicionales no cabían para reentrenar en la GPU de 8 GB disponible y por eso se reportan sobre la semilla original, en la que la saturación ya es visible. PGExplainer opera sobre aristas y se reporta aparte con la métrica de Jaccard.}
+\label{tab:elliptic-robustez-3s}
+\end{table}
