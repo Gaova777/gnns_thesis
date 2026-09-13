@@ -1,0 +1,570 @@
+Device: cpu
+Checkpoints to process: 60
+Config: /home/juan/Escritorio/gnn_thesis/gnns_thesis/configs/experiment_machineC_v3.yaml
+Dataset root: ./data
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    161,750
+  Licit (0):      157,205
+  Illicit (1):    4,545
+  Unknown (-1):   42,019
+Illicit ratio:    0.0281
+============================================================
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 109,833 nodes (3,462 illicit, 106,371 licit, ratio 1:30.7)
+  Val  : 28,751 nodes (914 illicit, 27,837 licit, ratio 1:30.5)
+  Test : 23,166 nodes (169 illicit, 22,997 licit, ratio 1:136.1)
+Normalizing features (fit on train set):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.5968, std~2.1935, clipped=4.58% of values
+Preprocessing complete.
+
+[1/60] 1:100_GAT_class_weighting  (arch=GAT)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.895909  ap=0.355320  trap=0.354679  p@50=0.780000 p@100=0.630000 p@npos=0.394967
+  test: n_pos=  169  roc=0.580020  ap=0.017380  trap=0.017106  p@50=0.020000 p@100=0.020000 p@npos=0.029586
+  [CHECK] test pr_auc_trap=0.01710589 vs meta.test_metrics.pr_auc=0.01710586  |diff|=2.24e-08  -> MATCH
+
+[2/60] 1:100_GAT_focal_loss  (arch=GAT)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.809256  ap=0.195678  trap=0.194851  p@50=0.320000 p@100=0.340000 p@npos=0.293217
+  test: n_pos=  169  roc=0.557157  ap=0.015209  trap=0.013837  p@50=0.080000 p@100=0.060000 p@npos=0.047337
+  [CHECK] test pr_auc_trap=0.01383704 vs meta.test_metrics.pr_auc=0.01383691  |diff|=1.29e-07  -> MATCH
+
+[3/60] 1:100_GAT_none  (arch=GAT)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.547664  ap=0.032969  trap=0.032886  p@50=0.000000 p@100=0.000000 p@npos=0.024070
+  test: n_pos=  169  roc=0.457124  ap=0.006054  trap=0.006000  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00600024 vs meta.test_metrics.pr_auc=0.00600024  |diff|=5.88e-09  -> MATCH
+
+[4/60] 1:100_GCN_class_weighting  (arch=GCN)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.813187  ap=0.205494  trap=0.204550  p@50=0.480000 p@100=0.460000 p@npos=0.288840
+  test: n_pos=  169  roc=0.512723  ap=0.007855  trap=0.007712  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00771184 vs meta.test_metrics.pr_auc=0.00771184  |diff|=0.00e+00  -> MATCH
+
+[5/60] 1:100_GCN_focal_loss  (arch=GCN)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.654016  ap=0.108184  trap=0.107398  p@50=0.620000 p@100=0.440000 p@npos=0.156455
+  test: n_pos=  169  roc=0.578717  ap=0.008185  trap=0.008051  p@50=0.000000 p@100=0.000000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.00805108 vs meta.test_metrics.pr_auc=0.00805108  |diff|=0.00e+00  -> MATCH
+
+[6/60] 1:100_GCN_none  (arch=GCN)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.618601  ap=0.058775  trap=0.058370  p@50=0.120000 p@100=0.170000 p@npos=0.099562
+  test: n_pos=  169  roc=0.542107  ap=0.007192  trap=0.007129  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00712878 vs meta.test_metrics.pr_auc=0.00712878  |diff|=0.00e+00  -> MATCH
+
+[7/60] 1:100_GraphSAGE_class_weighting  (arch=GraphSAGE)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.909110  ap=0.469027  trap=0.468668  p@50=0.840000 p@100=0.790000 p@npos=0.491247
+  test: n_pos=  169  roc=0.725185  ap=0.018835  trap=0.018565  p@50=0.000000 p@100=0.000000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.01856512 vs meta.test_metrics.pr_auc=0.01856512  |diff|=0.00e+00  -> MATCH
+
+[8/60] 1:100_GraphSAGE_focal_loss  (arch=GraphSAGE)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.550976  ap=0.034443  trap=0.034333  p@50=0.000000 p@100=0.020000 p@npos=0.026258
+  test: n_pos=  169  roc=0.610269  ap=0.008678  trap=0.008524  p@50=0.000000 p@100=0.010000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.00852437 vs meta.test_metrics.pr_auc=0.00852437  |diff|=0.00e+00  -> MATCH
+
+[9/60] 1:100_GraphSAGE_none  (arch=GraphSAGE)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.786972  ap=0.189484  trap=0.188982  p@50=0.480000 p@100=0.560000 p@npos=0.260394
+  test: n_pos=  169  roc=0.537081  ap=0.007078  trap=0.007019  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00701925 vs meta.test_metrics.pr_auc=0.00701925  |diff|=0.00e+00  -> MATCH
+
+[10/60] 1:100_TAGCN_class_weighting  (arch=TAGCN)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.719856  ap=0.160773  trap=0.160101  p@50=0.340000 p@100=0.380000 p@npos=0.301969
+  test: n_pos=  169  roc=0.693490  ap=0.010996  trap=0.010881  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01088057 vs meta.test_metrics.pr_auc=0.01088057  |diff|=0.00e+00  -> MATCH
+
+[11/60] 1:100_TAGCN_focal_loss  (arch=TAGCN)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.694967  ap=0.081105  trap=0.080771  p@50=0.020000 p@100=0.010000 p@npos=0.158643
+  test: n_pos=  169  roc=0.455349  ap=0.006079  trap=0.006014  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00601435 vs meta.test_metrics.pr_auc=0.00601435  |diff|=2.24e-09  -> MATCH
+
+[12/60] 1:100_TAGCN_none  (arch=TAGCN)
+  [mode=subsample-illicit] kept 1,063/3,462 illicit nodes
+  Scenario illicit:licit = 1:100
+    Illicit: 1,063 | Licit: 106,371 | Total: 107,434
+    Actual ratio: 0.0100 (target: 0.0100)
+  val : n_pos=  914  roc=0.645976  ap=0.058820  trap=0.058243  p@50=0.180000 p@100=0.200000 p@npos=0.078775
+  test: n_pos=  169  roc=0.681750  ap=0.010434  trap=0.010349  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01034921 vs meta.test_metrics.pr_auc=0.01034921  |diff|=0.00e+00  -> MATCH
+
+[13/60] 1:10_GAT_class_weighting  (arch=GAT)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.910838  ap=0.362523  trap=0.361373  p@50=0.540000 p@100=0.600000 p@npos=0.407002
+  test: n_pos=  169  roc=0.623434  ap=0.015000  trap=0.014388  p@50=0.020000 p@100=0.030000 p@npos=0.035503
+  [CHECK] test pr_auc_trap=0.01438797 vs meta.test_metrics.pr_auc=0.01438801  |diff|=3.64e-08  -> MATCH
+
+[14/60] 1:10_GAT_focal_loss  (arch=GAT)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.836678  ap=0.243410  trap=0.242515  p@50=0.580000 p@100=0.520000 p@npos=0.323851
+  test: n_pos=  169  roc=0.606474  ap=0.058069  trap=0.054458  p@50=0.260000 p@100=0.180000 p@npos=0.136095
+  [CHECK] test pr_auc_trap=0.05445834 vs meta.test_metrics.pr_auc=0.05445832  |diff|=1.65e-08  -> MATCH
+
+[15/60] 1:10_GAT_none  (arch=GAT)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.902937  ap=0.412268  trap=0.411417  p@50=0.620000 p@100=0.680000 p@npos=0.462801
+  test: n_pos=  169  roc=0.599630  ap=0.016473  trap=0.015686  p@50=0.020000 p@100=0.030000 p@npos=0.029586
+  [CHECK] test pr_auc_trap=0.01568586 vs meta.test_metrics.pr_auc=0.01568674  |diff|=8.85e-07  -> MATCH
+
+[16/60] 1:10_GCN_class_weighting  (arch=GCN)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.835170  ap=0.235901  trap=0.234854  p@50=0.420000 p@100=0.450000 p@npos=0.329322
+  test: n_pos=  169  roc=0.510684  ap=0.008302  trap=0.008107  p@50=0.000000 p@100=0.020000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.00810717 vs meta.test_metrics.pr_auc=0.00810717  |diff|=0.00e+00  -> MATCH
+
+[17/60] 1:10_GCN_focal_loss  (arch=GCN)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.824600  ap=0.210196  trap=0.209269  p@50=0.700000 p@100=0.510000 p@npos=0.280088
+  test: n_pos=  169  roc=0.657520  ap=0.017175  trap=0.016792  p@50=0.000000 p@100=0.010000 p@npos=0.041420
+  [CHECK] test pr_auc_trap=0.01679237 vs meta.test_metrics.pr_auc=0.01679237  |diff|=0.00e+00  -> MATCH
+
+[18/60] 1:10_GCN_none  (arch=GCN)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.694305  ap=0.116958  trap=0.116348  p@50=0.260000 p@100=0.320000 p@npos=0.211160
+  test: n_pos=  169  roc=0.606826  ap=0.012269  trap=0.011983  p@50=0.000000 p@100=0.020000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.01198252 vs meta.test_metrics.pr_auc=0.01198252  |diff|=0.00e+00  -> MATCH
+
+[19/60] 1:10_GraphSAGE_class_weighting  (arch=GraphSAGE)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.905558  ap=0.465752  trap=0.465195  p@50=0.800000 p@100=0.830000 p@npos=0.490153
+  test: n_pos=  169  roc=0.791823  ap=0.027310  trap=0.026665  p@50=0.060000 p@100=0.050000 p@npos=0.035503
+  [CHECK] test pr_auc_trap=0.02666463 vs meta.test_metrics.pr_auc=0.02666463  |diff|=0.00e+00  -> MATCH
+
+[20/60] 1:10_GraphSAGE_focal_loss  (arch=GraphSAGE)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.930633  ap=0.523323  trap=0.522904  p@50=0.860000 p@100=0.860000 p@npos=0.530635
+  test: n_pos=  169  roc=0.758687  ap=0.022967  trap=0.022484  p@50=0.000000 p@100=0.030000 p@npos=0.041420
+  [CHECK] test pr_auc_trap=0.02248375 vs meta.test_metrics.pr_auc=0.02248375  |diff|=0.00e+00  -> MATCH
+
+[21/60] 1:10_GraphSAGE_none  (arch=GraphSAGE)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.897948  ap=0.387205  trap=0.386465  p@50=0.700000 p@100=0.660000 p@npos=0.469365
+  test: n_pos=  169  roc=0.549950  ap=0.008399  trap=0.008216  p@50=0.000000 p@100=0.010000 p@npos=0.017751
+  [CHECK] test pr_auc_trap=0.00821605 vs meta.test_metrics.pr_auc=0.00821605  |diff|=0.00e+00  -> MATCH
+
+[22/60] 1:10_TAGCN_class_weighting  (arch=TAGCN)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.713344  ap=0.177067  trap=0.176284  p@50=0.600000 p@100=0.460000 p@npos=0.299781
+  test: n_pos=  169  roc=0.691053  ap=0.010875  trap=0.010761  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01076107 vs meta.test_metrics.pr_auc=0.01076107  |diff|=0.00e+00  -> MATCH
+
+[23/60] 1:10_TAGCN_focal_loss  (arch=TAGCN)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.836012  ap=0.198872  trap=0.198082  p@50=0.100000 p@100=0.200000 p@npos=0.323851
+  test: n_pos=  169  roc=0.491665  ap=0.006815  trap=0.006727  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00672716 vs meta.test_metrics.pr_auc=0.00672715  |diff|=2.64e-09  -> MATCH
+
+[24/60] 1:10_TAGCN_none  (arch=TAGCN)
+  [mode=subsample-licit] kept 34,620/106,371 licit nodes
+  Scenario illicit:licit = 1:10
+    Illicit: 3,462 | Licit: 34,620 | Total: 38,082
+    Actual ratio: 0.1000 (target: 0.1000)
+  val : n_pos=  914  roc=0.847200  ap=0.293251  trap=0.292719  p@50=0.860000 p@100=0.710000 p@npos=0.390591
+  test: n_pos=  169  roc=0.629745  ap=0.009718  trap=0.009601  p@50=0.000000 p@100=0.000000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00960054 vs meta.test_metrics.pr_auc=0.00960054  |diff|=0.00e+00  -> MATCH
+
+[25/60] 1:1_GAT_class_weighting  (arch=GAT)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.852259  ap=0.274639  trap=0.273637  p@50=0.680000 p@100=0.690000 p@npos=0.311816
+  test: n_pos=  169  roc=0.528249  ap=0.007253  trap=0.007177  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00717726 vs meta.test_metrics.pr_auc=0.00717725  |diff|=8.67e-09  -> MATCH
+
+[26/60] 1:1_GAT_focal_loss  (arch=GAT)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.846843  ap=0.167186  trap=0.166364  p@50=0.180000 p@100=0.150000 p@npos=0.233042
+  test: n_pos=  169  roc=0.471674  ap=0.006991  trap=0.006826  p@50=0.000000 p@100=0.010000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00682648 vs meta.test_metrics.pr_auc=0.00682647  |diff|=4.41e-09  -> MATCH
+
+[27/60] 1:1_GAT_none  (arch=GAT)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.917452  ap=0.360649  trap=0.359762  p@50=0.460000 p@100=0.530000 p@npos=0.433260
+  test: n_pos=  169  roc=0.669192  ap=0.015419  trap=0.014986  p@50=0.020000 p@100=0.030000 p@npos=0.029586
+  [CHECK] test pr_auc_trap=0.01498554 vs meta.test_metrics.pr_auc=0.01498558  |diff|=4.15e-08  -> MATCH
+
+[28/60] 1:1_GCN_class_weighting  (arch=GCN)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.841981  ap=0.165157  trap=0.164290  p@50=0.320000 p@100=0.270000 p@npos=0.218818
+  test: n_pos=  169  roc=0.640464  ap=0.015363  trap=0.014993  p@50=0.020000 p@100=0.020000 p@npos=0.023669
+  [CHECK] test pr_auc_trap=0.01499257 vs meta.test_metrics.pr_auc=0.01499258  |diff|=1.09e-08  -> MATCH
+
+[29/60] 1:1_GCN_focal_loss  (arch=GCN)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.699446  ap=0.066634  trap=0.066854  p@50=0.080000 p@100=0.070000 p@npos=0.082057
+  test: n_pos=  169  roc=0.647488  ap=0.010751  trap=0.010377  p@50=0.020000 p@100=0.020000 p@npos=0.017751
+  [CHECK] test pr_auc_trap=0.01037677 vs meta.test_metrics.pr_auc=0.01037678  |diff|=8.13e-09  -> MATCH
+
+[30/60] 1:1_GCN_none  (arch=GCN)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.819244  ap=0.131962  trap=0.131204  p@50=0.220000 p@100=0.160000 p@npos=0.190372
+  test: n_pos=  169  roc=0.683458  ap=0.020641  trap=0.020049  p@50=0.040000 p@100=0.020000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.02004922 vs meta.test_metrics.pr_auc=0.02004922  |diff|=0.00e+00  -> MATCH
+
+[31/60] 1:1_GraphSAGE_class_weighting  (arch=GraphSAGE)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.912063  ap=0.331770  trap=0.330602  p@50=0.480000 p@100=0.480000 p@npos=0.401532
+  test: n_pos=  169  roc=0.804352  ap=0.024819  trap=0.024463  p@50=0.000000 p@100=0.000000 p@npos=0.017751
+  [CHECK] test pr_auc_trap=0.02446290 vs meta.test_metrics.pr_auc=0.02446290  |diff|=0.00e+00  -> MATCH
+
+[32/60] 1:1_GraphSAGE_focal_loss  (arch=GraphSAGE)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.926719  ap=0.443295  trap=0.442876  p@50=0.800000 p@100=0.750000 p@npos=0.470460
+  test: n_pos=  169  roc=0.822157  ap=0.024556  trap=0.024211  p@50=0.000000 p@100=0.000000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.02421090 vs meta.test_metrics.pr_auc=0.02421090  |diff|=0.00e+00  -> MATCH
+
+[33/60] 1:1_GraphSAGE_none  (arch=GraphSAGE)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.920238  ap=0.415169  trap=0.414189  p@50=0.800000 p@100=0.690000 p@npos=0.452954
+  test: n_pos=  169  roc=0.778775  ap=0.020209  trap=0.019830  p@50=0.000000 p@100=0.030000 p@npos=0.017751
+  [CHECK] test pr_auc_trap=0.01983023 vs meta.test_metrics.pr_auc=0.01983023  |diff|=0.00e+00  -> MATCH
+
+[34/60] 1:1_TAGCN_class_weighting  (arch=TAGCN)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.712943  ap=0.173059  trap=0.172123  p@50=0.620000 p@100=0.460000 p@npos=0.293217
+  test: n_pos=  169  roc=0.695335  ap=0.011096  trap=0.010977  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01097714 vs meta.test_metrics.pr_auc=0.01097714  |diff|=0.00e+00  -> MATCH
+
+[35/60] 1:1_TAGCN_focal_loss  (arch=TAGCN)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.889369  ap=0.285187  trap=0.284054  p@50=0.540000 p@100=0.480000 p@npos=0.370897
+  test: n_pos=  169  roc=0.795080  ap=0.022662  trap=0.022267  p@50=0.020000 p@100=0.010000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.02226693 vs meta.test_metrics.pr_auc=0.02226693  |diff|=0.00e+00  -> MATCH
+
+[36/60] 1:1_TAGCN_none  (arch=TAGCN)
+  [mode=subsample-licit] kept 3,462/106,371 licit nodes
+  Scenario illicit:licit = 1:1
+    Illicit: 3,462 | Licit: 3,462 | Total: 6,924
+    Actual ratio: 1.0000 (target: 1.0000)
+  val : n_pos=  914  roc=0.712943  ap=0.173059  trap=0.172123  p@50=0.620000 p@100=0.460000 p@npos=0.293217
+  test: n_pos=  169  roc=0.695335  ap=0.011096  trap=0.010977  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01097714 vs meta.test_metrics.pr_auc=0.01097714  |diff|=0.00e+00  -> MATCH
+
+[37/60] 1:30_native_GAT_class_weighting  (arch=GAT)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.842249  ap=0.201791  trap=0.200821  p@50=0.680000 p@100=0.530000 p@npos=0.229759
+  test: n_pos=  169  roc=0.576210  ap=0.008551  trap=0.008462  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00846167 vs meta.test_metrics.pr_auc=0.00846165  |diff|=1.56e-08  -> MATCH
+
+[38/60] 1:30_native_GAT_focal_loss  (arch=GAT)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.838313  ap=0.267668  trap=0.267200  p@50=0.740000 p@100=0.650000 p@npos=0.342451
+  test: n_pos=  169  roc=0.581088  ap=0.008433  trap=0.008280  p@50=0.000000 p@100=0.010000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00828029 vs meta.test_metrics.pr_auc=0.00828029  |diff|=6.59e-09  -> MATCH
+
+[39/60] 1:30_native_GAT_none  (arch=GAT)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.845202  ap=0.201928  trap=0.201296  p@50=0.220000 p@100=0.210000 p@npos=0.307440
+  test: n_pos=  169  roc=0.740128  ap=0.018915  trap=0.018403  p@50=0.040000 p@100=0.050000 p@npos=0.029586
+  [CHECK] test pr_auc_trap=0.01840302 vs meta.test_metrics.pr_auc=0.01840292  |diff|=1.00e-07  -> MATCH
+
+[40/60] 1:30_native_GCN_class_weighting  (arch=GCN)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.601138  ap=0.075012  trap=0.074500  p@50=0.240000 p@100=0.290000 p@npos=0.146608
+  test: n_pos=  169  roc=0.636811  ap=0.010993  trap=0.010779  p@50=0.000000 p@100=0.000000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.01077854 vs meta.test_metrics.pr_auc=0.01077854  |diff|=0.00e+00  -> MATCH
+
+[41/60] 1:30_native_GCN_focal_loss  (arch=GCN)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.664106  ap=0.112753  trap=0.112110  p@50=0.180000 p@100=0.330000 p@npos=0.211160
+  test: n_pos=  169  roc=0.531778  ap=0.008196  trap=0.008003  p@50=0.000000 p@100=0.010000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.00800322 vs meta.test_metrics.pr_auc=0.00800322  |diff|=0.00e+00  -> MATCH
+
+[42/60] 1:30_native_GCN_none  (arch=GCN)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.730354  ap=0.122196  trap=0.121448  p@50=0.420000 p@100=0.470000 p@npos=0.178337
+  test: n_pos=  169  roc=0.567408  ap=0.008887  trap=0.008644  p@50=0.020000 p@100=0.020000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.00864407 vs meta.test_metrics.pr_auc=0.00864407  |diff|=0.00e+00  -> MATCH
+
+[43/60] 1:30_native_GraphSAGE_class_weighting  (arch=GraphSAGE)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.909406  ap=0.504068  trap=0.503722  p@50=0.880000 p@100=0.800000 p@npos=0.532823
+  test: n_pos=  169  roc=0.688870  ap=0.015000  trap=0.013673  p@50=0.040000 p@100=0.030000 p@npos=0.017751
+  [CHECK] test pr_auc_trap=0.01367299 vs meta.test_metrics.pr_auc=0.01367299  |diff|=0.00e+00  -> MATCH
+
+[44/60] 1:30_native_GraphSAGE_focal_loss  (arch=GraphSAGE)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.923748  ap=0.486410  trap=0.485935  p@50=0.720000 p@100=0.750000 p@npos=0.530635
+  test: n_pos=  169  roc=0.689026  ap=0.012293  trap=0.012075  p@50=0.000000 p@100=0.020000 p@npos=0.011834
+  [CHECK] test pr_auc_trap=0.01207461 vs meta.test_metrics.pr_auc=0.01207461  |diff|=0.00e+00  -> MATCH
+
+[45/60] 1:30_native_GraphSAGE_none  (arch=GraphSAGE)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.918670  ap=0.459771  trap=0.458754  p@50=0.820000 p@100=0.780000 p@npos=0.491247
+  test: n_pos=  169  roc=0.712187  ap=0.017655  trap=0.017314  p@50=0.000000 p@100=0.010000 p@npos=0.017751
+  [CHECK] test pr_auc_trap=0.01731413 vs meta.test_metrics.pr_auc=0.01731413  |diff|=0.00e+00  -> MATCH
+
+[46/60] 1:30_native_TAGCN_class_weighting  (arch=TAGCN)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.713704  ap=0.180366  trap=0.179594  p@50=0.620000 p@100=0.450000 p@npos=0.301969
+  test: n_pos=  169  roc=0.686678  ap=0.010671  trap=0.010559  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01055916 vs meta.test_metrics.pr_auc=0.01055916  |diff|=0.00e+00  -> MATCH
+
+[47/60] 1:30_native_TAGCN_focal_loss  (arch=TAGCN)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.886896  ap=0.396443  trap=0.396248  p@50=0.780000 p@100=0.670000 p@npos=0.484683
+  test: n_pos=  169  roc=0.670524  ap=0.011530  trap=0.011343  p@50=0.000000 p@100=0.010000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.01134291 vs meta.test_metrics.pr_auc=0.01134291  |diff|=0.00e+00  -> MATCH
+
+[48/60] 1:30_native_TAGCN_none  (arch=TAGCN)
+  [mode=native] preserving natural distribution
+  Scenario illicit:licit = 1:30.7 (native)
+    Illicit: 3,462 | Licit: 106,371 | Total: 109,833
+    Actual ratio: 0.0325
+  val : n_pos=  914  roc=0.646547  ap=0.059421  trap=0.058835  p@50=0.180000 p@100=0.190000 p@npos=0.080963
+  test: n_pos=  169  roc=0.681084  ap=0.010411  trap=0.010327  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01032687 vs meta.test_metrics.pr_auc=0.01032688  |diff|=3.31e-09  -> MATCH
+
+[49/60] 1:50_GAT_class_weighting  (arch=GAT)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.832126  ap=0.271941  trap=0.270939  p@50=0.660000 p@100=0.720000 p@npos=0.318381
+  test: n_pos=  169  roc=0.453906  ap=0.006079  trap=0.006015  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00601533 vs meta.test_metrics.pr_auc=0.00601533  |diff|=4.47e-09  -> MATCH
+
+[50/60] 1:50_GAT_focal_loss  (arch=GAT)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.886550  ap=0.385229  trap=0.384598  p@50=0.840000 p@100=0.790000 p@npos=0.421225
+  test: n_pos=  169  roc=0.624302  ap=0.011403  trap=0.011220  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01122031 vs meta.test_metrics.pr_auc=0.01122031  |diff|=0.00e+00  -> MATCH
+
+[51/60] 1:50_GAT_none  (arch=GAT)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.838050  ap=0.193666  trap=0.192947  p@50=0.420000 p@100=0.420000 p@npos=0.287746
+  test: n_pos=  169  roc=0.573181  ap=0.008449  trap=0.008264  p@50=0.020000 p@100=0.010000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00826420 vs meta.test_metrics.pr_auc=0.00826420  |diff|=4.20e-09  -> MATCH
+
+[52/60] 1:50_GCN_class_weighting  (arch=GCN)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.847429  ap=0.247603  trap=0.246665  p@50=0.540000 p@100=0.520000 p@npos=0.323851
+  test: n_pos=  169  roc=0.522627  ap=0.008344  trap=0.008180  p@50=0.000000 p@100=0.000000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00818038 vs meta.test_metrics.pr_auc=0.00818038  |diff|=0.00e+00  -> MATCH
+
+[53/60] 1:50_GCN_focal_loss  (arch=GCN)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.601484  ap=0.073730  trap=0.073427  p@50=0.500000 p@100=0.360000 p@npos=0.089716
+  test: n_pos=  169  roc=0.492684  ap=0.006499  trap=0.006446  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.00644619 vs meta.test_metrics.pr_auc=0.00644619  |diff|=0.00e+00  -> MATCH
+
+[54/60] 1:50_GCN_none  (arch=GCN)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.594954  ap=0.083010  trap=0.082137  p@50=0.220000 p@100=0.350000 p@npos=0.147702
+  test: n_pos=  169  roc=0.507574  ap=0.008606  trap=0.008253  p@50=0.040000 p@100=0.030000 p@npos=0.029586
+  [CHECK] test pr_auc_trap=0.00825279 vs meta.test_metrics.pr_auc=0.00825279  |diff|=0.00e+00  -> MATCH
+
+[55/60] 1:50_GraphSAGE_class_weighting  (arch=GraphSAGE)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.921431  ap=0.517534  trap=0.517159  p@50=0.880000 p@100=0.850000 p@npos=0.522976
+  test: n_pos=  169  roc=0.767632  ap=0.025328  trap=0.024689  p@50=0.040000 p@100=0.020000 p@npos=0.029586
+  [CHECK] test pr_auc_trap=0.02468919 vs meta.test_metrics.pr_auc=0.02468919  |diff|=0.00e+00  -> MATCH
+
+[56/60] 1:50_GraphSAGE_focal_loss  (arch=GraphSAGE)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.920703  ap=0.478243  trap=0.477765  p@50=0.740000 p@100=0.750000 p@npos=0.527352
+  test: n_pos=  169  roc=0.710671  ap=0.015905  trap=0.015663  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01566322 vs meta.test_metrics.pr_auc=0.01566323  |diff|=1.31e-08  -> MATCH
+
+[57/60] 1:50_GraphSAGE_none  (arch=GraphSAGE)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.846546  ap=0.191186  trap=0.190307  p@50=0.540000 p@100=0.420000 p@npos=0.236324
+  test: n_pos=  169  roc=0.566704  ap=0.007756  trap=0.007654  p@50=0.000000 p@100=0.000000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00765415 vs meta.test_metrics.pr_auc=0.00765415  |diff|=0.00e+00  -> MATCH
+
+[58/60] 1:50_TAGCN_class_weighting  (arch=TAGCN)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.720863  ap=0.171328  trap=0.170584  p@50=0.440000 p@100=0.430000 p@npos=0.304158
+  test: n_pos=  169  roc=0.688092  ap=0.010763  trap=0.010650  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01064985 vs meta.test_metrics.pr_auc=0.01064985  |diff|=5.60e-09  -> MATCH
+
+[59/60] 1:50_TAGCN_focal_loss  (arch=TAGCN)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.856399  ap=0.225057  trap=0.224416  p@50=0.100000 p@100=0.190000 p@npos=0.352298
+  test: n_pos=  169  roc=0.596126  ap=0.009084  trap=0.008940  p@50=0.000000 p@100=0.000000 p@npos=0.005917
+  [CHECK] test pr_auc_trap=0.00894046 vs meta.test_metrics.pr_auc=0.00894047  |diff|=6.03e-09  -> MATCH
+
+[60/60] 1:50_TAGCN_none  (arch=TAGCN)
+  [mode=subsample-illicit] kept 2,127/3,462 illicit nodes
+  Scenario illicit:licit = 1:50
+    Illicit: 2,127 | Licit: 106,371 | Total: 108,498
+    Actual ratio: 0.0200 (target: 0.0200)
+  val : n_pos=  914  roc=0.646168  ap=0.059201  trap=0.058616  p@50=0.200000 p@100=0.200000 p@npos=0.078775
+  test: n_pos=  169  roc=0.681269  ap=0.010417  trap=0.010332  p@50=0.000000 p@100=0.000000 p@npos=0.000000
+  [CHECK] test pr_auc_trap=0.01033231 vs meta.test_metrics.pr_auc=0.01033231  |diff|=0.00e+00  -> MATCH
+
+Wrote 120 rows (60 checkpoints × 2 splits) -> /home/juan/Escritorio/gnn_thesis/gnns_thesis/results_v3/reeval_metrics.csv
