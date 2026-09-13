@@ -29,7 +29,12 @@ narrativa vigente (no debería), **detenerse y dejar una nota en vez de forzar u
 cd /home/juan/Escritorio/gnn_thesis/gnns_thesis
 ~/.local/bin/uv run python scripts/consolidacion/escenario_3semillas.py     # GNNExplainer por escenario (ya en tesis; refresca)
 ~/.local/bin/uv run python scripts/consolidacion/robustez_3semillas.py      # NUEVO: GNNShap+PGExplainer 3 semillas + reeval
+~/.local/bin/uv run python scripts/make_fig_curves.py                       # NUEVO: curvas PR/ROC (promedia los quality_passed de las 3 semillas)
+cp presentacion_latex/fig/curvas_pr_roc.png tesis_latex/chapter_4/images_ch4/curvas_pr_roc.png
 ```
+
+Driver D ya dejó `results_v3/reeval_curves.csv` (los puntos de curva); `make_fig_curves.py` genera
+`presentacion_latex/fig/curvas_pr_roc.png`. El pipeline de curvas está validado de punta a punta.
 
 `robustez_3semillas.py` imprime por stdout y escribe:
 - `tesis_latex/tables/elliptic_robustez_3semillas.tex` (Spearman features: GNNExplainer vs GNNShap, con IC95).
@@ -80,6 +85,25 @@ En la respuesta ensayada sobre replicación (buscar "semillas"), añadir: "La re
 semillas no se limitó a GNNExplainer; también se corrieron GNNShap y PGExplainer en las tres
 semillas, y ambos confirman su patrón (saturación y degeneración respectivamente)."
 
+### 2d. Curvas PR/ROC (tesis, deck y discurso)
+
+La figura `presentacion_latex/fig/curvas_pr_roc.png` ya existe (paso 1) y se copió a
+`tesis_latex/chapter_4/images_ch4/`. Insertarla siguiendo los TRES huecos documentados en
+`docs/PENDIENTE_curvas_pr_roc.md` (sección "Qué queda por insertar cuando exista la figura"), con UN
+ajuste: como ahora se promedia sobre las TRES semillas, el caption NO debe decir "veintitrés
+configuraciones" sino "las configuraciones que superan el filtro de calidad, promediadas sobre las
+tres semillas de modelo".
+
+- **Tesis** (`tesis_latex/chapter_4/Chapter_4.tex`): insertar el bloque `\begin{figure}...
+  \includegraphics{chapter_4/images_ch4/curvas_pr_roc.png}...\label{fig:curvas}\end{figure}` del doc
+  de pendiente justo después de la tabla `tab:elliptic-rocauc` (~línea 114), con el caption ajustado a
+  3 semillas, y una frase de enlace en el párrafo de la línea 97 que remita a la Figura \ref{fig:curvas}.
+- **Deck** (`presentacion_latex/beamer_defensa_v3.tex`): lámina 28 ("Rigor métrico: PR-AUC y no
+  ROC-AUC"), hoy solo tabla. Pasarla a dos columnas, tabla a la izquierda y `\figcard{curvas_pr_roc.png}`
+  a la derecha con su `\figcap` (la figura se resuelve por `\graphicspath`, que incluye `fig/`).
+- **Discurso** (`docs/DISCURSO_defensa_dos_voces.md`): en la sección "Pagina 28", añadir una o dos
+  frases que apunten a los dos paneles de la figura. Los números no cambian.
+
 ## 3. Recompilar y verificar
 
 ```bash
@@ -101,10 +125,10 @@ cd /home/juan/Escritorio/gnn_thesis/gnns_thesis
 git add tesis_latex/chapter_4/Chapter_4.tex tesis_latex/tables/elliptic_robustez_3semillas.tex \
         tesis_latex/tables/elliptic_stab_scenario.tex tesis_latex/chapter_4/images_ch4/ \
         tesis_latex/main.pdf presentacion_latex/beamer_defensa_v3.tex presentacion_latex/beamer_defensa_v3.pdf \
-        docs/DISCURSO_defensa_dos_voces.md \
+        docs/DISCURSO_defensa_dos_voces.md presentacion_latex/fig/curvas_pr_roc.png \
         scripts/consolidacion/run_phase_D_pg_reeval.py scripts/consolidacion/robustez_3semillas.py \
-        scripts/consolidacion/reeval_rocauc.py
-git add -f results_seedsweep/xai-gnn-stability-seedsweep.csv results_seedsweep/robustez_3semillas_summary.csv results_v3/reeval_metrics.csv
+        scripts/consolidacion/reeval_rocauc.py scripts/make_fig_curves.py
+git add -f results_seedsweep/xai-gnn-stability-seedsweep.csv results_seedsweep/robustez_3semillas_summary.csv results_v3/reeval_metrics.csv results_v3/reeval_curves.csv
 git -c user.name=gaova777 -c user.email=gaova777@utp.edu.co commit -m "$(cat <<'EOF'
 resultados: robustez a 3 semillas de GNNShap y PGExplainer + reeval ROC-AUC/PR-AUC
 

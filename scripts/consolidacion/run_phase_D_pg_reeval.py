@@ -11,8 +11,10 @@ contenga '[driver-C] DONE' para no competir por la GPU. Luego:
           sweep (PGExplainer es de aristas y degenera en Elliptic; el valor es la
           completitud y confirmar que la degeneracion es estable entre semillas).
   FASE 2  Reeval inference-only sobre TODOS los checkpoints (seed 42/43/44), en CPU
-          para no arriesgar OOM. Produce results_v3/reeval_metrics.csv con columna
-          seed, o sea la version a 3 semillas de ROC-AUC / PR-AUC / precision@k.
+          para no arriesgar OOM, con --dump-curves. Produce results_v3/reeval_metrics.csv
+          (con columna seed) y results_v3/reeval_curves.csv, o sea la version a 3 semillas
+          de ROC-AUC / PR-AUC / precision@k y los puntos para graficar las curvas PR/ROC
+          (la unica maquina con checkpoints puede generarlas; ver docs/PENDIENTE_curvas_pr_roc.md).
   FASE 3  Escribe el centinela CHAIN_DONE para que la tarea programada de cierre
           (finalize) sepa que toda la cadena B->C->D termino.
 
@@ -75,9 +77,9 @@ for arch, cfg in ARCH_CFG:
                 f"PGExplainer {i}/{total}: {arch} | {scen} | {bal}")
 
 # ---------- FASE 2: reeval ROC-AUC / PR-AUC / precision@k (CPU, 3 seeds) ----------
-print("\n[driver-D] FASE 2: reeval metricas (CPU, todos los checkpoints 42/43/44)", flush=True)
-run(["scripts/consolidacion/reeval_rocauc.py", "--device", "cpu"],
-    "reeval ROC-AUC/PR-AUC/p@k (3 semillas)")
+print("\n[driver-D] FASE 2: reeval metricas + puntos de curvas (CPU, checkpoints 42/43/44)", flush=True)
+run(["scripts/consolidacion/reeval_rocauc.py", "--device", "cpu", "--dump-curves"],
+    "reeval ROC-AUC/PR-AUC/p@k + puntos de curvas PR/ROC (3 semillas)")
 
 # ---------- FASE 3: centinela de cadena completa ----------
 with open(SENTINEL, "w", encoding="utf-8") as fh:
