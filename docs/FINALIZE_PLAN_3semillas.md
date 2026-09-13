@@ -23,13 +23,23 @@ de la unidad sin discriminar arquitecturas y que PGExplainer degenera en Ellipti
 replicación a 3 semillas CONFIRMA eso; no invierte nada. Si algún número contradijera la
 narrativa vigente (no debería), **detenerse y dejar una nota en vez de forzar un push**.
 
+**ASIMETRÍA DE SEMILLAS (crítico, no sobre-afirmar).** GCN y GraphSAGE tienen las tres semillas
+(42/43/44). GAT y TAGCN **solo tienen la semilla 42**: sus pesos no cabían para reentrenar en la GPU
+de 8 GB disponible (GAT usa ocho cabezas de atención sobre el grafo completo; el entrenamiento
+reventó por OOM en el backward). Por tanto: (a) el IC a 3 semillas y la frase "tres semillas" valen
+para GCN/GraphSAGE, NO para GAT/TAGCN; (b) `robustez_3semillas.py` ya marca las celdas de GAT/TAGCN
+como `(s42)` y solo pone IC donde `n_seeds>=2`, así que respetar esa tabla tal cual; (c) el bloque
+ROC-AUC del manuscrito se mantiene en la semilla 42 (ver 2a); (d) las curvas se generan con
+`--seed 42` (por defecto) para que sus etiquetas cuadren con esas cifras. El resultado de arquitectura
+(GNNExplainer, las 4 arqs a 3 semillas) NO se ve afectado.
+
 ## 1. Regenerar artefactos (determinista, sin GPU)
 
 ```bash
 cd /home/juan/Escritorio/gnn_thesis/gnns_thesis
 ~/.local/bin/uv run python scripts/consolidacion/escenario_3semillas.py     # GNNExplainer por escenario (ya en tesis; refresca)
 ~/.local/bin/uv run python scripts/consolidacion/robustez_3semillas.py      # NUEVO: GNNShap+PGExplainer 3 semillas + reeval
-~/.local/bin/uv run python scripts/make_fig_curves.py                       # NUEVO: curvas PR/ROC (promedia los quality_passed de las 3 semillas)
+~/.local/bin/uv run python scripts/make_fig_curves.py                       # NUEVO: curvas PR/ROC (semilla 42 por defecto: cuadra con las cifras del manuscrito)
 cp presentacion_latex/fig/curvas_pr_roc.png tesis_latex/chapter_4/images_ch4/curvas_pr_roc.png
 ```
 
@@ -41,63 +51,65 @@ Driver D ya dejó `results_v3/reeval_curves.csv` (los puntos de curva); `make_fi
 - `tesis_latex/chapter_4/images_ch4/robustez_explicadores.png`.
 - `results_seedsweep/robustez_3semillas_summary.csv` (todas las familias + reeval; **esta es la fuente de las cifras** de abajo).
 
-Leer `results_seedsweep/robustez_3semillas_summary.csv` y quedarse con:
-- Filas `explainer=GNNShap` -> media de Spearman por arquitectura (se espera ~0,9x, plana).
-- Filas `explainer=PGExplainer` -> media de Jaccard por arquitectura (confirma degeneración).
-- Filas `explainer=reeval/val` y `reeval/test` -> `roc_auc`, `pr_auc_trap`, `prec_at_50` a 3 semillas (modelos que pasan el filtro).
+Leer `results_seedsweep/robustez_3semillas_summary.csv` (la columna `n_seeds` dice cuántas semillas respaldan cada celda):
+- Filas `explainer=GNNShap` -> media de Spearman por arquitectura (~0,9x, plana). GCN/GraphSAGE con `n_seeds=3`; GAT/TAGCN con `n_seeds=1` (solo seed 42).
+- Filas `explainer=PGExplainer` -> media de Jaccard por arquitectura (confirma degeneración). Misma asimetría de semillas.
+- Filas `explainer=reeval42/val` y `reeval42/test` -> `roc_auc`, `pr_auc_trap`, `prec_at_50` sobre la SEMILLA 42; deben reproducir las cifras ya publicadas (val ROC 0,884 / PR 0,367 / p@50 0,657; test 0,653 / 0,017 / 0,020).
 
 ## 2. Editar prosa (mínima y aditiva)
 
 ### 2a. `tesis_latex/chapter_4/Chapter_4.tex`
 
 - **Bloque ROC-AUC** (buscar "ROC-AUC medio de 0,884" y la tabla `tab:elliptic-rocauc`, ~líneas 97-112):
-  sustituir las seis cifras (val/test × ROC-AUC, PR-AUC, precisión@50) por las medias a 3 semillas
-  del `summary.csv` (reeval/val, reeval/test), y añadir en la prosa y el caption que ahora están
-  "promediadas sobre las tres semillas de modelo". Si una cifra redondea igual que la actual,
-  mantenerla y solo añadir la cláusula de tres semillas. La narrativa (ROC alto y engañoso, PR-AUC
-  bajo, colapso en test) NO cambia.
-- **Replicación a 3 semillas** (buscar "se recalculó la estabilidad de GNNExplainer", ~línea 145):
-  inmediatamente DESPUÉS de la sección por escenario (tras `\input{tables/elliptic_stab_scenario.tex}`,
-  ~línea 223) añadir un párrafo corto + la tabla nueva:
+  **NO cambiar las cifras.** Son de la semilla 42 y el reeval las reproduce (filas `reeval42/*` del
+  summary). No relabelar como "tres semillas": GAT y TAGCN solo tienen seed 42, así que un promedio a
+  tres semillas sería mixto y engañoso. Este bloque queda igual; su refuerzo visual es la figura de
+  curvas (2d).
+- **Replicación de GNNShap y PGExplainer** (buscar "se recalculó la estabilidad de GNNExplainer",
+  ~línea 145): inmediatamente DESPUÉS de la sección por escenario (tras
+  `\input{tables/elliptic_stab_scenario.tex}`, ~línea 223) añadir un párrafo corto + la tabla nueva:
   ```latex
-  La replicación con tres semillas se extendió también a los otros dos explicadores, de modo que la
-  caracterización de una sola semilla queda ahora confirmada por ciento ochenta modelos. GNNShap
-  reproduce su saturación, con una correlación de Spearman de features próxima a la unidad y
-  estadísticamente indistinguible entre las cuatro arquitecturas (Tabla \ref{tab:elliptic-robustez-3s}),
-  lo que ratifica que su altísima estabilidad convive con una incapacidad para ordenar arquitecturas.
-  PGExplainer mantiene su degeneración en las tres semillas, con una proporción de valores vacíos que
-  no cede ante el cambio de inicialización, en coherencia con que la limitación es del grafo disperso
-  y no del ajuste. [Rellenar con las cifras concretas del summary.csv.]
+  La replicación con tres semillas se extendió a GNNShap y PGExplainer para las dos arquitecturas
+  entrenables en la GPU de 8 GB disponible, GCN y GraphSAGE. GNNShap reproduce su saturación en las
+  tres semillas, con una correlación de Spearman de features próxima a la unidad
+  (Tabla \ref{tab:elliptic-robustez-3s}), lo que ratifica que su altísima estabilidad convive con una
+  incapacidad para ordenar arquitecturas. GAT y TAGCN, cuyos pesos con ocho cabezas de atención sobre
+  el grafo completo no cabían para reentrenar en esa tarjeta, se reportan sobre la semilla original,
+  en la que exhiben la misma saturación, de modo que la observación es transversal a las cuatro
+  arquitecturas aunque la replicación formal cubra dos. PGExplainer mantiene su degeneración.
+  [Rellenar las cifras concretas desde el summary.csv; respetar las marcas (s42).]
   \input{tables/elliptic_robustez_3semillas.tex}
   ```
-  Ajustar las cifras entre corchetes con los valores reales del `summary.csv`.
+  Ajustar las cifras entre corchetes con los valores reales del `summary.csv`, sin inventar IC para
+  las celdas `(s42)`.
 
 ### 2b. `presentacion_latex/beamer_defensa_v3.tex`
 
 Añadir, en la lámina de respaldo sobre estabilidad/replicación (o como nota al pie de la lámina de
-ranking a 3 semillas), una frase: que la replicación a tres semillas cubre **las tres familias** de
-explicador, no solo GNNExplainer, y que GNNShap (saturado) y PGExplainer (degenerado) confirman su
-comportamiento de una semilla. No alterar la narrativa ni las cifras de GNNExplainer.
+ranking a 3 semillas), una frase: que la replicación a tres semillas cubre GNNShap y PGExplainer para
+GCN y GraphSAGE (saturación y degeneración confirmadas), y que GAT/TAGCN se reportan en la semilla 42
+por límite de memoria, con el mismo patrón. No alterar la narrativa ni las cifras de GNNExplainer.
 
 ### 2c. `docs/DISCURSO_defensa_dos_voces.md`
 
 En la respuesta ensayada sobre replicación (buscar "semillas"), añadir: "La replicación a tres
-semillas no se limitó a GNNExplainer; también se corrieron GNNShap y PGExplainer en las tres
-semillas, y ambos confirman su patrón (saturación y degeneración respectivamente)."
+semillas no se limitó a GNNExplainer; GNNShap y PGExplainer se replicaron en GCN y GraphSAGE (las
+arquitecturas que caben en la GPU de 8 GB), confirmando saturación y degeneración; GAT y TAGCN
+muestran el mismo patrón ya en la semilla original."
 
 ### 2d. Curvas PR/ROC (tesis, deck y discurso)
 
 La figura `presentacion_latex/fig/curvas_pr_roc.png` ya existe (paso 1) y se copió a
-`tesis_latex/chapter_4/images_ch4/`. Insertarla siguiendo los TRES huecos documentados en
-`docs/PENDIENTE_curvas_pr_roc.md` (sección "Qué queda por insertar cuando exista la figura"), con UN
-ajuste: como ahora se promedia sobre las TRES semillas, el caption NO debe decir "veintitrés
-configuraciones" sino "las configuraciones que superan el filtro de calidad, promediadas sobre las
-tres semillas de modelo".
+`tesis_latex/chapter_4/images_ch4/`. Se genera con `--seed 42` (por defecto), así que sus etiquetas
+de AUC cuadran exactamente con las cifras seed-42 del bloque ROC-AUC; el caption del doc de pendiente
+sirve tal cual, sin cambios. Insertarla siguiendo los TRES huecos de
+`docs/PENDIENTE_curvas_pr_roc.md` (sección "Qué queda por insertar cuando exista la figura"):
 
 - **Tesis** (`tesis_latex/chapter_4/Chapter_4.tex`): insertar el bloque `\begin{figure}...
   \includegraphics{chapter_4/images_ch4/curvas_pr_roc.png}...\label{fig:curvas}\end{figure}` del doc
-  de pendiente justo después de la tabla `tab:elliptic-rocauc` (~línea 114), con el caption ajustado a
-  3 semillas, y una frase de enlace en el párrafo de la línea 97 que remita a la Figura \ref{fig:curvas}.
+  de pendiente justo después de la tabla `tab:elliptic-rocauc` (~línea 114), con el caption del doc de
+  pendiente sin cambios (es semilla 42), y una frase de enlace en el párrafo de la línea 97 que remita
+  a la Figura \ref{fig:curvas}.
 - **Deck** (`presentacion_latex/beamer_defensa_v3.tex`): lámina 28 ("Rigor métrico: PR-AUC y no
   ROC-AUC"), hoy solo tabla. Pasarla a dos columnas, tabla a la izquierda y `\figcard{curvas_pr_roc.png}`
   a la derecha con su `\figcap` (la figura se resuelve por `\graphicspath`, que incluye `fig/`).

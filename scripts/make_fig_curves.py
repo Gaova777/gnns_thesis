@@ -51,10 +51,21 @@ def main():
     ap.add_argument("--curves", default=CURVES)
     ap.add_argument("--metrics", default=METRICS)
     ap.add_argument("--out", default=OUT)
+    ap.add_argument("--seed", type=int, default=42,
+                    help="Filtra a esta semilla para que las etiquetas de AUC cuadren "
+                         "con las cifras del manuscrito (semilla 42). Con -1 no filtra "
+                         "(agrega todas las semillas disponibles).")
     args = ap.parse_args()
 
     curves = pd.read_csv(args.curves)
     metrics = pd.read_csv(args.metrics)
+    # Filtra por semilla para que figura y texto no se desincronicen: el manuscrito
+    # reporta las cifras de la semilla 42. Con --seed -1 se agregan todas.
+    if args.seed >= 0:
+        if "seed" in curves.columns:
+            curves = curves[curves["seed"] == args.seed]
+        if "seed" in metrics.columns:
+            metrics = metrics[metrics["seed"] == args.seed]
     if not args.all:
         curves = curves[curves["quality_passed"] == True]  # noqa: E712
         metrics = metrics[metrics["quality_passed"] == True]  # noqa: E712
