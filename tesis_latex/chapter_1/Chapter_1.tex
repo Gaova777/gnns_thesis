@@ -64,7 +64,7 @@ A pesar de estos avances, la literatura coincide en que explicar GNNs sigue sien
 
 \bigskip
 
-En el dominio AML, esta limitación es todavía más delicada. No basta con que un explicador produzca un subgrafo visualmente coherente; es necesario que la explicación sea estable, reproducible y suficientemente fiel como para respaldar decisiones en escenarios regulados. Gawantka et al. propusieron una métrica específica para evaluar la estabilidad de las explicaciones XAI, subrayando que este criterio ha sido históricamente subestimado en la literatura \cite{Gawantka2024AExplanations}. A su vez, Rai et al. mostraron que el desbalance de clases puede deteriorar significativamente el comportamiento de las técnicas XAI, incluso cuando el modelo mantiene un desempeño predictivo aceptable \cite{Rai2025EvaluatingData}. Fujiwara profundizó en esta relación al estudiar cómo técnicas de remuestreo y destilación del conocimiento pueden mejorar simultáneamente el rendimiento predictivo y la estabilidad explicativa en escenarios desbalanceados \cite{Fujiwara2024KnowledgeStability}.
+En el dominio AML, esta limitación es todavía más delicada. No basta con que un explicador produzca un subgrafo visualmente coherente. Es necesario que la explicación sea estable, reproducible y suficientemente fiel como para respaldar decisiones en escenarios regulados. Gawantka et al. propusieron una métrica específica para evaluar la estabilidad de las explicaciones XAI, subrayando que este criterio ha sido históricamente subestimado en la literatura \cite{Gawantka2024AExplanations}. A su vez, Rai et al. mostraron que el desbalance de clases puede deteriorar significativamente el comportamiento de las técnicas XAI, incluso cuando el modelo mantiene un desempeño predictivo aceptable \cite{Rai2025EvaluatingData}. Fujiwara profundizó en esta relación al estudiar cómo técnicas de remuestreo y destilación del conocimiento pueden mejorar simultáneamente el rendimiento predictivo y la estabilidad explicativa en escenarios desbalanceados \cite{Fujiwara2024KnowledgeStability}.
 
 \bigskip
 
@@ -94,7 +94,7 @@ Rai et al. \cite{Rai2025EvaluatingData} & XAI bajo desbalance & Evidencia impact
 \hline
 Fujiwara \cite{Fujiwara2024KnowledgeStability} & Remuestreo y estabilidad explicativa & Relaciona balanceo con estabilidad XAI & No aborda GNNs financieras de forma directa \\
 \hline
-\textbf{Este trabajo (2026)} & Estabilidad XAI en GNNs bajo desbalance extremo, con eje real y eje sintético de \textit{ground-truth} & Trata estabilidad, plausibilidad y fidelidad como dimensiones independientes; corrige dos artefactos de evaluación; entrega una matriz de recomendación por objetivo & La inferencia sobre plausibilidad y fidelidad proviene del eje sintético \\
+\textbf{Este trabajo (2026)} & Estabilidad XAI en GNNs bajo desbalance extremo, con eje real y eje sintético de \textit{ground-truth} & Trata estabilidad, plausibilidad y fidelidad como dimensiones independientes, corrige dos artefactos de evaluación y entrega una matriz de recomendación por objetivo & La inferencia sobre plausibilidad y fidelidad proviene del eje sintético \\
 \hline
 \end{tabular}
 \caption{Síntesis del estado del arte en detección AML basada en grafos y explicabilidad}
