@@ -5,7 +5,7 @@
 > Autores: Alejandro Gomez Huertas y Juan Diego Garzon Ovalle. Director: Ph.D. Cristian Rosero Arias.
 >
 > **Duracion objetivo:** 33 a 36 minutos, dentro de una franja de 40. **Reparto:** Alejandro presenta el Bloque A (contexto y
-> metodologia, paginas 1 a 17); Juan Diego presenta el Bloque B (resultados y cierre, paginas 19 a 35).
+> metodologia, paginas 1 a 17). Juan Diego presenta el Bloque B (resultados y cierre, paginas 19 a 35).
 > Cada slide indica quien habla, el tiempo objetivo, el guion hablado y el gesto de transicion.
 >
 > Escrito sin guiones largos ni medios. Los numeros son la version corregida (post fix R1).
@@ -13,9 +13,9 @@
 > ensayenlo hasta que suene propio y ajusten el fraseo a su manera de hablar.
 >
 > **Cambios de esta v2 respecto de la v1:** (1) se enuncian de forma explicita las tres hipotesis
-> falsables en el Bloque A y se cierra su refutacion en el Bloque B; (2) se responde de forma directa
-> el Objetivo 1 (el nivel de desbalance no degrada la estabilidad); (3) GNNShap gana un rol claro en la
-> narrativa de resultados; (4) el cierre responde de frente la pregunta de investigacion; (5) se anade
+> falsables en el Bloque A y se cierra su refutacion en el Bloque B, (2) se responde de forma directa
+> el Objetivo 1 (el nivel de desbalance no degrada la estabilidad), (3) GNNShap gana un rol claro en la
+> narrativa de resultados, (4) el cierre responde de frente la pregunta de investigacion, (5) se anade
 > una respuesta ensayada a la pregunta mas filosa del jurado.
 
 ---
@@ -97,7 +97,7 @@ metodologia, y mi companero continua con los resultados y las conclusiones. *(pa
 que este problema importa.
 
 
-> **En la tesis:** Portada; Cap. 1 (Introduccion).
+> **En la tesis:** Portada. Cap. 1 (Introduccion).
 
 ### Pagina 2: Contenido  ·  [A]  ·  25 s
 El recorrido tiene cinco partes. Primero el problema y por que la explicabilidad es critica en este
@@ -121,7 +121,7 @@ justificarse ante un auditor y debe ser reproducible. *(pausa)* Ahi es donde ent
 y ahi es donde encontramos que faltaba algo.
 
 
-> **En la tesis:** Cap. 1, seccion 1.1 (Planteamiento y Contexto del Problema); Cap. 2, seccion 2.3 (Sistemas Tradicionales de Monitoreo) y seccion 2.7 (Del Monitoreo Basado en Reglas hacia Enfoques Estructurales).
+> **En la tesis:** Cap. 1, seccion 1.1 (Planteamiento y Contexto del Problema). Cap. 2, seccion 2.3 (Sistemas Tradicionales de Monitoreo) y seccion 2.7 (Del Monitoreo Basado en Reglas hacia Enfoques Estructurales).
 
 ### Pagina 5: Pregunta, objetivos e hipotesis  ·  [A]  ·  80 s
 Nuestra pregunta es la siguiente: como se comporta la estabilidad de los metodos de explicabilidad
@@ -133,9 +133,9 @@ resiliencia de cuatro arquitecturas: GCN, GraphSAGE, GAT y TAGCN. El tercero, ev
 estrategias de balanceo afectan la calidad de las explicaciones. Y el cuarto, condensar todo en una
 matriz de recomendacion que diga que usar segun el objetivo. *(pausa)* Y para comprometernos con
 predicciones falsables antes de ver los datos, planteamos tres hipotesis: que la estabilidad se
-degradaria al agravarse el desbalance; que TAGCN, por su alcance multi-hop, seria la arquitectura mas
-estable; y que un explicador mas estable senalaria tambien mejor el patron de lavado. Adelanto algo que
-mi companero va a mostrar con datos: las tres se matizaron o se cayeron, y esa honestidad es parte del
+degradaria al agravarse el desbalance, que TAGCN, por su alcance multi-hop, seria la arquitectura mas
+estable, y que un explicador mas estable senalaria tambien mejor el patron de lavado. Adelanto algo que
+mi companero va a mostrar con datos: las tres se matizaron o se cayeron, y contarlo tambien es parte del
 aporte.
 
 
@@ -152,16 +152,16 @@ Esa doble brecha, la estabilidad no evaluada y la plausibilidad no medible, es l
 a cerrar.
 
 
-> **En la tesis:** Cap. 1, seccion 1.2 (Revision de Literatura y Estado del Arte) y seccion 1.3 (La Arista de Investigacion); Cap. 3, seccion 3.6.4 (El Problema de la Estabilidad Explicativa).
+> **En la tesis:** Cap. 1, seccion 1.2 (Revision de Literatura y Estado del Arte) y seccion 1.3 (La Arista de Investigacion). Cap. 3, seccion 3.6.4 (El Problema de la Estabilidad Explicativa).
 
 ### Pagina 8: Marco conceptual  ·  [A]  ·  55 s
 Un marco minimo para lo que sigue. Trabajamos con cuatro arquitecturas de red de grafos, que se
 diferencian en como cada nodo agrega informacion de sus vecinos: GCN usa una convolucion espectral de
 un salto, GraphSAGE muestrea y agrega de forma inductiva, GAT pondera a los vecinos con atencion, y
 TAGCN usa filtros polinomicos que alcanzan varios saltos. *(pausa)* Y sobre esas redes aplicamos tres
-explicadores post-hoc, que operan despues de entrenar: GNNExplainer, que optimiza una mascara por cada
-instancia; PGExplainer, que entrena una red generativa para explicar; y GNNShap, que usa valores de
-Shapley por muestreo. Cuatro arquitecturas por tres explicadores es el nucleo de la comparacion.
+explicadores post-hoc, que operan despues de entrenar. GNNExplainer optimiza una mascara por cada
+instancia, PGExplainer entrena una red generativa para explicar y GNNShap usa valores de Shapley por
+muestreo. Cuatro arquitecturas por tres explicadores es el nucleo de la comparacion.
 
 
 > **En la tesis:** Cap. 3, secciones 3.2 (GNN: Fundamentos Conceptuales), 3.3 (Arquitecturas GNN Fundamentales), 3.4 (TAGCN) y 3.6.2 (Metodos XAI para GNNs).
@@ -174,11 +174,11 @@ explicacion senala el patron real de lavado, lo que un experto reconoceria. Y la
 la explicacion refleja de verdad lo que el modelo uso para decidir. *(pausa)* La tesis central es que
 estas tres son dimensiones distintas que no se implican entre si. Una explicacion puede ser muy estable
 y aun asi apuntar al patron equivocado. Puede ser plausible para un humano y no reflejar el mecanismo
-del modelo. Gran parte de la literatura reporta una sola de estas y la llama calidad; nosotros vamos a
+del modelo. Gran parte de la literatura reporta una sola de estas y la llama calidad. Nosotros vamos a
 mostrar, con datos, que hay que medir las tres por separado.
 
 
-> **En la tesis:** Cap. 3, seccion 3.8.4 (Metricas de Estabilidad y Fidelidad Explicativa); Cap. 6, seccion 6.2 (Estabilidad, Plausibilidad y Fidelidad como Tres Dimensiones Independientes).
+> **En la tesis:** Cap. 3, seccion 3.8.4 (Metricas de Estabilidad y Fidelidad Explicativa). Cap. 6, seccion 6.2 (Estabilidad, Plausibilidad y Fidelidad como Tres Dimensiones Independientes).
 
 ### Pagina 11: Que produce un explicador  ·  [A]  ·  60 s
 Antes de entrar en la metodologia quiero aterrizar que es, en concreto, una explicacion, porque toda la
@@ -195,7 +195,7 @@ de aristas es casi trivial y solo el ranking de atributos discrimina. Por eso ah
 con Spearman sobre features.
 
 
-> **En la tesis:** Cap. 3, seccion 3.6.2 (Metodos XAI para GNNs) y seccion 3.8.4; Cap. 4, seccion 4.1.2 (Dispersion de la Topologia).
+> **En la tesis:** Cap. 3, seccion 3.6.2 (Metodos XAI para GNNs) y seccion 3.8.4. Cap. 4, seccion 4.1.2 (Dispersion de la Topologia).
 
 ### Pagina 12: Dos ejes  ·  [A]  ·  70 s
 Como se prueba algo asi. Con un diseno de dos ejes, que es la decision metodologica mas importante de
@@ -205,12 +205,12 @@ no trae patron verdadero, asi que solo permite medir estabilidad, y sus vecindar
 de unos dos nodos. El segundo eje es un grafo sintetico que construimos nosotros, con patron verdadero
 por cada nodo y por cada arista. Nos da validez interna: como sabemos cual es el patron correcto,
 podemos medir plausibilidad y fidelidad, cosa imposible en Elliptic. *(pausa)* La clave es que los dos
-ejes se complementan. Ninguno solo alcanza; juntos permiten afirmar cosas que ninguno probaria por su
+ejes se complementan. Ninguno solo alcanza. Juntos permiten afirmar cosas que ninguno probaria por su
 cuenta. Y aqui adelanto un punto que mi companero va a demostrar: los dos ejes, bien medidos, cuentan
 la misma historia.
 
 
-> **En la tesis:** Cap. 5, seccion 5.1 (Por que se Construye un Grafo Sintetico); Cap. 6, seccion 6.1 (Lectura Conjunta de los Dos Ejes).
+> **En la tesis:** Cap. 5, seccion 5.1 (Por que se Construye un Grafo Sintetico). Cap. 6, seccion 6.1 (Lectura Conjunta de los Dos Ejes).
 
 ### Pagina 13: Diseno factorial  ·  [A]  ·  55 s
 El experimento es una matriz factorial completa: cuatro arquitecturas, por tres explicadores, por tres
@@ -222,7 +222,7 @@ independientes, con pruebas estadisticas serias, Kruskal-Wallis, Wilcoxon e inte
 por bootstrap. Esto es lo que convierte observaciones sueltas en evidencia con respaldo.
 
 
-> **En la tesis:** Cap. 4, seccion 4.2 (Pipeline Experimental y Espacio Factorial); Cap. 5, seccion 5.4 (Analisis Estadistico de Robustez); Cap. 8, seccion 8.1 (Espacio de Busqueda de Hiperparametros).
+> **En la tesis:** Cap. 4, seccion 4.2 (Pipeline Experimental y Espacio Factorial). Cap. 5, seccion 5.4 (Analisis Estadistico de Robustez). Cap. 8, seccion 8.1 (Espacio de Busqueda de Hiperparametros).
 
 ### Pagina 14: Elliptic  ·  [A]  ·  60 s
 El primer eje en detalle. Elliptic tiene doscientos tres mil setecientos sesenta y nueve nodos,
@@ -232,7 +232,7 @@ uno a nueve en la parte etiquetada. *(pausa)* Hicimos una particion temporal cau
 pasado y evaluamos con el futuro, que es como opera un sistema real. Y hay un dato que gobierna todo lo
 demas: el vecindario tipico de un nodo tiene una mediana de unos dos nodos. Es un grafo extremadamente
 disperso. Por eso, como veran, la unica metrica de estabilidad que discrimina bien aqui es la
-correlacion de Spearman entre rankings de atributos; las metricas de aristas se saturan.
+correlacion de Spearman entre rankings de atributos. Las metricas de aristas se saturan.
 
 
 > **En la tesis:** Cap. 4, seccion 4.1 (Preprocesamiento y Analisis Exploratorio: 4.1.1 Composicion, 4.1.2 Dispersion de la Topologia).
@@ -241,7 +241,7 @@ correlacion de Spearman entre rankings de atributos; las metricas de aristas se 
 El segundo eje, nuestro grafo sintetico, responde a una necesidad concreta: para medir si una
 explicacion es plausible, hay que saber de antemano cual es el subgrafo correcto, y Elliptic no lo da.
 Asi que lo construimos. *(pausa)* Inyectamos cuatro tipologias de lavado reconocidas: structuring,
-layering, fan-in y fan-out. Y tomamos tres decisiones para que la medicion sea honesta: simetrizamos
+layering, fan-in y fan-out. Y tomamos tres decisiones para que la medicion no quede servida: simetrizamos
 las aristas para que el vecindario tenga estructura suficiente, anadimos aristas distractoras para que
 acertar no sea trivial, y atenuamos la firma de los atributos para que la tarea no se resuelva sola.
 Un detalle importante que nos van a preguntar: el patron verdadero es ciego al explicador, se define
@@ -267,7 +267,7 @@ completamente ciego a que explicador se va a evaluar despues. Que PGExplainer ga
 esta cableado en ninguna parte.
 
 
-> **En la tesis:** Cap. 5, seccion 5.2 (Construccion del Grafo Sintetico y sus Tipologias); Cap. 8, seccion 8.5. Material de apoyo: `docs/DEFENSA_R2_evidencia_sintetica.md`, pilares 4 y 5.
+> **En la tesis:** Cap. 5, seccion 5.2 (Construccion del Grafo Sintetico y sus Tipologias). Cap. 8, seccion 8.5. Material de apoyo: `docs/DEFENSA_R2_evidencia_sintetica.md`, pilares 4 y 5.
 
 ### Pagina 17: Metricas  ·  [A]  ·  55 s
 Cierro mi bloque con las metricas. La estabilidad la medimos con la correlacion de Spearman entre los
@@ -305,7 +305,7 @@ del metodo. Y de paso reportamos dos bugs concretos del PGExplainer de la librer
 todo esto y volvimos a medir. Lo que sigue son los numeros corregidos.
 
 
-> **En la tesis:** Cap. 4, seccion 4.5 (De un Artefacto de Computo a un Artefacto de Medida: dos Correcciones Metodologicas); Cap. 6, seccion 6.4 (Contribuciones Metodologicas).
+> **En la tesis:** Cap. 4, seccion 4.5 (De un Artefacto de Computo a un Artefacto de Medida: dos Correcciones Metodologicas). Cap. 6, seccion 6.4 (Contribuciones Metodologicas).
 
 ### Pagina 20: El segundo artefacto en detalle  ·  [JD]  ·  60 s
 Me detengo en el segundo artefacto porque es el mas instructivo de los dos. *(pausa)* La metrica de
@@ -322,7 +322,7 @@ defectos del protocolo de medida que apuntaban en direcciones opuestas y cada un
 para una conclusion comparativa falsa.
 
 
-> **En la tesis:** Cap. 4, seccion 4.5; Cap. 6, seccion 6.5 (Relacion con el Estado del Arte, la leccion de Kosan).
+> **En la tesis:** Cap. 4, seccion 4.5. Cap. 6, seccion 6.5 (Relacion con el Estado del Arte, la leccion de Kosan).
 
 ### Pagina 21: Ranking por arquitectura  ·  [JD]  ·  75 s
 Con la metrica corregida, y replicando el entrenamiento completo con tres semillas de modelo, lo que
@@ -335,15 +335,15 @@ diferencia entre ellas, una separacion tan marcada como la que vemos apareceria 
 en cien mil. Pero cuando hacemos la misma pregunta dentro del grupo alto, o dentro del grupo bajo, las
 diferencias son del tamano que el azar produce con frecuencia, asi que no podemos afirmar que existan. *(pausa)* Aqui cierro nuestra
 segunda hipotesis: esperabamos que TAGCN, por su alcance multi-hop, fuera la mas estable, y aparece de
-forma consistente en el grupo bajo en las tres semillas. La hipotesis se cae, y lo decimos sin rodeos.
-*(pausa)* Quiero ser honesto con dos cosas mas. La primera, que el liderazgo de GraphSAGE que reportaba
+forma consistente en el grupo bajo en las tres semillas. La hipotesis se cae.
+*(pausa)* Hay dos cosas mas que tenemos que decir. La primera, que el liderazgo de GraphSAGE que reportaba
 una version anterior de la tesis era un artefacto del truncamiento de la metrica, y corregido se
 disuelve. La segunda, que GAT y GCN se permutan entre semillas, asi que no afirmamos que ninguna de las
 dos sea la mejor: afirmamos que las dos forman el grupo alto. Decir menos seria impreciso, y decir mas
 seria sobre-interpretar.
 
 
-> **En la tesis:** Cap. 4, seccion 4.5 (tabla tab:ranking); Cap. 4, seccion 4.6 (Replicacion con Multiples Semillas y Estructura en Dos Grupos); Cap. 8, seccion 8.2.
+> **En la tesis:** Cap. 4, seccion 4.5 (tabla tab:ranking). Cap. 4, seccion 4.6 (Replicacion con Multiples Semillas y Estructura en Dos Grupos). Cap. 8, seccion 8.2.
 
 ### Pagina 22: Robustez de la particion  ·  [JD]  ·  55 s
 Me detengo un momento en que sostiene esa particion, porque es la diferencia entre una observacion y
@@ -363,7 +363,7 @@ extension quedo en la semilla de referencia por un motivo operativo: sus modelos
 semillas, que si forman parte de los ciento ochenta, no estaban en el equipo donde la corrimos, y
 reentrenarlos alli agoto la memoria de la tarjeta. Aun asi, en esa semilla muestran exactamente el
 mismo patron.
-*(pausa)* Hay un segundo hallazgo aqui que queremos declarar, porque es una contribucion en si misma. Al reentrenar
+*(pausa)* Hay un segundo hallazgo aqui que tambien cuenta como contribucion. Al reentrenar
 descubrimos que el pipeline no es reproducible bit a bit: las operaciones de agregacion sobre la
 tarjeta grafica suman en un orden que no esta determinado, asi que los pesos nunca salen identicos.
 Lo que si se reproduce son las conclusiones, veinticinco configuraciones sobre el filtro de calidad
@@ -372,8 +372,8 @@ la reproducibilidad de las conclusiones es algo que la literatura rara vez expli
 deberia hacerlo.
 
 
-> **En la tesis:** Cap. 4, seccion 4.6 (tablas tab:seeds y tab:ic); Cap. 6, seccion 6.4
-> (Contribuciones Metodologicas); Cap. 8, seccion 8.5 (Reproducibilidad y Entorno de Computo).
+> **En la tesis:** Cap. 4, seccion 4.6 (tablas tab:seeds y tab:ic). Cap. 6, seccion 6.4
+> (Contribuciones Metodologicas). Cap. 8, seccion 8.5 (Reproducibilidad y Entorno de Computo).
 
 ### Pagina 23: Concordancia entre regimenes  ·  [JD]  ·  70 s
 Este resultado es uno de los que mas me gustan, porque nacio de un error corregido. En una version
@@ -383,12 +383,12 @@ Cuando corregimos el bug de la metrica, esa inversion desaparecio. Lo que en rea
 contrario: los dos regimenes concuerdan. Las mismas arquitecturas que son estables en el grafo denso
 lo son en el disperso. Lo cuantificamos con la correlacion de rangos entre ambos regimenes, que pasa de
 menos cero coma veinte con la metrica defectuosa, a mas cero coma ochenta con la metrica corregida.
-*(pausa)* Y esto, lejos de debilitar la tesis, la refuerza, porque significa que datos reales y datos
+*(pausa)* Y esto le da peso a la tesis, porque significa que datos reales y datos
 sinteticos cuentan la misma historia. La coherencia entre los dos ejes es lo que le da solidez a todo
 el diseno.
 
 
-> **En la tesis:** Cap. 5, seccion 5.3 (Resultados de la Matriz Factorial); Cap. 6, secciones 6.1 y 6.2.
+> **En la tesis:** Cap. 5, seccion 5.3 (Resultados de la Matriz Factorial). Cap. 6, secciones 6.1 y 6.2.
 
 ### Pagina 24: Disociacion plausibilidad y fidelidad  ·  [JD]  ·  85 s
 Ahora el hallazgo central sobre los explicadores, y es un resultado con dos caras. *(pausa)* Por un
@@ -403,20 +403,20 @@ GNNExplainer no es recuperar el patron, sino la fidelidad al modelo. Es
 decir, si el objetivo es senalar el patron de lavado, PGExplainer gana sin discusion. *(pausa)* Pero
 por otro lado, ese mismo PGExplainer colapsa en fidelidad: cuando medimos cuanto depende la prediccion
 del modelo de las aristas que PGExplainer marca, el valor cae a cero coma once, frente a cero coma
-cincuenta y seis de GNNExplainer. La lectura es contraintuitiva y potente: el explicador mas plausible
+cincuenta y seis de GNNExplainer. La lectura va contra la intuicion: el explicador mas plausible
 no es el mas fiel. PGExplainer recupera las aristas que definen el patron que un humano reconoce, pero
 GNNExplainer recupera las aristas que el modelo realmente usa, y esos dos conjuntos no coinciden.
 *(pausa)* Una precision sobre la figura: compara los dos explicadores que producen mascara de aristas,
 que son los unicos comparables contra esa linea base de cero coma cuarenta. GNNShap no produce mascara
 de aristas por diseno, su plausibilidad es de features y vive en otra escala, con su propia linea base
-de cero coma cero siete cinco; sus valores estan en la lamina de respaldo con la metrica etiquetada. Lo
+de cero coma cero siete cinco. Sus valores estan en la lamina de respaldo con la metrica etiquetada. Lo
 que si cabe decir de GNNShap aqui es que es el mas estable internamente de los tres, el mas consistente
 entre ejecuciones, aunque no lidere ni plausibilidad ni fidelidad. Cada explicador, entonces, tiene su
 fortaleza en una dimension distinta. Esta disociacion solo se puede exhibir cuando tienes un patron
 verdadero contra el cual medir, y por eso el eje sintetico era indispensable.
 
 
-> **En la tesis:** Cap. 5, seccion 5.6 (La Disociacion entre Plausibilidad y Fidelidad); la plausibilidad de aristas en seccion 5.3.
+> **En la tesis:** Cap. 5, seccion 5.6 (La Disociacion entre Plausibilidad y Fidelidad). La plausibilidad de aristas en seccion 5.3.
 
 ### Pagina 25: Resultado 3, el puente que no existe  ·  [JD]  ·  60 s
 Esta lamina cierra nuestra hipotesis central, y tambien se cae. *(pausa)* Esperabamos que una explicacion
@@ -429,12 +429,12 @@ cero coma cero treinta y ocho a mas cero coma cero once, o sea que incluye el ce
 explicador estable no es por ello mas acertado sobre el patron real, y ambas propiedades hay que medirlas
 por separado. *(pausa)* Y hay un detalle que refuerza la conclusion: cuando desagregamos por tipologia, el
 signo de la relacion cambia segun cual mires, positivo en structuring y en fan-out, negativo en layering.
-No hay una ley que ligue las dos dimensiones, ni siquiera dentro del mismo grafo. Es un no-resultado, y lo
-reportamos con honestidad precisamente porque contradice lo que esperabamos; si hubieramos disenado el
+No hay una ley que ligue las dos dimensiones, ni siquiera dentro del mismo grafo. Es un resultado nulo, y lo
+reportamos porque contradice lo que esperabamos. Si hubieramos disenado el
 experimento para lucirnos, habriamos forzado una correlacion bonita, y no lo hicimos.
 
 
-> **En la tesis:** Cap. 5, seccion 5.5 (La Ausencia de un Puente entre Estabilidad y Plausibilidad); tabla `tab:synth-bridge` para el desglose por tipologia.
+> **En la tesis:** Cap. 5, seccion 5.5 (La Ausencia de un Puente entre Estabilidad y Plausibilidad). Tabla `tab:synth-bridge` para el desglose por tipologia.
 
 ### Pagina 26: El desbalance no gobierna la estabilidad  ·  [JD]  ·  55 s
 Cierro la primera hipotesis, y tambien se cae. *(pausa)* Esperabamos que la estabilidad se degradara a
@@ -455,7 +455,7 @@ tesis para un equipo de cumplimiento: el balanceo pueden elegirlo por rendimient
 que al hacerlo esten degradando la interpretabilidad. Son decisiones que se pueden tomar por separado.
 
 
-> **En la tesis:** Cap. 4, seccion 4.5 (perfil por escenario, tabla tab:elliptic-stab-scen); Cap. 6, seccion 6.3 (El Papel Secundario del Balanceo y de la Arquitectura); Cap. 7, seccion 7.1 (O1 y O3).
+> **En la tesis:** Cap. 4, seccion 4.5 (perfil por escenario, tabla tab:elliptic-stab-scen). Cap. 6, seccion 6.3 (El Papel Secundario del Balanceo y de la Arquitectura). Cap. 7, seccion 7.1 (O1 y O3).
 
 ### Pagina 27: Colapso validacion a test  ·  [JD]  ·  70 s
 Un resultado de rendimiento que debemos declarar con transparencia, porque enmarca todo lo anterior.
@@ -465,12 +465,12 @@ patrones de lavado cambian entre los primeros y los ultimos pasos, y un modelo e
 encuentra en el futuro una distribucion distinta. Es una propiedad del dato, no un defecto de nuestro
 metodo. Aqui hay un punto metodologico que quisimos remarcar: el ROC-AUC se ve enganosamente alto bajo
 desbalance extremo, cero coma ochenta y ocho en validacion, y por eso no lo usamos como metrica
-principal; usamos el area de precision y exhaustividad y la precision en los primeros de la lista, que no se dejan enganar. *(pausa)* Como consecuencia, la
+principal. Usamos el area de precision y exhaustividad y la precision en los primeros de la lista, que no se dejan enganar. *(pausa)* Como consecuencia, la
 estabilidad la estudiamos sobre los verdaderos positivos de validacion, donde el modelo si discrimina,
 y lo declaramos de forma abierta. No es esconder el colapso, es medir donde la pregunta tiene sentido.
 
 
-> **En la tesis:** Cap. 4, seccion 4.4 (Rendimiento Predictivo y el Colapso de Validacion a Test); Cap. 3, seccion 3.8.2.
+> **En la tesis:** Cap. 4, seccion 4.4 (Rendimiento Predictivo y el Colapso de Validacion a Test). Cap. 3, seccion 3.8.2.
 
 ### Pagina 28: Rigor metrico, PR-AUC y no ROC-AUC  ·  [JD]  ·  55 s
 Esta lamina desarrolla el punto metodologico que acabo de mencionar, porque creo que merece detenerse.
@@ -488,7 +488,7 @@ el trabajo real de un analista, que revisa una lista acotada de alertas y no tod
 transacciones.
 
 
-> **En la tesis:** Cap. 4, seccion 4.4 (tabla tab:elliptic-rocauc); Cap. 3, seccion 3.8.2 (Metricas en Escenarios de Desbalance).
+> **En la tesis:** Cap. 4, seccion 4.4 (tabla tab:elliptic-rocauc). Cap. 3, seccion 3.8.2 (Metricas en Escenarios de Desbalance).
 
 ### Pagina 29: Las tres hipotesis y su veredicto  ·  [JD]  ·  60 s
 Antes de pasar a las conclusiones quiero cerrar el circulo que abrio mi companero al principio. *(pausa)*
@@ -496,7 +496,7 @@ Nos comprometimos con tres predicciones falsables antes de ver los datos. La pri
 se degradaria al agravarse el desbalance: refutada, el perfil es plano. La segunda, que TAGCN seria la
 mas estable por su alcance multi-hop: refutada, aparece en el grupo bajo en las tres semillas. Y la
 tercera, que un explicador mas estable senalaria mejor el patron: refutada, el puente es nulo. *(pausa)*
-Las tres se cayeron. Ninguna se oculto. *(pausa)* Y quiero explicar por que presentamos esto como un
+Las tres se cayeron, y las tres estan en la tesis. *(pausa)* Y quiero explicar por que presentamos esto como un
 resultado y no como un fracaso. Comprometerse con predicciones concretas antes de mirar los datos es lo
 que hace que refutarlas signifique algo. Si hubieramos formulado hipotesis vagas, o las hubieramos
 ajustado despues de ver los numeros, no habriamos aprendido nada. Lo que estas tres refutaciones nos
@@ -504,12 +504,12 @@ dicen es que la intuicion dominante en el campo, la de que existe una nocion uni
 que todas las metricas capturan a la vez, es falsa. Y ese es el hallazgo central de la tesis.
 
 
-> **En la tesis:** Cap. 1, seccion 1.5.3 (Hipotesis de Trabajo); Cap. 7, seccion 7.1 (Respuestas a los Objetivos de Investigacion).
+> **En la tesis:** Cap. 1, seccion 1.5.3 (Hipotesis de Trabajo). Cap. 7, seccion 7.1 (Respuestas a los Objetivos de Investigacion).
 
 ### Pagina 31: Conclusiones del proyecto  ·  [JD]  ·  75 s
 Antes de responder objetivo por objetivo, permitanme dejar las seis conclusiones que sostienen todo el
 trabajo. *(pausa)* Primera: estabilidad, plausibilidad y fidelidad son tres dimensiones independientes.
-No existe una unica buena explicacion; el mejor explicador depende del objetivo de la auditoria.
+No existe una unica buena explicacion. El mejor explicador depende del objetivo de la auditoria.
 Segunda: la estabilidad por arquitectura no es un ranking de cuatro puestos sino una particion en dos
 grupos, y esa particion concuerda entre los datos reales y los sinteticos, que es la evidencia mas
 fuerte que tenemos de que no es un artefacto de un dataset. *(pausa)* Tercera: el explicador es la
@@ -519,10 +519,10 @@ Cuarta: el mas plausible no es el mas fiel, y por eso la eleccion se hace segun 
 patron o auditar el modelo. *(pausa)* Quinta, y es la que mas nos importa como aporte metodologico:
 corregimos dos artefactos de medicion, y aprendimos a distinguir la reproducibilidad de los pesos de la
 reproducibilidad de las conclusiones. Y sexta: las tres hipotesis que planteamos se refutaron, y lo
-reportamos. Eso no debilito la tesis, la fortalecio.
+reportamos tal cual, sin ajustar el analisis para salvarlas.
 
 
-> **En la tesis:** Cap. 7 (Conclusiones); Cap. 6 (Discusion).
+> **En la tesis:** Cap. 7 (Conclusiones). Cap. 6 (Discusion).
 
 ### Pagina 32: Los cuatro objetivos, respondidos  ·  [JD]  ·  70 s
 Esta lamina responde uno a uno los objetivos que planteamos, para que quede explicito en que medida cada
@@ -552,28 +552,28 @@ una recomendacion cerrada, porque obliga a hacer explicito el proposito de la au
 la herramienta.
 
 
-> **En la tesis:** Cap. 7, seccion 7.1 (Respuestas a los Objetivos de Investigacion, O4); Cap. 6, seccion 6.6 (Implicaciones para la Practica de Auditoria en Entornos Regulados).
+> **En la tesis:** Cap. 7, seccion 7.1 (Respuestas a los Objetivos de Investigacion, O4). Cap. 6, seccion 6.6 (Implicaciones para la Practica de Auditoria en Entornos Regulados).
 
 ### Pagina 34: Contribuciones y limitaciones  ·  [JD]  ·  70 s
-Recapitulo aportes y limites, con la misma honestidad. *(pausa)* Contribuciones: mostramos que
-estabilidad, plausibilidad y fidelidad son tres dimensiones independientes en este dominio; corregimos
-dos artefactos de evaluacion y reportamos dos bugs de PGExplainer; construimos un generador sintetico
-con patron verdadero por arista; y entregamos la matriz de recomendacion. *(pausa)* Limitaciones, y las
-decimos sin rodeos porque el jurado las va a ver: la evidencia inferencial mas fuerte proviene del eje
-sintetico, que es el unico donde plausibilidad y fidelidad son medibles; el clasificador colapsa en test
-por el desplazamiento temporal; y aunque replicamos el entrenamiento con tres semillas de modelo en
+Recapitulo aportes y limites. *(pausa)* Contribuciones: mostramos que
+estabilidad, plausibilidad y fidelidad son tres dimensiones independientes en este dominio. Corregimos
+dos artefactos de evaluacion y reportamos dos bugs de PGExplainer. Construimos un generador sintetico
+con patron verdadero por arista, y entregamos la matriz de recomendacion. *(pausa)* Limitaciones, y las
+decimos nosotros antes de que el jurado las encuentre: la evidencia inferencial mas fuerte proviene del eje
+sintetico, que es el unico donde plausibilidad y fidelidad son medibles. El clasificador colapsa en test
+por el desplazamiento temporal, y aunque replicamos el entrenamiento con tres semillas de modelo en
 ambos ejes, el numero de entrenamientos por celda sigue siendo modesto, suficiente para separar los dos
 grupos de arquitecturas pero no para ordenar dentro de cada grupo, algo especialmente cierto en TAGCN
 sobre Elliptic, cuya dispersion entre semillas es la mayor de las cuatro. Ninguna de estas invalida los
-hallazgos, pero delimitan con honestidad hasta donde llegan.
+hallazgos, pero marcan hasta donde llegan.
 
 
-> **En la tesis:** Cap. 6, secciones 6.4 (Contribuciones) y 6.8 (Limitaciones); Cap. 7, secciones 7.2 (Aportes Principales) y 7.3 (Limitaciones).
+> **En la tesis:** Cap. 6, secciones 6.4 (Contribuciones) y 6.8 (Limitaciones). Cap. 7, secciones 7.2 (Aportes Principales) y 7.3 (Limitaciones).
 
 ### Pagina 35: Conclusiones y cierre  ·  [JD]  ·  80 s
 Para cerrar, respondo de frente nuestra pregunta de investigacion y dejo tres mensajes. *(pausa)* La
 respuesta directa a la pregunta es que no existe una combinacion unica optima de arquitectura,
-explicador y balanceo, y que la eleccion depende del proposito de la auditoria; para estabilidad y
+explicador y balanceo, y que la eleccion depende del proposito de la auditoria. Para estabilidad y
 auditabilidad, GAT o GCN con un explicador consistente son el mejor punto de partida. *(pausa)* De ahi,
 tres mensajes. Primero: estabilidad, plausibilidad y fidelidad no son lo mismo, y por eso el mejor
 explicador depende del objetivo de quien audita. Segundo: con la medicion corregida, los datos reales y
@@ -593,16 +593,16 @@ atentos a sus preguntas.
 
 ## Notas de puesta en escena
 
-- **Ritmo:** el bloque de resultados (slides 13 a 18) es el mas cargado. No lean la slide; miren al
-  jurado y usen la slide como respaldo. El discurso ya dice lo esencial; la slide tiene el detalle.
-- **Los numeros que deben salir sin dudar:** grupo alto GAT 0,78 y GCN 0,76 frente a grupo bajo GraphSAGE 0,74 y TAGCN 0,67, con diferencias significativas entre grupos y no dentro; puente r = menos
-  0,01; disociacion plausibilidad 0,80 (azar 0,40) contra fidelidad 0,11 para PGExplainer; concordancia menos 0,20
-  a mas 0,80; PR-AUC 0,37 en validacion a 0,02 en test.
+- **Ritmo:** el bloque de resultados (slides 13 a 18) es el mas cargado. No lean la slide. Miren al
+  jurado y usen la slide como respaldo. El discurso ya dice lo esencial. La slide tiene el detalle.
+- **Los numeros que deben salir sin dudar:** grupo alto GAT 0,78 y GCN 0,76 frente a grupo bajo GraphSAGE 0,74 y TAGCN 0,67, con diferencias significativas entre grupos y no dentro, puente r = menos
+  0,01, disociacion plausibilidad 0,80 (azar 0,40) contra fidelidad 0,11 para PGExplainer, concordancia de menos 0,20
+  a mas 0,80 y PR-AUC de 0,37 en validacion a 0,02 en test.
 - **Si se ponen nerviosos con una cifra,** digan el orden de magnitud y la direccion ("alrededor de
   cero coma ocho, muy por encima del otro"): el jurado valora que entiendan el resultado, no que
   reciten decimales.
-- **La honestidad es su mejor carta.** Cada vez que dicen "esto lo corregimos" o "esto refuto nuestra
-  hipotesis", suman credibilidad. No lo escondan; subrayenlo.
+- **Reconocer los errores juega a favor.** Cada vez que dicen "esto lo corregimos" o "esto refuto nuestra
+  hipotesis", suman credibilidad. No lo escondan. Subrayenlo.
 
 ### Preguntas probables y respuestas ensayadas
 
@@ -625,11 +625,11 @@ atentos a sus preguntas.
   y el analisis por escenario, viene de las tres semillas. La tabla de ranking pone las tres columnas
   lado a lado para que la progresion se vea."
 - **"Si el modelo colapsa en test, que sentido tiene medir la estabilidad de sus explicaciones?"**
-  (la mas filosa; ensayenla palabra por palabra). Respuesta: "La estabilidad y el rendimiento son
+  (la mas filosa, ensayenla palabra por palabra). Respuesta: "La estabilidad y el rendimiento son
   preguntas distintas. El colapso en test es un desplazamiento temporal del dato, documentado en la
   literatura de Elliptic, no un defecto del metodo. Nosotros medimos la estabilidad donde la pregunta
-  tiene sentido, sobre los verdaderos positivos de validacion, donde el modelo si discrimina; explicar
-  una prediccion equivocada no aporta informacion. Y lo declaramos de forma abierta, no lo escondemos.
+  tiene sentido, sobre los verdaderos positivos de validacion, donde el modelo si discrimina. Explicar
+  una prediccion equivocada no aporta informacion. Y eso esta declarado en la tesis desde el principio.
   Ademas, la coherencia con el eje sintetico, donde no hay colapso, respalda que lo que medimos sobre
   validacion no es un artefacto del colapso."
 - **"La evidencia fuerte viene del dataset que ustedes construyeron. No es circular?"** Respuesta: el
@@ -637,9 +637,9 @@ atentos a sus preguntas.
   metodo, y se anadieron distractores y atenuacion de atributos para que acertar no fuera trivial. El
   eje real aporta la validez externa que el sintetico no puede dar. Apoyarse en `DEFENSA_R2_evidencia_sintetica.md`.
 - **"Por que GAT y GCN y no una sola?"** Respuesta: porque la diferencia entre las de la parte alta no
-  es estadisticamente significativa (Wilcoxon 0,37); afirmar un unico ganador seria sobre-interpretar.
+  es estadisticamente significativa (Wilcoxon 0,37). Afirmar un unico ganador seria sobre-interpretar.
 - **"En la tabla filtrada, GCN tiene una sola configuracion. Como sostienen que GCN encabeza?"**
-  (la segunda mas filosa, y la unica que ataca directo el Slide 14; ensayenla). Respuesta: "Tiene
+  (la segunda mas filosa, y la unica que ataca directo el Slide 14, ensayenla). Respuesta: "Tiene
   razon en que el n es desigual, y por eso el ranking que afirmamos es el de la corrida completa de
   sesenta configuraciones, donde las cuatro arquitecturas tienen soporte comparable: ahi GAT queda en
   cero coma setenta y ocho, GCN en cero coma setenta y seis, GraphSAGE en cero coma setenta y cuatro y
@@ -661,12 +661,12 @@ atentos a sus preguntas.
   comparable la particion entre Elliptic y el sintetico. La eleccion no es arbitraria: es la unica que
   permite el contraste.
 - **"Sobre la bibliografia, la referencia de 2026 existe?"** Respuesta: si, esta verificada en Crossref
-  (DOI resuelve, revista Springer indexada); tengan el DOI a la mano.
+  (DOI resuelve, revista Springer indexada). Tengan el DOI a la mano.
 
 ### Reparto de preguntas
-- Cada quien responde con solvencia el tema del bloque que presento; el otro complementa. Tengan a mano
+- Cada quien responde con solvencia el tema del bloque que presento. El otro complementa. Tengan a mano
   el mapa de `GUION_defensa_por_capitulo.md` (parte B).
 - **Slides de respaldo (ya creadas, paginas 29 a 33 del PDF):** R1 el bug de Spearman en detalle,
   R2 la estabilidad por semilla, R3 el detalle estadistico de la particion, R4 por que PR-AUC y no
-  ROC-AUC, R5 la construccion del grafo sintetico. Solo se muestran si el jurado las pide; sepan de
+  ROC-AUC, R5 la construccion del grafo sintetico. Solo se muestran si el jurado las pide. Sepan de
   memoria en que pagina esta cada una.

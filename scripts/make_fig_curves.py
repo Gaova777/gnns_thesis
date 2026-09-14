@@ -98,7 +98,7 @@ def main():
         lab = ("Validación" if split == "val" else "Test") + f" (AUC={com(auc_v)})"
         axp.plot(x, y, color=col, ls=ls, lw=2.2, label=lab, zorder=3)
     axp.set_xlabel("Recall (cobertura)"); axp.set_ylabel("Precisión")
-    axp.set_title("Curva Precisión–Recall", fontsize=11)
+    axp.set_title("Curva de precisión y exhaustividad", fontsize=11)
     axp.set_xlim(0, 1); axp.set_ylim(0, 1.02)
     axp.grid(ls=":", color="0.85", zorder=0); axp.legend(fontsize=8.6, loc="upper right")
 

@@ -1,7 +1,7 @@
 # Guion de defensa con referencia a capítulo y sección
 
 > ⚠️ **Numeración parcialmente desactualizada.** El mazo vigente tiene **37 páginas / 29 diapositivas
-> de contenido**; la tabla de la Parte A todavía refleja el guion anterior de 21 slides y no incluye
+> de contenido**. La tabla de la Parte A todavía refleja el guion anterior de 21 slides y no incluye
 > las 7 láminas nuevas. El mapa slide↔página vigente está en
 > [`DISCURSO_defensa_dos_voces.md`](DISCURSO_defensa_dos_voces.md). El mapa slide→capítulo de abajo
 > sigue siendo válido para las láminas que sí aparecen.
@@ -33,12 +33,12 @@
 | **9** Diseño factorial | Matriz + protocolo estadístico | Cap. 4 · §4.2 *Pipeline Experimental y Espacio Factorial* · Cap. 5 · §5.4 *Análisis Estadístico de Robustez* · Cap. 8 · §8.1 *Espacio de Búsqueda de Hiperparámetros…* |
 | **10** Elliptic | Dataset, split, dispersión | Cap. 4 · §4.1 *Preprocesamiento y Análisis Exploratorio* (§4.1.1 *Composición…*, §4.1.2 *Dispersión de la Topología*) |
 | **11** Sintético | Generador con ground-truth | Cap. 5 · §5.1 *Por qué se Construye…* y §5.2 *Construcción del Grafo Sintético y sus Tipologías* |
-| **12** Métricas | Spearman, plaus., fidel., PR-AUC | Cap. 3 · §3.8 *Formalización de Métricas de Evaluación* (§3.8.2 *…en Escenarios de Desbalance*, §3.8.4 *Estabilidad y Fidelidad*, §3.8.5 *Nociones de Inferencia Estadística*) |
+| **12** Métricas | Spearman, plausibilidad, fidelidad y PR-AUC | Cap. 3 · §3.8 *Formalización de Métricas de Evaluación* (§3.8.2 *…en Escenarios de Desbalance*, §3.8.4 *Estabilidad y Fidelidad*, §3.8.5 *Nociones de Inferencia Estadística*) |
 | **13** Dos artefactos | Contribución metodológica | Cap. 4 · §4.5 *De un Artefacto de Cómputo a un Artefacto de Medida: dos Correcciones Metodológicas* · Cap. 6 · §6.4 *Contribuciones Metodológicas* |
 | **14** Ranking (GAT/GCN) | Estabilidad por arquitectura | Cap. 4 · §4.5 (tabla `tab:ranking`) · Cap. 8 · §8.2 *Resultados Completos por Configuración sobre el Elliptic Dataset* |
 | **15** Concordancia (−0,20→+0,80) | Elliptic concuerda con sintético | Cap. 5 · §5.3 *Resultados de la Matriz Factorial* · Cap. 6 · §6.1 y §6.2 |
 | **16** Disociación | PGExplainer plausible pero no fiel | Cap. 5 · §5.6 *La Disociación entre Plausibilidad y Fidelidad* (plausibilidad en §5.3) |
-| **17** Puente nulo + balanceo | Hipótesis refutada; balanceo irrelevante | Cap. 5 · §5.5 *La Ausencia de un Puente entre Estabilidad y Plausibilidad* · Cap. 6 · §6.3 *El Papel Secundario del Balanceo y de la Arquitectura* |
+| **17** Puente nulo + balanceo | Hipótesis refutada. Balanceo irrelevante | Cap. 5 · §5.5 *La Ausencia de un Puente entre Estabilidad y Plausibilidad* · Cap. 6 · §6.3 *El Papel Secundario del Balanceo y de la Arquitectura* |
 | **18** Colapso val→test | ROC engañoso, PR-AUC primaria | Cap. 4 · §4.4 *Rendimiento Predictivo y el Colapso de Validación a Test* · Cap. 3 · §3.8.2 |
 | **19** Matriz de recomendación | Objetivo → configuración | Cap. 7 · §7.1 *Respuestas a los Objetivos de Investigación* (O4) · Cap. 6 · §6.6 *Implicaciones para la Práctica de Auditoría…* |
 | **20** Contribuciones/límites | Aportes y limitaciones | Cap. 6 · §6.4 *Contribuciones* y §6.8 *Limitaciones* · Cap. 7 · §7.2 *Aportes Principales* y §7.3 *Limitaciones* |
@@ -50,22 +50,22 @@
 
 | Pregunta que puede hacer el jurado | Respuesta corta | Sección de respaldo |
 |---|---|---|
-| *¿Por qué el clasificador colapsa en test?* | Shift temporal del dataset; por eso la estabilidad se mide sobre validación. | Cap. 4 · **§4.4** *…Colapso de Validación a Test* |
-| *La evidencia estadística fuerte viene del dataset que ustedes construyeron.* | Ese eje es el único donde plausibilidad/fidelidad son medibles (exigen ground-truth); es robusto (3 grafos × 3 semillas) y refutó nuestra propia hipótesis. | Cap. 5 · **§5.1** (por qué) y **§5.4** (robustez) · Cap. 7 · **§7.3** (límites) · guion `docs/DEFENSA_R2_evidencia_sintetica.md` |
-| *¿Por qué no usaron AMLSim?* | Bloqueado (dependencia MASON v20 inexistente) y sin ground-truth por arista; queda como trabajo futuro. | Cap. 5 · **§5.1** · Cap. 7 · **§7.4** · nota `NOTA_AUDITOR_amlsim_decision.md` |
+| *¿Por qué el clasificador colapsa en test?* | Shift temporal del dataset. Por eso la estabilidad se mide sobre validación. | Cap. 4 · **§4.4** *…Colapso de Validación a Test* |
+| *La evidencia estadística fuerte viene del dataset que ustedes construyeron.* | Ese eje es el único donde plausibilidad/fidelidad son medibles (exigen ground-truth). Es robusto (3 grafos × 3 semillas) y refutó nuestra propia hipótesis. | Cap. 5 · **§5.1** (por qué) y **§5.4** (robustez) · Cap. 7 · **§7.3** (límites) · guion `docs/DEFENSA_R2_evidencia_sintetica.md` |
+| *¿Por qué no usaron AMLSim?* | Bloqueado (dependencia MASON v20 inexistente) y sin ground-truth por arista. Queda como trabajo futuro. | Cap. 5 · **§5.1** · Cap. 7 · **§7.4** · nota `NOTA_AUDITOR_amlsim_decision.md` |
 | *¿No es circular medir plausibilidad contra un ground-truth propio?* | No: el ground-truth es ciego al explicador y el diseño refutó nuestra hipótesis del puente. | Cap. 5 · **§5.5** (puente nulo) y **§5.2** (construcción) |
 | *¿Cuál es el aporte metodológico?* | Dos artefactos de evaluación corregidos + dos bugs de PGExplainer + tres dimensiones independientes. | Cap. 4 · **§4.5** · Cap. 6 · **§6.4** |
-| *¿Por qué ahora lideran GAT/GCN y no GraphSAGE?* | El truncamiento del Spearman favorecía a GraphSAGE; corregido, el orden se invierte. | Cap. 4 · **§4.5** (tabla `tab:ranking`) |
-| *En la tabla filtrada GCN tiene n=1. ¿Cómo sostienen que encabeza?* | El ranking que se afirma es el de la corrida completa (60), con soporte comparable entre arquitecturas; la columna filtrada es control de robustez (no invierte el orden), no una estimación. El eje sintético, con replicación 3×3, concuerda. | Cap. 4 · **§4.5** (tabla `tab:ranking`) · Cap. 5 · **§5.3** · Cap. 6 · **§6.8** (límites) · respuesta ensayada en `DISCURSO_defensa_dos_voces.md` |
-| *¿El balanceo realmente no importa?* | η² ≤ 0,01 en las tres dimensiones; es un factor secundario. Lo mismo vale para el escenario de desbalance: Kruskal-Wallis p = 0,18 sobre Elliptic (no significativo) y η² ≤ 0,05, frente a 0,36-0,64 del explicador. | Cap. 5 · **§5.4** · Cap. 6 · **§6.3** |
-| *¿Por qué PGExplainer no da estabilidad en Elliptic?* | Degenera en grafos dispersos (mode collapse); se reporta como hallazgo, no como dato. | Cap. 4 · **§4.6** *Degeneración de PGExplainer en un Grafo Disperso* |
+| *¿Por qué ahora lideran GAT/GCN y no GraphSAGE?* | El truncamiento del Spearman favorecía a GraphSAGE. Corregido, el orden se invierte. | Cap. 4 · **§4.5** (tabla `tab:ranking`) |
+| *En la tabla filtrada GCN tiene n=1. ¿Cómo sostienen que encabeza?* | El ranking que se afirma es el de la corrida completa (60), con soporte comparable entre arquitecturas. La columna filtrada es control de robustez (no invierte el orden), no una estimación. El eje sintético, con replicación 3×3, concuerda. | Cap. 4 · **§4.5** (tabla `tab:ranking`) · Cap. 5 · **§5.3** · Cap. 6 · **§6.8** (límites) · respuesta ensayada en `DISCURSO_defensa_dos_voces.md` |
+| *¿El balanceo realmente no importa?* | η² ≤ 0,01 en las tres dimensiones. Es un factor secundario. Lo mismo vale para el escenario de desbalance: Kruskal-Wallis p = 0,18 sobre Elliptic (no significativo) y η² ≤ 0,05, frente a 0,36-0,64 del explicador. | Cap. 5 · **§5.4** · Cap. 6 · **§6.3** |
+| *¿Por qué PGExplainer no da estabilidad en Elliptic?* | Degenera en grafos dispersos (mode collapse). Se reporta como hallazgo, no como dato. | Cap. 4 · **§4.6** *Degeneración de PGExplainer en un Grafo Disperso* |
 | *¿Por qué el ranking por arquitectura solo usa GNNExplainer?* | Es el único de los tres que discrimina en Elliptic: PGExplainer degenera (Spearman nulo en las cuatro) y GNNShap se satura cerca de 0,95, indistinguible entre arquitecturas, igual que el Jaccard. Además es el explicador común a los dos ejes. No es arbitrario. | Cap. 4 · **§4.6** (replicación y scoping) · respaldo en el deck |
-| *El 0,80 de plausibilidad de PGExplainer, ¿es mucho? ¿comparado con qué?* | Contra el azar: un explicador aleatorio con el mismo protocolo obtiene 0,40. PGExplainer duplica el azar; GNNExplainer (0,50) apenas lo supera, lo que refuerza la disociación. | Cap. 5 · **§5.3** (plausibilidad de aristas) |
+| *El 0,80 de plausibilidad de PGExplainer, ¿es mucho? ¿comparado con qué?* | Contra el azar: un explicador aleatorio con el mismo protocolo obtiene 0,40. PGExplainer duplica el azar. GNNExplainer (0,50) apenas lo supera, lo que refuerza la disociación. | Cap. 5 · **§5.3** (plausibilidad de aristas) |
 | *¿Por qué GNNShap no aparece en la lámina de disociación?* | Porque no produce máscara de aristas por diseño: su plausibilidad es de features, con otra escala y otra línea base (azar 0,075 frente a 0,40 de aristas). Ponerla en la misma figura la haría parecer peor que el azar cuando en realidad lo duplica. Sus valores están en la lámina de respaldo, con la métrica etiquetada. | Cap. 5 · **§5.3** · respaldo en el deck |
 | *El perfil por escenario, ¿es plano o simplemente ruidoso?* | No se rechaza la igualdad: Kruskal-Wallis sobre el factor escenario da p = 0,18 con η² = 0,05, pequeño frente al 0,13 de la arquitectura. Y lo poco que se mueve apunta al revés de lo esperado, con el mínimo en 1:1, el escenario más equilibrado. | Cap. 4 · **§4.5** (tabla `tab:elliptic-stab-scen`) |
-| *¿Por qué la tabla por escenario usa 3 semillas y la del Jaccard una sola?* | La tabla del Jaccard y la corrida completa pertenecen a la sección de la semilla original, que el capítulo presenta antes de justificar la replicación; el análisis por escenario y la partición por arquitectura usan las 3 semillas. La tabla `tab:ranking` pone las tres columnas lado a lado precisamente para que la progresión sea explícita. | Cap. 4 · **§4.5** y **§4.6** |
+| *¿Por qué la tabla por escenario usa 3 semillas y la del Jaccard una sola?* | La tabla del Jaccard y la corrida completa pertenecen a la sección de la semilla original, que el capítulo presenta antes de justificar la replicación. El análisis por escenario y la partición por arquitectura usan las 3 semillas. La tabla `tab:ranking` pone las tres columnas lado a lado precisamente para que la progresión sea explícita. | Cap. 4 · **§4.5** y **§4.6** |
 | *¿La partición en dos grupos sobrevive la corrección por comparaciones múltiples?* | Sí: la separación entre grupos se mantiene tras la corrección de Holm. | Cap. 4 · **§4.6** |
-| *¿Se cumplieron los objetivos?* | Sí; se responden uno a uno, incluidas las hipótesis refutadas. | Cap. 7 · **§7.1** *Respuestas a los Objetivos de Investigación* |
+| *¿Se cumplieron los objetivos?* | Sí. Se responden uno a uno, incluidas las hipótesis refutadas. | Cap. 7 · **§7.1** *Respuestas a los Objetivos de Investigación* |
 | *¿Y las implicaciones éticas/regulatorias?* | Falsos positivos, debido proceso, auditabilidad. | Cap. 6 · **§6.6** y **§6.7** *Implicaciones Más Amplias del Estudio* |
 
 ---
@@ -81,4 +81,4 @@
 - **Cap. 7 · Conclusiones y Perspectivas** · 7.1 Respuestas a los objetivos · 7.2 Aportes principales · 7.3 Limitaciones · 7.4 Perspectivas futuras · 7.5 Reflexión final.
 - **Cap. 8 · Anexos** · 8.1 Hiperparámetros · 8.2 Resultados completos Elliptic · 8.3 Matriz factorial sintética · 8.4 Matriz robusta · 8.5 Reproducibilidad.
 
-> Nota: los números de sección corresponden al orden del manuscrito; confirma el número impreso contra el índice del `main.pdf` recompilado (los títulos son exactos).
+> Nota: los números de sección corresponden al orden del manuscrito. Confirma el número impreso contra el índice del `main.pdf` recompilado (los títulos son exactos).

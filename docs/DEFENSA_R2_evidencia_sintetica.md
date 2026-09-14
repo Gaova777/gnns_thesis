@@ -1,7 +1,7 @@
 # Guion de defensa, R2: "La evidencia fuerte viene del dataset que ustedes construyeron"
 
 > Material de estudio interno para la sustentación (Alejandro Gómez · Juan Diego Garzón).
-> Objetivo: responder con firmeza, estructura y honestidad la objeción más difícil de la defensa.
+> Objetivo: responder con firmeza y orden la objeción más difícil de la defensa.
 > **No es para publicar.** Ensayar en voz alta hasta que salga natural.
 
 ---
@@ -37,19 +37,19 @@ Dicho esto con calma, ya se ganó el 70% del intercambio. Los pilares 1-5 lo res
 constituye el patrón de lavado. Para medir plausibilidad necesitamos saber qué aristas SON el fraude,
 y ese ground-truth no existe en Elliptic. Además, su campo receptivo es degenerado: mediana de ~2
 nodos y 1-2 aristas, con lo que la plausibilidad de subgrafo y el Jaccard son triviales. No es que
-prefiriéramos el sintético; es que en Elliptic esas preguntas son literalmente incomputables."*
+prefiriéramos el sintético. Es que en Elliptic esas preguntas son literalmente incomputables."*
 
 **Respaldo:**
 - Weber (2019) etiqueta nodos ilícito/lícito, sin ground-truth de tipología ni de aristas.
 - Campo receptivo de Elliptic: mediana ≈ 2 nodos (documentado en Cap. 4 y en `stab_subgraph_n_nodes`).
-- Por eso en Elliptic **solo** se puede medir estabilidad (Spearman de features); plausibilidad y
+- Por eso en Elliptic **solo** se puede medir estabilidad (Spearman de features). Plausibilidad y
   fidelidad requieren el eje sintético.
 
 ### Pilar 2. Es la práctica estándar en XAI sobre grafos, no un atajo
 
 **Qué decir:** *"Usar grafos sintéticos con motivos plantados es exactamente cómo se evalúa la
-explicabilidad en grafos. El propio paper de GNNExplainer se validó sobre BA-Shapes y Tree-Cycles;
-GraphFramEx, GNNX-BENCH y Agarwal et al., los benchmarks que citamos en el marco teórico, construyen
+explicabilidad en grafos. El propio paper de GNNExplainer se validó sobre BA-Shapes y Tree-Cycles.
+GraphFramEx, GNNX-BENCH y el estudio de Agarwal y colaboradores, que son los benchmarks que citamos en el marco teórico, construyen
 grafos con ground-truth conocido por la misma razón: los datos reales no traen la explicación
 verdadera. Estamos siguiendo la metodología establecida, no inventando un dataset conveniente."*
 
@@ -65,14 +65,14 @@ Nuestra hipótesis central era que una explicación más estable sería más pla
 estabilidad→plausibilidad. El grafo sintético lo REFUTÓ: la correlación salió nula, r ≈ −0,01, con
 intervalo de confianza que incluye el cero. Nadie diseña un dataset para matar su propia hipótesis.
 La disociación entre plausibilidad y fidelidad tampoco era el resultado que buscábamos. Son hallazgos
-incómodos, no confirmatorios."*
+que no confirman lo que esperábamos."*
 
 **Respaldo:**
 - Puente estabilidad→plausibilidad: GNNExplainer r = −0,014, IC bootstrap incluye 0 → **nulo**.
-- Disociación: PGExplainer plaus. aristas 0,80 (la mejor) pero fidelidad 0,11 (la peor); GNNExplainer
+- Disociación: PGExplainer plaus. aristas 0,80 (la mejor) pero fidelidad 0,11 (la peor). GNNExplainer
   fidelidad 0,56 pero plausibilidad 0,50. El "mejor" explicador depende de qué dimensión mires.
 - Ancla de azar (baseline aleatorio con el mismo protocolo): plausibilidad de aristas al azar = 0,40.
-  PGExplainer (0,80) duplica el azar; GNNExplainer (0,50) apenas lo supera. Refuerza la disociación:
+  PGExplainer (0,80) duplica el azar. GNNExplainer (0,50) apenas lo supera. Refuerza la disociación:
   el fuerte de GNNExplainer es la fidelidad, no recuperar el patrón.
 - Cada métrica tiene su propia línea base y no deben mezclarse. La plausibilidad de **features** tiene
   un azar de 0,075, no de 0,40: GNNExplainer (0,45) lo sextuplica y GNNShap (0,15) lo duplica. Por eso
@@ -83,7 +83,7 @@ incómodos, no confirmatorios."*
   positivo).
 
 > **Este es el argumento que cierra el debate.** La circularidad requiere que el resultado favorezca
-> a quien construyó el dato; aquí el dato mordió la mano que lo construyó.
+> a quien construyó el dato. Aquí el dato mordió la mano que lo construyó.
 
 ### Pilar 4. La evidencia sintética es robusta (no es un grafo con suerte)
 
@@ -102,8 +102,8 @@ layering, fan-in y fan-out), no patrones exóticos elegidos para favorecer a un 
 > grafos es **asimétrica**: g0 trae el factorial completo (540 filas), mientras que g1 y g2 cubren solo
 > un corte reducido, escenarios 1:1 y natural con balanceo `none` (144 filas). El Wilcoxon de
 > p ≈ 2,6×10⁻³⁵ **sí** se calcula sobre la unión de los tres grafos, así que la cifra es correcta. Pero
-> si preguntan "¿la disociación se replica en los tres grafos?", la respuesta honesta es: en el corte
-> que g1 y g2 cubren, sí; el factorial completo está replicado sobre g0 con tres semillas de modelo.
+> si preguntan "¿la disociación se replica en los tres grafos?", la respuesta correcta es: en el corte
+> que g1 y g2 cubren, sí. El factorial completo está replicado sobre g0 con tres semillas de modelo.
 > Decirlo ustedes es más fuerte que dejar que lo descubran.
 
 ### Pilar 5. La construcción es neutral al explicador
@@ -129,7 +129,7 @@ fuera trivialmente separable. Son decisiones que ENDURECEN la prueba, no que la 
 → *"Es un compromiso deliberado entre control y realismo. Simetrizamos las aristas para lograr campos
 receptivos realistas (mediana ~29 nodos, no los ~2 de Elliptic dirigido), agregamos ruido de fondo y
 distractores, y atenuamos la firma. No buscábamos replicar Bitcoin, sino aislar la pregunta
-mecanística con ground-truth. La validez externa la aporta el eje Elliptic; la interna, el sintético.
+mecanística con ground-truth. La validez externa la aporta el eje Elliptic. La interna, el sintético.
 Son complementarios."*
 
 **"Entonces Elliptic no sirvió de nada."**
@@ -147,19 +147,19 @@ que ningún dataset disponible ofrecía."*
 
 **"¿No es circular medir plausibilidad contra un ground-truth que ustedes definieron?"**
 → *"El ground-truth define qué ES el patrón de lavado, no qué explicador debe ganar. La circularidad
-existiría si hubiéramos ajustado el ground-truth mirando las explicaciones; hicimos lo contrario: el
+existiría si hubiéramos ajustado el ground-truth mirando las explicaciones. Hicimos lo contrario: el
 grafo se fija primero, los explicadores se evalúan después, ciegos entre sí. Y si el diseño tuviera
 sesgo confirmatorio, no habría refutado nuestra hipótesis del puente."* (enlazar con Pilar 3)
 
 ---
 
-## 4. La concesión honesta (qué admitir, para desarmar el ataque)
+## 4. Lo que hay que conceder (qué admitir, para desarmar el ataque)
 
 Decir esto **proactivamente**, antes de que lo digan ellos:
 
 > *"Somos claros con el alcance: la validez externa de los hallazgos de plausibilidad y fidelidad se
 > limita al régimen controlado. No afirmamos que en producción AML estas tres dimensiones se disocien
-> universalmente; afirmamos que, en un entorno con ground-truth y bajo replicación, se disocian de
+> universalmente. Afirmamos que, en un entorno con ground-truth y bajo replicación, se disocian de
 > forma robusta. Generalizarlo a grafos reales a escala (Elliptic2, o AMLSim cuando se desbloquee) es
 > trabajo futuro explícito en el Capítulo 8."*
 
@@ -170,13 +170,13 @@ Conceder el límite correcto **fortalece** la credibilidad y cierra la puerta al
 ## 5. Qué NO decir (trampas a evitar)
 
 - ❌ **No ponerse a la defensiva ni pedir disculpas por el sintético.** Es una decisión metodológica
-  sólida; preséntenla con seguridad, no como un mal menor.
+  sólida. Preséntenla con seguridad, no como un mal menor.
 - ❌ **No afirmar que el sintético prueba comportamiento en producción.** Rompe la concesión del §4 y
   los expone.
 - ❌ **No menospreciar Elliptic** ("no servía"). Elliptic aporta validez externa y el hallazgo negativo.
-- ❌ **No entrar en detalles de implementación del generador** salvo que lo pidan; quédense en el
+- ❌ **No entrar en detalles de implementación del generador** salvo que lo pidan. Quédense en el
   argumento metodológico (necesidad de ground-truth) y usen el Pilar 3 como ancla.
-- ❌ **No improvisar números.** Los del §2 están verificados; si dudan de una cifra, digan "está en la
+- ❌ **No improvisar números.** Los del §2 están verificados. Si dudan de una cifra, digan "está en la
   tabla X del anexo" en lugar de arriesgar un valor.
 
 ---
@@ -186,10 +186,10 @@ Conceder el límite correcto **fortalece** la credibilidad y cierra la puerta al
 - **Quien lidere el eje sintético / experimentación** abre con el *one-liner* (§1) y los Pilares 1-2
   (necesidad metodológica + práctica estándar).
 - **Quien lidere el análisis / redacción** remata con el Pilar 3 (anti-conveniencia, el puente nulo)
-  y hace la concesión honesta del §4.
+  y hace la concesión del §4.
 - Si el jurado insiste, quien tenga más fresco el código del generador responde el Pilar 5 y la
-  pregunta de circularidad; el otro apoya con los números de robustez (Pilar 4).
-- **Regla de oro a dos voces:** una sola persona responde cada pregunta hasta el final; el otro
+  pregunta de circularidad. El otro apoya con los números de robustez (Pilar 4).
+- **Regla de oro a dos voces:** una sola persona responde cada pregunta hasta el final. El otro
   complementa solo si aporta algo nuevo. No pisarse ni contradecirse en cifras.
 
 ---
@@ -200,5 +200,5 @@ Conceder el límite correcto **fortalece** la credibilidad y cierra la puerta al
 2. Es la **práctica estándar** en XAI de grafos (GNNExplainer, GraphFramEx, GNNX-BENCH).
 3. **Refutó nuestra propia hipótesis** (puente nulo r≈−0,01) → imposible que sea confirmatorio.
 4. **Robusto:** 3 grafos × 3 semillas, p≈2,6×10⁻³⁵, σ≈0,007.
-5. **Neutral:** ground-truth ciego al explicador; distractores y firma atenuada endurecen la prueba.
+5. **Neutral:** ground-truth ciego al explicador. Distractores y firma atenuada endurecen la prueba.
 6. **Concesión:** validez externa limitada al régimen controlado → generalización = trabajo futuro.

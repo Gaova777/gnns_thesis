@@ -10,13 +10,13 @@
 > (Alejandro Gómez · Juan Diego Garzón). Números = versión **corregida** (post fix R1). Cada slide
 > indica título, puntos clave y qué figura/visual va. Pendiente de tu aprobación antes de generar el `.pptx`.
 >
-> **Reparto sugerido:** Bloque A (contexto + metodología, slides 1-12) una voz; Bloque B (resultados +
+> **Reparto sugerido:** Bloque A (contexto + metodología, slides 1-12) una voz. Bloque B (resultados +
 > cierre, slides 13-21) la otra. Ajustable.
 
 ---
 
 ### 1 · Portada
-- Título de la tesis; autores; director Ph.D. Cristian Rosero Arias; UTP · MISC; Pereira, 2026.
+- Título de la tesis. Autores. Director Ph.D. Cristian Rosero Arias. UTP · MISC. Pereira, 2026.
 - Visual: logo UTP + imagen sobria de grafo/red.
 
 ### 2 · Contenido
@@ -24,23 +24,23 @@
 - Visual: agenda en 5 hitos.
 
 ### 3 · El problema: detectar lavado sin caja negra
-- AML: 2-5% del PIB mundial; sistemas por reglas → 95-98% de falsos positivos.
+- AML: 2-5% del PIB mundial. Sistemas por reglas → 95-98% de falsos positivos.
 - GNNs modelan las transacciones como grafo y superan a lo tabular, **pero son opacas**.
 - En un entorno regulado, una alerta debe ser **justificable y reproducible**.
 - Visual: `chapter_2/images_ch2/enfoques_moeny_laundering.png` (reglas vs grafos).
 
 ### 4 · Pregunta de investigación y objetivos
-- Pregunta: ¿cómo se comporta la **estabilidad** de los métodos XAI sobre GNNs para AML bajo desbalance, y qué combinación arquitectura–explicador–balanceo la optimiza?
+- Pregunta: ¿cómo se comporta la **estabilidad** de los métodos XAI sobre GNNs para AML bajo desbalance, y qué combinación de arquitectura, explicador y balanceo la optimiza?
 - 4 objetivos: (1) degradación por desbalance, (2) resiliencia por arquitectura, (3) impacto del balanceo, (4) matriz de recomendación.
 - Visual: los 4 objetivos como iconos.
 
 ### 5 · La brecha en el estado del arte
-- Se estudian predicción y explicabilidad por separado; la **estabilidad** de las explicaciones sobre grafos AML no se había evaluado sistemáticamente.
+- Se estudian predicción y explicabilidad por separado. La **estabilidad** de las explicaciones sobre grafos AML no se había evaluado sistemáticamente.
 - Elliptic no tiene *ground-truth* de tipología → la plausibilidad no era medible en trabajos previos.
 - Visual: tabla-mini del estado del arte (Weber, He 2026, Lawal, Agarwal).
 
 ### 6 · Marco conceptual en una lámina
-- GNNs: paso de mensajes; 4 arquitecturas (GCN, GraphSAGE, GAT, TAGCN).
+- GNNs: paso de mensajes. 4 arquitecturas (GCN, GraphSAGE, GAT, TAGCN).
 - XAI post-hoc: GNNExplainer, PGExplainer, GNNShap.
 - Visual: esquema arquitecturas × explicadores.
 
@@ -50,28 +50,28 @@
 - Visual: diagrama de 3 círculos NO solapados.
 
 ### 8 · Metodología: diseño de dos ejes
-- **Eje Elliptic (real)** → validez externa; solo permite medir estabilidad.
-- **Eje sintético (propio, con ground-truth)** → validez interna; permite medir plausibilidad y fidelidad.
+- **Eje Elliptic (real)** → validez externa. Solo permite medir estabilidad.
+- **Eje sintético (propio, con ground-truth)** → validez interna. Permite medir plausibilidad y fidelidad.
 - Visual: `chapter_4/images_ch4/metodologia.png`.
 
 ### 9 · Diseño factorial
 - Arquitectura (4) × Explicador (3) × Balanceo (3) × Escenario de desbalance (5: 1:1, 1:10, nativo, 1:50, 1:100).
-- Estabilidad = 5 réplicas estocásticas; robustez = 3 semillas de modelo × 3 grafos (eje sintético).
+- Estabilidad = 5 réplicas estocásticas. Robustez = 3 semillas de modelo × 3 grafos (eje sintético).
 - Visual: `chapter_5/images_ch5/heatmap_factorial.png`.
 
 ### 10 · Eje 1 · Elliptic Bitcoin Dataset
-- 203.769 nodos, 234.355 aristas, 166 features, 49 pasos; ilícitas 2,2% (1:9 etiquetado).
-- Split temporal causal; **campo receptivo minúsculo** (mediana ~2 nodos).
+- 203.769 nodos, 234.355 aristas, 166 features, 49 pasos. Ilícitas 2,2% (1:9 etiquetado).
+- Split temporal causal. **Campo receptivo minúsculo** (mediana ~2 nodos).
 - Visual: `chapter_4/images_ch4/dispersion_elliptic.png` + `eda_clases_timestep.png`.
 
 ### 11 · Eje 2 · grafo sintético con ground-truth
 - Por qué: para medir plausibilidad/fidelidad se necesita saber **cuál** subgrafo es el patrón · Elliptic no lo da.
-- 4 tipologías estándar (structuring, layering, fan-in, fan-out); aristas distractoras; firma atenuada; 3 realizaciones.
+- 4 tipologías estándar (structuring, layering, fan-in, fan-out). Aristas distractoras. Firma atenuada. 3 realizaciones.
 - Visual: `chapter_5/images_ch5/hallazgo_estrella.png`.
 
 ### 12 · Métricas y protocolo
-- Estabilidad: **Spearman** de rankings de features (primaria); Jaccard (satura).
-- Plausibilidad y fidelidad vs ground-truth; **PR-AUC** como métrica predictiva primaria.
+- Estabilidad: **Spearman** de rankings de features (primaria). Jaccard (satura).
+- Plausibilidad y fidelidad vs ground-truth. **PR-AUC** como métrica predictiva primaria.
 - Estadística: Kruskal-Wallis, Wilcoxon, IC bootstrap.
 - Visual: tabla de métricas.
 
@@ -93,33 +93,33 @@
 - Visual: `chapter_5/images_ch5/contraste_regimen.png`.
 
 ### 16 · Resultado 2 · disociación plausibilidad ↔ fidelidad
-- **PGExplainer** recupera mejor el patrón (plausibilidad aristas 0,80 vs 0,50; Wilcoxon p≈2,6×10⁻³⁵)…
+- **PGExplainer** recupera mejor el patrón (plausibilidad aristas 0,80 vs 0,50, Wilcoxon p≈2,6×10⁻³⁵)…
 - Ancla de azar (mismo protocolo): plausibilidad de aristas al azar **0,40** → PGExplainer duplica el azar, GNNExplainer apenas lo supera.
 - …pero **colapsa en fidelidad** (0,11 vs 0,56 de GNNExplainer). El más "plausible" no es el más fiel.
 - Visual: `chapter_5/images_ch5/disociacion.png` + `fidelidad_arq.png`.
 
 ### 17 · Resultado 3 · puente nulo y balanceo irrelevante
-- Hipótesis central (estable ⇒ plausible): **refutada**, r = −0,01 (IC incluye 0). Un no-resultado, honesto.
+- Hipótesis central (estable ⇒ plausible): **refutada**, r = −0,01 (IC incluye 0). Un resultado nulo, y se reporta.
 - Balanceo prácticamente **irrelevante** para las tres dimensiones (η² ≤ 0,01). El escenario de desbalance, también secundario: Kruskal-Wallis p = 0,18 en Elliptic, η² ≤ 0,05.
 - Visual: `chapter_5/images_ch5/puente_nulo.png` + `balanceo_irrelevante.png`.
 
 ### 18 · Rendimiento predictivo y colapso validación→test
-- Val PR-AUC media 0,367 (mejor 0,52) → **test 0,017**; F1 test ~0,01-0,02. Colapso por shift temporal.
+- Val PR-AUC media 0,367 (mejor 0,52) → **test 0,017**. F1 test ~0,01-0,02. Colapso por shift temporal.
 - **ROC-AUC engañoso** bajo desbalance (0,88 val → 0,65 test): por eso PR-AUC + precision@k.
 - La estabilidad se estudia sobre TP de validación (encuadre declarado).
 - Visual: `chapter_4/images_ch4/estabilidad_escenario.png` o tabla ROC/PR.
 
 ### 19 · Matriz de recomendación
-- Auditabilidad/estabilidad → **GAT/GCN**; recuperar el patrón (plausibilidad) → **PGExplainer**; fidelidad → **GNNExplainer**; estabilidad interna del método → **GNNShap**.
+- Auditabilidad/estabilidad → **GAT/GCN**. Recuperar el patrón (plausibilidad) → **PGExplainer**. Fidelidad → **GNNExplainer**. Estabilidad interna del método → **GNNShap**.
 - Visual: matriz propósito → configuración.
 
 ### 20 · Contribuciones y limitaciones
-- Contribuciones: caracterización de 3 dimensiones independientes; corrección de 2 artefactos; generador sintético con ground-truth; matriz de recomendación.
-- Limitaciones (honestas): inferencia fuerte proviene del eje sintético; colapso en test; 1 semilla de modelo en Elliptic.
+- Contribuciones: caracterización de 3 dimensiones independientes. Corrección de 2 artefactos. Generador sintético con ground-truth. Matriz de recomendación.
+- Limitaciones declaradas: la inferencia fuerte proviene del eje sintético, el clasificador colapsa en test y con 3 semillas se sostiene el grupo, no el orden fino dentro de cada grupo.
 - Visual: dos columnas (aportes / límites).
 
 ### 21 · Conclusiones y trabajo futuro
-- Estabilidad ≠ plausibilidad ≠ fidelidad; el mejor explicador depende del objetivo; la medición corregida da una historia coherente entre datos reales y sintéticos.
+- Estabilidad ≠ plausibilidad ≠ fidelidad. El mejor explicador depende del objetivo. La medición corregida da una historia coherente entre datos reales y sintéticos.
 - Futuro: Elliptic2, AMLSim, GNNs temporales, GraphSMOTE.
 - Cierre: agradecimientos + "Preguntas".
 

@@ -96,7 +96,7 @@ la figura, del tipo "miren los dos paneles", una vez se sepa qué se ve en ellos
 ## Qué NO cambia
 
 Los valores ya publicados salen de `results_v3/reeval_metrics.csv` y están verificados contra ese
-CSV: ROC-AUC 0,884 y 0,653; PR-AUC 0,367 y 0,017; precisión en los primeros 50, 0,657 y 0,020; en los
+CSV: ROC-AUC 0,884 y 0,653. PR-AUC 0,367 y 0,017. Precisión en los primeros 50, 0,657 y 0,020. En los
 primeros 100, 0,640 y 0,022. La figura ilustra esos números, no los sustituye, y `make_fig_curves.py`
 toma las etiquetas de AUC de ese mismo CSV en lugar de integrarlas de la curva, precisamente para que
 figura y texto no puedan desincronizarse.

@@ -1,6 +1,6 @@
 % !TEX program = lualatex
 % =====================================================================
-% Defensa de tesis — DECK v3, estilo Metropolis (modo oscuro).
+% Defensa de tesis, DECK v3, estilo Metropolis (modo oscuro).
 % Universidad Tecnologica de Pereira · MISC · 2026.
 % Autores: Alejandro Gomez Huertas & Juan Diego Garzon Ovalle.
 % Compilar con LuaLaTeX (dos veces):  lualatex beamer_defensa_v3.tex
@@ -80,7 +80,7 @@
 \end{enumerate}
 \vspace{1em}
 \begin{block}{Presentación a dos voces}
-\small \textbf{Alejandro}: contexto y metodología. \quad \textbf{Juan Diego}: resultados y cierre. \quad Duración objetivo: 33--36 min.
+\small \textbf{Alejandro}: contexto y metodología. \quad \textbf{Juan Diego}: resultados y cierre. \quad Duración objetivo: 33 a 36 min.
 \end{block}
 \end{frame}
 
@@ -91,7 +91,7 @@
 \begin{columns}[T]
 \begin{column}{0.56\textwidth}
 \begin{itemize}
-  \item El lavado mueve el \alert{2--5\% del PIB mundial}; los sistemas por reglas generan \alert{95--98\% de falsos positivos}.
+  \item El lavado mueve \alert{entre el 2 y el 5\% del PIB mundial}. Los sistemas por reglas generan \alert{entre el 95 y el 98\% de falsos positivos}.
   \item Las \textbf{GNN} modelan las transacciones como grafo y superan a lo tabular.
   \item \textbf{Pero son cajas negras}: en un entorno regulado, cada alerta debe ser justificable y reproducible.
 \end{itemize}
@@ -131,8 +131,8 @@
 \begin{column}{0.5\textwidth}
 \begin{block}{Lo que ya se sabía}
 \begin{itemize}\small
-  \item Las GNN superan a lo tabular (Weber et al., 2019).
-  \item TAGCN + SHAP con alto rendimiento (He et al., 2026).
+  \item Las GNN superan a lo tabular (Weber y colaboradores, 2019).
+  \item TAGCN + SHAP con alto rendimiento (He y colaboradores, 2026).
   \item Predicción y explicabilidad, por separado.
 \end{itemize}
 \end{block}
@@ -259,7 +259,7 @@ Ante una transacción marcada como ilícita, el explicador devuelve dos cosas:
 \begin{itemize}\small
   \item Validez \textbf{interna}: \emph{ground-truth} por nodo y arista.
   \item Permite medir plausibilidad y fidelidad.
-  \item 4 tipologías estándar; 3 realizaciones.
+  \item 4 tipologías estándar y 3 realizaciones del grafo.
 \end{itemize}
 \end{block}
 \end{column}
@@ -284,7 +284,7 @@ Ante una transacción marcada como ilícita, el explicador devuelve dos cosas:
 \begin{itemize}\small
   \item 203.769 nodos \textperiodcentered\ 234.355 aristas \textperiodcentered\ 166 features \textperiodcentered\ 49 pasos.
   \item Ilícitas $\sim$2,2\% (razón $\sim$1:9 en el subconjunto etiquetado).
-  \item Split temporal causal (train 1--34 / val 35--42 / test 43--49).
+  \item Partición temporal causal: entrenamiento en los pasos 1 a 34, validación de 35 a 42 y test de 43 a 49.
   \item Campo receptivo mediana $\sim$2 nodos: solo el Spearman discrimina.
 \end{itemize}
 \vspace{0.2em}
@@ -304,7 +304,7 @@ Ante una transacción marcada como ilícita, el explicador devuelve dos cosas:
   \item \textbf{¿Por qué?} medir plausibilidad exige saber cuál subgrafo es el patrón: Elliptic no lo da.
   \item 4 tipologías: \emph{structuring}, \emph{layering}, \emph{fan-in}, \emph{fan-out}.
   \item Aristas distractoras + firma atenuada: la métrica discrimina.
-  \item \emph{Ground-truth} ciego al explicador; 3 realizaciones.
+  \item \emph{Ground-truth} ciego al explicador y 3 realizaciones del grafo.
 \end{itemize}
 \end{column}
 \begin{column}{0.46\textwidth}\centering
@@ -389,7 +389,7 @@ El truncamiento \textbf{no penaliza por igual}: castiga más a las arquitecturas
 \begin{column}{0.46\textwidth}
 \begin{block}{Los dos artefactos, juntos}
 \footnotesize
-1. \textbf{Memoria}: 13 configs de GAT fallaban por OOM silencioso; su media se calculaba solo sobre las que terminaban. \emph{Favorecía a GAT.}\\[4pt]
+1. \textbf{Memoria}: 13 configs de GAT fallaban por OOM silencioso y su media se calculaba solo sobre las que terminaban. \emph{Favorecía a GAT.}\\[4pt]
 2. \textbf{Métrica}: el truncamiento anterior. \emph{Favorecía a GraphSAGE.}\\[4pt]
 Cada uno \textbf{por separado} bastaba para una conclusión falsa.
 \end{block}
@@ -412,11 +412,11 @@ Cada uno \textbf{por separado} bastaba para una conclusión falsa.
   \item[\textcolor{muted}{$\blacksquare$}] TAGCN \hfill $0{,}672 \pm 0{,}077$
 \end{itemize}
 \vspace{0.5em}
-\small Media de \textbf{3 semillas} (180 modelos); el $\pm$ es la \textbf{desviación típica entre semillas}, no el intervalo de confianza de la figura. Significativo \textbf{entre} grupos, \textbf{no dentro}: Wilcoxon pareado GAT vs GCN $p=0{,}17$; GraphSAGE vs TAGCN $p=0{,}10$.
+\small Media de \textbf{3 semillas} (180 modelos). El $\pm$ es la \textbf{desviación típica entre semillas}, no el intervalo de confianza de la figura. Significativo \textbf{entre} grupos, \textbf{no dentro}: Wilcoxon pareado GAT vs GCN $p=0{,}17$ y GraphSAGE vs TAGCN $p=0{,}10$.
 \end{column}
 \begin{column}{0.5\textwidth}\centering
 \figcard{ranking_khop_eb.png}
-\figcap{Estabilidad (Spearman de GNNExplainer) por arquitectura en Elliptic; 3 semillas, 180 modelos, IC 95\%. \emph{Fuente: elaboración propia.}}
+\figcap{Estabilidad (Spearman de GNNExplainer) por arquitectura en Elliptic, con 3 semillas, 180 modelos e IC 95\%. \emph{Fuente: elaboración propia.}}
 \end{column}
 \end{columns}
 \end{frame}
@@ -442,7 +442,7 @@ Dentro grupo bajo & Kruskal-Wallis & $0{,}08$ \\
   \item Tamaño de efecto $\eta^2 = 0{,}13$ (grande), el mismo estadístico que reporta la tesis en el eje sintético.
   \item IC95\,\% bootstrap: se solapan \textbf{dentro}, apenas se tocan \textbf{entre} grupos.
   \item Sobrevive la corrección de \textbf{Holm} por comparaciones múltiples.
-  \item Los contrastes \emph{dentro} de grupo son no pareados; los $p$ de la lámina anterior ($0{,}17$ y $0{,}10$) son el Wilcoxon \textbf{pareado} sobre celdas comunes. Ambas vías no rechazan.
+  \item Los contrastes \emph{dentro} de grupo son no pareados. Los $p$ de la lámina anterior ($0{,}17$ y $0{,}10$) son el Wilcoxon \textbf{pareado} sobre celdas comunes. Ambas vías no rechazan.
 \end{itemize}
 \end{column}
 \begin{column}{0.44\textwidth}
@@ -451,7 +451,7 @@ Dentro grupo bajo & Kruskal-Wallis & $0{,}08$ \\
 Reentrenamos la matriz completa. Los \textbf{pesos no} se reproducen bit a bit (\emph{scatter} atómicos en GPU).\\[4pt]
 Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, y la \textbf{misma partición}.
 \end{block}
-{\footnotesize\color{muted} Distinguir ambas es, en sí mismo, una contribución metodológica.}
+{\footnotesize\color{muted} Distinguir entre ambas también es una contribución metodológica.}
 \end{column}
 \end{columns}
 \end{frame}
@@ -492,7 +492,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \end{column}
 \begin{column}{0.48\textwidth}\centering
 \figcard{disociacion_eb.png}
-\figcap{Plausibilidad de aristas frente a Fidelity+ (eje sintético; IC 95\%; azar de plausibilidad de aristas $=0{,}40$). \emph{Fuente: elaboración propia.}}
+\figcap{Plausibilidad de aristas frente a Fidelity+ (eje sintético, IC 95\% y azar de plausibilidad de aristas $=0{,}40$). \emph{Fuente: elaboración propia.}}
 \end{column}
 \end{columns}
 \end{frame}
@@ -502,15 +502,15 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \begin{column}{0.52\textwidth}
 \begin{itemize}\small
   \item Nuestra hipótesis central: una explicación más estable señalaría mejor el patrón real.
-  \item El dato dice que \textbf{no}. Correlación estabilidad--plausibilidad $r=-0{,}01$, IC 95\,\% de $-0{,}038$ a $+0{,}011$.
+  \item El dato dice que \textbf{no}. Correlación entre estabilidad y plausibilidad $r=-0{,}01$, IC 95\,\% de $-0{,}038$ a $+0{,}011$.
   \item El intervalo \textbf{incluye el cero}: no hay relación.
 \end{itemize}
 \vspace{0.4em}
-\small\emph{Es un no-resultado, y lo reportamos precisamente porque contradice lo que esperábamos.}
+\small\emph{Es un resultado nulo, y lo reportamos porque contradice lo que esperábamos.}
 \end{column}
 \begin{column}{0.48\textwidth}\centering
 \figcard{chapter_5/images_ch5/puente_nulo.png}
-\figcap{Relación estabilidad--plausibilidad (GNNExplainer): $r=-0{,}01$, IC incluye 0. \emph{Fuente: elaboración propia.}}
+\figcap{Relación entre estabilidad y plausibilidad (GNNExplainer): $r=-0{,}01$, IC incluye 0. \emph{Fuente: elaboración propia.}}
 \end{column}
 \end{columns}
 \end{frame}
@@ -591,7 +591,7 @@ Precisión en los primeros 100 & 0,640 & 0,022 \\
 \end{tabular}
 \end{center}
 \vspace{0.6em}
-{\footnotesize Las tres se cayeron. \textbf{Ninguna se ocultó.} Comprometerse con predicciones falsables antes de ver los datos es lo que permite que refutarlas sea un resultado, y no un fracaso.}
+{\footnotesize Las tres se cayeron y las tres se reportan. Haber escrito las predicciones antes de ver los datos es lo que convierte su refutación en un resultado.}
 \end{frame}
 
 % ##################################################################### 5
@@ -599,12 +599,12 @@ Precisión en los primeros 100 & 0,640 & 0,022 \\
 
 \begin{frame}{Conclusiones del proyecto}
 \begin{enumerate}\small
-  \item \textbf{\color{amber}Tres dimensiones independientes} (estabilidad, plausibilidad, fidelidad): no existe una única ``buena explicación''; el mejor explicador depende del objetivo de la auditoría.
-  \item \textbf{\color{amber}La estabilidad por arquitectura son dos grupos} (alto: GAT/GCN; bajo: GraphSAGE/TAGCN), y la partición \textbf{concuerda} entre datos reales y sintéticos.
-  \item \textbf{\color{amber}El explicador es la palanca dominante} ($\eta^2$ de $0{,}36$ a $0{,}64$); el balanceo es despreciable ($\eta^2 \le 0{,}01$) y el escenario de desbalance, pequeño y no significativo ($\eta^2 \le 0{,}05$).
+  \item \textbf{\color{amber}Tres dimensiones independientes} (estabilidad, plausibilidad, fidelidad): no existe una única ``buena explicación'' y el mejor explicador depende del objetivo de la auditoría.
+  \item \textbf{\color{amber}La estabilidad por arquitectura son dos grupos} (alto con GAT y GCN, bajo con GraphSAGE y TAGCN), y la partición \textbf{concuerda} entre datos reales y sintéticos.
+  \item \textbf{\color{amber}El explicador es la palanca dominante} ($\eta^2$ de $0{,}36$ a $0{,}64$). El balanceo es despreciable ($\eta^2 \le 0{,}01$) y el escenario de desbalance, pequeño y no significativo ($\eta^2 \le 0{,}05$).
   \item \textbf{\color{amber}El más plausible no es el más fiel} (PGExplainer vs GNNExplainer): elegir según se quiera \emph{reconocer el patrón} o \emph{auditar el modelo}.
   \item \textbf{\color{amber}Aporte metodológico}: dos artefactos de medición corregidos + distinguir reproducibilidad de \emph{pesos} vs de \emph{conclusiones}.
-  \item \textbf{\color{amber}Las tres hipótesis se refutaron con honestidad}: no debilitó la tesis, la fortaleció.
+  \item \textbf{\color{amber}Las tres hipótesis se refutaron} y se reportan tal cual, sin ajustar el análisis para salvarlas.
 \end{enumerate}
 \end{frame}
 
@@ -688,21 +688,21 @@ Trabajo futuro: Elliptic2, AMLSim, GNNs temporales, GraphSMOTE.}
 \begin{frame}[allowframebreaks]{Referencias seleccionadas}
 \scriptsize
 \begin{itemize}
-  \item Weber, M. et al. (2019). \emph{Anti-Money Laundering in Bitcoin: Experimenting with GCN for Financial Forensics.} KDD Workshop. arXiv:1908.02591.
-  \item Kipf, T. \& Welling, M. (2017). \emph{Semi-Supervised Classification with Graph Convolutional Networks.} ICLR.
-  \item Hamilton, W., Ying, R. \& Leskovec, J. (2017). \emph{Inductive Representation Learning on Large Graphs (GraphSAGE).} NeurIPS.
-  \item Veličković, P. et al. (2018). \emph{Graph Attention Networks (GAT).} ICLR.
-  \item Du, J. et al. (2017). \emph{Topology Adaptive Graph Convolutional Networks (TAGCN).} arXiv:1710.10370.
-  \item Ying, R. et al. (2019). \emph{GNNExplainer: Generating Explanations for Graph Neural Networks.} NeurIPS.
-  \item Luo, D. et al. (2020). \emph{Parameterized Explainer for Graph Neural Network (PGExplainer).} NeurIPS.
-  \item Akkas, S. \& Azad, A. (2024). \emph{GNNShap: Scalable and Accurate GNN Explanation using Shapley Values.} WWW.
-  \item Lundberg, S. \& Lee, S. (2017). \emph{A Unified Approach to Interpreting Model Predictions (SHAP).} NeurIPS.
-  \item Kosan, M. et al. (2023). \emph{GNNX-BENCH: Benchmarking and Sensitivity of GNN Explainers.}
-  \item Agarwal, C. et al. (2022). \emph{Probing GNN Explainers: Fidelity vs. Plausibility.}
-  \item Lawal, O., Okolie, A. \& Obunadike, C. (2025). \emph{An Explainable GNN Framework for AML on the Elliptic Dataset.} IJNSA 17(5/6). DOI:10.5121/ijnsa.2025.17602.
-  \item He, X. et al. (2026). \emph{An Explainable GNN Framework for Illicit Financial Transaction Detection.} Applied Intelligence 56. DOI:10.1007/s10489-026-07138-9.
-  \item Zhao, T., Zhang, X. \& Wang, S. (2021). \emph{GraphSMOTE: Imbalanced Node Classification on Graphs.} WSDM.
-  \item Lin, T. et al. (2017). \emph{Focal Loss for Dense Object Detection.} ICCV.
+  \item Weber M y colaboradores (2019). \emph{Anti-Money Laundering in Bitcoin: Experimenting with Graph Convolutional Networks for Financial Forensics.} arXiv:1908.02591.
+  \item Kipf T y Welling M (2017). \emph{Semi-Supervised Classification with Graph Convolutional Networks.} ICLR.
+  \item Hamilton W, Ying R y Leskovec J (2017). \emph{Inductive Representation Learning on Large Graphs.} NeurIPS.
+  \item Veličković P y colaboradores (2018). \emph{Graph Attention Networks.} ICLR.
+  \item Du J y colaboradores (2017). \emph{Topology Adaptive Graph Convolutional Networks.} arXiv:1710.10370.
+  \item Ying R y colaboradores (2019). \emph{GNNExplainer: Generating Explanations for Graph Neural Networks.} NeurIPS.
+  \item Luo D y colaboradores (2020). \emph{Parameterized Explainer for Graph Neural Network.} NeurIPS.
+  \item Akkas S y Azad A (2024). \emph{GNNShap: Scalable and Accurate GNN Explanation using Shapley Values.} WWW.
+  \item Lundberg S y Lee S (2017). \emph{A Unified Approach to Interpreting Model Predictions.} NeurIPS.
+  \item Kosan M y colaboradores (2023). \emph{GNNX-BENCH: Unravelling the Utility of Perturbation-based GNN Explainers through In-depth Benchmarking.} arXiv:2310.01794.
+  \item Agarwal C, Zitnik M y Lakkaraju H (2022). \emph{Probing GNN Explainers: A Rigorous Theoretical and Empirical Analysis of GNN Explanation Methods.} AISTATS.
+  \item Lawal O, Okolie A y Obunadike C (2025). \emph{An Explainable Graph Neural Network Framework for Anti-Money Laundering in Cryptocurrency Transactions Using the Elliptic Dataset.} IJNSA 17(6). DOI: 10.5121/ijnsa.2025.17602.
+  \item He X y colaboradores (2026). \emph{An Explainable Graph Neural Network Framework for Illicit Financial Transaction Detection.} Applied Intelligence 56. DOI: 10.1007/s10489-026-07138-9.
+  \item Zhao T, Zhang X y Wang S (2021). \emph{GraphSMOTE: Imbalanced Node Classification on Graphs with Graph Neural Networks.} WSDM.
+  \item Lin T y colaboradores (2017). \emph{Focal Loss for Dense Object Detection.} ICCV.
 \end{itemize}
 \end{frame}
 
@@ -719,7 +719,7 @@ GNNExplainer & 0,50 & \textbf{0,45} & \textbf{0,56} \\
 PGExplainer & \textbf{0,80} & n/d & 0,11 \\
 GNNShap & n/d & 0,15 & 0,46 \\
 \midrule
-\emph{Azar (línea base)} & \emph{0,40} & \emph{0,08} & --- \\
+\emph{Azar (línea base)} & \emph{0,40} & \emph{0,08} & no aplica \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -736,10 +736,10 @@ GNNShap & n/d & 0,15 & 0,46 \\
 \toprule
 \textbf{Arquitectura} & \textbf{s42} & \textbf{s43} & \textbf{s44} & \textbf{Media} & \textbf{IC95\,\%} \\
 \midrule
-GAT       & 0,766 & 0,789 & 0,790 & \textbf{0,782} & [0,758; 0,805] \\
-GCN       & 0,783 & 0,733 & 0,757 & \textbf{0,758} & [0,724; 0,787] \\
-GraphSAGE & 0,756 & 0,713 & 0,738 & 0,735 & [0,710; 0,756] \\
-TAGCN     & 0,586 & 0,693 & 0,736 & 0,672 & [0,632; 0,717] \\
+GAT       & 0,766 & 0,789 & 0,790 & \textbf{0,782} & 0,758 a 0,805 \\
+GCN       & 0,783 & 0,733 & 0,757 & \textbf{0,758} & 0,724 a 0,787 \\
+GraphSAGE & 0,756 & 0,713 & 0,738 & 0,735 & 0,710 a 0,756 \\
+TAGCN     & 0,586 & 0,693 & 0,736 & 0,672 & 0,632 a 0,717 \\
 \bottomrule
 \end{tabular}
 \end{center}

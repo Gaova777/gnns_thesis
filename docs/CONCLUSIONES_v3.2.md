@@ -1,11 +1,11 @@
-# CONCLUSIONES v3.2 — Estabilidad de la explicabilidad en GNNs sobre Elliptic
+# CONCLUSIONES v3.2: Estabilidad de la explicabilidad en GNNs sobre Elliptic
 
-> 🔴 **NÚMEROS SUPERADOS — NO USAR EN LA DEFENSA.** Este documento (2026-07-15) refleja una corrida
+> 🔴 **NÚMEROS SUPERADOS. NO USAR EN LA DEFENSA.** Este documento (2026-07-15) refleja una corrida
 > de **una sola semilla** con la métrica de Spearman aún truncada, y concluye que "GraphSAGE es la
 > más estable" (0,630 / 0,486 / 0,468 / 0,270). Esa conclusión fue **retractada** en la consolidación
 > del 2026-07-22 (fix R1: truncamiento de Spearman) y al replicar con **3 semillas de modelo**. El
-> hallazgo vigente es una **partición en dos grupos** — alto: GAT (0,782) y GCN (0,758); bajo:
-> GraphSAGE (0,735) y TAGCN (0,672) — sin un ranking de cuatro puestos. **Fuente de verdad:**
+> hallazgo vigente es una **partición en dos grupos**, alto: GAT (0,782) y GCN (0,758). Bajo:
+> GraphSAGE (0,735) y TAGCN (0,672), sin un ranking de cuatro puestos. **Fuente de verdad:**
 > `tesis_latex/main.pdf` y el `README.md` de la raíz. Se conserva solo como registro histórico.
 
 Fecha: 2026-07-15
@@ -62,7 +62,7 @@ al método de medición lo convierte en el hallazgo más sólido del estudio. TA
 las explicaciones menos estables, con una separación clara respecto a las demás
 arquitecturas tanto en media como en mediana. GAT y GCN ocupan posiciones intermedias y
 no son distinguibles entre sí, dado que la diferencia entre sus medias es menor que la
-dispersión interna de sus celdas; por tanto se reportan como comparables y no se afirma
+dispersión interna de sus celdas. Por tanto se reportan como comparables y no se afirma
 un orden entre ellos.
 
 ## 4. Hallazgos previos que quedan retractados
@@ -70,11 +70,11 @@ un orden entre ellos.
 Dos hallazgos que la versión anterior del documento presentaba como contribuciones
 centrales quedan retractados por no sostenerse sobre datos corregidos. El primero es el
 supuesto tradeoff entre desempeño predictivo y estabilidad de la explicación, que
-sostenía que la arquitectura más precisa producía las explicaciones menos estables; con
+sostenía que la arquitectura más precisa producía las explicaciones menos estables. Con
 la medición corregida GraphSAGE encabeza la estabilidad, de modo que el tradeoff no se
 observa. El segundo es el patrón de pico y colapso de la estabilidad en función del
 desbalance, según el cual la estabilidad alcanzaba un máximo en el escenario 1:50 y
-caía en 1:100; con la medición sobre el receptive field real este patrón desaparece y la
+caía en 1:100. Con la medición sobre el receptive field real este patrón desaparece y la
 estabilidad por escenario no muestra una tendencia monótona pronunciada. Ambos patrones
 eran artefactos de medir sobre el conjunto de prueba contaminado por el cambio de
 distribución temporal y sobre el grafo completo en lugar del vecindario relevante.
@@ -85,7 +85,7 @@ GNNExplainer es el único explicador que produce una señal de estabilidad con v
 informativa en este dataset, con correlaciones de Spearman que cubren un rango amplio
 según la arquitectura y el escenario. PGExplainer presenta una degeneración total, con
 correlación de Spearman nula en la totalidad de las celdas medibles, atribuible a un
-comportamiento del método en la versión 2.7 de la librería utilizada; este resultado se
+comportamiento del método en la versión 2.7 de la librería utilizada. Este resultado se
 reporta como un hallazgo metodológico y no como una medida de estabilidad, y los ajustes
 de hiperparámetros ensayados mitigan el problema en el dataset Cora pero no lo resuelven
 en Elliptic. GNNShap ofrece una señal parcial y se considera una métrica secundaria.
@@ -99,7 +99,7 @@ previa de tres nodos por celda. No obstante, el diseño mantiene un único model
 por celda, de modo que la comparación entre celdas descansa sobre modelos individuales y
 no sobre réplicas de entrenamiento. Por esta razón el análisis se limita a marginales por
 factor acompañadas de tamaños de efecto, y no a un análisis de varianza factorial con
-pretensión de potencia estadística; una verificación de degeneración del diseño precede a
+pretensión de potencia estadística. Una verificación de degeneración del diseño precede a
 cualquier prueba y descarta las respuestas de varianza nula, como la del índice de Jaccard.
 Esta limitación se declara de forma explícita para que las conclusiones se interpreten
 como una caracterización descriptiva y no como una inferencia poblacional.
