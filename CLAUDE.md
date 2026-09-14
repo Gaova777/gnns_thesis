@@ -13,7 +13,7 @@ estabilidad) y un **grafo sintético propio con ground-truth por arista** (`phas
 donde sí se pueden medir plausibilidad y fidelidad).
 
 > **La fuente de verdad de los hallazgos es el manuscrito**, no este archivo ni los CSV sueltos:
-> `tesis_latex/main.pdf` (117 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
+> `tesis_latex/main.pdf` (120 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
 
 ## Estado actual (2026-07-23)
 
@@ -157,7 +157,7 @@ Difieren en `hidden_dim` (cap por VRAM), `optuna_trials` (50 vs 8), `epochs` (60
 ```
 gnns_thesis/
 ├── tesis_latex/            ← MANUSCRITO (main.tex + 8 capítulos + tables/ + bibliografia.bib)
-│   └── main.pdf              117 páginas, versionado
+│   └── main.pdf              120 páginas, versionado
 ├── presentacion_latex/     ← defensa en Beamer (beamer_defensa_v3 es el vigente, 42 páginas)
 ├── docs/                   ← material de defensa (ver abajo)
 ├── configs/                ← *_v3.yaml son los vigentes; el resto es legacy

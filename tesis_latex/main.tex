@@ -74,6 +74,8 @@
 % Párrafos
 % ------------------------------------------------
 \setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{2em}
 
 % ------------------------------------------------
 % BIBLIOGRAFÍA (Mendeley compatible)
@@ -89,6 +91,7 @@ isbn=false
 
 % IMPORTANTE: Asegúrate de que el archivo que exportas de Mendeley se llame bibliografia.bib
 \addbibresource{bibliografia.bib}
+\AtBeginBibliography{\sloppy}
 
 % --- SOLUCIÓN PARA GUIONES BAJOS DE MENDELEY ---
 \DeclareSourcemap{
@@ -250,7 +253,7 @@ The adoption of Graph Neural Networks (GNNs) for money laundering detection requ
 \chapter*{Lista de Acrónimos}
 \addcontentsline{toc}{chapter}{Lista de Acrónimos}
 
-\begin{longtable}{p{0.16\textwidth}p{0.78\textwidth}}
+\begin{longtable}{p{0.19\textwidth}p{0.75\textwidth}}
 \textbf{AML} & \textit{Anti-Money Laundering}, prevención del lavado de activos \\[2pt]
 \textbf{AUC-PR} & Área bajo la curva de precisión y exhaustividad (\textit{Precision-Recall Area Under the Curve}) \\[2pt]
 \textbf{FATF} & \textit{Financial Action Task Force} (Grupo de Acción Financiera Internacional) \\[2pt]

@@ -21,7 +21,7 @@ clases (1:1, 1:10, 1:30 nativo, 1:50, 1:100), complementado con un **grafo sint�
 
 > ### ✅ Estado (2026-07-22): consolidación completada
 > La **fuente de verdad de los hallazgos es el manuscrito** ([`tesis_latex/`](tesis_latex/)), que
-> compila a 117 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
+> compila a 120 páginas y está commiteado en la rama `consolidacion-auditoria`. Tras la auditoría
 > integral se corrigieron **dos artefactos de evaluación** que invertían conclusiones sobre
 > estabilidad; los números de este README ya reflejan la versión corregida. El registro detallado de
 > los cambios está en **[CAMBIOS_CONSOLIDACION_2026-07-22.md](CAMBIOS_CONSOLIDACION_2026-07-22.md)** y
@@ -450,7 +450,7 @@ El manuscrito y el material de defensa viven **en este repositorio**:
 | Artefacto | Ubicación |
 |---|---|
 | **Manuscrito (fuente LaTeX)** | [`tesis_latex/`](tesis_latex/) — `main.tex` + 8 capítulos + `tables/` + `bibliografia.bib` |
-| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 117 páginas |
+| **Manuscrito (PDF)** | [`tesis_latex/main.pdf`](tesis_latex/main.pdf) — 120 páginas |
 | **Presentación de defensa (Beamer)** | [`presentacion_latex/beamer_defensa_v3.pdf`](presentacion_latex/beamer_defensa_v3.pdf) — 42 páginas (34 de contenido) |
 | **Guiones de defensa** | `docs/GUION_defensa_por_capitulo.md`, `docs/ESQUELETO_presentacion_defensa.md`, `docs/DEFENSA_R2_evidencia_sintetica.md` |
 

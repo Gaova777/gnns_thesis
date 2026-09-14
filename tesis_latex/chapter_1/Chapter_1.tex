@@ -74,7 +74,8 @@ En consecuencia, el estado del arte revela una convergencia clara: el problema A
 
 \begin{table}[h!]
 \centering
-\begin{tabular}{|p{3.2cm}|p{3.7cm}|p{4.2cm}|p{4.2cm}|}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{2.6cm}|>{\raggedright\arraybackslash}p{3.4cm}|>{\raggedright\arraybackslash}p{4.1cm}|>{\raggedright\arraybackslash}p{4.0cm}|}
 \hline
 \textbf{Trabajo} & \textbf{Enfoque principal} & \textbf{Aporte} & \textbf{Limitación relevante} \\
 \hline
@@ -166,7 +167,7 @@ Evaluar exhaustivamente la estabilidad de los métodos de explicabilidad en Rede
 \begin{itemize}
     \item Evaluar el impacto directo del desequilibrio de clases en la robustez de las explicaciones estructurales, ejecutando un análisis comparativo y cuantitativo de métodos representativos como GNNExplainer, PGExplainer y GNNShap a través de escenarios incrementales de submuestreo y desbalance en el \textit{Elliptic Dataset} \cite{Ying2019Gnnexplainer:Networks, Luo2020ParameterizedNetwork, Akkas2024Gnnshap:Values}.
     \item Comparar la resiliencia topológica de múltiples arquitecturas GNN, incluyendo GCN, GraphSAGE, GAT y TAGCN, midiendo la consistencia de los subgrafos explicativos generados bajo condiciones de estrés de datos \cite{Weber2019Anti-MoneyForensics, Du2017TopologyNetworks}.
-    \item Analizar el impacto colateral de las estrategias de mitigación del desbalance, como GraphSMOTE, ponderación de clases y esquemas equivalentes, determinando mediante métricas de fidelidad y estabilidad si dichas intervenciones estabilizan o distorsionan la interpretación topológica del modelo \cite{Zhao2021Graphsmote:Networks, Rai2025EvaluatingData, Fujiwara2024KnowledgeStability}.
+    \item Analizar el impacto colateral de las estrategias de mitigación del desbalance, como \mbox{GraphSMOTE}, ponderación de clases y esquemas equivalentes, determinando mediante métricas de fidelidad y estabilidad si dichas intervenciones estabilizan o distorsionan la interpretación topológica del modelo \cite{Zhao2021Graphsmote:Networks, Rai2025EvaluatingData, Fujiwara2024KnowledgeStability}.
     \item Construir y validar una matriz de recomendación técnica que articule rendimiento predictivo y estabilidad explicativa, proporcionando un marco de decisión fundamentado para el diseño de sistemas de detección AML basados en IA explicable.
 \end{itemize}
 
