@@ -542,7 +542,7 @@ Las \textbf{conclusiones sí}: 25/60 sobre el filtro de calidad frente a 23/60, 
 \begin{column}{0.60\textwidth}
 \centering
 \figcard[\linewidth]{colapso_val_test.png}
-\figcap{Rendimiento en validación y test sobre los mismos modelos: PR-AUC y precisión@50 colapsan; el ROC-AUC apenas cae. \emph{Fuente: elaboración propia.}}
+\figcap{Rendimiento en validación y test sobre los mismos modelos: PR-AUC y precisión@50 colapsan, mientras que el ROC-AUC cae mucho menos y aparenta un modelo aceptable. \emph{Fuente: elaboración propia.}}
 \end{column}
 \begin{column}{0.40\textwidth}
 \small
@@ -779,21 +779,21 @@ GCN vs TAGCN & 0,0067 & $<10^{-4}$ \\
 \toprule
 \textbf{Explicador (Elliptic)} & \textbf{GAT} & \textbf{GCN} & \textbf{GraphSAGE} & \textbf{TAGCN} \\
 \midrule
-\textbf{\color{teal}GNNExplainer} & 0,78 & 0,76 & 0,74 & 0,68 \\
+\textbf{\color{teal}GNNExplainer} & 0,78 & 0,76 & 0,74 & 0,67 \\
 PGExplainer & 0,00 & 0,00 & 0,00 & 0,00 \\
-GNNShap & 0,97 & 0,97 & 0,95 & 0,97 \\
+GNNShap & 0,97$^{*}$ & 0,97 & 0,95 & 0,97$^{*}$ \\
 \bottomrule
 \end{tabular}
 \end{center}
 \vspace{0.5em}
-{\footnotesize \textbf{\color{teal}GNNExplainer} es el único que discrimina entre arquitecturas: PGExplainer degenera (Spearman nulo) y GNNShap se satura cerca de 0,96, indistinguible. Además es el explicador común a los dos ejes, lo que hace comparable la partición. Cifras a 3 semillas.}
+{\footnotesize \textbf{\color{teal}GNNExplainer} es el único que discrimina entre arquitecturas: PGExplainer degenera (Spearman nulo) y GNNShap se satura cerca de 0,96, indistinguible. Además es el explicador común a los dos ejes, lo que hace comparable la partición. GNNExplainer, a 3 semillas en las cuatro arquitecturas. GNNShap, a 3 semillas en GCN y GraphSAGE. Las marcadas con $^{*}$, GAT y TAGCN, solo en la semilla 42.}
 \end{frame}
 
 \begin{frame}{Respaldo \textperiodcentered\ curvas ROC y precisión-recall}
 \begin{center}
 \figcard[0.96\linewidth]{curvas_pr_roc.png}
 \end{center}
-\figcap{Curvas ROC (izquierda) y de precisión y exhaustividad (derecha) sobre validación y test, mismos modelos. El ROC apenas cae en test, pero la precisión y exhaustividad se desploma casi a la tasa base de transacciones ilícitas: por eso la métrica primaria es PR-AUC y no ROC-AUC. \emph{Fuente: elaboración propia.}}
+\figcap{Curvas ROC (izquierda) y de precisión y exhaustividad (derecha) sobre validación y test, mismos modelos. El ROC cae de 0,88 a 0,65, mientras que la precisión y exhaustividad se desploma casi a la tasa base de transacciones ilícitas: por eso la métrica primaria es PR-AUC y no ROC-AUC. \emph{Fuente: elaboración propia.}}
 \end{frame}
 
 \end{document}

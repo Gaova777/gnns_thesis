@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Figura de colapso validacion->test para la lamina 18.
 Barras agrupadas: cada metrica con su valor en validacion y en test.
-Muestra que PR-AUC y precision@50 se desploman mientras ROC-AUC apenas cae
+Muestra que PR-AUC y precision@50 se desploman mientras ROC-AUC cae mucho menos
 (=> ROC-AUC enganoso bajo desbalance). Valores = manuscrito (tabla val/test)."""
 import os
 import numpy as np
@@ -26,9 +26,9 @@ def com(v): return f"{v:.3f}".replace(".", ",")
 fig, ax = plt.subplots(figsize=(6.6, 4.0))
 xs = np.arange(len(labels)); w = 0.38
 b1 = ax.bar(xs - w/2, val, w, color="#1C7293", edgecolor="black", linewidth=0.5,
-            label="Validación (entrenamiento)", zorder=3)
+            label="Validación", zorder=3)
 b2 = ax.bar(xs + w/2, test, w, color="#C0392B", edgecolor="black", linewidth=0.5,
-            label="Test (futuro no visto)", zorder=3)
+            label="Test (periodo posterior)", zorder=3)
 
 for i in range(len(labels)):
     ax.text(xs[i] - w/2, val[i] + 0.02, com(val[i]), ha="center", fontsize=8.8)
@@ -37,8 +37,8 @@ for i in range(len(labels)):
 
 # sombra + anotacion sobre ROC-AUC (la enganosa), en el hueco entre grupos
 ax.axvspan(xs[2] - 0.5, xs[2] + 0.5, color="#F4B41A", alpha=0.10, zorder=0)
-ax.annotate("ROC-AUC apenas cae\n(engañoso bajo desbalance)",
-            xy=(xs[2] + w/2, test[2] + 0.01), xytext=(1.28, 0.86),
+ax.annotate("ROC-AUC cae mucho menos\n(engañoso bajo desbalance)",
+            xy=(xs[2] + w/2, test[2] + 0.01), xytext=(1.13, 0.80),
             ha="center", va="center", fontsize=8.2, color="0.20",
             arrowprops=dict(arrowstyle="->", color="0.45", lw=1))
 

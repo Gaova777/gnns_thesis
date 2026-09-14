@@ -1,16 +1,19 @@
+% Editada a mano: la columna de GNNExplainer copia tab:ic (bootstrap) y se anadio la columna de
+% configuraciones. Si se vuelve a correr scripts/consolidacion/robustez_3semillas.py, esta tabla se
+% sobrescribe con intervalos t y TAGCN 0,676: revisar antes de aceptar el cambio.
 \begin{table}[htbp]
 \centering
 \renewcommand{\arraystretch}{1.3}
-\begin{tabular}{lcc}
+\begin{tabular}{lccc}
 \toprule
-\textbf{Arquitectura} & \textbf{GNNExplainer} & \textbf{GNNShap} \\
+\textbf{Arquitectura} & \textbf{GNNExplainer} & \textbf{GNNShap} & \textbf{Config. GNNShap} \\
 \midrule
-GraphSAGE & 0,735 [0,711; 0,760] & 0,950 [0,942; 0,959] \\
-GAT & 0,782 [0,758; 0,806] & 0,968 (s42) \\
-GCN & 0,758 [0,725; 0,791] & 0,971 [0,964; 0,978] \\
-TAGCN & 0,676 [0,632; 0,720] & 0,967 (s42) \\
+GraphSAGE & 0,735 [0,710; 0,756] & 0,950 [0,942; 0,959] & 33 \\
+GAT & 0,782 [0,758; 0,805] & 0,968 (s42) & 7 \\
+GCN & 0,758 [0,724; 0,787] & 0,971 [0,964; 0,978] & 4 \\
+TAGCN & 0,672 [0,632; 0,717] & 0,967 (s42) & 4 \\
 \bottomrule
 \end{tabular}
-\caption{Estabilidad de las explicaciones medida como correlación de Spearman sobre el ranking de \textit{features}. Ambos explicadores atribuyen importancia a \textit{features} y comparten escala, pero su lectura difiere. GNNExplainer discrimina entre arquitecturas y reproduce la partición en dos grupos, con GAT y GCN por encima de GraphSAGE y TAGCN. GNNShap, en cambio, se satura en valores próximos a la unidad para las cuatro arquitecturas, de modo que su estabilidad es alta pero no separa arquitecturas. Las celdas con intervalo de confianza al 95\% se promedian sobre las tres semillas de modelo; las marcadas \textup{(s42)} corresponden a GAT y TAGCN, cuyos pesos de las semillas adicionales no cabían para reentrenar en la GPU de 8 GB disponible y por eso se reportan sobre la semilla original, en la que la saturación ya es visible. PGExplainer opera sobre aristas y se reporta aparte con la métrica de Jaccard.}
+\caption{Estabilidad de las explicaciones medida como correlación de Spearman sobre el ranking de \textit{features}. Ambos explicadores atribuyen importancia a \textit{features} y comparten escala, pero su lectura difiere. GNNExplainer discrimina entre arquitecturas y reproduce la partición en dos grupos, con GAT y GCN por encima de GraphSAGE y TAGCN. GNNShap, en cambio, se satura en valores próximos a la unidad para las cuatro arquitecturas, de modo que su estabilidad es alta pero no separa arquitecturas. La columna de GNNExplainer reproduce los valores y los intervalos bootstrap de la Tabla \ref{tab:ic}. Los intervalos de GNNShap son intervalos t de Student al 95\% sobre las tres semillas de modelo, calculados sobre el número de configuraciones que indica la última columna, que es el de las que superan el filtro de calidad. Las celdas marcadas \textup{(s42)} corresponden a GAT y TAGCN, que se reportan sobre la semilla de referencia por la razón operativa expuesta en el texto. PGExplainer opera sobre aristas y se reporta aparte con la métrica de Jaccard.}
 \label{tab:elliptic-robustez-3s}
 \end{table}

@@ -13,7 +13,7 @@ estabilidad) y un **grafo sintético propio con ground-truth por arista** (`phas
 donde sí se pueden medir plausibilidad y fidelidad).
 
 > **La fuente de verdad de los hallazgos es el manuscrito**, no este archivo ni los CSV sueltos:
-> `tesis_latex/main.pdf` (114 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
+> `tesis_latex/main.pdf` (117 páginas, 8 capítulos). El README de la raíz es el resumen vigente.
 
 ## Estado actual (2026-07-23)
 
@@ -53,6 +53,13 @@ encuentras esas afirmaciones en algún documento del repo, está desactualizado.
 - **La plausibilidad de GNNShap es de features, no de aristas**, y su línea base de azar es **0,075**,
   no 0,40. GNNShap no produce máscara de aristas por diseño. Nunca ponerla en la misma figura ni en la
   misma columna que la plausibilidad de aristas de GNNExplainer y PGExplainer.
+- **GNNShap y PGExplainer a 3 semillas solo cubren GCN y GraphSAGE.** GAT y TAGCN quedan en la semilla
+  42 por una razón **operativa**: sus modelos 43/44 (que sí forman parte de los 180 de GNNExplainer)
+  no estaban en la máquina donde corrió la extensión, y reentrenarlos allí dio OOM en la **primera
+  configuración de GAT**, lo que detuvo la fase; **TAGCN nunca se intentó**. No escribir "no caben en
+  8 GB" ni atribuirlo a las cabezas de atención. GNNShap en GCN son solo **4 configuraciones**.
+  `tables/elliptic_robustez_3semillas.tex` está editada a mano para copiar `tab:ic` (TAGCN 0,672):
+  si se regenera con `robustez_3semillas.py` vuelve a salir TAGCN 0,676 con intervalos t.
 - **Nunca decir "GAT es la más estable"**: GAT y GCN se permutan entre semillas.
 - El pipeline **no es determinista a nivel de pesos** (scatter con atómicos en GPU). Reproduce
   conclusiones, no decimales: el reentrenamiento dio 25/60 sobre el gate frente a 23/60.
@@ -150,8 +157,8 @@ Difieren en `hidden_dim` (cap por VRAM), `optuna_trials` (50 vs 8), `epochs` (60
 ```
 gnns_thesis/
 ├── tesis_latex/            ← MANUSCRITO (main.tex + 8 capítulos + tables/ + bibliografia.bib)
-│   └── main.pdf              114 páginas, versionado
-├── presentacion_latex/     ← defensa en Beamer (beamer_defensa_v3 es el vigente, 41 páginas)
+│   └── main.pdf              117 páginas, versionado
+├── presentacion_latex/     ← defensa en Beamer (beamer_defensa_v3 es el vigente, 42 páginas)
 ├── docs/                   ← material de defensa (ver abajo)
 ├── configs/                ← *_v3.yaml son los vigentes; el resto es legacy
 ├── scripts/
@@ -184,8 +191,8 @@ gnns_thesis/
 | `docs/PENDIENTE_curvas_pr_roc.md` | Traspaso de las curvas PR/ROC: requieren los checkpoints, que no estan en git |
 
 **El deck vigente es `beamer_defensa_v3.tex`** (tema Metropolis oscuro, se compila con **LuaLaTeX** y
-necesita el paquete `beamertheme-metropolis`). Tiene **41 páginas** para **34 láminas de contenido**:
-intercala 5 separadores de sección, 1 lámina de cierre, 2 de referencias y 4 de respaldo. Los
+necesita el paquete `beamertheme-metropolis`). Tiene **42 páginas** para **34 láminas de contenido**:
+intercala 5 separadores de sección, 1 lámina de cierre, 2 de referencias y 5 de respaldo. Los
 encabezados del DISCURSO usan ya esa numeración de página. Los decks `beamer_defensa.tex` (v1) y
 `beamer_defensa_v2.tex` quedan como registro histórico y **no** llevan las correcciones posteriores:
 no usarlos para ensayar.

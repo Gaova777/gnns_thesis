@@ -28,7 +28,7 @@
 
 ### Mapa del guion a la pagina del PDF
 
-> **El deck vigente es `presentacion_latex/beamer_defensa_v3.pdf`** (tema Metropolis oscuro), de **41
+> **El deck vigente es `presentacion_latex/beamer_defensa_v3.pdf`** (tema Metropolis oscuro), de **42
 > paginas**: 34 laminas de contenido, 5 separadores de seccion (no se hablan, se pasan mientras se dice
 > la frase de transicion), 1 lamina de cierre y 5 de respaldo que solo se abren si el jurado pregunta.
 > Los encabezados de este guion usan la numeracion de pagina de ese PDF. Duracion estimada: **33 a 36
@@ -72,15 +72,15 @@
 | **34** | Contribuciones y limitaciones | JD |
 | **35** | Cierre | JD |
 | *36 a 37* | *Referencias seleccionadas* | |
-| *38 a 41* | *respaldo: solo si preguntan* | |
+| *38 a 42* | *respaldo: solo si preguntan* | |
 
 **El [RELEVO] cae en la pagina 18**, el separador "Resultados": Alejandro cierra en la 17 (Metricas),
 pasa a la 18 mientras dice la frase de entrega, y Juan Diego arranca con la 19 en pantalla. Es el punto
 de cambio mas limpio posible.
 
-**Respaldo (paginas 38 a 41):** disociacion con valores exactos y las dos lineas base de azar,
-estabilidad por semilla de modelo, detalle estadistico de la particion en los dos ejes, y por que el
-ranking por arquitectura usa solo GNNExplainer. Sepan de memoria en que pagina esta cada una para
+**Respaldo (paginas 38 a 42):** disociacion con valores exactos y las dos lineas base de azar,
+estabilidad por semilla de modelo, detalle estadistico de la particion en los dos ejes, por que el
+ranking por arquitectura usa solo GNNExplainer, y las curvas ROC y de precision y exhaustividad. Sepan de memoria en que pagina esta cada una para
 llegar sin buscar.
 
 ---
@@ -328,11 +328,12 @@ para una conclusion comparativa falsa.
 Con la metrica corregida, y replicando el entrenamiento completo con tres semillas de modelo, lo que
 encontramos no es un ranking de cuatro puestos sino una particion en dos grupos. Un grupo alto, con GAT
 en cero coma setenta y ocho y GCN en cero coma setenta y seis, y un grupo bajo, con GraphSAGE en cero
-coma setenta y tres y TAGCN en cero coma sesenta y ocho. *(pausa)* Y lo importante es donde estan las
+coma setenta y cuatro y TAGCN en cero coma sesenta y siete. *(pausa)* Y lo importante es donde estan las
 diferencias: entre los dos grupos son estadisticamente significativas, y dentro de cada grupo no lo son.
-La prueba estadistica que compara los cuatro grupos nos dice que la probabilidad de que esta
-separacion sea pura casualidad es diminuta, menos de una en cien mil; pero al preguntar lo mismo
-dentro del grupo alto, o dentro del grupo bajo, ahi las diferencias si podrian ser azar. *(pausa)* Aqui cierro nuestra
+La prueba que compara las cuatro arquitecturas nos dice que, si en realidad no hubiera ninguna
+diferencia entre ellas, una separacion tan marcada como la que vemos apareceria menos de tres veces
+en cien mil. Pero cuando hacemos la misma pregunta dentro del grupo alto, o dentro del grupo bajo, las
+diferencias son del tamano que el azar produce con frecuencia, asi que no podemos afirmar que existan. *(pausa)* Aqui cierro nuestra
 segunda hipotesis: esperabamos que TAGCN, por su alcance multi-hop, fuera la mas estable, y aparece de
 forma consistente en el grupo bajo en las tres semillas. La hipotesis se cae, y lo decimos sin rodeos.
 *(pausa)* Quiero ser honesto con dos cosas mas. La primera, que el liderazgo de GraphSAGE que reportaba
@@ -349,17 +350,19 @@ Me detengo un momento en que sostiene esa particion, porque es la diferencia ent
 un resultado. *(pausa)* Reentrenamos la matriz completa de sesenta configuraciones tres veces, con tres
 semillas distintas, ciento ochenta modelos, y en cada una corrimos el procedimiento entero incluida su
 propia busqueda de hiperparametros. Sobre esos ciento ochenta modelos, la pregunta es simple: las diferencias que vemos, ¿son reales o
-podrian ser casualidad? Una prueba estadistica estandar responde que la separacion entre el grupo alto
-y el bajo es real, la probabilidad de que sea azar es menor de una en diez mil. En cambio, dentro de
-cada grupo las diferencias si podrian ser casualidad. Dicho de otro modo, toda la variacion esta entre
+podrian ser casualidad? Una prueba estadistica estandar responde que, si el grupo alto y el bajo fueran
+en realidad iguales, una diferencia como la que medimos apareceria menos de dos veces en un millon, asi
+que la tratamos como real. En cambio, dentro de cada grupo las diferencias son compatibles con el azar. Dicho de otro modo, toda la variacion esta entre
 grupos, ninguna dentro. Los margenes de error, calculados repitiendo el analisis muchas veces con
 remuestreo, cuentan lo mismo: se solapan dentro de cada grupo y apenas se tocan entre ellos. Y por si
 preguntan si esto sale de haber hecho muchas comparaciones a la vez, aplicamos el ajuste habitual para
 ese caso y la separacion aguanta. *(pausa)* Y esa replicacion no se limito a GNNExplainer: tambien
 corrimos GNNShap y PGExplainer en las tres semillas para GCN y GraphSAGE, y confirman su patron,
-GNNShap muy estable pero sin distinguir arquitecturas y PGExplainer degenerado; GAT y TAGCN, cuyos
-pesos no caben para reentrenar en la tarjeta de ocho gigabytes, quedan en la semilla de referencia,
-donde ya muestran lo mismo.
+GNNShap muy estable pero sin distinguir arquitecturas y PGExplainer degenerado. En GAT y TAGCN esa
+extension quedo en la semilla de referencia por un motivo operativo: sus modelos de las otras dos
+semillas, que si forman parte de los ciento ochenta, no estaban en el equipo donde la corrimos, y
+reentrenarlos alli agoto la memoria de la tarjeta. Aun asi, en esa semilla muestran exactamente el
+mismo patron.
 *(pausa)* Hay un segundo hallazgo aqui que queremos declarar, porque es una contribucion en si misma. Al reentrenar
 descubrimos que el pipeline no es reproducible bit a bit: las operaciones de agregacion sobre la
 tarjeta grafica suman en un orden que no esta determinado, asi que los pesos nunca salen identicos.
@@ -390,8 +393,9 @@ el diseno.
 ### Pagina 24: Disociacion plausibilidad y fidelidad  ·  [JD]  ·  85 s
 Ahora el hallazgo central sobre los explicadores, y es un resultado con dos caras. *(pausa)* Por un
 lado, PGExplainer es claramente el que mejor recupera el patron real: su plausibilidad de aristas es de
-cero coma ochenta, frente a cero coma cincuenta de GNNExplainer, y la diferencia es
-estadisticamente abrumadora, practicamente imposible de atribuir al azar. Y
+cero coma ochenta, frente a cero coma cincuenta de GNNExplainer, y la ventaja es sistematica: gana en
+noventa y dos de cada cien comparaciones pareadas, algo que no ocurriria en la practica si los dos
+explicadores fueran igual de buenos. Y
 para que estas cifras signifiquen algo, las contrastamos con el azar: un explicador que eligiera las
 aristas al azar, con el mismo protocolo, obtiene cero coma cuarenta. PGExplainer duplica ese nivel,
 mientras que GNNExplainer apenas lo supera, lo que ya anticipa la disociacion que viene: el fuerte de
@@ -591,7 +595,7 @@ atentos a sus preguntas.
 
 - **Ritmo:** el bloque de resultados (slides 13 a 18) es el mas cargado. No lean la slide; miren al
   jurado y usen la slide como respaldo. El discurso ya dice lo esencial; la slide tiene el detalle.
-- **Los numeros que deben salir sin dudar:** grupo alto GAT 0,78 y GCN 0,76 frente a grupo bajo GraphSAGE 0,73 y TAGCN 0,68, con diferencias significativas entre grupos y no dentro; puente r = menos
+- **Los numeros que deben salir sin dudar:** grupo alto GAT 0,78 y GCN 0,76 frente a grupo bajo GraphSAGE 0,74 y TAGCN 0,67, con diferencias significativas entre grupos y no dentro; puente r = menos
   0,01; disociacion plausibilidad 0,80 (azar 0,40) contra fidelidad 0,11 para PGExplainer; concordancia menos 0,20
   a mas 0,80; PR-AUC 0,37 en validacion a 0,02 en test.
 - **Si se ponen nerviosos con una cifra,** digan el orden de magnitud y la direccion ("alrededor de
@@ -638,8 +642,8 @@ atentos a sus preguntas.
   (la segunda mas filosa, y la unica que ataca directo el Slide 14; ensayenla). Respuesta: "Tiene
   razon en que el n es desigual, y por eso el ranking que afirmamos es el de la corrida completa de
   sesenta configuraciones, donde las cuatro arquitecturas tienen soporte comparable: ahi GAT queda en
-  cero coma setenta y ocho, GCN en cero coma setenta y seis, GraphSAGE en cero coma setenta y tres y
-  TAGCN en cero coma sesenta y ocho, sobre tres semillas de modelo. La columna filtrada de la version
+  cero coma setenta y ocho, GCN en cero coma setenta y seis, GraphSAGE en cero coma setenta y cuatro y
+  TAGCN en cero coma sesenta y siete, sobre tres semillas de modelo. La columna filtrada de la version
   de una sola semilla la reportabamos como control de robustez, no
   como estimacion: su valor es que no invierte el orden. Con una sola configuracion, el cero coma
   ochenta y tres de GCN no admite lectura inferencial, y no lo presentamos como tal. Por eso la
