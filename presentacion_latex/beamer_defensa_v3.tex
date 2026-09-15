@@ -87,43 +87,93 @@
 % ##################################################################### 1
 \section{Problema y motivación}
 
-\begin{frame}{El problema: detectar lavado sin caja negra}
+\begin{frame}{El lavado de dinero es un problema de red}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\textbf{\color{navy}Tres fases clásicas}
+\begin{enumerate}\small
+  \item \textbf{Colocación}: el dinero ilícito entra al sistema.
+  \item \textbf{Estratificación}: se fragmenta en muchas transacciones para borrar el rastro.
+  \item \textbf{Integración}: vuelve a la economía con apariencia legal.
+\end{enumerate}
+\vspace{0.4em}
+\textbf{\color{navy}Tipologías = patrones entre cuentas}
+\begin{itemize}\small
+  \item \emph{Structuring} (pitufeo), \emph{layering}, \emph{fan-in}, \emph{fan-out}.
+\end{itemize}
+\end{column}
+\begin{column}{0.46\textwidth}
+\begin{block}{La idea clave}
+Una transacción \textbf{aislada} parece normal. Lo que delata el lavado es el \alert{patrón de conexiones} entre cuentas.
+\end{block}
+\vspace{0.3em}
+{\footnotesize\color{muted} Por eso se modela como \textbf{grafo}, no como una tabla de transacciones independientes.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{El problema: detectar sin caja negra}
 \begin{columns}[T]
 \begin{column}{0.56\textwidth}
 \begin{itemize}
-  \item El lavado mueve \alert{entre el 2 y el 5\% del PIB mundial}. Los sistemas por reglas generan \alert{entre el 95 y el 98\% de falsos positivos}.
-  \item Las \textbf{GNN} modelan las transacciones como grafo y superan a lo tabular.
-  \item \textbf{Pero son cajas negras}: en un entorno regulado, cada alerta debe ser justificable y reproducible.
+  \item El lavado mueve \alert{entre el 2 y el 5\% del PIB mundial}.
+  \item Los sistemas \textbf{por reglas} generan \alert{entre el 95 y el 98\% de falsos positivos}: reglas rígidas que los criminales aprenden a esquivar.
+  \item Las \textbf{GNN} modelan la red de flujos y \textbf{superan a lo tabular}, que mira cada transacción aislada.
+  \item \textbf{Pero son cajas negras}: no dicen \emph{por qué} marcan una transacción.
 \end{itemize}
 \vspace{0.3em}
 {\scriptsize\color{muted} Cifras: informes UNODC y GAFI/FATF (ver Cap. 2 del manuscrito).}
 \end{column}
 \begin{column}{0.44\textwidth}\centering
 \figcard{chapter_2/images_ch2/enfoques_moeny_laundering.png}
-\figcap{Enfoques de detección de lavado: reglas frente a modelos de grafos. \emph{Fuente: elaboración propia.}}
+\figcap{Enfoques de detección: reglas frente a modelos de grafos. \emph{Fuente: elaboración propia.}}
 \end{column}
 \end{columns}
 \end{frame}
 
+\begin{frame}{Por qué la caja negra es inaceptable aquí}
+\begin{itemize}
+  \item Una alerta puede \alert{congelar cuentas} o iniciar una investigación: el costo de un error es alto.
+  \item En un entorno \textbf{regulado}, el analista debe \textbf{justificar cada decisión} ante un auditor.
+  \item Y debe ser \textbf{reproducible}: la misma entrada tiene que dar la misma explicación.
+\end{itemize}
+\vspace{0.5em}
+\begin{block}{Consecuencia}
+La explicabilidad no es un lujo, es un \alert{requisito}. Y si la explicación \textbf{cambia} cada vez que se recalcula, no sirve para auditar: por eso la \alert{estabilidad} es la propiedad crítica y el foco de esta tesis.
+\end{block}
+\end{frame}
+
 \begin{frame}{Pregunta de investigación y objetivos}
 \begin{block}{Pregunta}
-¿Cómo se comporta la \alert{estabilidad} de los métodos XAI sobre GNNs para AML bajo desbalance, y qué combinación de arquitectura, explicador y balanceo optimiza la interpretación robusta y auditable?
+¿Cómo se comporta la \alert{estabilidad} de los métodos XAI sobre GNNs para detección de lavado bajo desbalance, y qué combinación de \textbf{arquitectura}, \textbf{explicador} y \textbf{balanceo} produce la interpretación más robusta y auditable?
 \end{block}
-\vspace{0.5em}
+\vspace{0.4em}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
-\begin{itemize}
-  \item[\textcolor{amber}{\textbf{O1}}] Degradación de la estabilidad con el desbalance.
-  \item[\textcolor{amber}{\textbf{O2}}] Resiliencia de GCN, GraphSAGE, GAT, TAGCN.
+\begin{itemize}\small
+  \item[\textcolor{amber}{\textbf{O1}}] ¿Se degrada la estabilidad al agravarse el desbalance?
+  \item[\textcolor{amber}{\textbf{O2}}] ¿Qué tan resilientes son GCN, GraphSAGE, GAT y TAGCN?
 \end{itemize}
 \end{column}
 \begin{column}{0.5\textwidth}
-\begin{itemize}
-  \item[\textcolor{amber}{\textbf{O3}}] Impacto de las estrategias de balanceo.
-  \item[\textcolor{amber}{\textbf{O4}}] Matriz de recomendación técnica.
+\begin{itemize}\small
+  \item[\textcolor{amber}{\textbf{O3}}] ¿Influyen las estrategias de balanceo?
+  \item[\textcolor{amber}{\textbf{O4}}] Condensar todo en una matriz de recomendación.
 \end{itemize}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Tres hipótesis falsables}
+Nos comprometimos con tres predicciones \textbf{antes} de ver los datos:
+\vspace{0.5em}
+\begin{itemize}
+  \item[\textcolor{coral}{\textbf{H1}}] La estabilidad \textbf{se degradará} al agravarse el desbalance.
+  \item[\textcolor{coral}{\textbf{H2}}] \textbf{TAGCN} será la más estable, por su alcance multi-salto.
+  \item[\textcolor{coral}{\textbf{H3}}] Un explicador más \textbf{estable} señalará mejor el \textbf{patrón real} (plausibilidad).
+\end{itemize}
+\vspace{0.6em}
+{\footnotesize\color{muted} Comprometerse con predicciones concretas es lo que hace que refutarlas signifique algo. El desenlace de las tres, en Resultados.}
 \end{frame}
 
 \begin{frame}{La brecha en el estado del arte}
@@ -151,26 +201,58 @@
 % ##################################################################### 2
 \section{Marco conceptual}
 
-\begin{frame}{Marco: redes de grafos y explicabilidad}
+\begin{frame}{Cómo funciona una GNN: paso de mensajes}
 \begin{columns}[T]
-\begin{column}{0.5\textwidth}
-\textbf{\color{navy}4 arquitecturas GNN}
-\begin{itemize}\small
-  \item \textbf{GCN}: convolución espectral (1 salto)
-  \item \textbf{GraphSAGE}: muestreo + agregación inductiva
-  \item \textbf{GAT}: atención multi-cabeza
-  \item \textbf{TAGCN}: filtros polinómicos de orden $K$
+\begin{column}{0.56\textwidth}
+\begin{itemize}
+  \item Cada nodo \textbf{actualiza su representación} agregando la de sus \textbf{vecinos}.
+  \item Se repite \textbf{capa por capa}: con $L$ capas, un nodo "ve" hasta \textbf{$L$ saltos} de distancia (su \emph{campo receptivo}).
+  \item La predicción sobre una transacción depende de \textbf{su vecindario}, no solo de ella.
 \end{itemize}
+\vspace{0.2em}
+\begin{block}{Por eso, explicar =}
+señalar \textbf{qué} del vecindario (qué aristas, qué \emph{features}) sostuvo la predicción.
+\end{block}
 \end{column}
-\begin{column}{0.5\textwidth}
-\textbf{\color{navy}3 explicadores XAI (post-hoc)}
-\begin{itemize}\small
-  \item \textbf{GNNExplainer}: máscara por instancia
-  \item \textbf{PGExplainer}: red generativa entrenada
-  \item \textbf{GNNShap}: valores de Shapley por muestreo
-\end{itemize}
+\begin{column}{0.44\textwidth}\centering
+\begin{tikzpicture}[>=Stealth, n/.style={circle,draw=teal,fill=card,text=greytx,minimum size=7mm,font=\scriptsize,inner sep=0}]
+  \node[n,draw=amber,line width=1pt] (c) at (0,0) {$v$};
+  \node[n] (a) at (-1.8,1.0) {};
+  \node[n] (b) at (-2.0,-0.6) {};
+  \node[n] (d) at (1.8,1.0) {};
+  \node[n] (e) at (2.0,-0.6) {};
+  \draw[->,teal,line width=1pt] (a)--(c);
+  \draw[->,teal,line width=1pt] (b)--(c);
+  \draw[->,teal,line width=1pt] (d)--(c);
+  \draw[->,teal,line width=1pt] (e)--(c);
+\end{tikzpicture}
+\\[4pt]
+{\scriptsize\color{muted} Los vecinos "envían mensajes" al nodo $v$.}
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Cuatro arquitecturas GNN}
+\begin{itemize}
+  \item \textbf{\color{navy}GCN}: \emph{promedia} a los vecinos (convolución espectral de un salto). Simple y sólida.
+  \item \textbf{\color{navy}GraphSAGE}: \emph{muestrea} vecinos y los agrega; inductiva, escala a grafos grandes.
+  \item \textbf{\color{navy}GAT}: pondera a los vecinos con \emph{atención} --- no todos pesan igual.
+  \item \textbf{\color{navy}TAGCN}: filtros polinómicos de orden $K$ que alcanzan \emph{varios saltos} de una vez.
+\end{itemize}
+\vspace{0.5em}
+{\footnotesize\color{muted} Se eligieron por cubrir las familias dominantes de agregación de vecinos. Comparar las cuatro es el Objetivo 2.}
+\end{frame}
+
+\begin{frame}{Tres explicadores post-hoc}
+{\footnotesize \textbf{Post-hoc} = explican un modelo \textbf{ya entrenado}, sin modificarlo. Cada uno produce una \textbf{máscara de aristas} y un \textbf{ranking de \emph{features}}.}
+\vspace{0.5em}
+\begin{itemize}
+  \item \textbf{\color{navy}GNNExplainer}: optimiza una \emph{máscara por instancia} --- aprende qué importa para \emph{ese} nodo.
+  \item \textbf{\color{navy}PGExplainer}: entrena una red \emph{amortizada} que aprende a explicar en todo el grafo (generaliza entre nodos).
+  \item \textbf{\color{navy}GNNShap}: reparte el crédito con \emph{valores de Shapley} (teoría de juegos); muy consistente.
+\end{itemize}
+\vspace{0.4em}
+{\footnotesize\color{muted} Cuatro arquitecturas $\times$ tres explicadores es el núcleo de la comparación.}
 \end{frame}
 
 \begin{frame}{Tres propiedades que no son lo mismo}
@@ -185,10 +267,12 @@
 \begin{block}{Fidelidad}\small ¿Refleja de verdad la decisión interna del modelo?\end{block}
 \end{column}
 \end{columns}
-\vspace{1em}
+\vspace{0.8em}
 \begin{center}\large
 \alert{Tesis central:} \emph{las tres son empíricamente independientes.}
 \end{center}
+\vspace{0.3em}
+{\footnotesize\color{muted} Un explicador puede ser \textbf{estable y equivocado} --- como un reloj parado: siempre marca lo mismo, y siempre mal.}
 \end{frame}
 
 % ##################################################################### 3
