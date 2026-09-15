@@ -521,12 +521,12 @@ Dentro grupo alto & Kruskal-Wallis & $0{,}19$ \\
 Dentro grupo bajo & Kruskal-Wallis & $0{,}08$ \\
 \bottomrule
 \end{tabular}
-\vspace{0.5em}
-\begin{itemize}\footnotesize
-  \item Tamaño de efecto $\eta^2 = 0{,}13$ (grande), el mismo estadístico que reporta la tesis en el eje sintético.
+\vspace{0.35em}
+\begin{itemize}\scriptsize
+  \item Tamaño de efecto $\eta^2 = 0{,}13$ (grande), el mismo que reporta el eje sintético.
   \item IC95\,\% bootstrap: se solapan \textbf{dentro}, apenas se tocan \textbf{entre} grupos.
   \item Sobrevive la corrección de \textbf{Holm} por comparaciones múltiples.
-  \item Los contrastes \emph{dentro} de grupo son no pareados. Los $p$ de la lámina anterior ($0{,}17$ y $0{,}10$) son el Wilcoxon \textbf{pareado} sobre celdas comunes. Ambas vías no rechazan.
+  \item Los $p$ dentro de grupo ($0{,}19$; $0{,}08$) son no pareados; el Wilcoxon \textbf{pareado} de la lámina previa ($0{,}17$; $0{,}10$) coincide: ninguna vía rechaza.
 \end{itemize}
 \end{column}
 \begin{column}{0.44\textwidth}
@@ -807,8 +807,8 @@ GNNShap & n/d & 0,15 & 0,46 \\
 \bottomrule
 \end{tabular}
 \end{center}
-\vspace{0.4em}
-{\footnotesize Las celdas n/d corresponden a métricas que el explicador no produce por diseño: PGExplainer no ordena \emph{features} y GNNShap no genera máscara de aristas. Contra su propia línea base, PGExplainer duplica el azar en aristas y GNNExplainer lo sextuplica en \emph{features}. PGExplainer supera a GNNExplainer en plausibilidad de aristas: Wilcoxon pareado $p\approx 2{,}6\times10^{-35}$ ($n=225$ parejas). \textbf{GNNShap} es el más estable internamente entre ejecuciones ($0{,}98$), aunque no lidere plausibilidad ni fidelidad.}
+\vspace{0.3em}
+{\scriptsize n/d = métricas que el explicador no produce por diseño (PGExplainer no ordena \emph{features}; GNNShap no genera máscara de aristas). Contra su propia línea base, PGExplainer duplica el azar en aristas y GNNExplainer lo sextuplica en \emph{features}. PGExplainer supera a GNNExplainer en plausibilidad de aristas (Wilcoxon pareado $p\approx 2{,}6\times10^{-35}$, $n=225$). \textbf{GNNShap} es el más estable internamente ($0{,}98$).}
 \end{frame}
 
 \begin{frame}{Respaldo \textperiodcentered\ estabilidad por semilla de modelo}
@@ -875,9 +875,9 @@ GNNShap & 0,97$^{*}$ & 0,97 & 0,95 & 0,97$^{*}$ \\
 
 \begin{frame}{Respaldo \textperiodcentered\ curvas ROC y precisión-recall}
 \begin{center}
-\figcard[0.96\linewidth]{curvas_pr_roc.png}
+\figcard[0.82\linewidth]{curvas_pr_roc.png}
 \end{center}
-\figcap{Curvas ROC (izquierda) y de precisión y exhaustividad (derecha) sobre validación y test, mismos modelos. El ROC cae de 0,88 a 0,65, mientras que la precisión y exhaustividad se desploma casi a la tasa base de transacciones ilícitas: por eso la métrica primaria es PR-AUC y no ROC-AUC. \emph{Fuente: elaboración propia.}}
+\figcap{Curvas ROC (izquierda) y precisión--recall (derecha), validación vs test, mismos modelos. El ROC cae de 0,88 a 0,65, pero la precisión--recall se desploma casi a la tasa base de ilícitas: por eso la métrica primaria es PR-AUC, no ROC-AUC. \emph{Fuente: elaboración propia.}}
 \end{frame}
 
 \end{document}
