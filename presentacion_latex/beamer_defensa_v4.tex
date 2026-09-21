@@ -1,0 +1,681 @@
+% !TEX program = lualatex
+% =====================================================================
+% Defensa de tesis, DECK v4 FORMAL (20 minutos), estilo Metropolis oscuro.
+% Universidad Tecnologica de Pereira, MISC, 2026.
+% Autores: Alejandro Gomez Huertas y Juan Diego Garzon Ovalle.
+% Compilar con LuaLaTeX (dos veces): lualatex beamer_defensa_v4.tex
+%
+% Diferencias frente a v3:
+%   - Intro y marco conceptual condensados a 4 laminas con figuras de resumen.
+%   - Las dos graficas de barras (Resultado 1 y Resultado 4) se sustituyen por
+%     figuras conceptuales dibujadas en TikZ que representan la tecnica y el concepto.
+%   - Recorte a una defensa de 20 minutos. El respaldo conserva el detalle numerico.
+% =====================================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage[spanish,es-noshorthands]{babel}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
+\graphicspath{{../tesis_latex/}{fig/}}
+
+\usetheme{metropolis}
+\metroset{sectionpage=progressbar, progressbar=frametitle, numbering=fraction, block=fill}
+
+% -------------------------------------------------- paleta (modo oscuro)
+\definecolor{darkbg}{rgb}{0.05,0.10,0.125}
+\definecolor{card}{rgb}{0.10,0.15,0.185}
+\definecolor{greytx}{rgb}{0.87,0.88,0.90}
+\definecolor{amber}{rgb}{1.0,0.80,0.25}
+\definecolor{orange}{rgb}{1.0,0.55,0.40}
+\definecolor{teal}{rgb}{0.40,0.80,0.92}
+\definecolor{seafoam}{rgb}{0.45,0.86,0.70}
+\definecolor{coral}{rgb}{1.0,0.46,0.42}
+\definecolor{muted}{rgb}{0.62,0.68,0.78}
+\definecolor{navy}{rgb}{0.62,0.80,1.0}
+
+% -------------------------------------------------- colores del tema
+\setbeamercolor{normal text}{fg=greytx,bg=darkbg}
+\setbeamercolor{background canvas}{bg=darkbg}
+\setbeamercolor{alerted text}{fg=amber}
+\setbeamercolor{example text}{fg=seafoam}
+\setbeamercolor{frametitle}{fg=amber,bg=darkbg}
+\setbeamercolor{progress bar}{fg=amber,bg=card}
+\setbeamercolor{title separator}{fg=amber}
+\setbeamercolor{progress bar in section page}{fg=amber,bg=card}
+\setbeamercolor{itemize item}{fg=amber}
+\setbeamercolor{itemize subitem}{fg=teal}
+\setbeamercolor{enumerate item}{fg=amber}
+\setbeamercolor{standout}{fg=amber,bg=darkbg}
+\setbeamercolor{block title}{fg=darkbg,bg=amber}
+\setbeamercolor{block body}{fg=greytx,bg=card}
+\setbeamercolor{block title alerted}{fg=white,bg=coral}
+\setbeamercolor{block body alerted}{fg=greytx,bg=card}
+\setbeamercolor{block title example}{fg=darkbg,bg=seafoam}
+\setbeamercolor{block body example}{fg=greytx,bg=card}
+
+% -------------------------------------------------- helpers
+\newcommand{\figcard}[2][\linewidth]{\tikz\node[fill=white,rounded corners=2pt,inner sep=2.5pt]{\includegraphics[width=#1]{#2}};}
+\newcounter{figc}
+\newcounter{tabc}
+\newcommand{\figcap}[1]{\stepcounter{figc}\par\vspace{2pt}{\scriptsize\color{muted}\textbf{Figura~\thefigc.}~#1}}
+\newcommand{\tabcap}[1]{\stepcounter{tabc}{\scriptsize\color{muted}\textbf{Tabla~\thetabc.}~#1\par}\vspace{3pt}}
+
+% estilos comunes de nodos para las figuras conceptuales
+\tikzset{
+  gnode/.style={circle,draw=muted,fill=card,minimum size=6.5mm,inner sep=0,font=\scriptsize,text=greytx},
+  gill/.style={circle,draw=coral,fill=coral!30,minimum size=6.5mm,inner sep=0,font=\scriptsize,text=white,line width=0.9pt},
+  gbox/.style={rounded corners=3pt,draw=teal,fill=card,text=greytx,align=center,inner sep=5pt,font=\footnotesize},
+  gflow/.style={-{Stealth[length=2.4mm]},line width=1pt,teal}
+}
+
+% punto con barra de error horizontal para la figura de particion (Resultado 1)
+% args: x, err, y, color, nombre, valor
+\newcommand{\ptmark}[6]{%
+  \draw[#4,line width=1.2pt] (#1-#2,#3) -- (#1+#2,#3);
+  \draw[#4,line width=1.2pt] (#1-#2,#3-0.12) -- (#1-#2,#3+0.12);
+  \draw[#4,line width=1.2pt] (#1+#2,#3-0.12) -- (#1+#2,#3+0.12);
+  \node[circle,fill=#4,draw=darkbg,line width=0.4pt,inner sep=2.2pt] at (#1,#3) {};
+  \node[#4,font=\scriptsize,anchor=south] at (#1,#3+0.16) {\textbf{#5}~#6};%
+}
+
+% -------------------------------------------------- datos del titulo
+\title{Estabilidad de Métodos de Explicabilidad (XAI) en GNNs}
+\subtitle{Detección de Lavado de Dinero bajo Desbalance Extremo}
+\author{Alejandro Gómez Huertas \and Juan Diego Garzón Ovalle}
+\institute{{\color{amber}\textsc{Universidad Tecnológica de Pereira}}\\ Facultad de Ingenierías \textperiodcentered\ Maestría en Ingeniería en Sistemas y Computación\\ Director: Ph.D. Cristian Rosero Arias}
+\date{Trabajo de grado para optar al título de Magíster \textperiodcentered\ Pereira, Colombia \textperiodcentered\ 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Contenido de la sustentación}
+\begin{columns}[T]
+\begin{column}{0.62\textwidth}
+\begin{enumerate}
+  \item[\textcolor{amber}{\textbf{1}}] \textbf{Problema y marco conceptual}
+  \item[\textcolor{amber}{\textbf{2}}] \textbf{Metodología: dos ejes}
+  \item[\textcolor{amber}{\textbf{3}}] \textbf{Resultados}
+  \item[\textcolor{amber}{\textbf{4}}] \textbf{Conclusiones}
+\end{enumerate}
+\end{column}
+\begin{column}{0.38\textwidth}
+\begin{block}{Formato}
+\small Defensa formal de \alert{20 minutos}. El detalle numérico queda en el respaldo, para las preguntas del jurado.
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ##################################################################### 1
+\section{Problema y marco conceptual}
+
+% -------- Lamina 1 de 4: motivacion en una figura
+\begin{frame}{El lavado es un patrón de red, y la GNN es una caja negra}
+\begin{columns}[T]
+\begin{column}{0.46\textwidth}
+\begin{itemize}\footnotesize
+  \item El lavado mueve \alert{2 a 5\% del PIB mundial} y se delata por el \alert{patrón de conexiones}, no por transacciones aisladas.
+  \item Las reglas fijas dan \alert{95 a 98\% de falsos positivos}. Las \textbf{GNN} modelan la red y superan a lo tabular, pero son \textbf{cajas negras}.
+  \item En un entorno regulado el analista debe \textbf{justificar} cada alerta, y de forma \textbf{reproducible}.
+\end{itemize}
+\vspace{0.1em}
+\begin{block}{}
+\footnotesize Si la explicación \textbf{cambia} al recalcular, no sirve para auditar. Por eso la \alert{estabilidad} es la propiedad crítica de esta tesis.
+\end{block}
+\end{column}
+\begin{column}{0.54\textwidth}\centering
+\begin{tikzpicture}[scale=0.68, every node/.style={transform shape}]
+  % patron de fan-in ilicito
+  \node[gill] (h) at (0,0) {};
+  \node[gnode] (a) at (-2.1,1.15) {};
+  \node[gnode] (b) at (-2.35,0.15) {};
+  \node[gnode] (c) at (-2.1,-0.9) {};
+  \node[gnode] (n1) at (-0.6,1.5) {};
+  \node[gnode] (n2) at (-3.1,-0.7) {};
+  \draw[coral,line width=1.6pt] (a)--(h);
+  \draw[coral,line width=1.6pt] (b)--(h);
+  \draw[coral,line width=1.6pt] (c)--(h);
+  \draw[muted,line width=0.6pt] (a)--(n1);
+  \draw[muted,line width=0.6pt] (b)--(n2);
+  \node[coral,font=\scriptsize] at (-1.15,-1.6) {patrón de lavado};
+  % caja GNN
+  \node[gbox,draw=amber,minimum width=1.9cm,minimum height=1.0cm] (gnn) at (2.6,0.3) {GNN\\{\scriptsize caja negra}};
+  \draw[gflow,teal] (h) -- (gnn);
+  % salida
+  \node[align=left,font=\footnotesize] (out) at (2.6,-1.55) {\textcolor{coral}{\textbf{Alerta: ilícita}}\\[1pt]\textcolor{amber}{¿por qué?}\\[1pt]\textcolor{amber}{¿sale igual al repetir?}};
+  \draw[gflow,amber] (gnn) -- (out);
+\end{tikzpicture}
+\figcap{De un patrón de conexiones a una alerta sin explicación auditable. \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+% -------- Lamina 2 de 4: pregunta, objetivos, hipotesis
+\begin{frame}{Pregunta, objetivos e hipótesis}
+\begin{block}{Pregunta de investigación}
+\footnotesize ¿Cómo se comporta la \alert{estabilidad} de los métodos XAI sobre GNNs para detección de lavado bajo desbalance, y qué combinación de \textbf{arquitectura}, \textbf{explicador} y \textbf{balanceo} produce la interpretación más robusta y auditable?
+\end{block}
+\vspace{0.1em}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\scriptsize\color{navy}\textbf{Objetivos}}
+\begin{itemize}\scriptsize
+  \item[\textcolor{amber}{O1}] ¿Se degrada la estabilidad al agravarse el desbalance?
+  \item[\textcolor{amber}{O2}] ¿Qué tan resilientes son las 4 arquitecturas?
+  \item[\textcolor{amber}{O3}] ¿Influyen las estrategias de balanceo?
+  \item[\textcolor{amber}{O4}] Condensar todo en una matriz de recomendación.
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\scriptsize\color{navy}\textbf{Hipótesis, escritas antes de ver los datos}}
+\begin{itemize}\scriptsize
+  \item[\textcolor{coral}{H1}] La estabilidad se degradará con el desbalance.
+  \item[\textcolor{coral}{H2}] TAGCN será la más estable, por su alcance multi-salto.
+  \item[\textcolor{coral}{H3}] Un explicador más estable señalará mejor el patrón real.
+\end{itemize}
+\end{column}
+\end{columns}
+\vspace{0.3em}
+{\scriptsize\color{muted} Comprometerse con predicciones concretas antes de ver los datos es lo que hace que refutarlas signifique algo.}
+\end{frame}
+
+% -------- Lamina 3 de 4: que es explicar una GNN (pipeline conceptual)
+\begin{frame}{Qué es explicar una GNN}
+\begin{columns}[T]
+\begin{column}{0.4\textwidth}
+\footnotesize
+Una GNN actualiza cada nodo \textbf{agregando a sus vecinos}, capa por capa. La predicción depende del \textbf{vecindario}, no solo del nodo.
+\vspace{0.4em}
+
+\textbf{\color{navy}Cuatro arquitecturas} por su forma de agregar: GCN promedia, GraphSAGE muestrea, GAT usa atención, TAGCN alcanza varios saltos.
+\vspace{0.4em}
+
+\textbf{\color{navy}Tres explicadores} post-hoc sobre el modelo ya entrenado: GNNExplainer, PGExplainer y GNNShap.
+\vspace{0.3em}
+
+\begin{block}{}
+\footnotesize Explicar es señalar \textbf{qué aristas} y \textbf{qué features} sostuvieron la predicción.
+\end{block}
+\end{column}
+\begin{column}{0.6\textwidth}\centering
+\begin{tikzpicture}[scale=0.92, every node/.style={transform shape}]
+  % paso de mensajes
+  \node[gnode,draw=amber,line width=1pt] (v) at (0,0) {$v$};
+  \node[gnode] (m1) at (-1.35,0.85) {};
+  \node[gnode] (m2) at (-1.55,-0.15) {};
+  \node[gnode] (m3) at (-1.15,-1.0) {};
+  \draw[gflow] (m1)--(v);
+  \draw[gflow] (m2)--(v);
+  \draw[gflow] (m3)--(v);
+  \node[muted,font=\scriptsize] at (-1.35,-1.6) {paso de mensajes};
+  % modelo
+  \node[gbox,draw=amber] (mod) at (2.15,0) {GNN entrenada\\{\scriptsize GCN, GraphSAGE,}\\[-1pt]{\scriptsize GAT, TAGCN}};
+  \draw[gflow,amber] (v) -- (mod);
+  % explicador
+  \node[gbox] (exp) at (5.0,0) {Explicador\\{\scriptsize GNNExplainer,}\\[-1pt]{\scriptsize PGExplainer, GNNShap}};
+  \draw[gflow,amber] (mod) -- (exp);
+  % salidas
+  \node[gbox,draw=seafoam,minimum width=2.2cm] (mask) at (5.0,-1.95) {máscara de aristas};
+  \node[gbox,draw=seafoam,minimum width=2.2cm] (rank) at (2.1,-1.95) {ranking de features\\{\scriptsize 1, 2, 3, \ldots\ de 166}};
+  \draw[gflow,seafoam] (exp) -- (mask);
+  \draw[gflow,seafoam] (exp.south) to[out=-120,in=20] (rank.east);
+\end{tikzpicture}
+\figcap{Del paso de mensajes a las dos salidas del explicador. \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+% -------- Lamina 4 de 4: tres propiedades independientes
+\begin{frame}{Tres propiedades que no son lo mismo}
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}
+\begin{block}{Estabilidad}\small ¿La explicación se reproduce entre semillas y perturbaciones?\end{block}
+\end{column}
+\begin{column}{0.32\textwidth}
+\begin{block}{Plausibilidad}\small ¿Señala el patrón real de lavado (\emph{ground-truth})?\end{block}
+\end{column}
+\begin{column}{0.32\textwidth}
+\begin{block}{Fidelidad}\small ¿Refleja de verdad la decisión interna del modelo?\end{block}
+\end{column}
+\end{columns}
+\vspace{0.5em}
+\begin{columns}[c]
+\begin{column}{0.56\textwidth}
+\begin{center}
+\alert{Tesis central:} \emph{las tres son empíricamente independientes.}
+\end{center}
+\vspace{0.2em}
+{\footnotesize\color{muted} Un explicador puede ser \textbf{estable y equivocado}, como un reloj parado: siempre marca lo mismo, y siempre mal.}
+\end{column}
+\begin{column}{0.44\textwidth}\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
+  \draw[-{Stealth[length=2mm]},teal,line width=1pt] (0,0) -- (0,1.9) node[above,font=\scriptsize,text=teal]{Estabilidad};
+  \draw[-{Stealth[length=2mm]},seafoam,line width=1pt] (0,0) -- (2.3,-0.55) node[right,font=\scriptsize,text=seafoam]{Plausibilidad};
+  \draw[-{Stealth[length=2mm]},amber,line width=1pt] (0,0) -- (-2.1,-0.75) node[left,font=\scriptsize,text=amber]{Fidelidad};
+  \node[circle,fill=greytx,inner sep=1.3pt] at (0,0) {};
+  \node[muted,font=\scriptsize] at (0,-1.5) {tres ejes ortogonales};
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ##################################################################### 2
+\section{Metodología}
+
+\begin{frame}{Un diseño de dos ejes}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{block}{Eje 1 \textperiodcentered\ Elliptic (real)}
+\begin{itemize}\small
+  \item Validez \textbf{externa}: transacciones reales de Bitcoin.
+  \item Sin \emph{ground-truth} de tipología: solo permite medir \textbf{estabilidad}.
+  \item 203.769 nodos, 166 features, partición temporal causal.
+  \item Campo receptivo minúsculo ($\sim$2 nodos): solo el ranking de features discrimina.
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{block}{Eje 2 \textperiodcentered\ Sintético (propio)}
+\begin{itemize}\small
+  \item Validez \textbf{interna}: \emph{ground-truth} por nodo y arista.
+  \item Permite medir además \textbf{plausibilidad} y \textbf{fidelidad}.
+  \item 4 tipologías canónicas plantadas, con aristas distractoras y firma atenuada.
+  \item 3 realizaciones del grafo para verificar.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\vspace{0.3em}
+{\footnotesize\color{muted} La validez externa la da Elliptic. La inferencia fuerte sobre plausibilidad y fidelidad la da el sintético, porque Elliptic no dice cuál subgrafo es el patrón.}
+\end{frame}
+
+\begin{frame}{Diseño factorial, métricas y protocolo}
+\begin{center}
+{\color{teal}\Large\textbf{4}} arquitecturas \; $\times$ \; {\color{amber}\Large\textbf{3}} explicadores \; $\times$ \; {\color{seafoam}\Large\textbf{3}} balanceos \; $\times$ \; {\color{coral}\Large\textbf{5}} escenarios
+\end{center}
+\vspace{0.2em}
+\begin{center}\small = 60 configuraciones por eje, cada una replicada con \textbf{3 semillas de modelo}\end{center}
+\vspace{0.4em}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+{\footnotesize\color{navy}\textbf{Métricas}}
+\begin{itemize}\scriptsize
+  \item \textbf{Estabilidad}: Spearman entre rankings de features.
+  \item \textbf{Plausibilidad}: coincidencia con el \emph{ground-truth}.
+  \item \textbf{Fidelidad}: caída de la predicción al retirar lo importante (Fidelity+).
+  \item \textbf{Rendimiento}: PR-AUC, no F1 ni ROC-AUC.
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+{\footnotesize\color{navy}\textbf{Protocolo estadístico}}
+\begin{itemize}\scriptsize
+  \item Pruebas no paramétricas: Kruskal-Wallis y Wilcoxon.
+  \item Intervalos de confianza \emph{bootstrap}.
+  \item Tamaño de efecto $\eta^2$ de ANOVA.
+  \item Corrección de Holm por comparaciones múltiples.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ##################################################################### 3
+\section{Resultados}
+
+\begin{frame}{Contribución central: dos artefactos de medición}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{alertblock}{1 \textperiodcentered\ Fallo de memoria silencioso}
+\small El cálculo sobre el grafo completo dejaba \textbf{13 configuraciones de GAT} en OOM silencioso, y su media salía solo de las que terminaban. \emph{Favorecía a GAT.}
+\end{alertblock}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{alertblock}{2 \textperiodcentered\ Truncamiento del Spearman}
+\small La métrica dimensionaba los rangos por \texttt{top\_k} y descartaba las features fuera del umbral, mutilando el ranking. \emph{Favorecía a GraphSAGE.}
+\end{alertblock}
+\end{column}
+\end{columns}
+\vspace{0.5em}
+\begin{center}\small
+\alert{Cada artefacto, por separado, bastaba para una conclusión comparativa falsa.}\\ La estabilidad medida depende del protocolo, no solo del método.
+\end{center}
+\vspace{0.2em}
+{\scriptsize\color{muted}\hfill Además, dos \emph{bugs} reportables en el PGExplainer de PyG 2.7. En línea con Kosan et al. (2023).\hspace*{0.3cm}}
+\end{frame}
+
+% -------- Resultado 1: figura conceptual de particion (reemplaza barras)
+\begin{frame}{Resultado 1: la estabilidad separa dos grupos, no cuatro puestos}
+\begin{columns}[T]
+\begin{column}{0.42\textwidth}
+\footnotesize
+La corrección de la métrica, con la matriz reentrenada a \textbf{3 semillas (180 modelos)}, no revela un ranking de cuatro, sino una \alert{partición en dos grupos}.
+\vspace{0.4em}
+
+La línea \textbf{no} se traza por la distancia entre barras, sino por dónde la diferencia es \textbf{consistente}:
+\begin{itemize}\scriptsize
+  \item \textbf{Entre} grupos: significativa.
+  \item \textbf{Dentro} de cada grupo: no (Wilcoxon pareado $p=0{,}17$ y $p=0{,}10$).
+\end{itemize}
+\vspace{0.2em}
+{\scriptsize\color{muted} GAT y GCN se permutan entre semillas: no hay un ganador único.}
+\end{column}
+\begin{column}{0.58\textwidth}\centering
+\begin{tikzpicture}[scale=0.55]
+  % marco de ejes: eje x = estabilidad de 0.64 a 0.82 -> 0 a 12
+  % transform: x(v) = (v-0.64)*66.667
+  \def\Y{2.9}
+  % bandas de grupo
+  \begin{scope}[on background layer]
+    \fill[muted!14,rounded corners=2pt] (-0.3,-0.15) rectangle (7.05,\Y+0.35);
+    \fill[seafoam!16,rounded corners=2pt] (7.25,-0.15) rectangle (12.4,\Y+0.35);
+  \end{scope}
+  % eje x
+  \draw[muted,line width=0.7pt] (-0.3,-0.25) -- (12.4,-0.25);
+  \foreach \v/\lab in {0.65/0{,}65, 0.70/0{,}70, 0.75/0{,}75, 0.80/0{,}80}{
+    \pgfmathsetmacro\xx{(\v-0.64)*66.667}
+    \draw[muted,line width=0.6pt] (\xx,-0.25) -- (\xx,-0.4);
+    \node[muted,font=\tiny] at (\xx,-0.62) {\lab};
+  }
+  \node[muted,font=\scriptsize] at (6.05,-1.0) {estabilidad (Spearman de features)};
+  % divisor / brecha
+  \draw[coral,dashed,line width=1pt] (7.15,-0.15) -- (7.15,\Y+0.35);
+  \node[coral,font=\scriptsize,align=center] at (7.15,\Y+0.75) {brecha\\significativa};
+  % etiquetas de grupo
+  \node[muted,font=\scriptsize] at (2.2,\Y+0.55) {grupo bajo};
+  \node[seafoam,font=\scriptsize] at (9.8,\Y+0.55) {grupo alto};
+  % puntos con barras de error horizontales
+  % GAT 0.782 +-0.013 -> x=9.47 err 0.867 ; y alto
+  % GCN 0.758 +-0.025 -> x=7.87 err 1.667
+  % SAGE 0.735 +-0.022 -> x=6.33 err 1.467
+  % TAGCN 0.672 +-0.077 -> x=2.13 err 5.133
+  \ptmark{9.47}{0.87}{2.35}{seafoam}{GAT}{0{,}782}
+  \ptmark{7.87}{1.67}{1.55}{seafoam}{GCN}{0{,}758}
+  \ptmark{6.33}{1.47}{0.78}{muted}{GraphSAGE}{0{,}735}
+  \ptmark{2.13}{5.13}{0.10}{muted}{TAGCN}{0{,}672}
+\end{tikzpicture}
+\figcap{Estabilidad por arquitectura con IC 95\%. Los grupos se solapan por dentro y se separan en la brecha. TAGCN tiene la mayor dispersión. \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Resultado 1b: la partición concuerda en ambos regímenes}
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{itemize}\small
+  \item La \emph{inversión por densidad} que reportaba una versión anterior era un \textbf{artefacto} de la métrica.
+  \item Corregida, Elliptic (disperso) \textbf{concuerda} con el sintético (denso), sobre datos y \emph{pipeline} independientes.
+  \item El sintético separa \textbf{los mismos dos grupos}.
+\end{itemize}
+\vspace{0.4em}
+\begin{center}
+\small Correlación de rangos entre regímenes\\[3pt]
+{\color{coral}\Large\textbf{$-0{,}20$}} \; $\rightarrow$ \; {\color{amber}\Large\textbf{$+0{,}80$}}\\[2pt]
+{\footnotesize métrica con \emph{bug} \; a \; métrica corregida}
+\end{center}
+\end{column}
+\begin{column}{0.5\textwidth}\centering
+\figcard{chapter_5/images_ch5/contraste_regimen.png}
+\figcap{Orden de estabilidad: Elliptic (disperso) frente al sintético (denso). \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Resultado 2: el más plausible no es el más fiel}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{itemize}\small
+  \item \textbf{\color{teal}PGExplainer} domina la plausibilidad de aristas: 0,80 frente a 0,50, con 0,40 de azar (Wilcoxon $p\approx 2{,}6\times10^{-35}$).
+  \item Pero \textbf{\color{coral}colapsa en fidelidad}: 0,11 frente a 0,56 de GNNExplainer.
+  \item \emph{El explicador más plausible no es el más fiel.} Confirma la independencia de las dimensiones.
+\end{itemize}
+\vspace{0.3em}
+{\scriptsize\color{muted} La figura compara los dos explicadores con máscara de aristas. GNNShap no la produce por diseño: su plausibilidad es de features, con otra línea base, y va en el respaldo.}
+\end{column}
+\begin{column}{0.48\textwidth}\centering
+\figcard{disociacion_eb.png}
+\figcap{Plausibilidad de aristas frente a Fidelity+ (eje sintético, IC 95\%, azar de aristas $=0{,}40$). \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Resultado 3: el puente que no existe}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{itemize}\small
+  \item Nuestra hipótesis central (H3): una explicación más estable señalaría mejor el patrón real.
+  \item El dato dice que \textbf{no}. Correlación entre estabilidad y plausibilidad $r=-0{,}01$, con IC 95\,\% de $-0{,}038$ a $+0{,}011$.
+  \item El intervalo \textbf{incluye el cero}: no hay relación.
+\end{itemize}
+\vspace{0.4em}
+\small\emph{Es un resultado nulo, y lo reportamos porque contradice lo que esperábamos.}
+\end{column}
+\begin{column}{0.48\textwidth}\centering
+\figcard{chapter_5/images_ch5/puente_nulo.png}
+\figcap{Relación entre estabilidad y plausibilidad (GNNExplainer): $r=-0{,}01$, IC incluye 0. \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+% -------- Resultado 4: figura conceptual esperado vs observado (reemplaza barras)
+\begin{frame}{Resultado 4: el desbalance no gobierna la estabilidad}
+\begin{columns}[T]
+\begin{column}{0.42\textwidth}
+\footnotesize
+Esperábamos (H1) que la estabilidad \textbf{cayera} al agravarse el desbalance. La curva observada es \alert{plana y sin dirección}.
+\begin{itemize}\scriptsize
+  \item Rango de 0,696 (1:1) a 0,765 (1:50), \textbf{siete centésimas}, menor que las once entre arquitecturas.
+  \item \textbf{Kruskal-Wallis $p=0{,}18$}: no se rechaza la igualdad. Efecto $\eta^2=0{,}05$ (pequeño).
+  \item El mínimo está en \textbf{1:1}, el más equilibrado. La variación no tiene dirección.
+\end{itemize}
+\begin{block}{}
+\scriptsize Implicación: el balanceo puede elegirse por \textbf{rendimiento}, sin temer que degrade la interpretabilidad.
+\end{block}
+\end{column}
+\begin{column}{0.58\textwidth}\centering
+\begin{tikzpicture}[scale=0.62]
+  % eje y estabilidad 0.5..0.85 -> 0..6 ; y(v)=(v-0.5)*17.143 (valores numericos)
+  \draw[muted,line width=0.7pt] (-0.2,0) -- (-0.2,6.1);
+  \draw[muted,line width=0.7pt] (-0.2,0) -- (11.2,0);
+  \foreach \yy/\v in {1.714/0.6, 3.429/0.7, 5.143/0.8}{
+    \draw[muted,line width=0.5pt] (-0.35,\yy) -- (-0.2,\yy);
+    \node[muted,font=\tiny,anchor=east] at (-0.4,\yy) {\v};
+  }
+  \node[muted,font=\scriptsize,rotate=90] at (-1.15,3.0) {estabilidad};
+  \foreach \x/\lab in {0/1:1, 2.6/1:10, 5.2/1:50, 7.8/1:100, 10.4/nativo}{
+    \node[muted,font=\tiny,anchor=north] at (\x,-0.1) {\lab};
+  }
+  \node[muted,font=\scriptsize] at (5.2,-0.85) {escenario de desbalance};
+  % linea esperada H1 (cae): valores numericos ya evaluados
+  \draw[coral,dashed,line width=1.2pt]
+     (0,5.143) -- (2.6,3.771) -- (5.2,2.400) -- (7.8,1.200) -- (10.4,1.714);
+  \node[coral,font=\scriptsize,anchor=west] at (7.9,1.55) {lo que H1 predecía};
+  % linea observada (plana): 0.696,0.736,0.765,0.745,0.760
+  \draw[amber,line width=1.4pt]
+     (0,3.360) -- (2.6,4.046) -- (5.2,4.543) -- (7.8,4.200) -- (10.4,4.457);
+  \foreach \x/\y in {0/3.360, 2.6/4.046, 5.2/4.543, 7.8/4.200, 10.4/4.457}{
+    \node[circle,fill=amber,inner sep=2pt] at (\x,\y) {};
+  }
+  \node[amber,font=\scriptsize,anchor=south] at (5.2,4.75) {observado ($p=0{,}18$)};
+  % marca del minimo en 1:1
+  \draw[seafoam,line width=0.8pt] (0,3.360) circle (0.22);
+  \node[seafoam,font=\tiny,anchor=south west] at (0.2,2.85) {mínimo en 1:1};
+\end{tikzpicture}
+\figcap{Estabilidad por escenario: la predicción de H1 frente a la curva observada, plana. \emph{Fuente: elaboración propia.}}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Rendimiento: colapso validación a test, por eso PR-AUC}
+\begin{columns}[c]
+\begin{column}{0.56\textwidth}\centering
+\figcard[\linewidth]{colapso_val_test.png}
+\figcap{PR-AUC y precisión@50 colapsan de validación a test, mientras el ROC-AUC cae mucho menos y aparenta un modelo aceptable. \emph{Fuente: elaboración propia.}}
+\end{column}
+\begin{column}{0.44\textwidth}
+\small
+\begin{itemize}
+  \item El modelo aprende en validación y \textbf{colapsa en test}: es el \emph{shift} temporal del dataset, una propiedad del dato, no del método.
+  \item El \textbf{ROC-AUC engaña} bajo desbalance (0,88). Tomamos \textbf{PR-AUC} y \textbf{precisión@k} como primarias.
+  \item Por eso la estabilidad se estudia sobre los \textbf{verdaderos positivos de validación}, encuadre declarado en el manuscrito.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ##################################################################### 4
+\section{Conclusiones}
+
+\begin{frame}{Las tres hipótesis, y qué pasó con cada una}
+\begin{center}
+\small
+\tabcap{Hipótesis de trabajo y su veredicto empírico.}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{p{0.42\textwidth}p{0.15\textwidth}p{0.33\textwidth}}
+\toprule
+\textbf{Lo que predijimos} & \textbf{Veredicto} & \textbf{La evidencia} \\
+\midrule
+\textbf{H1.} La estabilidad se degradaría con el desbalance. & \textcolor{coral}{\textbf{Refutada}} & Variación sin dirección: $p=0{,}18$, mínimo en 1:1. \\
+\textbf{H2.} TAGCN sería la más estable. & \textcolor{coral}{\textbf{Refutada}} & TAGCN en el grupo bajo en las 3 semillas. \\
+\textbf{H3.} Un explicador más estable señalaría mejor el patrón. & \textcolor{coral}{\textbf{Refutada}} & Puente nulo: $r=-0{,}01$, IC incluye el cero. \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.5em}
+{\footnotesize Las tres se cayeron y las tres se reportan. Escribir las predicciones antes de ver los datos es lo que convierte su refutación en un resultado.}
+\end{frame}
+
+\begin{frame}{Conclusiones y matriz de recomendación}
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+{\footnotesize\color{navy}\textbf{Conclusiones}}
+\begin{enumerate}\scriptsize
+  \item \textbf{Tres dimensiones independientes}: no existe una única buena explicación.
+  \item \textbf{Dos grupos de estabilidad}, no cuatro puestos, y la partición concuerda entre datos reales y sintéticos.
+  \item \textbf{El explicador es la palanca dominante} ($\eta^2$ de 0,36 a 0,64). Balanceo despreciable ($\eta^2\le 0{,}01$), escenario pequeño y no significativo.
+  \item \textbf{El más plausible no es el más fiel}.
+  \item \textbf{Aporte metodológico}: dos artefactos corregidos y reproducibilidad de pesos frente a la de conclusiones.
+\end{enumerate}
+\end{column}
+\begin{column}{0.46\textwidth}
+\tabcap{Recomendación por objetivo de auditoría.}
+{\footnotesize
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ll}
+\toprule
+\textbf{Objetivo} & \textbf{Configuración} \\
+\midrule
+Auditabilidad & \textcolor{teal}{grupo alto: GAT o GCN} \\
+Recuperar patrón & \textcolor{seafoam}{PGExplainer} \\
+Fidelidad al modelo & \textcolor{amber}{GNNExplainer} \\
+Estabilidad interna & \textcolor{coral}{GNNShap} \\
+\bottomrule
+\end{tabular}}
+\vspace{0.3em}
+{\scriptsize\color{muted} La recomendación de arquitectura es de \textbf{grupo}: dentro del alto la evidencia no distingue, así que se elige por coste o disponibilidad.}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[standout]
+Gracias \textperiodcentered\ Preguntas
+\vspace{0.5em}
+
+{\small\color{greytx} Estabilidad $\neq$ plausibilidad $\neq$ fidelidad: el mejor explicador depende del objetivo.\\
+Trabajo futuro: Elliptic2, AMLSim, GNNs temporales, GraphSMOTE.}
+\vspace{0.5em}
+
+{\footnotesize\color{muted} Alejandro Gómez Huertas \textperiodcentered\ Juan Diego Garzón Ovalle}
+\end{frame}
+
+% ##################################################################### RESPALDO
+\appendix
+
+\begin{frame}[allowframebreaks]{Referencias seleccionadas}
+\scriptsize
+\begin{itemize}
+  \item Weber M y colaboradores (2019). \emph{Anti-Money Laundering in Bitcoin: Experimenting with Graph Convolutional Networks for Financial Forensics.} arXiv:1908.02591.
+  \item Kipf T y Welling M (2017). \emph{Semi-Supervised Classification with Graph Convolutional Networks.} ICLR.
+  \item Hamilton W, Ying R y Leskovec J (2017). \emph{Inductive Representation Learning on Large Graphs.} NeurIPS.
+  \item Veličković P y colaboradores (2018). \emph{Graph Attention Networks.} ICLR.
+  \item Du J y colaboradores (2017). \emph{Topology Adaptive Graph Convolutional Networks.} arXiv:1710.10370.
+  \item Ying R y colaboradores (2019). \emph{GNNExplainer: Generating Explanations for Graph Neural Networks.} NeurIPS.
+  \item Luo D y colaboradores (2020). \emph{Parameterized Explainer for Graph Neural Network.} NeurIPS.
+  \item Akkas S y Azad A (2024). \emph{GNNShap: Scalable and Accurate GNN Explanation using Shapley Values.} WWW.
+  \item Kosan M y colaboradores (2023). \emph{GNNX-BENCH: Unravelling the Utility of Perturbation-based GNN Explainers through In-depth Benchmarking.} arXiv:2310.01794.
+  \item Agarwal C, Zitnik M y Lakkaraju H (2022). \emph{Probing GNN Explainers: A Rigorous Theoretical and Empirical Analysis of GNN Explanation Methods.} AISTATS.
+  \item He X y colaboradores (2026). \emph{An Explainable Graph Neural Network Framework for Illicit Financial Transaction Detection.} Applied Intelligence 56.
+  \item Zhao T, Zhang X y Wang S (2021). \emph{GraphSMOTE: Imbalanced Node Classification on Graphs with Graph Neural Networks.} WSDM.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Respaldo \textperiodcentered\ estabilidad por semilla de modelo}
+\begin{center}
+\small
+\tabcap{Estabilidad por semilla de modelo (Elliptic, GNNExplainer).}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Arquitectura} & \textbf{s42} & \textbf{s43} & \textbf{s44} & \textbf{Media} & \textbf{IC95\,\%} \\
+\midrule
+GAT       & 0,766 & 0,789 & 0,790 & \textbf{0,782} & 0,758 a 0,805 \\
+GCN       & 0,783 & 0,733 & 0,757 & \textbf{0,758} & 0,724 a 0,787 \\
+GraphSAGE & 0,756 & 0,713 & 0,738 & 0,735 & 0,710 a 0,756 \\
+TAGCN     & 0,586 & 0,693 & 0,736 & 0,672 & 0,632 a 0,717 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.5em}
+{\footnotesize \textbf{GAT y GCN se permutan} entre semillas: por eso no nombramos un ganador único. \textbf{TAGCN} tiene la mayor dispersión (dt 0,077, el triple): su lugar en el grupo bajo es firme, su valor central admite margen.}
+\end{frame}
+
+\begin{frame}{Respaldo \textperiodcentered\ disociación: valores exactos}
+\begin{center}
+\small
+\tabcap{Plausibilidad y Fidelity+ por explicador (eje sintético, g0, 3 semillas). Cada explicador se compara contra la línea base de azar de su propia métrica.}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Explicador} & \textbf{Plaus. aristas} & \textbf{Plaus. features} & \textbf{Fidelity+} \\
+\midrule
+GNNExplainer & 0,50 & \textbf{0,45} & \textbf{0,56} \\
+PGExplainer & \textbf{0,80} & n/d & 0,11 \\
+GNNShap & n/d & 0,15 & 0,46 \\
+\midrule
+\emph{Azar (línea base)} & \emph{0,40} & \emph{0,08} & no aplica \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.3em}
+{\scriptsize n/d = métricas que el explicador no produce por diseño. Contra su propia línea base, PGExplainer duplica el azar en aristas y GNNExplainer lo sextuplica en features. \textbf{GNNShap} es el más estable internamente (0,98).}
+\end{frame}
+
+\begin{frame}{Respaldo \textperiodcentered\ ¿por qué GNNExplainer para el ranking?}
+\begin{center}
+\small
+\tabcap{Estabilidad (Spearman) por explicador y arquitectura en Elliptic.}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Explicador (Elliptic)} & \textbf{GAT} & \textbf{GCN} & \textbf{GraphSAGE} & \textbf{TAGCN} \\
+\midrule
+\textbf{\color{teal}GNNExplainer} & 0,78 & 0,76 & 0,74 & 0,67 \\
+PGExplainer & 0,00 & 0,00 & 0,00 & 0,00 \\
+GNNShap & 0,97$^{*}$ & 0,97 & 0,95 & 0,97$^{*}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{0.5em}
+{\footnotesize \textbf{\color{teal}GNNExplainer} es el único que discrimina entre arquitecturas: PGExplainer degenera (Spearman nulo) y GNNShap se satura cerca de 0,96. Es además el explicador común a los dos ejes. GNNShap a 3 semillas cubre GCN y GraphSAGE. Las marcadas con $^{*}$, GAT y TAGCN, solo en la semilla 42.}
+\end{frame}
+
+\begin{frame}{Respaldo \textperiodcentered\ curvas ROC y precisión-recall}
+\begin{center}
+\figcard[0.82\linewidth]{curvas_pr_roc.png}
+\end{center}
+\figcap{Curvas ROC (izquierda) y precisión-recall (derecha), validación frente a test, mismos modelos. El ROC cae de 0,88 a 0,65, pero la precisión-recall se desploma casi a la tasa base de ilícitas. \emph{Fuente: elaboración propia.}}
+\end{frame}
+
+\end{document}
