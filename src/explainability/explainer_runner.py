@@ -73,6 +73,7 @@ def create_explainer(
     method: str = "GNNExplainer",
     epochs: int = 200,
     lr: float = 0.01,
+    explanation_type: Optional[str] = None,
 ) -> Explainer:
     """
     Create a PyG Explainer with the specified algorithm.
@@ -82,6 +83,13 @@ def create_explainer(
         method: "GNNExplainer" or "PGExplainer".
         epochs: Training epochs for the explainer.
         lr: Learning rate for the explainer.
+        explanation_type: None keeps the legacy behaviour (GNNExplainer "model",
+            PGExplainer "phenomenon" with the ground-truth label as target). "model"
+            for PGExplainer (pipeline v4): PyG 2.7's PGExplainer only accepts
+            "phenomenon", so the Explainer is still built as phenomenon but tagged
+            ``_target_mode = "model"``; ``explain_nodes`` / ``train_pgexplainer`` then
+            use the MODEL'S PREDICTION as target, which is exactly what PyG's
+            "model" explanations do.
 
     Returns:
         Configured Explainer instance.
@@ -126,6 +134,7 @@ def create_explainer(
                 return_type="raw",
             ),
         )
+        explainer._target_mode = "model" if explanation_type == "model" else "label"
     else:
         raise ValueError(f"Unknown explainer method: {method}")
 
@@ -157,11 +166,19 @@ def explain_nodes(
     # PGExplainer with 'phenomenon' explanation_type needs a target
     # PyG stores explanation_type as an enum, so compare via str()
     needs_target = "phenomenon" in str(explainer.explanation_type).lower()
+    model_target = getattr(explainer, "_target_mode", "label") == "model"
+    pred = None
+    if needs_target and model_target:
+        with torch.no_grad():
+            explainer.model.eval()
+            pred = explainer.model(x, edge_index).argmax(dim=-1)
 
     for idx in node_indices:
         kwargs = {"index": idx}
         if needs_target:
-            kwargs["target"] = data.y[idx].to(device)
+            # NOTE (v4): the legacy path passes data.y[idx] as a 0-dim target, which
+            # PyG indexes as y[index]; kept as-is for backward compatibility.
+            kwargs["target"] = pred if model_target else data.y[idx].to(device)
         explanation = explainer(x, edge_index, **kwargs)
         explanations.append(explanation)
 
@@ -170,8 +187,14 @@ def explain_nodes(
 
 def train_pgexplainer(
     explainer: Explainer,
-    data: Data,
+    data: Optional[Data],
     device: str = "cpu",
+    *,
+    x: Optional[torch.Tensor] = None,
+    edge_index: Optional[torch.Tensor] = None,
+    target: Optional[torch.Tensor] = None,
+    train_nodes: Optional[list] = None,
+    require_clean_epoch: bool = False,
 ) -> bool:
     """
     Train PGExplainer's parametric model on training nodes.
@@ -179,11 +202,22 @@ def train_pgexplainer(
     Uses a rollback strategy: saves weights before each step and restores
     them if the step produces NaN loss, preventing weight corruption cascades.
 
+    Legacy call ``train_pgexplainer(explainer, data, device)`` is unchanged: the
+    first 50 train-mask nodes, ground-truth labels as target. Pipeline v4 passes
+    the graph (``x``/``edge_index``, e.g. an exact subgraph), the ``target`` (the
+    model's prediction for every node of that graph) and ``train_nodes`` (indices
+    into that graph, a stratified sample with illicit nodes). v3's
+    ``train_indices[:50]`` contained NO illicit node. ``require_clean_epoch=True``
+    reports failure when every epoch was rolled back (legacy: proceeds silently).
+
     Returns True if training produced usable weights, False otherwise.
     """
-    x = data.x.to(device)
-    edge_index = data.edge_index.to(device)
-    train_indices = torch.where(data.train_mask)[0]
+    x = (x if x is not None else data.x).to(device)
+    edge_index = (edge_index if edge_index is not None else data.edge_index).to(device)
+    if train_nodes is not None:
+        train_indices = torch.as_tensor(list(train_nodes), dtype=torch.long)
+    else:
+        train_indices = torch.where(data.train_mask)[0][:50]
     explainer.algorithm.to(device)
 
     # CRITICAL FIX — gradient clipping via monkey-patching the optimizer.
@@ -203,7 +237,7 @@ def train_pgexplainer(
 
     # PGExplainer loss = cross_entropy(y_hat, y).
     # target must be class indices (long scalars), NOT raw logits.
-    target = data.y.to(device)
+    target = (target if target is not None else data.y).to(device)
 
     loss = 0.0
     nan_epochs = 0
@@ -222,7 +256,7 @@ def train_pgexplainer(
         epoch_valid = 0
         had_nan = False
 
-        for idx in train_indices[:50]:  # 100→50 nodes: faster, still representative
+        for idx in train_indices:  # legacy: first 50 train nodes; v4: stratified sample
             step_loss = explainer.algorithm.train(
                 epoch, explainer.model, x, edge_index,
                 target=target,
@@ -254,6 +288,10 @@ def train_pgexplainer(
 
     if has_nan_weights:
         print(f"  PGExplainer: weights contain NaN after training — unusable")
+        return False
+    if require_clean_epoch and valid_steps == 0:
+        # v4: every epoch rolled back → the explainer is its random init; not usable.
+        print("  PGExplainer: 0 clean epochs (all rolled back) — unusable")
         return False
 
     total_epochs = nan_epochs + valid_steps

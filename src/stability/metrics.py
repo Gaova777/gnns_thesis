@@ -2,6 +2,8 @@
 Stability metrics for evaluating XAI explanation consistency.
 
 Implements:
+  - v4 (score-based, NaN + reason when not measurable): spearman_full, spearman_topk,
+    jaccard_edges_topk, spearman_edges, node_stability_v4, aggregate_nodes_v4
   - Jaccard Index (subgraph overlap)
   - Spearman Rank Correlation (feature ranking agreement)
   - SHAP Concentration (attribution focus)
@@ -85,7 +87,11 @@ def spearman_rank_agreement(
     ranking_a = np.asarray(ranking_a)
     ranking_b = np.asarray(ranking_b)
     if ranking_a.size == 0 or ranking_b.size == 0:
-        return 0.0
+        # AUDIT FIX (v4): an empty ranking means the explainer produced NO feature
+        # attribution (e.g. PGExplainer has no node_mask). That is "not applicable",
+        # not "zero agreement": returning 0.0 here was read as PGExplainer "mode
+        # collapse". NaN propagates to the mean so it can never pass as a value.
+        return float("nan")
 
     # AUDIT FIX (R1): size the rank vectors by the NUMBER OF FEATURES (max index + 1),
     # not by top_k. The rankings hold feature INDICES (argsort output, e.g. 0..165), so
@@ -108,7 +114,8 @@ def spearman_rank_agreement(
         ranks_b[int(feat)] = pos
 
     corr, _ = stats.spearmanr(ranks_a, ranks_b)
-    return float(corr) if not np.isnan(corr) else 0.0
+    # Undefined correlation (a constant rank vector) is NOT agreement 0: NaN (v4 fix).
+    return float(corr) if not np.isnan(corr) else float("nan")
 
 
 def pairwise_spearman(
@@ -263,3 +270,204 @@ def compute_perturbation_stability(
         metrics["noise_levels"][str(sigma)] = level_metrics
 
     return metrics
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# v4 metrics — computed on SCORE vectors (not argsort rankings)
+# ════════════════════════════════════════════════════════════════════════════
+#
+# Conventions (v4):
+#   * Inputs are importance SCORES per replica, aligned across replicas: a matrix
+#     [n_replicas, n_items] (items = features, or the edges of the node's explanation
+#     subgraph). Ranks are taken with scipy's average-rank rule, so ties get the mean
+#     rank instead of an arbitrary argsort order.
+#   * A metric that cannot be measured is NaN, never 0.0, and carries a reason:
+#       REASON_NA            the explainer does not produce this output (PGExplainer has
+#                            no feature mask; ShapleyFeatures has no edge mask)
+#       REASON_FEW_EDGES     the explanation subgraph has < 2 edges (Jaccard/Spearman of
+#                            edges is trivially 1 or undefined there)
+#       REASON_FEW_REPLICAS  < 2 usable replicas
+#       REASON_CONSTANT      a replica's score vector is constant (rank correlation
+#                            undefined; e.g. an all-zero mask)
+#   * spearman_full: Spearman over ALL items (the primary measure of ORDER stability).
+#   * spearman_topk: the v3 measure (top-k by position, the rest tied at the worst rank).
+#     With k=20 of 165 features, 145 features are tied, so it mostly measures SET overlap
+#     of the top-k; kept only as a sensitivity analysis.
+
+REASON_NA = "no_aplica"
+REASON_FEW_EDGES = "menos_de_2_aristas"
+REASON_FEW_REPLICAS = "menos_de_2_replicas"
+REASON_CONSTANT = "vector_constante"
+
+_NAN = float("nan")
+
+
+def _n_items(scores) -> Optional[int]:
+    """Number of items of a score matrix, or None if the explainer gave no output."""
+    if scores is None:
+        return None
+    m = np.asarray(scores, dtype=float)
+    return int(m.shape[1]) if m.ndim == 2 else None
+
+
+def _as_score_matrix(scores) -> Optional[np.ndarray]:
+    """[n_rep, n_items] float array, dropping replicas that are missing/all-NaN."""
+    if scores is None:
+        return None
+    m = np.asarray(scores, dtype=float)
+    if m.ndim != 2 or m.shape[1] == 0:
+        return None
+    keep = ~np.all(np.isnan(m), axis=1)
+    return m[keep]
+
+
+def _pairwise(values_fn, m: np.ndarray) -> tuple[float, float, list, Optional[str]]:
+    vals = []
+    reasons = []
+    for a, b in combinations(range(m.shape[0]), 2):
+        v, r = values_fn(m[a], m[b])
+        if r is not None:
+            reasons.append(r)
+        else:
+            vals.append(v)
+    if not vals:
+        return _NAN, _NAN, [], (reasons[0] if reasons else REASON_FEW_REPLICAS)
+    return float(np.mean(vals)), float(np.std(vals)), vals, None
+
+
+def _spearman_scores(a: np.ndarray, b: np.ndarray) -> tuple[float, Optional[str]]:
+    if np.ptp(a) == 0 or np.ptp(b) == 0:
+        return _NAN, REASON_CONSTANT
+    rho = stats.spearmanr(a, b).statistic  # average ranks for ties
+    if np.isnan(rho):
+        return _NAN, REASON_CONSTANT
+    return float(rho), None
+
+
+def spearman_full(scores) -> dict:
+    """Mean pairwise Spearman between replicas over the FULL score vector.
+
+    Args:
+        scores: [n_replicas, n_items] importance scores (absolute values are the
+            caller's choice; they are ranked as given). ``None``/empty → no_aplica.
+    Returns:
+        {"mean", "std", "n_pairs", "reason"}; reason is None when measurable.
+    """
+    m = _as_score_matrix(scores)
+    if m is None:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "reason": REASON_NA}
+    if m.shape[0] < 2:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "reason": REASON_FEW_REPLICAS}
+    mean, std, vals, reason = _pairwise(_spearman_scores, m)
+    return {"mean": mean, "std": std, "n_pairs": len(vals), "reason": reason}
+
+
+def _topk_ranking(v: np.ndarray) -> np.ndarray:
+    """Descending argsort with a deterministic tie-break (stable on -v)."""
+    return np.argsort(-v, kind="stable")
+
+
+def spearman_topk(scores, k: int = 20) -> dict:
+    """v3-style Spearman on the top-k positions (sensitivity analysis only).
+
+    Items outside each replica's top-k are tied at the worst rank; see the module
+    note: with k << n_items this measures top-k SET agreement more than order.
+    """
+    m = _as_score_matrix(scores)
+    if m is None:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "reason": REASON_NA}
+    if m.shape[0] < 2:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "reason": REASON_FEW_REPLICAS}
+
+    def fn(a, b):
+        if np.ptp(a) == 0 or np.ptp(b) == 0:
+            return _NAN, REASON_CONSTANT
+        rho = spearman_rank_agreement(_topk_ranking(a), _topk_ranking(b), top_k=k)
+        return (rho, None) if rho == rho else (_NAN, REASON_CONSTANT)
+
+    mean, std, vals, reason = _pairwise(fn, m)
+    return {"mean": mean, "std": std, "n_pairs": len(vals), "reason": reason}
+
+
+def effective_topk_edges(n_edges: int, k: int) -> int:
+    """Top-k used for edge Jaccard: min(k, n_edges - 1).
+
+    If k >= n_edges every replica selects ALL edges and Jaccard is 1 by construction
+    (the artefact v3 had on 0–2-edge subgraphs). Capping at n_edges - 1 keeps the
+    selection a proper subset so the index can actually disagree.
+    """
+    return max(1, min(int(k), int(n_edges) - 1))
+
+
+def jaccard_edges_topk(edge_scores, k: int = 20) -> dict:
+    """Mean pairwise Jaccard of the top-k edges between replicas.
+
+    Only defined when the explanation subgraph has >= 2 edges (else NaN,
+    ``menos_de_2_aristas``); ``None`` scores → ``no_aplica``. The effective k is
+    ``effective_topk_edges(n_edges, k)``. Ties at the cut are broken by edge
+    position (stable sort), identically for every replica.
+    """
+    n_edges = _n_items(edge_scores)
+    if n_edges is None:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "k_eff": 0, "reason": REASON_NA}
+    if n_edges < 2:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "k_eff": 0,
+                "reason": REASON_FEW_EDGES}
+    m = _as_score_matrix(edge_scores)
+    if m.shape[0] < 2:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "k_eff": 0,
+                "reason": REASON_FEW_REPLICAS}
+    k_eff = effective_topk_edges(n_edges, k)
+    sets = [set(_topk_ranking(row)[:k_eff].tolist()) for row in m]
+    vals = [len(sets[a] & sets[b]) / len(sets[a] | sets[b])
+            for a, b in combinations(range(len(sets)), 2)]
+    return {"mean": float(np.mean(vals)), "std": float(np.std(vals)),
+            "n_pairs": len(vals), "k_eff": k_eff, "reason": None}
+
+
+def spearman_edges(edge_scores) -> dict:
+    """Mean pairwise Spearman of the EDGE-mask scores between replicas.
+
+    The stability measure for PGExplainer (which only produces an edge mask). NaN
+    with ``menos_de_2_aristas`` if the subgraph has < 2 edges.
+    """
+    n_edges = _n_items(edge_scores)
+    if n_edges is None:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "reason": REASON_NA}
+    if n_edges < 2:
+        return {"mean": _NAN, "std": _NAN, "n_pairs": 0, "reason": REASON_FEW_EDGES}
+    return spearman_full(edge_scores)
+
+
+def node_stability_v4(feat_scores, edge_scores, top_k_features: int = 20,
+                      top_k_edges: int = 20) -> dict:
+    """All v4 per-node metrics for one (model, explainer, node).
+
+    Args:
+        feat_scores: [n_rep, n_features] or None (explainer without feature output).
+        edge_scores: [n_rep, n_edges] or None (explainer without edge output).
+    Returns flat dict: spearman_full, spearman_topk, jaccard_edges_topk,
+    spearman_edges, each with a ``<name>_reason`` (None if measurable).
+    """
+    out = {}
+    for name, res in (("spearman_full", spearman_full(feat_scores)),
+                      ("spearman_topk", spearman_topk(feat_scores, top_k_features)),
+                      ("jaccard_edges_topk", jaccard_edges_topk(edge_scores, top_k_edges)),
+                      ("spearman_edges", spearman_edges(edge_scores))):
+        out[name] = res["mean"]
+        out[f"{name}_reason"] = res["reason"]
+    return out
+
+
+def aggregate_nodes_v4(per_node: list[dict], metric: str,
+                       mask: Optional[list] = None) -> dict:
+    """Mean over nodes of a v4 metric, ignoring NaN; reason = most frequent node reason
+    when nothing is measurable. ``mask`` (bools) restricts to a subset (e.g. TP nodes)."""
+    rows = [r for i, r in enumerate(per_node) if mask is None or mask[i]]
+    vals = [r[metric] for r in rows if r.get(metric) == r.get(metric)]
+    if vals:
+        return {"mean": float(np.mean(vals)), "std": float(np.std(vals)),
+                "n": len(vals), "reason": None}
+    reasons = [r.get(f"{metric}_reason") for r in rows if r.get(f"{metric}_reason")]
+    reason = max(set(reasons), key=reasons.count) if reasons else "sin_nodos"
+    return {"mean": _NAN, "std": _NAN, "n": 0, "reason": reason}

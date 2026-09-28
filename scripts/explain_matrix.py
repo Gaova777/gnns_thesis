@@ -1,23 +1,68 @@
 """
-Explain matrix runner (Pipeline v3 — Script 2 of 2).
+Explain matrix runner — pipeline v4 (Script 2 of 2). Also runs v3 configs.
 
-Responsibility: load trained model checkpoints produced by train_matrix.py,
-enforce the F1/MCC quality gate, and run explainability + stability tests
-only on models that actually learned.
+For every trained checkpoint that passes the quality gate, run the three explainers
+(GNNExplainer, PGExplainer, ShapleyFeatures) with ``num_replicas`` stochastic replicas
+over ONE COMMON set of validation illicit nodes, save the raw scores, and compute
+stability. See ``src/explainability/v4_explain.py`` for the method changes vs v3.
 
-Inputs (from `models_dir`):
-  - {run_id}_best.pt    — model weights
-  - {run_id}_meta.json  — metadata (best_params, test_metrics, quality_passed, ...)
+Inputs (``models_dir``, written by scripts/train_matrix.py):
+  {run_id}_best.pt, {run_id}_meta.json  (gate: ``quality_passed``; val_metrics.pr_auc …)
 
-Outputs:
-  - {results_dir}/{experiment_name}.csv  (one row per config × explainer)
-  - MLflow nested runs under the training parent run (if mlflow_run_id present)
+Outputs (``results_dir``):
+  explain_nodes_v4.json                   common node set (sampled once, then reused)
+  rankings/{run_id}__{explainer}.npz      raw scores per node × replica (see NPZ below)
+  elliptic_v4_stability.csv               one row per (run_id, explainer)  — columns below
+  elliptic_v4_stability_pernode.csv       one row per (run_id, explainer, node)
+  {logs_dir}/progress.jsonl               RunLog events, stage "explain"
+
+CSV columns (elliptic_v4_stability.csv):
+  run_id, seed, scenario, arch, balancing, explainer   identity (explainer ∈ GNNExplainer,
+                                                         PGExplainer, ShapleyFeatures)
+  gate_passed          quality_passed from meta.json (val F1/MCC gate)
+  status               ok | gated_out | oom | error | incomplete
+  reason               why a unit or its primary metric is NaN (e.g. no_aplica, oom: …)
+  val_pr_auc, val_f1, val_mcc, test_pr_auc, test_f1    predictive metrics (val: argmax;
+                                                         test: val-calibrated threshold)
+  n_nodes              nodes explained (common set)
+  n_tp                 of those, predicted illicit by this model (argmax) = true positives
+  n_tp_calibrated      same with the val-calibrated threshold
+  n_replicas           replicas requested
+  top_k_features, top_k_edges
+  spearman_full        mean over nodes of the mean pairwise Spearman (all features,
+                       average ranks for ties).  NaN for PGExplainer (no_aplica)
+  spearman_full_std    std over nodes
+  spearman_full_tp     same, TP nodes only
+  spearman_topk        v3 metric (top-k positions, rest tied) — sensitivity only
+  spearman_edges       Spearman of the edge-mask scores (PGExplainer's stability metric;
+                       also for GNNExplainer). NaN for ShapleyFeatures (no_aplica)
+  spearman_edges_tp    same, TP nodes only
+  jaccard_edges_topk   Jaccard of top-k edges, only nodes with ≥2 edges, k_eff =
+                       min(k, n_edges-1)
+  stability_primary    spearman_edges for PGExplainer, spearman_full otherwise
+  n_measurable         nodes where stability_primary is defined
+  n_measurable_feat, n_measurable_edges, n_measurable_jaccard
+  spearman_full_reason, spearman_edges_reason, jaccard_reason   NaN reasons
+  median_sub_edges     median edges in the node's explanation subgraph
+  pg_train_n, pg_train_illicit, pg_failed_replicas   PGExplainer training sample
+  seconds, sec_per_node, device, rankings_file, finished_at
+
+NPZ (rankings/{run_id}__{explainer}.npz):
+  run_id, seed, scenario, arch, balancing, explainer   (0-d strings / ints)
+  nodes [n], tp [n], tp_calibrated [n], prob_illicit [n], node_reason [n] (str, "" = ok)
+  seconds [n]
+  feat [n, R, F] float32 (NaN = no output)            only if the explainer has features
+  edge_ptr [n+1], edge_ids [ΣE] (global edge ids), edge [R, ΣE] float32
+                                                       only if the explainer has edges
+  Node i's edges are edge_ids[edge_ptr[i]:edge_ptr[i+1]].
 
 Usage:
-    uv run python scripts/explain_matrix.py --config configs/experiment_machineB_v3.yaml
-    uv run python scripts/explain_matrix.py --config ... --arch GraphSAGE
-    uv run python scripts/explain_matrix.py --config ... --explainer PGExplainer
-    uv run python scripts/explain_matrix.py --config ... --force  # ignore quality gate
+  uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml
+  … --seed 43                      only models trained with seed 43
+  … --arch GAT --scenario 1:1 --balancing none --explainer PGExplainer
+  … --resume                       skip units whose npz + CSV row are complete
+  … --include-gated                also explain models that fail the gate (sensitivity)
+  … --threads 2                     torch CPU threads (default 2)
 """
 
 import argparse
@@ -29,29 +74,47 @@ import time
 import warnings
 from pathlib import Path
 
-# Make project root importable (so `src.*` works when run via `uv run python scripts/...`)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
+import pandas as pd
 import torch
 import yaml
-from tqdm import tqdm
 
-from src.analysis.tracking import ExperimentTracker
-from src.data.imbalance import create_imbalance_scenario
-from src.data.loader import load_elliptic, print_dataset_stats
+from src.data.loader import load_elliptic
 from src.data.preprocessing import preprocess
-from src.explainability.explainer_runner import (
-    select_explanation_nodes, full_graph_logits, SubgraphPredictionMismatch,
+from src.explainability.explainer_runner import full_graph_logits
+from src.explainability.v4_explain import (
+    canonical_explainer, receptive_hops, run_gnnexplainer, run_pgexplainer,
+    run_shapley_features, select_common_explain_nodes,
 )
-from src.stability.metrics import compute_stability_metrics
-from src.stability.stochastic_test import (
-    run_stochastic_replicas,
-    run_stochastic_test_batch,
-)
+from src.monitoring.progress import RunLog
+from src.stability.metrics import aggregate_nodes_v4, node_stability_v4
 from src.training.trainer import build_model
 
-warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+warnings.filterwarnings("ignore", category=UserWarning)
+
+EXPLAINERS = ["GNNExplainer", "PGExplainer", "ShapleyFeatures"]
+HAS_FEAT = {"GNNExplainer": True, "PGExplainer": False, "ShapleyFeatures": True}
+HAS_EDGE = {"GNNExplainer": True, "PGExplainer": True, "ShapleyFeatures": False}
+
+COLUMNS = [
+    "run_id", "seed", "scenario", "arch", "balancing", "explainer", "gate_passed",
+    "status", "reason", "val_pr_auc", "val_f1", "val_mcc", "test_pr_auc", "test_f1",
+    "n_nodes", "n_tp", "n_tp_calibrated", "n_replicas", "top_k_features", "top_k_edges",
+    "spearman_full", "spearman_full_std", "spearman_full_tp", "spearman_topk",
+    "spearman_edges", "spearman_edges_tp", "jaccard_edges_topk", "stability_primary",
+    "n_measurable", "n_measurable_feat", "n_measurable_edges", "n_measurable_jaccard",
+    "spearman_full_reason", "spearman_edges_reason", "jaccard_reason",
+    "median_sub_edges", "pg_train_n", "pg_train_illicit", "pg_failed_replicas",
+    "seconds", "sec_per_node", "device", "rankings_file", "finished_at",
+]
+PERNODE_COLUMNS = [
+    "run_id", "seed", "scenario", "arch", "balancing", "explainer", "node", "tp",
+    "prob_illicit", "node_reason", "n_edges", "spearman_full", "spearman_full_reason",
+    "spearman_topk", "spearman_edges", "spearman_edges_reason", "jaccard_edges_topk",
+    "jaccard_edges_topk_reason", "seconds",
+]
 
 _interrupted = False
 
@@ -59,451 +122,469 @@ _interrupted = False
 def _signal_handler(signum, frame):
     global _interrupted
     _interrupted = True
-    sig_name = signal.Signals(signum).name
-    tqdm.write(f"\n[SIGNAL] {sig_name} received — finishing current config then exiting.")
+    print(f"\n[SIGNAL] {signal.Signals(signum).name} — finishing current unit then exiting.",
+          flush=True)
 
 
-def parse_args():
-    p = argparse.ArgumentParser(description="Explain matrix over trained checkpoints")
-    p.add_argument("--config", type=str, required=True)
-    p.add_argument("--models-dir", type=str, default=None,
-                   help="Override config's models_dir")
-    p.add_argument("--device", type=str, default="auto")
-    p.add_argument("--arch", type=str, default=None)
-    p.add_argument("--scenario", type=str, default=None)
-    p.add_argument("--balancing", type=str, default=None)
-    p.add_argument("--explainer", type=str, default=None,
-                   help="Filter to one explainer: GNNExplainer | PGExplainer | GNNShap")
-    p.add_argument("--force", action="store_true",
-                   help="Run explainers even if quality_passed=False")
+def parse_args(argv=None):
+    p = argparse.ArgumentParser(description="Explain matrix (v4) over trained checkpoints")
+    p.add_argument("--config", required=True)
+    p.add_argument("--models-dir", default=None, help="override tracking.models_dir")
+    p.add_argument("--results-dir", default=None, help="override tracking.results_dir")
+    p.add_argument("--logs-dir", default=None, help="override tracking.logs_dir")
+    p.add_argument("--device", default="auto", help="auto | cpu | cuda")
+    p.add_argument("--seed", type=int, default=None, help="only models of this seed")
+    p.add_argument("--arch", default=None)
+    p.add_argument("--scenario", default=None)
+    p.add_argument("--balancing", default=None)
+    p.add_argument("--explainer", default=None,
+                   help="GNNExplainer | PGExplainer | ShapleyFeatures (alias GNNShap)")
+    p.add_argument("--include-gated", "--force", dest="include_gated", action="store_true",
+                   help="also explain models that FAIL the gate (rows keep gate_passed=False)")
     p.add_argument("--resume", action="store_true",
-                   help="Skip (run_id, explainer) pairs already in results CSV")
-    p.add_argument("--max-hours", type=float, default=10.0)
-    return p.parse_args()
+                   help="skip units with a complete npz AND an 'ok' CSV row")
+    p.add_argument("--max-hours", type=float, default=1e9)
+    p.add_argument("--n-nodes", type=int, default=None, help="override explain_nodes")
+    p.add_argument("--replicas", type=int, default=None, help="override num_replicas")
+    p.add_argument("--threads", type=int, default=2,
+                   help="torch CPU threads (default 2; 0 = torch default). The explainers "
+                        "run on tiny subgraphs: with the default (all cores) on a loaded "
+                        "machine GNNExplainer measured 50 s vs 0.8 s per model (3 nodes).")
+    return p.parse_args(argv)
 
 
-def _safe_name(s: str) -> str:
-    return s.replace(":", "-").replace("/", "-")
+# ─────────────────────────────────────────────────────────────────────────────
+# Config
+# ─────────────────────────────────────────────────────────────────────────────
+
+def load_settings(config: dict, args) -> dict:
+    """Normalise v4 (explainability.{gnnexplainer,pgexplainer,shapley}) and v3
+    (explainability.methods list) configs into one dict."""
+    ex = config.get("explainability", {}) or {}
+    methods = {canonical_explainer(m["name"]): m for m in ex.get("methods", [])}
+    gx = {**methods.get("GNNExplainer", {}), **(ex.get("gnnexplainer") or {})}
+    pg = {**methods.get("PGExplainer", {}), **(ex.get("pgexplainer") or {})}
+    sh = {**methods.get("ShapleyFeatures", {}), **(ex.get("shapley") or {})}
+    st = config.get("stability", {}) or {}
+    tr = config.get("tracking", {}) or {}
+    gate = (config.get("analysis", {}) or {}).get("quality_gate", {}) or {}
+    results_dir = Path(args.results_dir or tr.get("results_dir", "./results_v4"))
+    return {
+        "n_nodes": int(args.n_nodes or ex.get("explain_nodes", ex.get("nodes_per_class", 30))),
+        "nodes_seed": int(ex.get("explain_nodes_seed", 1234)),
+        "replicas": int(args.replicas or st.get("num_replicas", 5)),
+        "top_k_features": int(st.get("top_k_features", 20)),
+        "top_k_edges": int(st.get("top_k_edges", 20)),
+        "gx_epochs": int(gx.get("epochs", 100)), "gx_lr": float(gx.get("lr", 0.01)),
+        "pg_epochs": int(pg.get("epochs", 100)), "pg_lr": float(pg.get("lr", 0.001)),
+        "pg_train_nodes": int(pg.get("train_nodes", 50)),
+        "pg_train_min_illicit": int(pg.get("train_min_illicit", 25)),
+        "pg_nan_abort": int(pg.get("nan_abort_threshold", 2)),
+        "shap_samples": int(sh.get("num_samples", 50)),
+        "results_dir": results_dir,
+        "models_dir": Path(args.models_dir or tr.get("models_dir", "./results_models_v4")),
+        "logs_dir": Path(args.logs_dir or tr.get("logs_dir", "./runs_v4")),
+        "gate_f1": float(gate.get("f1_min", 0.30)),
+        "gate_mcc": float(gate.get("mcc_min", 0.15)),
+        "data": config.get("data", {}) or {},
+    }
 
 
-def _load_meta_files(models_dir: Path) -> list[dict]:
+def meta_gate(meta: dict, s: dict) -> bool:
+    """Gate decision of a checkpoint. train_matrix (v3 and v4) writes ``quality_passed``
+    (val F1 >= f1_min AND val MCC >= mcc_min, argmax). If absent, recompute it from the
+    stored val metrics with the config thresholds."""
+    for key in ("quality_passed", "gate_passed"):
+        if key in meta and meta[key] is not None:
+            return bool(meta[key])
+    f1 = meta.get("val_f1_best_epoch", (meta.get("val_metrics") or {}).get("f1"))
+    mcc = meta.get("val_mcc_best_epoch", (meta.get("val_metrics") or {}).get("mcc"))
+    if f1 is None or mcc is None:
+        return False
+    return bool(f1 >= s["gate_f1"] and mcc >= s["gate_mcc"])
+
+
+def meta_perf(meta: dict) -> dict:
+    vm = meta.get("val_metrics") or {}
+    tm = meta.get("test_metrics") or {}
+    nan = float("nan")
+    return {
+        "val_pr_auc": vm.get("pr_auc", meta.get("val_pr_auc", nan)),
+        "val_f1": vm.get("f1", meta.get("val_f1_best_epoch", nan)),
+        "val_mcc": vm.get("mcc", meta.get("val_mcc_best_epoch", meta.get("best_val_mcc", nan))),
+        "test_pr_auc": tm.get("pr_auc", nan),
+        "test_f1": tm.get("f1", nan),
+    }
+
+
+def _safe(s: str) -> str:
+    return str(s).replace(":", "-").replace("/", "-")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CSV (upsert by run_id + explainer, atomic rewrite)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _upsert(path: Path, rows: list[dict], columns: list[str], key=("run_id", "explainer")):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    new = pd.DataFrame(rows, columns=columns)
+    if path.exists():
+        old = pd.read_csv(path)
+        if len(old) and len(new):
+            k_new = set(map(tuple, new[list(key)].astype(str).values))
+            drop = old[list(key)].astype(str).apply(tuple, axis=1).isin(k_new)
+            old = old[~drop]
+        new = pd.concat([old, new], ignore_index=True) if len(old) else new
+    tmp = path.with_suffix(".tmp")
+    new.reindex(columns=columns).to_csv(tmp, index=False)
+    tmp.replace(path)
+
+
+def _completed_units(csv_path: Path) -> set:
+    if not csv_path.exists():
+        return set()
+    df = pd.read_csv(csv_path)
+    if df.empty:
+        return set()
+    return set(zip(df.loc[df.status == "ok", "run_id"].astype(str),
+                   df.loc[df.status == "ok", "explainer"].astype(str)))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NPZ  ⇄  per-node metrics
+# ─────────────────────────────────────────────────────────────────────────────
+
+def save_npz(path: Path, ident: dict, explainer: str, results: list[dict], R: int, F: int,
+             tp, tp_cal, prob):
+    n = len(results)
+    arrays = {k: np.array(v) for k, v in ident.items()}
+    arrays.update(
+        explainer=np.array(explainer), nodes=np.array([r["node"] for r in results]),
+        tp=np.asarray(tp, bool), tp_calibrated=np.asarray(tp_cal, bool),
+        prob_illicit=np.asarray(prob, np.float32),
+        node_reason=np.array([r["reason"] or "" for r in results]),
+        seconds=np.array([r["seconds"] for r in results], np.float32),
+        n_replicas=np.array(R))
+    if HAS_FEAT[explainer]:
+        feat = np.full((n, R, F), np.nan, np.float32)
+        for i, r in enumerate(results):
+            if r["feat"] is not None:
+                feat[i, :r["feat"].shape[0]] = r["feat"]
+        arrays["feat"] = feat
+    if HAS_EDGE[explainer]:
+        ptr = [0]
+        ids, cols = [], []
+        for r in results:
+            e = r["edge"]
+            if e is None or e.size == 0:
+                ptr.append(ptr[-1])
+                continue
+            pad = np.full((R, e.shape[1]), np.nan, np.float32)
+            pad[:e.shape[0]] = e
+            ids.append(np.asarray(r["edge_ids"], np.int64))
+            cols.append(pad)
+            ptr.append(ptr[-1] + e.shape[1])
+        arrays["edge_ptr"] = np.array(ptr, np.int64)
+        arrays["edge_ids"] = np.concatenate(ids) if ids else np.zeros(0, np.int64)
+        arrays["edge"] = (np.concatenate(cols, axis=1) if cols
+                          else np.zeros((R, 0), np.float32))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.stem + ".tmp.npz")
+    np.savez_compressed(tmp, **arrays)
+    tmp.replace(path)
+
+
+def load_node_scores(npz) -> list[dict]:
+    """Per node: feat [R, F] or None, edge [R, E] or None, edge_ids, reason, tp."""
+    out = []
+    has_f, has_e = "feat" in npz.files, "edge" in npz.files
+    for i, node in enumerate(npz["nodes"]):
+        d = {"node": int(node), "tp": bool(npz["tp"][i]),
+             "prob_illicit": float(npz["prob_illicit"][i]),
+             "reason": str(npz["node_reason"][i]) or None,
+             "seconds": float(npz["seconds"][i]), "feat": None, "edge": None,
+             "edge_ids": None}
+        if has_f and not np.all(np.isnan(npz["feat"][i])):
+            d["feat"] = npz["feat"][i]
+        if has_e:
+            a, b = int(npz["edge_ptr"][i]), int(npz["edge_ptr"][i + 1])
+            d["edge"] = npz["edge"][:, a:b]
+            d["edge_ids"] = npz["edge_ids"][a:b]
+        out.append(d)
+    return out
+
+
+def metrics_from_npz(path: Path, explainer: str, kf: int, ke: int):
+    with np.load(path, allow_pickle=False) as z:
+        nodes = load_node_scores(z)
+    per_node = []
+    for d in nodes:
+        m = node_stability_v4(d["feat"] if HAS_FEAT[explainer] else None,
+                              d["edge"] if HAS_EDGE[explainer] else None, kf, ke)
+        if d["reason"]:  # node-level failure (subgraph mismatch, PG training failed)
+            for k in list(m):
+                if k.endswith("_reason"):
+                    m[k] = d["reason"]
+                elif m[k] == m[k]:
+                    m[k] = float("nan")
+        m.update(node=d["node"], tp=d["tp"], prob_illicit=d["prob_illicit"],
+                 node_reason=d["reason"] or "", seconds=d["seconds"],
+                 n_edges=(0 if d["edge"] is None else int(d["edge"].shape[1])))
+        per_node.append(m)
+    tp = [m["tp"] for m in per_node]
+    sf = aggregate_nodes_v4(per_node, "spearman_full")
+    se = aggregate_nodes_v4(per_node, "spearman_edges")
+    jc = aggregate_nodes_v4(per_node, "jaccard_edges_topk")
+    tk = aggregate_nodes_v4(per_node, "spearman_topk")
+    primary = se if explainer == "PGExplainer" else sf
+    agg = {
+        "spearman_full": sf["mean"], "spearman_full_std": sf["std"],
+        "spearman_full_tp": aggregate_nodes_v4(per_node, "spearman_full", tp)["mean"],
+        "spearman_topk": tk["mean"],
+        "spearman_edges": se["mean"],
+        "spearman_edges_tp": aggregate_nodes_v4(per_node, "spearman_edges", tp)["mean"],
+        "jaccard_edges_topk": jc["mean"],
+        "stability_primary": primary["mean"], "n_measurable": primary["n"],
+        "n_measurable_feat": sf["n"], "n_measurable_edges": se["n"],
+        "n_measurable_jaccard": jc["n"],
+        "spearman_full_reason": sf["reason"], "spearman_edges_reason": se["reason"],
+        "jaccard_reason": jc["reason"], "reason": primary["reason"],
+        "median_sub_edges": float(np.median([m["n_edges"] for m in per_node]))
+        if per_node else float("nan"),
+        "n_nodes": len(per_node), "n_tp": int(sum(tp)),
+    }
+    return agg, per_node
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _load_metas(models_dir: Path) -> list[dict]:
     metas = []
-    for path in sorted(models_dir.glob("*_meta.json")):
+    for p in sorted(models_dir.glob("*_meta.json")):
         try:
-            with open(path, encoding="utf-8") as f:
-                meta = json.load(f)
-            meta["_meta_path"] = str(path)
-            metas.append(meta)
-        except Exception as exc:
-            tqdm.write(f"  WARNING: could not read {path.name}: {exc}")
+            m = json.loads(p.read_text(encoding="utf-8"))
+            m["_meta_path"] = str(p)
+            metas.append(m)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  WARNING: cannot read {p.name}: {exc}")
     return metas
 
 
-def _completed_pairs_from_csv(tracker: ExperimentTracker) -> set[tuple]:
-    """Return set of (scenario, architecture, balancing, seed, explainer) already in the CSV.
-
-    The key includes the SEED. It used to rebuild a run_id as "{scenario}_{arch}_{balancing}",
-    which is not unique once a seed sweep is running: every seed of the same cell collapsed to
-    the same key, so seed-suffixed runs never matched and --resume re-ran them on every pass,
-    appending duplicate rows. The CSV carries a `seed` column, so key on it directly instead of
-    reconstructing an identifier the CSV does not store.
-    """
-    csv_path = Path(tracker.results_dir) / f"{tracker.experiment_name}.csv"
-    if not csv_path.exists():
-        return set()
-    try:
-        import pandas as pd
-        df = pd.read_csv(csv_path)
-        needed = {"scenario", "architecture", "balancing", "seed", "explainer"}
-        if not needed.issubset(df.columns):
-            return set()
-        return {
-            (str(r["scenario"]), str(r["architecture"]), str(r["balancing"]),
-             str(r["seed"]), str(r["explainer"]))
-            for _, r in df.iterrows()
-        }
-    except Exception:
-        return set()
+def _build_model(meta: dict, in_channels: int, models_dir: Path, device: str):
+    bp = meta.get("best_params", {}) or {}
+    kw = {}
+    if meta["architecture"] == "GAT" and "heads" in bp:
+        kw["heads"] = bp["heads"]
+    if meta["architecture"] == "TAGCN" and "K" in bp:
+        kw["K"] = bp["K"]
+    model = build_model(meta["architecture"], in_channels=in_channels,
+                        hidden_channels=bp.get("hidden_dim", 128),
+                        num_layers=bp.get("num_layers", 2),
+                        dropout=bp.get("dropout", 0.3), **kw)
+    ckpt = models_dir / meta.get("checkpoint", f"{_safe(meta['run_id'])}_best.pt")
+    model.load_state_dict(torch.load(ckpt, map_location="cpu", weights_only=True))
+    return model.to(device).eval()
 
 
-def _run_one_explainer(
-    model, data, test_nodes, explainer_name, explainer_cfg, stability_cfg, device,
-    base_k=None, full_logits=None,
-) -> dict:
-    """Run one explainer over the test nodes and aggregate stability."""
-    ex_epochs = explainer_cfg.get("epochs", 200)
-    ex_lr = explainer_cfg.get("lr", 0.01)
-    shap_samples = explainer_cfg.get("num_samples", 50)
-    nan_abort = explainer_cfg.get("nan_abort_threshold", 2)
-    num_replicas = stability_cfg.get("num_replicas", 5)
-    top_k_edges = stability_cfg.get("top_k_edges", 20)
-    top_k_features = stability_cfg.get("top_k_features", 20)
-
-    agg = {"jaccard_means": [], "spearman_means": [], "shap_oom_retries": 0,
-           "subgraph_mismatch": 0, "sub_n_nodes": [], "sub_n_edges": []}
-
-    if explainer_name == "PGExplainer":
-        batch_results = run_stochastic_test_batch(
-            model, data, test_nodes, method="PGExplainer",
-            num_replicas=num_replicas, top_k_edges=top_k_edges, device=device,
-            explainer_epochs=ex_epochs, explainer_lr=ex_lr,
-            nan_abort_threshold=nan_abort,
-        )
-        for stoch in batch_results:
-            m = compute_stability_metrics(stoch, top_k_features=top_k_features)
-            if "jaccard" in m:
-                agg["jaccard_means"].append(m["jaccard"]["mean"])
-            if "spearman" in m:
-                agg["spearman_means"].append(m["spearman"]["mean"])
-    else:
-        node_pbar = tqdm(test_nodes, desc=f"    {explainer_name}",
-                         leave=False, unit="node")
-        for node_idx in node_pbar:
-            try:
-                stoch = run_stochastic_replicas(
-                    model, data, node_idx, explainer_name,
-                    num_replicas=num_replicas, top_k_edges=top_k_edges, device=device,
-                    explainer_epochs=ex_epochs, explainer_lr=ex_lr,
-                    shap_samples=shap_samples,
-                    base_k=base_k,
-                    full_logit=(full_logits[int(node_idx)] if full_logits is not None else None),
-                )
-            except SubgraphPredictionMismatch:
-                # auditor Condición 1: subgraph doesn't reproduce the prediction →
-                # skip this node; never write a false stability value.
-                agg["subgraph_mismatch"] += 1
-                if device != "cpu":
-                    torch.cuda.empty_cache()
-                continue
-            m = compute_stability_metrics(stoch, top_k_features=top_k_features)
-            if "jaccard" in m:
-                agg["jaccard_means"].append(m["jaccard"]["mean"])
-            if "spearman" in m:
-                agg["spearman_means"].append(m["spearman"]["mean"])
-            agg["shap_oom_retries"] += stoch.get("shap_oom_retries", 0)
-            if stoch.get("sub_n_nodes") is not None:
-                agg["sub_n_nodes"].append(stoch["sub_n_nodes"])
-                agg["sub_n_edges"].append(stoch["sub_n_edges"])
-            if device != "cpu":
-                torch.cuda.empty_cache()  # free GPU between nodes
-        node_pbar.close()
-
-    flat = {}
-    # AUDIT FIX: drop NaN (insufficient-replica) nodes before aggregating, so one
-    # unmeasurable node doesn't poison the config mean, and a fully-unmeasurable
-    # config yields no key (empty in CSV) instead of a fake value. (x != x for NaN)
-    jm = [x for x in agg["jaccard_means"] if x == x]
-    if jm:
-        flat["jaccard_mean"] = float(np.mean(jm))
-        flat["jaccard_std"] = float(np.std(jm))
-    sm = [x for x in agg["spearman_means"] if x == x]
-    if sm:
-        flat["spearman_mean"] = float(np.mean(sm))
-    if agg["shap_oom_retries"] > 0:
-        flat["shap_oom_retries"] = agg["shap_oom_retries"]
-    # AUDIT FIX (B5): how many nodes/replica-sets actually produced ≥2 usable
-    # replicas — coverage, so a "mean" over 1 node isn't read like a mean over many.
-    flat["n_measurable"] = len(jm)
-    # Auditor: median receptive-field size for this cell (evidence that Elliptic
-    # illicit nodes have ~2-node neighbourhoods => edge-level stability isn't
-    # informative; feature-ranking Spearman is the primary stability metric).
-    if agg["sub_n_nodes"]:
-        flat["subgraph_n_nodes"] = float(np.median(agg["sub_n_nodes"]))
-        flat["subgraph_n_edges"] = float(np.median(agg["sub_n_edges"]))
-    if agg["subgraph_mismatch"] > 0:
-        flat["reason"] = f"subgraph_prediction_mismatch:{agg['subgraph_mismatch']}"
-    return flat
+def _is_oom(exc: BaseException) -> bool:
+    return isinstance(exc, torch.cuda.OutOfMemoryError) or (
+        isinstance(exc, RuntimeError) and "out of memory" in str(exc).lower())
 
 
-def main():
-    args = parse_args()
-    pipeline_start = time.time()
-    deadline_sec = args.max_hours * 3600
-
+def main(argv=None):
+    args = parse_args(argv)
+    t_start = time.time()
     signal.signal(signal.SIGTERM, _signal_handler)
     signal.signal(signal.SIGINT, _signal_handler)
 
-    # encoding is explicit: see the note in train_matrix.py (non-ASCII in the YAML comments).
-    with open(args.config, "r", encoding="utf-8") as f:
+    with open(args.config, encoding="utf-8") as f:
         config = yaml.safe_load(f)
+    s = load_settings(config, args)
+    device = ("cuda" if torch.cuda.is_available() else "cpu") if args.device == "auto" \
+        else args.device
+    if args.threads:
+        torch.set_num_threads(args.threads)
+    print(f"Device: {device} | torch threads: {torch.get_num_threads()}")
 
-    device = "cuda" if args.device == "auto" and torch.cuda.is_available() else "cpu"
-    print(f"Device: {device}")
+    only_ex = canonical_explainer(args.explainer) if args.explainer else None
+    explainers = [e for e in EXPLAINERS if only_ex is None or e == only_ex]
+    if not explainers:
+        sys.exit(f"Unknown explainer {args.explainer!r}; choose from {EXPLAINERS}")
 
-    tracking_cfg = config["tracking"]
-    models_dir = Path(args.models_dir or tracking_cfg.get("models_dir", "./results_models_v3"))
-    if not models_dir.exists():
-        raise FileNotFoundError(f"Models dir not found: {models_dir}")
+    res_dir, rk_dir = s["results_dir"], s["results_dir"] / "rankings"
+    csv_path = res_dir / "elliptic_v4_stability.csv"
+    pernode_path = res_dir / "elliptic_v4_stability_pernode.csv"
+    log = RunLog(s["logs_dir"], "explain")
 
-    metas = _load_meta_files(models_dir)
+    metas = _load_metas(s["models_dir"])
+    metas = [m for m in metas
+             if (args.seed is None or int(m.get("seed", -1)) == args.seed)
+             and (args.arch is None or m.get("architecture") == args.arch)
+             and (args.scenario is None or m.get("scenario") == args.scenario)
+             and (args.balancing is None or m.get("balancing") == args.balancing)]
     if not metas:
-        print(f"No *_meta.json files found in {models_dir}. Run train_matrix.py first.")
-        return
+        print(f"No checkpoints matched in {s['models_dir']}.")
+        return 0
 
-    # Apply CLI filters
-    def _keep(meta: dict) -> bool:
-        if args.scenario and meta.get("scenario") != args.scenario:
-            return False
-        if args.arch and meta.get("architecture") != args.arch:
-            return False
-        if args.balancing and meta.get("balancing") != args.balancing:
-            return False
-        return True
+    # ── data + common node set ───────────────────────────────────────────────
+    d = s["data"]
+    data = load_elliptic(root=d.get("root", "./data"))
+    preprocess(data, train_range=tuple(d.get("train_timesteps", (1, 34))),
+               val_range=tuple(d.get("val_timesteps", (35, 42))),
+               test_range=tuple(d.get("test_timesteps", (43, 49))))
+    nodeset = select_common_explain_nodes(data, s["n_nodes"], s["nodes_seed"],
+                                          res_dir / "explain_nodes_v4.json")
+    nodes = nodeset["nodes"]
+    print(f"Common node set: {len(nodes)} illicit val nodes (seed {nodeset['seed']}, "
+          f"pool {nodeset['pool_size']}) -> {res_dir / 'explain_nodes_v4.json'}")
 
-    metas = [m for m in metas if _keep(m)]
-    if not metas:
-        print("No metas matched filters.")
-        return
+    # ── plan ─────────────────────────────────────────────────────────────────
+    done = _completed_units(csv_path) if args.resume else set()
+    units, gated_rows = [], []
+    for m in metas:
+        gate = meta_gate(m, s)
+        for ex in explainers:
+            if not gate and not args.include_gated:
+                gated_rows.append((m, ex))
+            else:
+                units.append((m, ex, gate))
+    todo = [(m, ex, g) for m, ex, g in units
+            if not (args.resume and (m["run_id"], ex) in done
+                    and (rk_dir / f"{_safe(m['run_id'])}__{ex}.npz").exists())]
+    log.plan(len(todo), items=[f"{m['run_id']}__{ex}" for m, ex, _ in todo])
+    print(f"{len(metas)} checkpoints | {len(units)} units to explain "
+          f"({len(units) - len(todo)} already complete) | "
+          f"{len({m['run_id'] for m, _ in gated_rows})} checkpoints gated out")
 
-    # Tracker + resume state
-    tracker = ExperimentTracker(
-        backend=tracking_cfg["backend"],
-        experiment_name=tracking_cfg["experiment_name"],
-        results_dir=tracking_cfg["results_dir"],
-    )
-    completed_pairs = _completed_pairs_from_csv(tracker) if args.resume else set()
+    # Gated-out models: one row per explainer so the analysis knows they exist.
+    if gated_rows:
+        rows = []
+        for m, ex in gated_rows:
+            rows.append({"run_id": m["run_id"], "seed": m.get("seed"),
+                         "scenario": m.get("scenario"), "arch": m.get("architecture"),
+                         "balancing": m.get("balancing"), "explainer": ex,
+                         "gate_passed": False, "status": "gated_out",
+                         "reason": "quality_gate", **meta_perf(m)})
+            log.skip(f"{m['run_id']}__{ex}", "quality_gate")
+        # never overwrite a completed row (e.g. an earlier --include-gated run)
+        done_all = _completed_units(csv_path)
+        rows = [r for r in rows if (r["run_id"], r["explainer"]) not in done_all]
+        if rows:
+            _upsert(csv_path, rows, COLUMNS)
 
-    # Dataset — load + preprocess once
-    print("\n" + "=" * 70)
-    print("LOADING ELLIPTIC DATASET")
-    print("=" * 70)
-    data_raw = load_elliptic(root=config["data"]["root"])
-    print_dataset_stats(data_raw)
-    preprocess(data_raw)
+    # ── run ──────────────────────────────────────────────────────────────────
+    n_ok = n_fail = 0
+    by_meta: dict = {}
+    for m, ex, gate in todo:
+        by_meta.setdefault(m["run_id"], (m, gate, []))[2].append(ex)
 
-    # Explainers to run
-    explainer_methods = config["explainability"]["methods"]
-    if args.explainer:
-        explainer_methods = [m for m in explainer_methods if m["name"] == args.explainer]
-        if not explainer_methods:
-            print(f"No explainer named {args.explainer!r} in config.")
-            return
-    nodes_per_class = config["explainability"]["nodes_per_class"]
-
-    gate_cfg = config.get("analysis", {}).get("quality_gate", {})
-    gate_f1 = gate_cfg.get("f1_min", 0.70)
-    gate_mcc = gate_cfg.get("mcc_min", 0.40)
-
-    # Fallback only. The seed that matters is the one each checkpoint was TRAINED with, read
-    # per-meta below: it drives create_imbalance_scenario(), so taking it from the config would
-    # rebuild a different train/val/test split than the model actually saw whenever the sweep
-    # covers more than one seed.
-    default_seed = config.get("training", {}).get("seeds", [42])[0]
-
-    total_cfgs = len(metas)
-    print(f"\nExplain matrix: {total_cfgs} checkpoints × {len(explainer_methods)} explainers "
-          f"= {total_cfgs * len(explainer_methods)} runs (before gating)")
-
-    gated_out = []
-    pbar = tqdm(metas, desc="Explain matrix", unit="ckpt",
-                bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]")
-
-    for meta in pbar:
+    for run_id, (m, gate, exs) in by_meta.items():
         if _interrupted:
-            tqdm.write("  Interrupt — stopping.")
             break
-        elapsed = time.time() - pipeline_start
-        if (deadline_sec - elapsed) < 1800:
-            tqdm.write(f"  DEADLINE: {elapsed/3600:.1f}h elapsed, <30 min remaining — stopping.")
+        if (time.time() - t_start) / 3600 > args.max_hours:
+            print("  DEADLINE reached — stopping.")
             break
-
-        run_id = meta["run_id"]
-        seed = meta.get("seed", default_seed)
-        pbar.set_postfix_str(run_id, refresh=True)
-
-        # Quality gate
-        if not args.force:
-            if not meta.get("quality_passed", False):
-                tm = meta.get("test_metrics", {})
-                tqdm.write(
-                    f"  SKIP (quality gate) {run_id}: "
-                    f"F1={tm.get('f1', float('nan')):.4f} MCC={tm.get('mcc', float('nan')):.4f} "
-                    f"< F1>={gate_f1} AND MCC>={gate_mcc}"
-                )
-                gated_out.append(run_id)
-                # Log a SKIPPED row so downstream analysis sees it
-                try:
-                    tracker.log_run(
-                        scenario=meta["scenario"], architecture=meta["architecture"],
-                        balancing=meta["balancing"], explainer="SKIPPED_QUALITY_GATE",
-                        seed=seed, predictive_metrics=tm,
-                        stability_metrics={"reason": "quality_gate_v3"},
-                    )
-                except Exception:
-                    pass
-                continue
-
-        # Build + load model
-        arch = meta["architecture"]
-        bp = meta["best_params"]
-        arch_kwargs = {}
-        if arch == "GAT" and "heads" in bp:
-            arch_kwargs["heads"] = bp["heads"]
-        if arch == "TAGCN" and "K" in bp:
-            arch_kwargs["K"] = bp["K"]
-
-        # Recreate data for this scenario
-        data = create_imbalance_scenario(data_raw, meta["imbalance_ratio"], seed=seed)
-
-        model = build_model(
-            arch,
-            in_channels=data.num_node_features,
-            hidden_channels=bp.get("hidden_dim", 128),
-            num_layers=bp.get("num_layers", 2),
-            dropout=bp.get("dropout", 0.3),
-            **arch_kwargs,
-        )
-        ckpt_file = models_dir / meta["checkpoint"]
-        if not ckpt_file.exists():
-            tqdm.write(f"  ERROR: checkpoint missing: {ckpt_file}. Skipping.")
+        ident = {"run_id": run_id, "seed": int(m.get("seed", -1)),
+                 "scenario": str(m.get("scenario")), "arch": str(m.get("architecture")),
+                 "balancing": str(m.get("balancing"))}
+        base_row = {**ident, "gate_passed": gate, **meta_perf(m),
+                    "n_replicas": s["replicas"], "top_k_features": s["top_k_features"],
+                    "top_k_edges": s["top_k_edges"], "device": device}
+        try:
+            model = _build_model(m, data.num_node_features, s["models_dir"], device)
+        except Exception as exc:  # noqa: BLE001
+            for ex in exs:
+                log.error(f"{run_id}__{ex}", f"load: {type(exc).__name__}: {exc}")
+                _upsert(csv_path, [{**base_row, "explainer": ex, "status": "error",
+                                    "reason": f"load: {exc}"}], COLUMNS)
+            n_fail += len(exs)
             continue
-        model.load_state_dict(torch.load(ckpt_file, map_location=device, weights_only=True))
-        model = model.to(device)
-        model.eval()
-
-        # Threshold calibration is applied at reporting time in train_matrix.
-        # Explainers (GNNExplainer/PGExplainer/GNNShap) work on raw logits and
-        # feature attributions — they don't depend on the decision threshold,
-        # so we log it for context but don't need to apply it.
-        calib_t = meta.get("calibrated_threshold")
-        tm = meta.get("test_metrics", {})
-        tm_argmax = meta.get("test_metrics_argmax", {})
-        if calib_t is not None:
-            tqdm.write(
-                f"  Loaded {run_id}: calibrated_threshold={calib_t:.2f} | "
-                f"test F1 calib={tm.get('f1', float('nan')):.4f} "
-                f"(argmax={tm_argmax.get('f1', float('nan')):.4f})"
-            )
-
-        # Select nodes to explain — condition on TRUE POSITIVES (audit fix).
-        # Framing is validation-based: the model discriminates on val
-        # (VAL PR-AUC ~0.34) but collapses on test (temporal shift), so we explain
-        # illicit nodes it classifies correctly on VALIDATION. threshold=None
-        # (argmax): the test-calibrated threshold (~0.87) is too conservative for
-        # val and would starve TP coverage.
-        selected = select_explanation_nodes(
-            data,
-            n_per_class=nodes_per_class,
-            seed=seed,
-            model=model,
-            threshold=None,
-            only_correct=True,
-            device=device,
-            mask_name="val_mask",
-        )
-        test_nodes = selected["illicit"][:nodes_per_class]
-        n_tp = selected["coverage"]["illicit_selected"]
-
-        # No true positives => stability is not measurable. Record it honestly and
-        # skip; never measure the "stability" of wrong predictions.
-        if n_tp == 0:
-            tqdm.write(f"  SKIP stability {run_id}: 0 true-positive illicit nodes on val.")
-            tracker.log_run(
-                scenario=meta["scenario"], architecture=meta["architecture"],
-                balancing=meta["balancing"], explainer="SKIPPED_NO_TP",
-                seed=seed, predictive_metrics=meta["test_metrics"],
-                stability_metrics={"reason": "no_true_positives", "n_tp": 0},
-            )
-            continue
-
-        # k-hop scope for GNNExplainer (auditor Opción A): receptive field per arch.
-        # GCN/GraphSAGE/GAT explain over num_layers hops; TAGCN over num_layers*K
-        # (each TAGConv aggregates 0..K hops per layer). build_receptive_subgraph
-        # adapts +hops when a degree-normalised model needs the boundary degree, and
-        # verifies the subgraph reproduces the full-graph prediction (Condición 1).
-        num_layers = bp.get("num_layers", 2)
-        base_k = num_layers * bp.get("K", 3) if arch == "TAGCN" else num_layers
         full_logits = full_graph_logits(model, data, device="cpu")
+        prob = torch.softmax(full_logits[nodes], -1)[:, 1].numpy()
+        tp = prob >= 0.5  # argmax for 2 classes; all nodes are illicit → predicted = TP
+        thr = m.get("calibrated_threshold")
+        tp_cal = prob >= thr if thr is not None else tp
+        base_k = receptive_hops(model, m.get("best_params", {}) or {}, ident["arch"])
 
-        # Open a parent run to host the nested explainer runs (explainer_run
-        # uses nested=True which requires an active parent).
-        pred_metrics = meta["test_metrics"]
-        parent_params = {
-            "scenario": meta["scenario"], "architecture": meta["architecture"],
-            "balancing": meta["balancing"],
-            "phase": "explain_only", "seed": seed,
-        }
-        with tracker.training_run(f"{run_id}__explain", params=parent_params):
-            tracker.log_test_metrics(pred_metrics)
-            for ex_cfg in explainer_methods:
-                ex_name = ex_cfg["name"]
-                resume_key = (str(meta["scenario"]), str(meta["architecture"]),
-                              str(meta["balancing"]), str(seed), ex_name)
-                if args.resume and resume_key in completed_pairs:
-                    tqdm.write(f"  SKIP (resume): {run_id} / {ex_name}")
-                    continue
+        for ex in exs:
+            if _interrupted:
+                break
+            unit = f"{run_id}__{ex}"
+            npz_path = rk_dir / f"{_safe(run_id)}__{ex}.npz"
+            row = {**base_row, "explainer": ex, "n_nodes": len(nodes),
+                   "n_tp": int(tp.sum()), "n_tp_calibrated": int(np.sum(tp_cal)),
+                   "rankings_file": str(npz_path.relative_to(res_dir))}
+            try:
+                with log.step(unit) as rec:
+                    t0 = time.monotonic()
+                    extra = {}
+                    if args.resume and npz_path.exists():
+                        print(f"  {unit}: npz present — recomputing metrics only")
+                    else:
+                        beat = lambda i, nd, u=unit: log.beat(u, f"node {i + 1}/{len(nodes)}")  # noqa: E731
+                        if ex == "GNNExplainer":
+                            res = run_gnnexplainer(model, data, nodes, base_k, full_logits,
+                                                   s["replicas"], s["gx_epochs"], s["gx_lr"],
+                                                   device, on_node=beat)
+                        elif ex == "ShapleyFeatures":
+                            res = run_shapley_features(model, data, nodes, base_k,
+                                                       full_logits, s["replicas"],
+                                                       s["shap_samples"], device,
+                                                       on_node=beat)
+                        else:
+                            res, extra = run_pgexplainer(
+                                model, data, nodes, base_k, full_logits, s["replicas"],
+                                s["pg_epochs"], s["pg_lr"], s["pg_train_nodes"],
+                                s["pg_train_min_illicit"], device, on_node=beat,
+                                nan_abort_threshold=s["pg_nan_abort"])
+                        save_npz(npz_path, ident, ex, res, s["replicas"],
+                                 data.num_node_features, tp, tp_cal, prob)
+                    agg, per_node = metrics_from_npz(npz_path, ex, s["top_k_features"],
+                                                     s["top_k_edges"])
+                    secs = time.monotonic() - t0
+                    row.update(agg)
+                    row.update({k: extra.get(k) for k in
+                                ("pg_train_n", "pg_train_illicit", "pg_failed_replicas")})
+                    row.update(status="ok", seconds=round(secs, 1),
+                               sec_per_node=round(secs / max(len(nodes), 1), 2),
+                               finished_at=time.strftime("%Y-%m-%dT%H:%M:%S"))
+                    kf = s["top_k_features"]
+                    rec["metrics"] = {
+                        "spearman_full": agg["spearman_full"],
+                        f"spearman_top{kf}": agg["spearman_topk"],
+                        "spearman_edges": agg["spearman_edges"],
+                        "jaccard": agg["jaccard_edges_topk"],
+                        "n_nodes": agg["n_nodes"], "n_tp": agg["n_tp"],
+                        "n_measurable": agg["n_measurable"], "seconds": round(secs, 1)}
+                    _upsert(pernode_path, [{**ident, "explainer": ex, **pn}
+                                           for pn in per_node], PERNODE_COLUMNS)
+                    _upsert(csv_path, [row], COLUMNS)
+                n_ok += 1
+                fmt = lambda v: "nan" if v != v else f"{v:.3f}"  # noqa: E731
+                print(f"  {unit}: primary={fmt(row['stability_primary'])} "
+                      f"full={fmt(row['spearman_full'])} edges={fmt(row['spearman_edges'])} "
+                      f"jac={fmt(row['jaccard_edges_topk'])} "
+                      f"(n={row['n_measurable']}, tp={row['n_tp']}) {row['seconds']}s",
+                      flush=True)
+            except Exception as exc:  # noqa: BLE001 — RunLog.step already wrote 'error'
+                n_fail += 1
+                status = "oom" if _is_oom(exc) else "error"
+                print(f"  {status.upper()} {unit}: {type(exc).__name__}: {exc}", flush=True)
+                _upsert(csv_path, [{**row, "status": status,
+                                    "reason": f"{status}: {str(exc)[:200]}"}], COLUMNS)
+            finally:
+                if device != "cpu":
+                    torch.cuda.empty_cache()
+                gc.collect()
+        del model
+        gc.collect()
 
-                with tracker.explainer_run(ex_name, params={"method": ex_name}):
-                    def _log(fm):
-                        # AUDIT FIX (B5): every row carries TP coverage — no silent NaN.
-                        fm.setdefault("n_tp", n_tp)
-                        tracker.log_stability(fm)
-                        tracker.log_run(
-                            scenario=meta["scenario"], architecture=meta["architecture"],
-                            balancing=meta["balancing"], explainer=ex_name,
-                            seed=seed, predictive_metrics=pred_metrics,
-                            stability_metrics=fm,
-                        )
-                    try:
-                        flat = _run_one_explainer(
-                            model, data, test_nodes, ex_name, ex_cfg,
-                            config.get("stability", {}), device,
-                            base_k=base_k, full_logits=full_logits,
-                        )
-                        flat["n_tp"] = n_tp
-                        jmean = flat.get("jaccard_mean")
-                        tqdm.write(
-                            f"  {run_id} / {ex_name}: "
-                            + (f"Jaccard={jmean:.4f}" if jmean is not None else "done")
-                            + (f", Spearman={flat['spearman_mean']:.4f}"
-                               if 'spearman_mean' in flat else "")
-                        )
-                        _log(flat)
-                    except torch.cuda.OutOfMemoryError:
-                        # AUDIT FIX (B1/B3): OOM is NOT success. Free the GPU and retry
-                        # this cell on CPU so GAT gets evaluated completely; if CPU also
-                        # fails, record reason='cuda_oom' explicitly (never a silent NaN).
-                        torch.cuda.empty_cache(); gc.collect()
-                        tqdm.write(f"  OOM {run_id}/{ex_name} on GPU — retrying on CPU...")
-                        try:
-                            flat = _run_one_explainer(
-                                model.cpu(), data, test_nodes, ex_name, ex_cfg,
-                                config.get("stability", {}), "cpu",
-                                base_k=base_k, full_logits=full_logits,
-                            )
-                            flat["n_tp"] = n_tp
-                            flat["reason"] = "ran_on_cpu"
-                            tqdm.write(f"  {run_id}/{ex_name}: recovered on CPU"
-                                       + (f", Spearman={flat['spearman_mean']:.4f}"
-                                          if 'spearman_mean' in flat else ""))
-                            _log(flat)
-                        except Exception as exc2:
-                            tqdm.write(f"  CUDA_OOM {run_id}/{ex_name} (CPU retry failed): {exc2}")
-                            _log({"reason": "cuda_oom",
-                                  "error": "CUDA out of memory (CPU retry also failed)"})
-                        finally:
-                            model.to(device)
-                    except Exception as exc:
-                        import traceback
-                        tqdm.write(f"  UNEXPECTED_ERROR {run_id}/{ex_name}:\n{traceback.format_exc()}")
-                        _log({"reason": "unexpected_error", "error": str(exc)})
-                    finally:
-                        # AUDIT FIX (B2): free GPU between explainers so memory doesn't
-                        # accumulate across cells (root cause of the GAT OOM cascade).
-                        torch.cuda.empty_cache(); gc.collect()
-
-    pbar.close()
-    print("\n" + "=" * 70)
-    print("EXPLAIN MATRIX SUMMARY")
-    print("=" * 70)
-    print(f"  Checkpoints processed: {total_cfgs}")
-    print(f"  Gated out (quality):   {len(gated_out)}")
-    for r in gated_out:
-        print(f"    ✗ {r}")
-    total_elapsed_h = (time.time() - pipeline_start) / 3600
-    print(f"  Total time: {total_elapsed_h:.2f} h")
-    print(f"  CSV: {tracking_cfg['results_dir']}/{tracking_cfg['experiment_name']}.csv")
+    print(f"\nDone: {n_ok} ok, {n_fail} failed, {(time.time() - t_start) / 60:.1f} min. "
+          f"CSV: {csv_path}")
+    return 0 if n_fail == 0 else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1,8 +1,22 @@
 """
-SHAP-based explanation runner for GNNs.
+Shapley-value FEATURE attributions for GNN node predictions ("ShapleyFeatures").
 
-Integrates GNNShap (Akkas & Azad, WWW'24) for scalable, GPU-accelerated
-Shapley value computation on graph neural networks.
+WHAT THIS COMPUTES (honest description, v4):
+    Monte-Carlo permutation-sampling Shapley values (Strumbelj & Kononenko, 2014) of
+    P(y = illicit) with respect to the FEATURES OF THE EXPLAINED NODE ONLY. Players are
+    the node's feature columns; a feature "absent" from a coalition is replaced by the
+    mean of that feature over the node's k-hop subgraph (baseline). Graph structure and
+    the features of every other node stay fixed. For binary softmax outputs |phi| is the
+    same whether P(illicit) or P(licit) is explained, so the ranking explains the
+    model's prediction whatever class it predicts.
+
+WHAT IT IS NOT:
+    It is NOT GNNShap (Akkas & Azad, WWW'24), which estimates Shapley values over EDGES
+    (players = edges of the computational graph) with GPU batching. Up to v3 results
+    were labelled "GNNShap"; from v4 on they are written as "ShapleyFeatures". Readers
+    of old CSVs map "GNNShap" → "ShapleyFeatures" (see
+    ``src.explainability.v4_explain.canonical_explainer``). It produces no edge mask,
+    so edge-level stability is "no_aplica" for it.
 
 Also provides a SHAP Concentration metric.
 """
@@ -244,3 +258,61 @@ def explain_nodes_shap(
         )
         explanations.append(exp)
     return explanations
+
+
+@torch.no_grad()
+def shapley_features_subgraph(
+    model: nn.Module,
+    sub_x: torch.Tensor,
+    sub_edge_index: torch.Tensor,
+    target: int,
+    num_samples: int = 50,
+    seed: int = 42,
+    device: str = "cpu",
+    max_nodes_per_forward: int = 400_000,
+) -> np.ndarray:
+    """Permutation-sampling Shapley values of the target node's features (v4).
+
+    Same estimator as ``compute_shap_values_permutation`` (same permutations for the
+    same ``seed``: ``RandomState(seed).permutation`` per sample; same baseline: mean of
+    the subgraph rows) but (a) on a subgraph that the caller has verified to be exact
+    for the target, and (b) batched: the F+1 coalition states of each permutation are
+    evaluated in ONE forward over a disjoint union of copies of the subgraph (identical
+    per-copy outputs, since message passing never crosses copies). The legacy loop
+    also re-evaluated the "without" state, doubling the forwards.
+
+    Returns phi [F] for P(y=1).
+    """
+    model.eval()
+    rng = np.random.RandomState(seed)
+    x = sub_x.to(device)
+    ei = sub_edge_index.to(device)
+    n, F = x.shape
+    baseline = x.mean(dim=0)
+    actual = x[target]
+    phi = np.zeros(F)
+    copies_per_chunk = max(1, int(max_nodes_per_forward // max(n, 1)))
+
+    def _probs(states: torch.Tensor) -> np.ndarray:
+        """states [S, F] = target-row values; returns P(y=1) for each state."""
+        out = []
+        for s0 in range(0, states.shape[0], copies_per_chunk):
+            st = states[s0:s0 + copies_per_chunk]
+            S = st.shape[0]
+            xb = x.repeat(S, 1)
+            xb[torch.arange(S, device=device) * n + target] = st
+            eib = torch.cat([ei + c * n for c in range(S)], dim=1) if ei.numel() else ei
+            logits = model(xb, eib)[torch.arange(S, device=device) * n + target]
+            out.append(torch.softmax(logits, dim=-1)[:, 1].cpu())
+        return torch.cat(out).numpy().astype(np.float64)
+
+    for _ in range(num_samples):
+        perm = rng.permutation(F)
+        states = baseline.repeat(F + 1, 1)
+        # state j = features perm[:j] set to their actual value
+        for j in range(1, F + 1):
+            states[j] = states[j - 1]
+            states[j, perm[j - 1]] = actual[perm[j - 1]]
+        p = _probs(states)
+        phi[perm] += p[1:] - p[:-1]
+    return phi / num_samples

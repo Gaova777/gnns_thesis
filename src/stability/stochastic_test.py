@@ -117,7 +117,7 @@ def run_stochastic_replicas(
             if device != "cpu" and torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
-        elif method == "GNNShap":
+        elif method in ("GNNShap", "ShapleyFeatures"):  # legacy label / v4 label
             result = explain_node_shap(
                 model, data, node_idx, num_samples=shap_samples,
                 device=device, seed=seed
