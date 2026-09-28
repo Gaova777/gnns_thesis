@@ -1,5 +1,19 @@
 # Guía del proyecto — XAI Stability in GNNs (AML / Elliptic)
 
+> ## ⚠️ Estado 28-sep-2026: pipeline v4 en curso — lee `RUNBOOK_V4.md` antes de hacer nada
+>
+> El eje Elliptic de la v3 se entrenó con las **etiquetas invertidas** (los 157.205 nodos sin
+> etiqueta como «lícitos»; los 42.019 lícitos reales fuera). Todas las cifras de Elliptic de este
+> archivo y del manuscrito (partición en dos grupos, p = 0,178, «1:30 nativo», colapso val→test)
+> vienen de esa corrida y **no son válidas para la tarea que describe la tesis**. La razón nativa
+> real en train es **1:7,6**, no 1:30.
+>
+> La v4 corrige eso y otros problemas de diseño (escenarios, presupuesto por arquitectura, nodos
+> comunes, PGExplainer, Shapley, métricas, compuerta, atajos del grafo sintético). Todo lo que hay
+> que saber —qué cambió, cómo correrlo, el plan de monitoreo y el cronograma hasta el 15-oct— está
+> en **`RUNBOOK_V4.md`**. El resto de este archivo describe la v3 y queda como registro histórico
+> hasta que se reescriba con los resultados de la v4.
+
 ## Qué es este proyecto
 
 Tesis de maestría (UTP, MISC, 2026) de Alejandro Gómez Huertas y Juan Diego Garzón Ovalle, dirigida

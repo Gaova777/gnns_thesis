@@ -125,3 +125,14 @@ presentacion_latex/*.vrb
 # para acceso remoto a la máquina; no debe hacerse público)
 # ───────────────────────────────────────────────
 README_ACCESO_REMOTO_CLAUDE.md
+
+# Pipeline v4 (salidas de corridas; se versionan solo los CSV/tablas finales que se decida publicar)
+/results_v4/
+/results_models_v4/
+/runs_v4/
+/results_phase1_v4/
+/runs_smoke/
+/results_smoke/
+/results_models_smoke/
+/results_v4_smoke/
+/results_models_v4_smoke/
