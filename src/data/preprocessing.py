@@ -115,9 +115,14 @@ def preprocess(
     val_range: Tuple[int, int] = (35, 42),
     test_range: Tuple[int, int] = (43, 49),
     normalize: bool = True,
+    validate: bool = True,
 ) -> None:
     """
     Full preprocessing pipeline: time-split + normalization.
+
+    With ``validate=True`` (default) the labelled counts of each split are checked
+    against ``src.data.loader.EXPECTED_SPLIT_COUNTS`` (exact match for the default
+    split, global totals + warning otherwise) and the run stops on mismatch.
 
     Modifies the data object in-place.
 
@@ -127,12 +132,18 @@ def preprocess(
         val_range: Timestep range for validation split.
         test_range: Timestep range for test split.
         normalize: Whether to apply feature normalization.
+        validate: Hard-check split counts (see above).
     """
     print("Preprocessing Elliptic dataset...")
 
     # 1. Create temporal splits
     print("Creating time-based splits:")
     create_time_split_masks(data, train_range, val_range, test_range)
+    if validate:
+        from src.data.loader import validate_split_counts
+        validate_split_counts(data, {"train": tuple(train_range), "val": tuple(val_range),
+                                     "test": tuple(test_range)})
+        print("  Split counts validated against the official Elliptic release.")
 
     # 2. Normalize features (fit on train only)
     if normalize:

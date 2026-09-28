@@ -184,3 +184,178 @@ def verify_scenario_integrity(data: Data, scenario_name: str = "") -> bool:
     else:
         print(f"  ✓ Scenario {scenario_name}: all illicit nodes connected")
         return True
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Pipeline v4 scenarios
+# ════════════════════════════════════════════════════════════════════════════
+#
+# Design (v4):
+#   * The graph is NEVER modified: only the train mask changes. Nodes dropped from the
+#     train mask (and all unknown nodes) still take part in message passing.
+#   * Subsampling uses a FIXED data seed (V4_SUBSAMPLE_SEED), independent of the model
+#     seed, so the 3 model seeds (42/43/44) see exactly the same training subset and the
+#     seed sweep measures model variance only.
+#   * val/test are never subsampled.
+#   * Every scenario returns a report and is checked against V4_EXPECTED_TRAIN (±1).
+#
+# Scenario semantics (default split: train = 3,462 illicit / 26,432 licit):
+#   native            all labelled train nodes (≈ 1:7.6)
+#   1:10, 1:50, 1:100 keep ALL licit (26,432), subsample illicit to floor(26,432 / k)
+#   1:1               all illicit (3,462) + 3,462 subsampled licit
+#   native_size_ctrl  size control for 1:1: same total (6,924) at the native ratio
+#                     (illicit = round(6,924 × 3,462 / 29,894) = 802, licit = 6,122)
+
+import hashlib
+import json
+
+V4_SUBSAMPLE_SEED = 2026
+
+V4_SCENARIOS = {
+    "native": {"kind": "native"},
+    "1:1": {"kind": "balanced"},
+    "native_size_ctrl": {"kind": "native_size_ctrl"},
+    "1:10": {"kind": "illicit_per_licit", "k": 10},
+    "1:50": {"kind": "illicit_per_licit", "k": 50},
+    "1:100": {"kind": "illicit_per_licit", "k": 100},
+}
+
+# Expected (n_illicit, n_licit) in the train mask for the default temporal split.
+V4_EXPECTED_TRAIN = {
+    "native": (3462, 26432),
+    "1:1": (3462, 3462),
+    "native_size_ctrl": (802, 6122),
+    "1:10": (2643, 26432),
+    "1:50": (528, 26432),
+    "1:100": (264, 26432),
+}
+V4_BASE_TRAIN = (3462, 26432)  # native train counts the expected table is derived from
+V4_TOLERANCE = 1
+
+
+def v4_target_counts(name: str, n_illicit: int, n_licit: int) -> tuple[int, int]:
+    """Target (n_illicit, n_licit) for scenario ``name`` given the native train counts."""
+    if name not in V4_SCENARIOS:
+        raise ValueError(f"Unknown v4 scenario {name!r}. Choose from {list(V4_SCENARIOS)}")
+    spec = V4_SCENARIOS[name]
+    kind = spec["kind"]
+    if kind == "native":
+        return n_illicit, n_licit
+    if kind == "balanced":
+        m = min(n_illicit, n_licit)
+        return m, m
+    if kind == "illicit_per_licit":
+        # integer division == floor(n_licit × 1/k) without float error
+        return min(n_licit // spec["k"], n_illicit), n_licit
+    if kind == "native_size_ctrl":
+        total = 2 * min(n_illicit, n_licit)  # size of the 1:1 scenario
+        il = int(round(total * n_illicit / (n_illicit + n_licit)))
+        return il, total - il
+    raise ValueError(f"Unhandled scenario kind {kind!r}")
+
+
+def _sample(idx: torch.Tensor, size: int, rng: np.random.Generator) -> torch.Tensor:
+    if size >= len(idx):
+        return idx
+    chosen = rng.choice(idx.numpy(), size=size, replace=False)
+    return torch.as_tensor(np.sort(chosen), dtype=torch.long)
+
+
+def create_v4_scenario(
+    data: Data,
+    name: str,
+    subsample_seed: int = V4_SUBSAMPLE_SEED,
+    mask_name: str = "train_mask",
+    check_expected: bool = True,
+    verbose: bool = True,
+) -> tuple[Data, dict]:
+    """Build a v4 imbalance scenario. Only ``mask_name`` changes; the graph is untouched.
+
+    Returns ``(data_new, report)``. ``report`` has n_illicit, n_licit, total, ratio
+    (illicit/licit), ratio_str ("1:x.x"), expected counts, subsample_seed and a SHA-1 of
+    the selected train indices (identical across model seeds by construction).
+
+    Raises ``DataIntegrityError`` if the result deviates from ``V4_EXPECTED_TRAIN`` by
+    more than ±1 while the native train counts are the default-split ones. With a
+    non-default split the expected table does not apply: a warning is printed instead.
+    """
+    from src.data.loader import DataIntegrityError, ILLICIT, LICIT
+
+    data_new = deepcopy(data)
+    mask = getattr(data_new, mask_name)
+    idx = torch.where(mask)[0]
+    il_idx = idx[data_new.y[idx] == ILLICIT]
+    lic_idx = idx[data_new.y[idx] == LICIT]
+    n_il0, n_lic0 = len(il_idx), len(lic_idx)
+
+    t_il, t_lic = v4_target_counts(name, n_il0, n_lic0)
+    # Independent streams per class so each class's draw does not depend on the other.
+    rng_il = np.random.default_rng([subsample_seed, 1])
+    rng_lic = np.random.default_rng([subsample_seed, 0])
+    keep_il = _sample(il_idx, t_il, rng_il)
+    keep_lic = _sample(lic_idx, t_lic, rng_lic)
+
+    new_mask = torch.zeros_like(mask)
+    new_mask[keep_il] = True
+    new_mask[keep_lic] = True
+    setattr(data_new, mask_name, new_mask)
+
+    n_il = int((data_new.y[new_mask] == ILLICIT).sum())
+    n_lic = int((data_new.y[new_mask] == LICIT).sum())
+    sel = torch.where(new_mask)[0].numpy().astype(np.int64)
+    report = {
+        "scenario": name,
+        "kind": V4_SCENARIOS[name]["kind"],
+        "subsample_seed": subsample_seed,
+        "n_illicit": n_il,
+        "n_licit": n_lic,
+        "total": n_il + n_lic,
+        "ratio": (n_il / n_lic) if n_lic else float("inf"),
+        "ratio_str": f"1:{n_lic / n_il:.1f}" if n_il else "no illicit",
+        "native_train": {"n_illicit": n_il0, "n_licit": n_lic0},
+        "target": {"n_illicit": t_il, "n_licit": t_lic},
+        "expected": None,
+        "expected_checked": False,
+        "train_idx_sha1": hashlib.sha1(sel.tobytes()).hexdigest(),
+        "val_test_subsampled": False,
+    }
+
+    if check_expected:
+        if (n_il0, n_lic0) == V4_BASE_TRAIN:
+            e_il, e_lic = V4_EXPECTED_TRAIN[name]
+            report["expected"] = {"n_illicit": e_il, "n_licit": e_lic}
+            report["expected_checked"] = True
+            if abs(n_il - e_il) > V4_TOLERANCE or abs(n_lic - e_lic) > V4_TOLERANCE:
+                raise DataIntegrityError(
+                    f"Scenario {name}: got {n_il} illicit / {n_lic} licit, expected "
+                    f"{e_il} / {e_lic} (±{V4_TOLERANCE})"
+                )
+        else:
+            print(f"  WARNING: native train counts {(n_il0, n_lic0)} differ from the default "
+                  f"split {V4_BASE_TRAIN}; scenario {name!r} not checked against the table.")
+
+    if verbose:
+        print(f"  [v4 scenario {name}] illicit={n_il:,} licit={n_lic:,} total={n_il + n_lic:,} "
+              f"ratio={report['ratio_str']} (subsample_seed={subsample_seed}, "
+              f"idx sha1={report['train_idx_sha1'][:10]})")
+    return data_new, report
+
+
+def build_v4_report_table(data: Data, names=None,
+                          subsample_seed: int = V4_SUBSAMPLE_SEED) -> dict:
+    """Build every v4 scenario and return {name: report} (used by tests and audits)."""
+    names = list(names or V4_SCENARIOS)
+    out = {}
+    for n in names:
+        _, rep = create_v4_scenario(data, n, subsample_seed=subsample_seed, verbose=False)
+        out[n] = rep
+    return out
+
+
+if __name__ == "__main__":  # pragma: no cover - manual audit helper
+    from src.data.loader import load_elliptic
+    from src.data.preprocessing import preprocess
+
+    d = load_elliptic()
+    preprocess(d, normalize=False)
+    print(json.dumps(build_v4_report_table(d), indent=2))
