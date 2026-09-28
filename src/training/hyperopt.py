@@ -86,6 +86,8 @@ def objective(
     metric: str = "pr_auc",
     early_stop_metric: Optional[str] = None,
     hidden_dim_choices: Optional[list] = None,
+    search_space: Optional[dict] = None,
+    epoch_callback=None,
 ) -> float:
     """
     Optuna objective function for hyperparameter search.
@@ -102,6 +104,10 @@ def objective(
         metric: Which metric to return ('pr_auc', 'f1', 'mcc').
         early_stop_metric: Metric used for early stopping inside a trial.
                            Defaults to `metric` (consistent with Optuna objective).
+        search_space: Optional ranges from the config ``hyperparameter_search`` block
+                      (num_layers, dropout, learning_rate, weight_decay as [lo, hi]).
+                      Missing keys fall back to the historical defaults.
+        epoch_callback: Passed to the Trainer (time budget / heartbeat).
 
     Returns:
         Validation score (to maximize) — either val_pr_auc, val_f1 or val_mcc.
@@ -115,10 +121,15 @@ def objective(
     # Override via hidden_dim_choices when the config wants a VRAM/speed-constrained cap.
     _choices = hidden_dim_choices if hidden_dim_choices else [64, 128, 140, 148, 211, 256]
     hidden_dim = trial.suggest_categorical("hidden_dim", _choices)
-    num_layers = trial.suggest_int("num_layers", 2, 3)
-    dropout = trial.suggest_float("dropout", 0.1, 0.5)
-    lr = trial.suggest_float("lr", 1e-4, 1e-2, log=True)
-    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-3, log=True)
+    sp = search_space or {}
+    nl = sp.get("num_layers") or [2, 3]
+    do = sp.get("dropout") or [0.1, 0.5]
+    lr_r = sp.get("learning_rate") or [1e-4, 1e-2]
+    wd_r = sp.get("weight_decay") or [1e-5, 1e-3]
+    num_layers = trial.suggest_int("num_layers", int(min(nl)), int(max(nl)))
+    dropout = trial.suggest_float("dropout", float(do[0]), float(do[1]))
+    lr = trial.suggest_float("lr", float(lr_r[0]), float(lr_r[1]), log=True)
+    weight_decay = trial.suggest_float("weight_decay", float(wd_r[0]), float(wd_r[1]), log=True)
 
     # Architecture-specific params
     kwargs = {}
@@ -158,6 +169,7 @@ def objective(
         patience=patience,
         disable_checkpointing=True,
         early_stop_metric=early_stop_metric,
+        epoch_callback=epoch_callback,
     )
 
     results = trainer.train(
@@ -183,6 +195,10 @@ def run_hyperopt(
     focal_alpha: float = 0.75,
     warm_start: bool = True,
     hidden_dim_choices: Optional[list] = None,
+    search_space: Optional[dict] = None,
+    epoch_callback=None,
+    timeout_s: Optional[float] = None,
+    show_progress_bar: bool = True,
 ) -> dict:
     """
     Run hyperparameter optimization for a given architecture + balancing combo.
@@ -199,6 +215,10 @@ def run_hyperopt(
         metric: Optuna objective metric ('pr_auc', 'f1', 'mcc').
         focal_gamma, focal_alpha: Focal Loss hyperparameters.
         warm_start: If True, enqueue literature-optimal priors as trial 0.
+        search_space: Config ranges (see ``objective``).
+        epoch_callback: Called after every epoch of every trial; an exception it raises
+            (e.g. ConfigTimeoutError) aborts the whole study and propagates.
+        timeout_s: Overall Optuna budget in seconds (default 8 min × n_trials).
 
     Returns:
         Dict with best_params, best_score, metric, and the Optuna study.
@@ -241,10 +261,11 @@ def run_hyperopt(
             trial, data, arch_name, balancing, device, epochs, patience,
             focal_gamma=focal_gamma, focal_alpha=focal_alpha, metric=metric,
             hidden_dim_choices=hidden_dim_choices,
+            search_space=search_space, epoch_callback=epoch_callback,
         ),
         n_trials=n_trials,
-        timeout=n_trials * 480,  # overall budget: 8 min × n_trials
-        show_progress_bar=True,
+        timeout=timeout_s if timeout_s is not None else n_trials * 480,
+        show_progress_bar=show_progress_bar,
     )
 
     print(f"\n  Best trial (val {metric}={study.best_trial.value:.4f}):")

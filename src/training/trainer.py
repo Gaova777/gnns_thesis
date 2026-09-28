@@ -16,7 +16,30 @@ from sklearn.metrics import (
     precision_recall_curve,
     auc,
 )
-from typing import Optional
+from typing import Callable, Optional
+
+
+class ConfigTimeoutError(RuntimeError):
+    """Raised (typically from an ``epoch_callback``) when a configuration exceeds its
+    wall-clock budget. Checked between epochs only — no threads, no signals."""
+
+
+def make_deadline_callback(deadline: Optional[float], label: str = "",
+                           beat: Optional[Callable[[int], None]] = None):
+    """Epoch callback that raises ConfigTimeoutError once ``time.monotonic() > deadline``.
+
+    ``beat(epoch)`` (optional) is called every epoch first, e.g. to refresh a heartbeat.
+    """
+    import time as _time
+
+    def _cb(epoch: int, _metrics: dict) -> None:
+        if beat is not None:
+            beat(epoch)
+        if deadline is not None and _time.monotonic() > deadline:
+            raise ConfigTimeoutError(
+                f"{label or 'config'} exceeded its time budget at epoch {epoch}"
+            )
+    return _cb
 
 
 class Trainer:
@@ -38,6 +61,8 @@ class Trainer:
         early_stop_metric: Validation metric used for early stopping and
             best-checkpoint selection. One of 'f1', 'mcc', 'pr_auc'.
             Default 'f1' (more stable than MCC on imbalanced data).
+        epoch_callback: Optional ``f(epoch, val_metrics)`` called after every epoch.
+            Exceptions it raises (e.g. ConfigTimeoutError) propagate out of train().
     """
 
     _EARLY_STOP_INIT = {"f1": -1.0, "mcc": -2.0, "pr_auc": -1.0}
@@ -53,8 +78,10 @@ class Trainer:
         tracker=None,
         disable_checkpointing: bool = False,
         early_stop_metric: str = "f1",
+        epoch_callback: Optional[Callable[[int, dict], None]] = None,
     ):
         self.model = model.to(device)
+        self.epoch_callback = epoch_callback
         self.loss_fn = loss_fn
         self.optimizer = optimizer
         self.device = device
@@ -145,33 +172,22 @@ class Trainer:
         data,
         mask_name: str = "val_mask",
         n_thresholds: int = 101,
-        match_ratio_mask: Optional[str] = None,
-        seed: int = 42,
     ) -> dict:
         """
-        Find the decision threshold that maximizes F1 on the given mask.
+        Find the decision threshold that maximizes F1 on ``mask_name`` (validation).
 
-        Sweeps `n_thresholds` values in (0, 1) exclusive, picks the one with
-        highest F1. Necessary when train/val/test have different class ratios
-        (e.g. Elliptic: train 1:1 post-scenario, test 1:136 natural) — plain
-        argmax assumes the test ratio matches training.
+        Sweeps `n_thresholds` values in (0, 1) exclusive and picks the highest F1.
 
-        Args:
-            data: PyG Data object.
-            mask_name: Split to calibrate on (default val_mask).
-            n_thresholds: Number of thresholds to sweep in (0, 1).
-            match_ratio_mask: If set, downsample the mask to match the class
-                ratio of this other mask BEFORE calibrating. Example: calibrate
-                on val_mask but with the same prevalence as test_mask, so the
-                chosen threshold transfers to test. Essential when val/test
-                have very different class ratios (common in temporal splits).
-            seed: RNG seed for the resampling, for reproducibility.
+        v4 CHANGE — validation only. Up to v3 this method could resample validation to
+        the class prevalence of the TEST split (``match_ratio_mask="test_mask"``) before
+        sweeping. That uses a property of the test labels to choose a decision rule, i.e.
+        test-set information leaks into model selection, so it was removed. The threshold
+        is now chosen on the validation labels alone; the test split is only scored with
+        it afterwards. ``resample`` is kept in the return value (always None) for
+        backwards compatibility with readers of v3 meta.json files.
 
-        Returns dict: threshold, f1 (at that threshold on the effective mask),
-        sweep, and info on the resampling if applied.
+        Returns dict: threshold, f1 (at that threshold on the mask), sweep, resample=None.
         """
-        import numpy as _np
-
         self.model.eval()
         mask = getattr(data, mask_name).to(self.device)
         out = self.model(data.x.to(self.device), data.edge_index.to(self.device))
@@ -179,54 +195,6 @@ class Trainer:
         labels = y_all[mask].cpu().numpy()
         probs = F.softmax(out[mask], dim=-1)[:, 1].cpu().numpy()
         resample_info = None
-
-        if match_ratio_mask is not None:
-            target_mask = getattr(data, match_ratio_mask)
-            target_labels = data.y[target_mask].cpu().numpy()
-            t_illicit = int((target_labels == 1).sum())
-            t_licit = int((target_labels == 0).sum())
-            if t_licit == 0 or t_illicit == 0:
-                resample_info = {"applied": False, "reason": "target mask has only one class"}
-            else:
-                target_ratio = t_illicit / t_licit  # positives per negative
-                v_illicit = int((labels == 1).sum())
-                v_licit = int((labels == 0).sum())
-                v_current_ratio = v_illicit / v_licit
-                # To reach target_ratio we either:
-                #   (A) downsample illicit:  keep all v_licit, reduce illicit to v_licit*target_ratio
-                #   (B) downsample licit:    keep all v_illicit, reduce licit to v_illicit/target_ratio
-                # Both are feasible only if the desired count is <= the available count.
-                # Pick the feasible option with more TOTAL samples (statistical power).
-                # If target_ratio > v_current_ratio → need more illicit per licit → option B
-                # If target_ratio < v_current_ratio → need fewer illicit per licit → option A
-                rng = _np.random.RandomState(seed)
-                if target_ratio <= v_current_ratio:
-                    # Downsample illicit (option A) — always feasible because
-                    # we're reducing illicit count.
-                    new_illicit = max(int(round(v_licit * target_ratio)), 1)
-                    new_illicit = min(new_illicit, v_illicit)
-                    idx_illicit = _np.where(labels == 1)[0]
-                    idx_licit = _np.where(labels == 0)[0]
-                    sel_illicit = rng.choice(idx_illicit, size=new_illicit, replace=False)
-                    keep_idx = _np.concatenate([sel_illicit, idx_licit])
-                else:
-                    # Downsample licit (option B).
-                    new_licit = max(int(round(v_illicit / target_ratio)), 1)
-                    new_licit = min(new_licit, v_licit)
-                    idx_illicit = _np.where(labels == 1)[0]
-                    idx_licit = _np.where(labels == 0)[0]
-                    sel_licit = rng.choice(idx_licit, size=new_licit, replace=False)
-                    keep_idx = _np.concatenate([idx_illicit, sel_licit])
-                labels = labels[keep_idx]
-                probs = probs[keep_idx]
-                resample_info = {
-                    "applied": True,
-                    "target_mask": match_ratio_mask,
-                    "target_ratio_illicit_per_licit": target_ratio,
-                    "before": {"illicit": v_illicit, "licit": v_licit},
-                    "after": {"illicit": int((labels == 1).sum()),
-                              "licit": int((labels == 0).sum())},
-                }
 
         thresholds = np.linspace(1.0 / (n_thresholds + 1),
                                  n_thresholds / (n_thresholds + 1),
@@ -297,6 +265,7 @@ class Trainer:
                 print(f"  WARNING: Could not load epoch checkpoint ({exc}), starting fresh")
                 start_epoch = 1
 
+        last_epoch = start_epoch - 1
         for epoch in range(start_epoch, epochs + 1):
             train_loss = self.train_epoch(data)
             val_metrics = self.evaluate(data, "val_mask")
@@ -361,6 +330,10 @@ class Trainer:
                                        if torch.cuda.is_available() else None),
                 }, epoch_ckpt_path)
 
+            last_epoch = epoch
+            if self.epoch_callback is not None:
+                self.epoch_callback(epoch, val_metrics)
+
             if self.patience_counter >= self.patience:
                 if verbose:
                     print(f"  Early stopping at epoch {epoch} (best: {self.best_epoch})")
@@ -388,6 +361,7 @@ class Trainer:
             "best_val_mcc": self.best_val_mcc,
             "best_val_score": self.best_val_score,
             "early_stop_metric": self.early_stop_metric,
+            "epochs_run": last_epoch,
             "test_metrics": test_metrics,
             "history": self.history,
         }

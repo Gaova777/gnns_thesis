@@ -1,0 +1,130 @@
+# Experiment config — v4 (una sola config para las 4 arquitecturas)
+#
+# Cambios de fondo respecto a v3 (configs/experiment_machine{B,C}_v3.yaml):
+#   1. ETIQUETAS: v3 entrenó con los 157.205 nodos sin etiqueta como "lícitos" y dejó fuera
+#      los 42.019 lícitos reales (remapeo PyG invertido en src/data/loader.py). v4 corrige el
+#      remapeo (0 lícita, 1 ilícita, -1 desconocido) y DETIENE la corrida si los conteos no
+#      son los oficiales (4.545 / 42.019 / 157.205 y la tabla por partición).
+#   2. PRESUPUESTO COMÚN: v3 daba a B (GCN/SAGE) 50 trials y 600 épocas y a C (GAT/TAGCN) 8 y
+#      150. Esa asimetría confunde arquitectura con presupuesto; v4 usa el mismo presupuesto
+#      (el de C, el que cabe en la GPU pequeña) para las 4.
+#   3. ESCENARIOS: el nativo real de train es ≈1:7,6 (no 1:30, que venía de contar los
+#      desconocidos como lícitos). Se submuestrea con una semilla de DATOS fija (2026),
+#      distinta de la del modelo, para que las 3 semillas vean el mismo subconjunto. Se añade
+#      native_size_ctrl para separar el efecto del tamaño del efecto de la razón en 1:1.
+#   4. UMBRAL: se calibra solo con validación (v3 remuestreaba val a la prevalencia de test,
+#      lo que filtra información del test a la selección del modelo).
+#   5. MONITOREO: eventos en logs_dir/progress.jsonl (src/monitoring/progress.py).
+
+version: "v4"
+
+data:
+  root: "./data"
+  train_timesteps: [1, 34]
+  val_timesteps: [35, 42]
+  test_timesteps: [43, 49]
+
+scenarios:
+  mode: "v4"                 # activa src/data/imbalance.py::create_v4_scenario
+  subsample_seed: 2026       # semilla de DATOS (fija); independiente de training.seeds
+  # Conteos esperados en train (se verifican con ±1; val/test nunca se submuestrean):
+  #   native            3.462 il / 26.432 lic  (≈1:7,6; todo train etiquetado)
+  #   1:1               3.462 / 3.462          (todas las ilícitas + lícitas submuestreadas)
+  #   native_size_ctrl    802 / 6.122          (control de tamaño del 1:1 a razón nativa)
+  #   1:10              2.643 / 26.432         (todas las lícitas; ilícitas = floor(26.432/10))
+  #   1:50                528 / 26.432
+  #   1:100               264 / 26.432
+  names: ["native", "1:1", "native_size_ctrl", "1:10", "1:50", "1:100"]
+
+models:
+  architectures:
+    - name: "GCN"
+      class: "src.models.gcn.GCN"
+    - name: "GraphSAGE"
+      class: "src.models.sage.GraphSAGE"
+    - name: "GAT"
+      class: "src.models.gat.GAT"
+    - name: "TAGCN"
+      class: "src.models.tagcn.TAGCN"
+
+  hyperparameter_search:
+    hidden_dim: [64, 128, 148]         # v3-B llegaba a 256; tope común 148 (cabe GAT en 4 GB)
+    num_layers: [2, 3]
+    dropout: [0.1, 0.5]                # rango continuo (suggest_float)
+    learning_rate: [0.0001, 0.01]      # rango log
+    weight_decay: [0.00001, 0.001]     # rango log
+    # GAT además busca heads ∈ {4, 8} y TAGCN K ∈ [2, 4] (fijo en src/training/hyperopt.py)
+    optuna_trials: 8                   # v3-B 50 / v3-C 8 → 8 para todas (presupuesto común)
+    optuna_metric: "pr_auc"            # métrica primaria del estudio (no F1/ROC-AUC)
+    warm_start: true                   # prior como trial 0 (hidden se ajusta al más cercano)
+    trial_epochs: 50                   # épocas por trial de Optuna (igual que v3, ahora explícito)
+    trial_patience: 10
+
+training:
+  epochs: 150                          # v3-B 600 / v3-C 150 → 150 para todas
+  patience: 20                         # v3-B 50 / v3-C 20 → 20 para todas
+  early_stop_metric: "f1"
+  optimizer: "adam"
+  batch_size: null
+  seeds: [42, 43, 44]                  # la primera es la canónica (run_id sin sufijo);
+                                       # 43/44 con --reuse-hp reutilizan los HP de la 42
+
+balancing:
+  techniques:
+    - name: "none"
+    - name: "class_weighting"
+    - name: "focal_loss"
+      gamma: 2.0
+      alpha: 0.75                      # alpha = peso de la clase rara (semántica corregida en v3)
+
+# Consumido por la etapa de explicación/estabilidad (scripts/explain_matrix.py, otro agente).
+explainability:
+  explain_nodes: 30                    # nodos a explicar por configuración (VP de validación)
+  explain_nodes_seed: 1234             # semilla fija para elegirlos (mismos nodos entre semillas)
+  explanation_type: "model"
+  gnnexplainer:
+    epochs: 100
+    lr: 0.01
+  pgexplainer:
+    epochs: 100
+    lr: 0.001
+    train_nodes: 50                    # nodos para entrenar el explicador paramétrico
+    train_min_illicit: 25              # de ellos, al menos 25 ilícitos
+  shapley:
+    num_samples: 50                    # v3-C usaba 25 para GAT; común: 50
+  # Lista legada (formato v3) con los mismos valores, por si algún lector aún la usa.
+  # Fuente de verdad: los bloques gnnexplainer / pgexplainer / shapley de arriba.
+  methods:
+    - name: "GNNExplainer"
+      epochs: 100
+      lr: 0.01
+    - name: "PGExplainer"
+      epochs: 100
+      lr: 0.001
+      train_nodes: 50
+      train_min_illicit: 25
+      nan_abort_threshold: 2
+    - name: "GNNShap"
+      num_samples: 50
+
+stability:
+  num_replicas: 5
+  top_k_features: 20
+  top_k_edges: 20
+  noise_levels: [0.01, 0.05, 0.10]
+
+analysis:
+  # Compuerta de calidad sobre VALIDACIÓN (test sufre el shift temporal del cierre del
+  # mercado oscuro). Mismos umbrales que v3; ahora sobre etiquetas correctas.
+  quality_gate:
+    f1_min: 0.30
+    mcc_min: 0.15
+  bootstrap_samples: 1000
+  confidence_level: 0.95
+
+tracking:
+  backend: "mlflow"
+  experiment_name: "xai-gnn-stability-v4"
+  results_dir: "./results_v4"          # separado de v3: nada de v4 se mezcla con lo publicado
+  models_dir: "./results_models_v4"    # {run_id}_best.pt + {run_id}_meta.json
+  logs_dir: "./runs_v4"                # progress.jsonl + HEARTBEAT_<stage> (RunLog)
