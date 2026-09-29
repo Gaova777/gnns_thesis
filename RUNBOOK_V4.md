@@ -15,12 +15,38 @@ detectados en la auditoría, y trae un plan de corrida por prioridades con monit
 **Nada de la v3 se borra**: la v4 escribe en directorios nuevos (`results_v4/`, `results_models_v4/`,
 `runs_v4/`, `results_phase1_v4/`).
 
+## 0b. Cambios del 28-sep por la noche (reunión con Cristian) — LEER PRIMERO
+
+La reunión cambió dos cosas del diseño. El código de este PR ya las incorpora:
+
+1. **Qué cuenta como «lícito» (modos de etiqueta).** Hay tres formas de armar la clase negativa;
+   la ilícita siempre es la positiva:
+
+   | Modo | Negativos | Train | Test | Para qué |
+   |---|---|---|---|---|
+   | **C** `licit_unknown` («completo») | lícitas + sin etiqueta | 3.462 / 132.803 (**1:38,4**) | 169 / 29.515 (1:174,6) | **Todo el análisis**: es el caso más real (el fraude no detectado no se puede etiquetar) y su desbalance es el real |
+   | B `licit` | solo lícitas revisadas | 3.462 / 26.432 (1:7,6) | 169 / 6.518 | Comparar |
+   | A `unknown` | solo sin etiqueta (lo que corrió la v3 por error) | 3.462 / 106.371 (1:30,7) | 169 / 22.997 | Comparar |
+
+   **Paso 0** (nuevo): A, B y C se entrenan **solo en el escenario nativo, semilla 42**, y se
+   comparan en varas comunes (`scripts/v4/run_label_comparison.sh`). Si se parecen, queda
+   argumentado que los sin etiqueta se pueden tratar como lícitos y **todo lo demás corre sobre C**.
+   A y B **no** pasan por explicadores ni estabilidad.
+
+2. **El balanceo protege la señal de fraude.** Ningún escenario principal quita ilícitas (la v4
+   del 23-sep bajaba a 264 ilícitas en 1:100). Ahora se submuestrea la clase negativa y se
+   sobremuestrean ilícitas con SMOTE (§3). Los escenarios viejos siguen en el código con sufijo
+   `_subil`, pero no se corren.
+
+La normalización ahora se ajusta con todos los nodos de los timesteps de train (con o sin
+etiqueta), así es idéntica en A, B y C y no confunde la comparación.
+
 ## 1. Por qué existe la v4
 
 | # | Problema en v3 | Evidencia | Corrección v4 |
 |---|---|---|---|
 | 1 | Etiquetas invertidas: PyG codifica `{'unknown': 2, '1': 1, '2': 0}` y el loader asumió 0 = desconocido | `reeval_rocauc.log`: «Licit: 157,205 · Unknown: 42,019» | `src/data/loader.py`: 0 lícita, 1 ilícita, 2 → −1. **Excepción `DataIntegrityError` si los conteos no cuadran** (totales y por partición) |
-| 2 | Escenarios mezclaban proporción con tamaño (1:1 entrenaba con 6.924 nodos, nativo con 109.833) y 1:50/1:100 descartaban ilícitas diciendo lo contrario | `src/data/imbalance.py` | Escenarios v4 con lícitas fijas y control de tamaño (§3) |
+| 2 | Escenarios mezclaban proporción con tamaño (1:1 entrenaba con 6.924 nodos, nativo con 109.833) y 1:50/1:100 descartaban ilícitas diciendo lo contrario | `src/data/imbalance.py` | Escenarios que conservan todas las ilícitas: submuestreo de negativos + SMOTE (§3) |
 | 3 | Presupuesto distinto por arquitectura (GCN/SAGE 50 trials × 600 épocas; GAT/TAGCN 8 × 150) | configs B vs C | `configs/experiment_v4.yaml`: **mismo presupuesto para las 4** |
 | 4 | Umbral calibrado con la prevalencia del test | `trainer.calibrate_threshold` | Calibración solo con validación |
 | 5 | Cada modelo explicaba sus propios aciertos → arquitecturas comparadas sobre nodos distintos | `explain_matrix.py` | **30 ilícitas de validación comunes** a todos los modelos (`results_v4/explain_nodes_v4.json`) |
@@ -55,21 +81,33 @@ choca con algo que diga Cristian, **manda lo de Cristian** y se actualiza este a
 | Val (ts 35-42) | 914 | 9.069 | 27.837 |
 | Test (ts 43-49) | 169 | 6.518 | 22.997 |
 
-**Escenarios** (solo cambia la máscara de train; grafo, val y test intactos; submuestreo con
-semilla de datos fija 2026, la misma para las 3 semillas de modelo):
+**Modo de etiquetas:** C (`data.label_mode: licit_unknown` en la config). Negativos de train =
+26.432 lícitas + 106.371 sin etiqueta.
 
-| Escenario | Ilícitas | Lícitas | Total |
+**Escenarios** (regla: **no se quita ninguna ilícita**; val y test intactos; semilla de datos
+fija 2026, la misma para las 3 semillas de modelo):
+
+| Escenario | Ilícitas | Negativos | Cómo |
 |---|---|---|---|
-| `native` (1:7,6) | 3.462 | 26.432 | 29.894 |
-| `1:10` | 2.643 | 26.432 | 29.075 |
-| `1:50` | 528 | 26.432 | 26.960 |
-| `1:100` | 264 | 26.432 | 26.696 |
-| `1:1` | 3.462 | 3.462 | 6.924 |
-| `native_size_ctrl` (control de tamaño del 1:1) | 802 | 6.122 | 6.924 |
+| `native` (1:38,4) | 3.462 | 132.803 | Todo: el desbalance real |
+| `1:10` | 3.462 | 34.620 | Submuestreo de negativos |
+| `1:1` | 3.462 | 3.462 | Submuestreo de negativos |
+| `1:10_os` | 6.924 (3.462 reales + 3.462 SMOTE) | 69.240 | Sobremuestreo ×2 de ilícitas + submuestreo de negativos |
 
-**Matriz:** 6 escenarios × 4 arquitecturas × 3 balanceos (`none`, `class_weighting`, `focal_loss`)
-= **72 configuraciones por semilla**, semillas 42 (con Optuna) y 43/44 (`--reuse-hp`: reusan los HP
-de la 42, solo reentrenan).
+- El submuestreo de negativos es **estratificado**: conserva la mezcla del nativo (≈ 19,9 % lícitas,
+  80,1 % sin etiqueta).
+- **SMOTE** (Chawla et al., 2002): cada nodo sintético interpola las variables de una ilícita de
+  train y una de sus 5 vecinas ilícitas más cercanas, y hereda las aristas de la ancla (la variante
+  de SMOTE con copia de aristas que GraphSMOTE, Zhao et al., 2021, usa como línea base; verificar
+  la cita en el paper). No hay duplicados exactos. Viven solo en los timesteps de train y Elliptic
+  no tiene aristas entre timesteps, así que val y test no los ven (lo comprueban las pruebas).
+- No hay escenario más desbalanceado que el nativo: con C, llegar a 1:50 exigiría quitar ilícitas.
+- `1:10` contra `1:10_os` aísla el efecto de la técnica (misma razón, submuestreo solo vs mixto).
+
+**Matriz:** 4 escenarios × 4 arquitecturas × 3 balanceos (`none`, `class_weighting`, `focal_loss`)
+= **48 configuraciones por semilla**, semillas 42 (con Optuna) y 43/44 (`--reuse-hp`: reusan los HP
+de la 42, solo reentrenan) = 144 modelos. Más el paso 0: 24 modelos de A y B (los 12 de C nativo
+son los mismos de la matriz). **Total: 168 modelos** (antes 216).
 
 **Presupuesto común:** 8 trials de Optuna, 150 épocas, paciencia 20, `hidden_dim ∈ {64,128,148}`.
 
@@ -80,7 +118,7 @@ de la 42, solo reentrenan).
 (variables). Solo modelos que pasan la compuerta (`--include-gated` como sensibilidad).
 
 **Análisis:** unidad = configuración (media de semillas). H1 desbalance (Friedman + TOST ±0,05 vs
-`native` + control `native_size_ctrl` vs `1:1`), H2 arquitectura (Holm sobre los 6 pares +
+`native`), H2 arquitectura (Holm sobre los 6 pares +
 regresión con `val_pr_auc` como covariable), H3 balanceo (sin `1:1`), control estabilidad ~ calidad.
 El resumen dice para cada hipótesis qué rama aplica: *efecto significativo* / *equivalencia (TOST)* /
 *no se detectó con esta potencia*.
@@ -108,6 +146,25 @@ bash scripts/v4/smoke_v4.sh
 Corre todo el pipeline en miniatura en directorios aislados (`runs_smoke/`, `results_smoke/`,
 `results_models_smoke/`) y termina en `HUMO OK`. **Si no termina en `HUMO OK`, no se lanza la
 corrida real.** (Ya pasó en CPU en la máquina de Alejandro el 28-sep; en GPU es la primera vez.)
+
+### Paso 2b — Paso 0 del diseño: comparar A / B / C (solo entrenamiento)
+
+```bash
+bash scripts/v4/run_label_comparison.sh --device cuda
+```
+
+Entrena el escenario nativo, semilla 42, 4 arquitecturas × 3 balanceos, en los tres modos:
+36 modelos, de los cuales los 12 de C quedan en `results_models_v4/` y los reusa la corrida real
+(`--resume` los salta). Al final escribe `results_v4_labels/label_comparison.md`:
+
+- **E1:** en la vara común «ilícitas vs lícitas reales» (test), ¿C rinde como B? Criterio propuesto:
+  |mediana(C − B)| de PR-AUC ≤ 0,05.
+- **E2:** los modelos B, que nunca vieron un sin etiqueta, ¿los marcan como ilícitos tan poco como a
+  las lícitas? Si sí, los sin etiqueta se comportan como lícitos.
+- **E3:** ¿A y C llegan a lo mismo?
+
+**Punto de control C0b** (Alejandro y Juan Diego, luego Cristian): si E1 y E2 salen bien, seguir con
+C. Si no, Cristian propuso analizar dos modos en paralelo; se decide con él antes de gastar más GPU.
 
 ### Paso 3 — Corrida real
 
@@ -194,7 +251,7 @@ actúa según esta tabla. No esperes a que termine un bloque para mirar.
 | Latido sin actualizar > 45 min | Crítica | Proceso colgado o muerto | `nvidia-smi` y `ps`; si el proceso murió, relanzar el bloque con `--resume`; si está colgado, matarlo y relanzar |
 | ≥ 2 OOM seguidos | Crítica | La siguiente configuración también fallará | Parar ese bloque. Para entrenamiento: relanzar esa arquitectura sola; si persiste, restringir `hidden_dim` a {64,128} **solo para esa arquitectura**, declararlo en el log de decisiones y avisar a Alejandro |
 | Tasa de compuerta < 30 % tras 10 configuraciones | Crítica | Casi ningún modelo aprende | **Parar todo.** Revisar `val_pr_auc` y `val_f1` de los meta.json; casi seguro es un bug de datos o de escenario. No seguir gastando GPU |
-| Mediana de `val_pr_auc` fuera de [0,20 ; 0,95] | Crítica | < 0,20: no aprende (el azar es ≈ 0,09). > 0,95: sospecha de fuga de información | Parar y revisar; con > 0,95 revisar que val/test no entren al entrenamiento |
+| Mediana de `val_pr_auc` fuera de [0,20 ; 0,95] | Crítica | < 0,20: no aprende (el azar en val es ≈ 0,024 con el modo C). > 0,95: sospecha de fuga de información | Parar y revisar; con > 0,95 revisar que val/test no entren al entrenamiento |
 | NaN en métrica primaria | Crítica | Métrica rota | Parar la etapa y revisar el primer run_id con NaN |
 | Explicador con > 50 % «no_aplica» | Crítica | El explicador no produce lo que se mide | Revisar `reason` en el CSV. En PGExplainer, `spearman_full` NaN es esperado y no cuenta |
 | Latido > 15 min | Aviso | Unidad lenta | Solo observar |
@@ -205,7 +262,8 @@ resumen con `monitor_run.py --once` y las cifras):
 
 | Punto | Cuándo | Qué se mira | Si sale bien | Si sale mal |
 |---|---|---|---|---|
-| C0 | Fin del humo | `HUMO OK` | Lanzar P0 | Corregir antes de gastar GPU |
+| C0 | Fin del humo | `HUMO OK` | Lanzar el paso 0 (A/B/C) | Corregir antes de gastar GPU |
+| C0b | Fin del paso 0 | `label_comparison.md`: E1, E2, E3 | Lanzar P0 sobre C | Decidir con Cristian (¿dos modos en paralelo?) |
 | C1 | Fin de P0 (entrenamiento GCN + GraphSAGE) | Tasa de compuerta, mediana de `val_pr_auc`, tiempo por configuración | Seguir con P1 y recalcular el ETA | Parar y diagnosticar |
 | C2 | Fin de la semilla 42 (P0 + P1) | Las 4 arquitecturas con soporte (≥ 5 configuraciones que pasan la compuerta) | Seguir con P2 | Si GAT o TAGCN no tienen soporte, se reporta así; no se «arregla» subiendo presupuesto solo para ellas |
 | C3 | 02-oct | ¿Semillas 43/44 terminadas o en curso sin errores? | Análisis completo | Entregar con semilla 42 para las que falten, declarado en límites |
@@ -222,17 +280,18 @@ PGExplainer 3-7 min por modelo). **El C1 da el primer tiempo real y con él se r
 
 | Fecha | Qué | Quién |
 |---|---|---|
-| Lun 28-sep | PR con la v4 listo para revisar | Alejandro |
-| Mar 29-sep | Revisar y mergear el PR; preflight + humo en GPU; **lanzar P0 esa misma tarde** | Juan Diego (+ su Claude) |
-| Mar 29-sep | Lanzar el eje sintético en la máquina de Alejandro | Alejandro |
-| Mié 30-sep | C1 por la mañana; P1 corriendo; explicación de P0 en CPU | Juan Diego |
+| Lun 28-sep | PR con la v4 + cambios de la reunión con Cristian (modos de etiqueta, balanceo que protege las ilícitas) | Alejandro |
+| Lun 28-sep noche | Merge + preflight + humo en GPU; **lanzar el paso 0 (A/B/C) esa noche** | Juan Diego (+ su Claude) |
+| Mar 29-sep | C0b con la comparación A/B/C; lanzar P0 sobre C | Los dos |
+| Mié 30-sep | C1; P1 corriendo; explicación de P0 en CPU | Juan Diego |
 | Jue 01-oct | C2; P2 (semillas 43/44) corriendo | Juan Diego |
-| Vie 02-oct | **C3: punto de decisión.** Semillas 43/44 terminando; estabilidad entre semillas y análisis | Los dos |
-| Sáb 03-oct | Revisión con Cristian: diseño + primeros resultados | Los tres |
-| 04 al 09-oct | Reescribir los caps. 4 a 7 y el resumen con las ramas de discusión ya decididas; figuras desde `analyze_elliptic_v4.py` | Los dos |
+| Vie 02-oct | **C3: punto de decisión.** Estabilidad entre semillas y análisis | Los dos |
+| Sáb 03-oct | Reunión con Cristian: comparación A/B/C + primeros resultados + presentación con la historia | Los tres |
+| 04 al 09-oct | Reescribir con la narrativa nueva (una hipótesis; sintético y pruebas estadísticas a anexo) | Los dos |
 | Sáb 10-oct | Versión final a Cristian | Los dos |
 | 11 al 14-oct | Correcciones | Los dos |
 | **Jue 15-oct** | **Entrega** | — |
+| 15-oct → ~5-nov | Ventana de correcciones del jurado: completitud, fidelidad, otro dataset si se decide | Los dos |
 
 **Plan B** si P0 no arranca antes del miércoles 30-sep: semilla 42 para las 4 arquitecturas y
 semillas 43/44 solo para GCN y GraphSAGE, declarado en los límites.
@@ -247,8 +306,9 @@ tal cual. Avisar **de inmediato** ante cualquier alerta crítica que obligue a p
 
 | Archivo | Qué hace |
 |---|---|
-| `src/data/loader.py` | Etiquetas corregidas + `EXPECTED_COUNTS`, `EXPECTED_SPLIT_COUNTS`, `DataIntegrityError` |
-| `src/data/imbalance.py` | `create_v4_scenario`, `V4_SCENARIOS`, reporte y verificación de cada escenario |
+| `src/data/loader.py` | Etiquetas corregidas + `EXPECTED_COUNTS`, `EXPECTED_SPLIT_COUNTS_BY_MODE`, `DataIntegrityError`, `apply_label_mode` (A/B/C; la verdad de 3 clases queda en `data.y3`) |
+| `src/data/imbalance.py` | `create_v4_scenario`, `V4_SCENARIOS`, `smote_oversample`, reporte y verificación de cada escenario por modo |
+| `scripts/v4/run_label_comparison.sh`, `compare_label_modes.py` | Paso 0: A/B/C en el nativo y la comparación en varas comunes (`meta["cross_label_eval"]`) |
 | `src/training/trainer.py`, `hyperopt.py` | Umbral solo con validación; callback de tiempo por configuración |
 | `scripts/train_matrix.py` | Modo v4, RunLog, sigue ante OOM o timeout, `--reuse-hp`, overrides |
 | `src/explainability/v4_explain.py` | Nodos comunes, PGExplainer estratificado, Shapley por lotes |

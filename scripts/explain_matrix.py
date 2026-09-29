@@ -81,7 +81,7 @@ import pandas as pd
 import torch
 import yaml
 
-from src.data.loader import load_elliptic
+from src.data.loader import apply_label_mode, load_elliptic
 from src.data.preprocessing import preprocess
 from src.explainability.explainer_runner import full_graph_logits
 from src.explainability.v4_explain import (
@@ -431,6 +431,14 @@ def main(argv=None):
     # ── data + common node set ───────────────────────────────────────────────
     d = s["data"]
     data = load_elliptic(root=d.get("root", "./data"))
+    # The label mode must be the one the models were trained with (meta.json); v3 metas
+    # have none and fall back to the config (default C).
+    modes = {m.get("label_mode") for m in metas} - {None}
+    if len(modes) > 1:
+        raise SystemExit(f"Checkpoints in {s['models_dir']} mix label modes {sorted(modes)}; "
+                         "explain each mode from its own models dir.")
+    label_mode = apply_label_mode(data, modes.pop() if modes else d.get("label_mode"))
+    print(f"Label mode: {label_mode}")
     preprocess(data, train_range=tuple(d.get("train_timesteps", (1, 34))),
                val_range=tuple(d.get("val_timesteps", (35, 42))),
                test_range=tuple(d.get("test_timesteps", (43, 49))))

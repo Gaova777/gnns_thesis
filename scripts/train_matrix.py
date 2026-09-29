@@ -7,6 +7,10 @@ model with the best hyperparameters and saves its checkpoint + metadata.
 Pipeline v4 (configs/experiment_v4.yaml, ``scenarios.mode: v4``):
   * Correct Elliptic labels (0 licit, 1 illicit, -1 unknown) with hard count checks
     (src/data/loader.py); the run stops on any mismatch.
+  * Label mode (data.label_mode or --label-mode): C "licit_unknown" (main: licit + unknown
+    are the negative class), B "licit" or A "unknown". Every model is also scored on the
+    common yardsticks of meta["cross_label_eval"] (illicit vs licit, vs unknown, vs all),
+    which is what scripts/v4/compare_label_modes.py compares across A/B/C.
   * v4 scenarios (src/data/imbalance.py::create_v4_scenario): only the train mask changes,
     subsampled with a FIXED data seed (scenarios.subsample_seed, default 2026) so every
     model seed sees the same subset. The scenario report goes into meta.json.
@@ -60,8 +64,13 @@ from src.data.imbalance import (
 from src.data.loader import (
     DataIntegrityError,
     EXPECTED_COUNTS,
+    ILLICIT,
+    LICIT,
+    UNKNOWN,
+    apply_label_mode,
     load_elliptic,
     print_dataset_stats,
+    resolve_label_mode,
 )
 from src.data.preprocessing import preprocess
 from src.monitoring.progress import RunLog
@@ -122,6 +131,9 @@ def parse_args():
     p.add_argument("--results-dir", type=str, default=None, help="Override tracking.results_dir")
     p.add_argument("--logs-dir", type=str, default=None, help="Override tracking.logs_dir")
     p.add_argument("--no-mlflow", action="store_true", help="Use the CSV tracker backend")
+    p.add_argument("--label-mode", type=str, default=None,
+                   help="Override data.label_mode: licit_unknown (C) | licit (B) | unknown "
+                        "(A); aliases C/B/A")
     return p.parse_args()
 
 
@@ -211,6 +223,8 @@ def main():
         tracking_cfg["logs_dir"] = args.logs_dir
     if args.no_mlflow:
         tracking_cfg["backend"] = "csv"
+    if args.label_mode:
+        config["data"]["label_mode"] = resolve_label_mode(args.label_mode)
     effective_sha256 = hashlib.sha256(
         json.dumps(config, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -233,6 +247,11 @@ def main():
     data_raw = load_elliptic(root=config["data"]["root"])  # hard label-count checks
     print_dataset_stats(data_raw)
     dcfg = config["data"]
+    # Legacy v3 configs have no label_mode: they keep the reviewed-licit negatives (B).
+    label_mode = apply_label_mode(
+        data_raw, dcfg.get("label_mode", "licit_unknown" if v4_mode else "licit"))
+    print(f"  Label mode: {label_mode} (negatives = "
+          f"{ {'licit_unknown': 'licit + unknown', 'licit': 'licit', 'unknown': 'unknown'}[label_mode]})")
     preprocess(
         data_raw,
         train_range=tuple(dcfg.get("train_timesteps", (1, 34))),
@@ -245,6 +264,8 @@ def main():
         for n in ("train", "val", "test")
     }
     print(f"  Data loaded + validated in {time.time() - t0:.1f}s: {split_counts}")
+    split_ranges = {n: tuple(dcfg.get(f"{n}_timesteps", d)) for n, d in
+                    (("train", (1, 34)), ("val", (35, 42)), ("test", (43, 49)))}
 
     # ── Experimental matrix (with CLI filters) ───────────────────────────────
     if v4_mode:
@@ -319,6 +340,7 @@ def main():
         gate_f1=gate_f1, gate_mcc=gate_mcc, focal_cfg=focal_cfg,
         config_sha256=config_sha256, effective_sha256=effective_sha256,
         config_version=config_version, split_counts=split_counts,
+        label_mode=label_mode, split_ranges=split_ranges,
     )
 
     summary = {"passed": [], "failed": [], "skipped_resume": [], "errors": []}
@@ -414,6 +436,58 @@ def main():
     print(f"\n  Total time: {(time.time() - pipeline_start) / 3600:.2f} h")
     print(f"  Checkpoints + metadata in: {models_dir}")
     print(f"  Progress log: {runlog.path}")
+
+
+@torch.no_grad()
+def cross_label_eval(model, data, threshold: float, split_ranges: dict, device) -> dict:
+    """Score the model on yardsticks that do not depend on the label mode.
+
+    For val and test (by timestep, real nodes only) and using the 3-class truth ``data.y3``:
+      vs_licit    illicit vs reviewed licit     (the label-mode B problem)
+      vs_unknown  illicit vs unknown            (the label-mode A problem, v3)
+      vs_all      illicit vs licit + unknown    (the label-mode C problem)
+    each with PR-AUC, and F1/MCC/recall/precision at ``threshold`` (calibrated on the
+    model's own validation set), plus the fraction of each class flagged as illicit
+    (flag_rate). If A/B/C models agree here, unknowns can be treated as licit.
+    """
+    from sklearn.metrics import (auc, f1_score, matthews_corrcoef, precision_recall_curve,
+                                 precision_score, recall_score)
+    import torch.nn.functional as F
+
+    model.eval()
+    out = model(data.x.to(device), data.edge_index.to(device))
+    probs = F.softmax(out, dim=-1)[:, 1].cpu()
+    y3 = data.y3.cpu()
+    ts = data.timestep.cpu()
+    real = ~data.is_synthetic.cpu() if hasattr(data, "is_synthetic") else torch.ones_like(y3, dtype=torch.bool)
+
+    def _score(mask):
+        lab = (y3[mask] == ILLICIT).numpy().astype(int)
+        p = probs[mask].numpy()
+        pred = (p >= threshold).astype(int)
+        prec, rec, _ = precision_recall_curve(lab, p, pos_label=1)
+        return {"n_illicit": int(lab.sum()), "n_negative": int(len(lab) - lab.sum()),
+                "pr_auc": float(auc(rec, prec)),
+                "f1": float(f1_score(lab, pred, zero_division=0)),
+                "mcc": float(matthews_corrcoef(lab, pred)),
+                "recall": float(recall_score(lab, pred, zero_division=0)),
+                "precision": float(precision_score(lab, pred, zero_division=0))}
+
+    res = {"threshold": float(threshold)}
+    for split in ("val", "test"):
+        lo, hi = split_ranges[split]
+        in_split = real & (ts >= lo) & (ts <= hi)
+        il, li, un = (in_split & (y3 == c) for c in (ILLICIT, LICIT, UNKNOWN))
+        res[split] = {
+            "vs_licit": _score(il | li),
+            "vs_unknown": _score(il | un),
+            "vs_all": _score(il | li | un),
+            "flag_rate": {name: float((probs[m] >= threshold).float().mean())
+                          for name, m in (("illicit", il), ("licit", li), ("unknown", un))},
+            "mean_prob": {name: float(probs[m].mean())
+                          for name, m in (("illicit", il), ("licit", li), ("unknown", un))},
+        }
+    return res
 
 
 def run_one_config(ctx, data_raw, scenario_name, ratio, arch_name, balance_name, seed,
@@ -559,6 +633,13 @@ def run_one_config(ctx, data_raw, scenario_name, ratio, arch_name, balance_name,
             f"test F1={test_calibrated['f1']:.4f} MCC={test_calibrated['mcc']:.4f}"
         )
         tracker.log_test_metrics(test_calibrated)
+        cross_eval = cross_label_eval(trainer.model, data, thr, ctx["split_ranges"], device)
+        t_ce = cross_eval["test"]
+        tqdm.write(
+            f"  Cross-label test PR-AUC: vs licit={t_ce['vs_licit']['pr_auc']:.4f} "
+            f"vs unknown={t_ce['vs_unknown']['pr_auc']:.4f} vs all={t_ce['vs_all']['pr_auc']:.4f}"
+            f" | unknown flagged={t_ce['flag_rate']['unknown']:.3%}"
+        )
 
     # Quality gate on VALIDATION (argmax at the best epoch), as in v3: test is hit by the
     # temporal covariate shift (dark-market shutdown), val shows whether the model learned.
@@ -581,7 +662,11 @@ def run_one_config(ctx, data_raw, scenario_name, ratio, arch_name, balance_name,
         "scenario_report": scenario_report,
         "n_train_illicit": scenario_report["n_illicit"],
         "n_train_licit": scenario_report["n_licit"],
+        "label_mode": ctx["label_mode"],
         "label_encoding": {"licit": 0, "illicit": 1, "unknown": -1},
+        "negative_class": {"licit_unknown": "licit+unknown", "licit": "licit",
+                           "unknown": "unknown"}[ctx["label_mode"]],
+        "cross_label_eval": cross_eval,
         "data_counts": {"total": EXPECTED_COUNTS, "splits": ctx["split_counts"]},
         "architecture": arch_name,
         "balancing": balance_name,
@@ -628,7 +713,10 @@ def run_one_config(ctx, data_raw, scenario_name, ratio, arch_name, balance_name,
         "val_f1": round(val_f1, 4),
         "val_mcc": round(val_mcc, 4),
         "test_pr_auc": round(float(test_calibrated["pr_auc"]), 4),
+        "test_pr_auc_vs_licit": round(float(cross_eval["test"]["vs_licit"]["pr_auc"]), 4),
+        "unknown_flag_rate_test": round(float(cross_eval["test"]["flag_rate"]["unknown"]), 4),
         "gate_passed": quality_passed,
+        "label_mode": ctx["label_mode"],
         "n_train_illicit": scenario_report["n_illicit"],
         "n_train_licit": scenario_report["n_licit"],
         "epochs_run": results["epochs_run"],

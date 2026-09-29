@@ -7,7 +7,8 @@ Checks (cada uno imprime OK / FALLO / AVISO):
        train (t 1-34) 3.462/26.432 · val (35-42) 914/9.069 · test (43-49) 169/6.518
      y, además, por el loader del pipeline (src.data.loader.load_elliptic + split temporal +
      validate_split_counts). Si el loader no se puede importar se avisa y vale el conteo directo.
-     --skip-loader salta la segunda vía (la primera nunca se salta).
+     --skip-loader salta la segunda vía (la primera nunca se salta). Con el loader se validan
+     también los tres modos de etiqueta (C lícitas+sin etiqueta, B lícitas, A sin etiqueta).
   2. configs/experiment_v4.yaml existe, lista las 4 arquitecturas y el presupuesto es el MISMO
      para las 4 (ninguna entrada de arquitectura sobrescribe epochs/trials/patience/hidden...).
   3. Espacio libre en disco ≥ --min-disk-gb (default 20 GB) en el repo.
@@ -112,6 +113,15 @@ def check_elliptic(data_root: Path, skip_loader: bool):
         create_time_split_masks(d, SPLIT["train"], SPLIT["val"], SPLIT["test"])
         got = validate_split_counts(d, SPLIT)
         ok(f"loader del pipeline: etiquetas y particiones validadas {got}")
+        # Los tres modos de etiqueta (C principal, B y A para la comparación) cuadran.
+        from copy import deepcopy
+        from src.data.loader import apply_label_mode
+        for mode in ("licit_unknown", "licit", "unknown"):
+            dm = deepcopy(d)
+            apply_label_mode(dm, mode)
+            create_time_split_masks(dm, SPLIT["train"], SPLIT["val"], SPLIT["test"])
+            gm = validate_split_counts(dm, SPLIT)
+            ok(f"modo de etiquetas {mode}: train {gm['train']} · test {gm['test']}")
     except Exception as exc:  # noqa: BLE001
         fail(f"loader del pipeline: {type(exc).__name__}: {str(exc)[:300]}")
 

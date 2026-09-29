@@ -145,9 +145,14 @@ def preprocess(
                                      "test": tuple(test_range)})
         print("  Split counts validated against the official Elliptic release.")
 
-    # 2. Normalize features (fit on train only)
+    # 2. Normalize features (fit on train TIMESTEPS only, labelled or not). Fitting on every
+    #    node of the train timesteps makes the scaling identical for the three label modes
+    #    (A/B/C differ only in which nodes are labelled), so their comparison is not confounded
+    #    by the normalization. Still leak-free: no val/test timestep is used.
     if normalize:
-        print("Normalizing features (fit on train set):")
-        normalize_features(data, fit_mask=data.train_mask)
+        print("Normalizing features (fit on every node of the train timesteps):")
+        ts = data.timestep if hasattr(data, "timestep") else data.x[:, 0].long()
+        fit_mask = (ts >= train_range[0]) & (ts <= train_range[1])
+        normalize_features(data, fit_mask=fit_mask)
 
     print("Preprocessing complete.")

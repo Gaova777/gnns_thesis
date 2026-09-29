@@ -47,6 +47,61 @@ EXPECTED_SPLIT_COUNTS = {
 }
 
 
+# ── Label modes (reunión con Cristian, 28-sep-2026) ─────────────────────────
+# The three ways of defining the NEGATIVE class. Illicit is always the positive class.
+#   licit_unknown  (C, "completo", main analysis): licit + unknown are negatives. Closest to
+#                  the real world (undetected fraud cannot be labelled) and keeps the REAL
+#                  imbalance (train ≈ 1:38, test ≈ 1:175).
+#   licit          (B): only the reviewed licit nodes are negatives; unknowns are excluded
+#                  from loss/metrics (they still pass messages).
+#   unknown        (A): only unknown nodes are negatives and real licit ones are excluded.
+#                  Reproduces exactly what v3 trained on by mistake; kept to compare.
+# A and B are only trained (native scenario) to argue that unknowns can be treated as licit;
+# the explainers and the whole stability analysis run on C.
+LABEL_MODES = ("licit_unknown", "licit", "unknown")
+DEFAULT_LABEL_MODE = "licit_unknown"
+LABEL_MODE_ALIASES = {"C": "licit_unknown", "B": "licit", "A": "unknown"}
+
+# Labelled (positive / negative) counts per split and label mode, default temporal split.
+_UNK_SPLIT = {"train": 106371, "val": 27837, "test": 22997}
+EXPECTED_SPLIT_COUNTS_BY_MODE = {
+    "licit": EXPECTED_SPLIT_COUNTS,
+    "unknown": {k: {"illicit": v["illicit"], "licit": _UNK_SPLIT[k]}
+                for k, v in EXPECTED_SPLIT_COUNTS.items()},
+    "licit_unknown": {k: {"illicit": v["illicit"], "licit": v["licit"] + _UNK_SPLIT[k]}
+                      for k, v in EXPECTED_SPLIT_COUNTS.items()},
+}
+
+
+def resolve_label_mode(mode: str | None) -> str:
+    mode = LABEL_MODE_ALIASES.get(mode, mode) if mode else DEFAULT_LABEL_MODE
+    if mode not in LABEL_MODES:
+        raise ValueError(f"Unknown label mode {mode!r}. Choose from {LABEL_MODES} "
+                         f"(or aliases {LABEL_MODE_ALIASES})")
+    return mode
+
+
+def apply_label_mode(data, mode: str | None) -> str:
+    """Set ``data.y`` for the given label mode, keeping the 3-class truth in ``data.y3``.
+
+    Must run on the output of ``load_elliptic`` (y in {0 licit, 1 illicit, -1 unknown}) and
+    BEFORE ``preprocess`` (the split masks take every node with y >= 0). Returns the
+    resolved mode name and stores it in ``data.label_mode``.
+    """
+    mode = resolve_label_mode(mode)
+    y3 = data.y3 if hasattr(data, "y3") else data.y.clone()
+    y = y3.clone()
+    if mode == "licit_unknown":
+        y[y3 == UNKNOWN] = LICIT
+    elif mode == "unknown":
+        y[y3 == LICIT] = UNKNOWN
+        y[y3 == UNKNOWN] = LICIT
+    data.y3 = y3
+    data.y = y
+    data.label_mode = mode
+    return mode
+
+
 class DataIntegrityError(RuntimeError):
     """Raised when the loaded data does not match the official Elliptic counts.
 
@@ -74,14 +129,20 @@ def validate_label_counts(data) -> dict:
     return counts
 
 
-def validate_split_counts(data, split_ranges: dict | None = None) -> dict:
+def validate_split_counts(data, split_ranges: dict | None = None,
+                          label_mode: str | None = None) -> dict:
     """Check train/val/test labelled counts.
 
     With the default split (train 1-34, val 35-42, test 43-49) the counts must match
-    ``EXPECTED_SPLIT_COUNTS`` exactly, otherwise ``DataIntegrityError``. With any other
-    split only the global totals are validated and a warning is printed.
+    ``EXPECTED_SPLIT_COUNTS_BY_MODE[label_mode]`` exactly, otherwise
+    ``DataIntegrityError``. With any other split only the global totals are validated and
+    a warning is printed. ``label_mode`` defaults to ``data.label_mode`` (or "licit" if the
+    data never went through ``apply_label_mode``). "licit" in the returned dict means the
+    negative class of that mode.
     """
     split_ranges = split_ranges or DEFAULT_SPLIT
+    label_mode = resolve_label_mode(label_mode or getattr(data, "label_mode", "licit"))
+    expected = EXPECTED_SPLIT_COUNTS_BY_MODE[label_mode]
     got = {}
     for name in ("train", "val", "test"):
         mask = getattr(data, f"{name}_mask")
@@ -92,13 +153,18 @@ def validate_split_counts(data, split_ranges: dict | None = None) -> dict:
 
     normalized = {k: tuple(v) for k, v in split_ranges.items()}
     if normalized == DEFAULT_SPLIT:
-        if got != EXPECTED_SPLIT_COUNTS:
+        if got != expected:
             raise DataIntegrityError(
-                f"Split counts {got} != expected {EXPECTED_SPLIT_COUNTS} for the default "
-                "temporal split (train 1-34, val 35-42, test 43-49)."
+                f"Split counts {got} != expected {expected} for label mode {label_mode!r} "
+                "and the default temporal split (train 1-34, val 35-42, test 43-49)."
             )
     else:
-        validate_label_counts(data)
+        if hasattr(data, "y3"):
+            if _label_counts(data.y3) != EXPECTED_COUNTS:
+                raise DataIntegrityError(f"3-class totals {_label_counts(data.y3)} != "
+                                         f"{EXPECTED_COUNTS}")
+        else:
+            validate_label_counts(data)
         print(f"  WARNING: non-default split {normalized}; only global label totals were "
               f"validated. Split counts: {got}")
     return got

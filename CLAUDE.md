@@ -5,8 +5,12 @@
 > El eje Elliptic de la v3 se entrenó con las **etiquetas invertidas** (los 157.205 nodos sin
 > etiqueta como «lícitos»; los 42.019 lícitos reales fuera). Todas las cifras de Elliptic de este
 > archivo y del manuscrito (partición en dos grupos, p = 0,178, «1:30 nativo», colapso val→test)
-> vienen de esa corrida y **no son válidas para la tarea que describe la tesis**. La razón nativa
-> real en train es **1:7,6**, no 1:30.
+> vienen de esa corrida y **no son válidas para la tarea que describe la tesis**.
+>
+> **Diseño vigente (reunión con Cristian, 28-sep):** la clase negativa principal es **lícitas + sin
+> etiqueta** (modo C, razón real en train **1:38,4**, en test 1:174,6); los modos «solo lícitas» (B,
+> 1:7,6) y «solo sin etiqueta» (A, lo de la v3) solo se entrenan para justificar C. Ningún
+> escenario quita ilícitas: se submuestrean negativos y se sobremuestrean ilícitas con SMOTE.
 >
 > La v4 corrige eso y otros problemas de diseño (escenarios, presupuesto por arquitectura, nodos
 > comunes, PGExplainer, Shapley, métricas, compuerta, atajos del grafo sintético). Todo lo que hay

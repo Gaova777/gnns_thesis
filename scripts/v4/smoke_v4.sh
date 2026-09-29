@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Corrida GPU de HUMO del pipeline v4 (~15-20 min objetivo en la RTX 4060 / 3050).
-#   1 escenario (native) × 4 arquitecturas × 1 balanceo (class_weighting) × 1 semilla (42)
+#   modo de etiquetas C · native × 4 arquitecturas + 1:10_os (SMOTE) × GCN
+#   × 1 balanceo (class_weighting) × 1 semilla (42)
 #   0 trials de Optuna (HP por defecto) · 3 épocas · 3 nodos · 2 réplicas · 3 explicadores
 #   → analyze --selftest → monitor --once
 # Directorios AISLADOS (runs_smoke/, results_smoke/, results_models_smoke/): no toca runs_v4/.
@@ -52,6 +53,10 @@ for A in "${ARCHS[@]}"; do
       --trials 0 --epochs 3 --max-minutes-per-config 10 --no-mlflow \
       --models-dir "$MODELS" --results-dir "$RES" --logs-dir "$RUNS"
 done
+"${PY[@]}" scripts/train_matrix.py --config "$CONFIG" --device "$DEVICE" \
+    --arch GCN --scenario 1:10_os --balancing class_weighting --seed 42 \
+    --trials 0 --epochs 3 --max-minutes-per-config 10 --no-mlflow \
+    --models-dir "$MODELS" --results-dir "$RES" --logs-dir "$RUNS"
 
 step "2/4 explicar (3 explicadores, 3 nodos, 2 réplicas; --include-gated: 3 épocas no pasan la compuerta)"
 for A in "${ARCHS[@]}"; do
@@ -60,6 +65,10 @@ for A in "${ARCHS[@]}"; do
       --include-gated --n-nodes 3 --replicas 2 \
       --models-dir "$MODELS" --results-dir "$RES" --logs-dir "$RUNS"
 done
+"${PY[@]}" scripts/explain_matrix.py --config "$CONFIG" --device "$DEVICE" \
+    --arch GCN --scenario 1:10_os --balancing class_weighting --seed 42 \
+    --include-gated --n-nodes 3 --replicas 2 \
+    --models-dir "$MODELS" --results-dir "$RES" --logs-dir "$RUNS"
 # TODO(otro agente): explain_matrix no expone --epochs para GNNExplainer/PGExplainer; el humo
 # usa las épocas del YAML (100). Si se añade un override, bajarlo aquí a ~10.
 
@@ -80,11 +89,11 @@ models, res = sys.argv[1], sys.argv[2]
 metas = glob.glob(f"{models}/*_meta.json")
 rows = list(csv.DictReader(open(f"{res}/elliptic_v4_stability.csv")))
 ok = [r for r in rows if r.get("status") == "ok"]
-print(f"modelos={len(metas)} (esperado 4) · filas explain={len(rows)} ok={len(ok)} (esperado 12)")
+print(f"modelos={len(metas)} (esperado 5) · filas explain={len(rows)} ok={len(ok)} (esperado 15)")
 bad = [(r["run_id"], r["explainer"], r.get("status"), r.get("reason")) for r in rows if r.get("status") != "ok"]
 for b in bad:
     print("  NO-OK:", b)
-sys.exit(0 if len(metas) == 4 and len(ok) == 12 else 3)
+sys.exit(0 if len(metas) == 5 and len(ok) == 15 else 3)
 PYEOF
 SRC=$?
 set -e
