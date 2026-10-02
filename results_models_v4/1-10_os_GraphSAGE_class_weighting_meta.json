@@ -1,0 +1,224 @@
+{
+  "run_id": "1:10_os_GraphSAGE_class_weighting",
+  "pipeline_version": "v4",
+  "scenario": "1:10_os",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.1,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "1:10_os",
+    "kind": "oversample",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 6924,
+    "n_synthetic_illicit": 3462,
+    "n_licit": 69240,
+    "negative_origin": {
+      "licit": 13781,
+      "unknown": 55459
+    },
+    "total": 76164,
+    "ratio": 0.1,
+    "ratio_str": "1:10.0",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "07027587adca21a16b2706e78e74ef9933498d67",
+    "val_test_subsampled": false,
+    "smote": {
+      "n_new": 3462,
+      "k": 5,
+      "n_edges_added": 7028
+    }
+  },
+  "n_train_illicit": 6924,
+  "n_train_licit": 69240,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.7745098039215685,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.7666389987419145,
+        "f1": 0.6269503546099291,
+        "mcc": 0.6339324617539059,
+        "recall": 0.48358862144420134,
+        "precision": 0.8911290322580645
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.4368574839842367,
+        "f1": 0.45850622406639,
+        "mcc": 0.4404072956552545,
+        "recall": 0.48358862144420134,
+        "precision": 0.4358974358974359
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.4214796681751454,
+        "f1": 0.44601412714429867,
+        "mcc": 0.432578542019668,
+        "recall": 0.48358862144420134,
+        "precision": 0.41385767790262173
+      },
+      "flag_rate": {
+        "illicit": 0.48358863592147827,
+        "licit": 0.005954349879175425,
+        "unknown": 0.02054819092154503
+      },
+      "mean_prob": {
+        "illicit": 0.6157751679420471,
+        "licit": 0.04222356900572777,
+        "unknown": 0.07212658226490021
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.05163571998417082,
+        "f1": 0.015810276679841896,
+        "mcc": -0.0010516252265939195,
+        "recall": 0.011834319526627219,
+        "precision": 0.023809523809523808
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.013885554900495799,
+        "f1": 0.013333333333333334,
+        "mcc": 0.007064493410975126,
+        "recall": 0.011834319526627219,
+        "precision": 0.015267175572519083
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.011013783619842607,
+        "f1": 0.010471204188481676,
+        "mcc": 0.004176623342842253,
+        "recall": 0.011834319526627219,
+        "precision": 0.009389671361502348
+      },
+      "flag_rate": {
+        "illicit": 0.011834319680929184,
+        "licit": 0.01258054655045271,
+        "unknown": 0.005609427113085985
+      },
+      "mean_prob": {
+        "illicit": 0.09268910437822342,
+        "licit": 0.044332355260849,
+        "unknown": 0.04263187199831009
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GraphSAGE",
+  "balancing": "class_weighting",
+  "seed": 42,
+  "best_params": {
+    "hidden_dim": 64,
+    "num_layers": 2,
+    "dropout": 0.4879639408647978,
+    "lr": 0.004622589001020831,
+    "weight_decay": 2.6587543983272695e-05
+  },
+  "optuna_best_score": 0.4362945278410122,
+  "optuna_metric": "pr_auc",
+  "hp_source": "optuna",
+  "early_stop_metric": "f1",
+  "best_epoch": 150,
+  "epochs_run": 150,
+  "best_val_score": 0.40256670043904086,
+  "best_val_mcc": 0.4158888593639366,
+  "val_metrics": {
+    "loss": 0.3225157856941223,
+    "f1": 0.40256670043904086,
+    "mcc": 0.4158888593639366,
+    "pr_auc": 0.4214796681751454
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.3225157856941223,
+    "f1": 0.44601412714429867,
+    "mcc": 0.432578542019668,
+    "pr_auc": 0.4214796681751454
+  },
+  "test_metrics": {
+    "loss": 0.2876957058906555,
+    "f1": 0.010471204188481676,
+    "mcc": 0.004176623342842253,
+    "pr_auc": 0.011013783619842607
+  },
+  "test_metrics_argmax": {
+    "loss": 0.2876957058906555,
+    "f1": 0.012674271229404309,
+    "mcc": 0.004603058121642516,
+    "pr_auc": 0.011013783619842607
+  },
+  "calibrated_threshold": 0.7745098039215685,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.44601412714429867,
+  "calibration_resample": null,
+  "quality_passed": true,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.40256670043904086,
+  "val_mcc_best_epoch": 0.4158888593639366,
+  "mlflow_run_id": "0bbfc6a52da64ce28b01b1c067680bdd",
+  "checkpoint": "1-10_os_GraphSAGE_class_weighting_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 49.6,
+  "finished_at": "2026-09-28T23:38:01"
+}

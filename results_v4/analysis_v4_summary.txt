@@ -1,0 +1,171 @@
+Análisis v4 Elliptic — métrica: stability_primary; unidad: configuración (media de semillas); α=0.05; margen TOST ±0.05; soporte mínimo 5 configuraciones por arquitectura.
+Fuente: ./results_v4/elliptic_v4_stability.csv (171 filas 'ok'; 171 pasan la compuerta).
+
+==============================================================================
+PRINCIPAL: solo modelos que pasan la compuerta
+==============================================================================
+[GNNExplainer | gate] n configuraciones = 21
+  H1 escenario: Friedman χ²=1.60 p=0.4493 W=0.160 (bloques=5, k=3) 
+    1:10 vs native: Δ=-0.005 IC90 [-0.020, 0.010] TOST p=0.0015 → equivalente
+    1:10_os vs native: Δ=-0.004 IC90 [-0.018, 0.010] TOST p=0.0005729 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GraphSAGE=8, GAT=5, TAGCN=8
+    Friedman χ²=1.50 p=0.4724 W=0.188 (bloques=4) ; Kruskal H=0.34 p=0.8455
+    GraphSAGE vs GAT: Δ=-0.013 Wilcoxon p_holm=0.5859 TOST p=0.0037 (n=4)
+    GraphSAGE vs TAGCN: Δ=0.011 Wilcoxon p_holm=0.5859 TOST p=0.0016 (n=8)
+    GAT vs TAGCN: Δ=0.018 Wilcoxon p_holm=0.5859 TOST p=0.0350 (n=4)
+    OLS intercepto: β=0.889 (SE 0.048, p=1.01e-12)
+    OLS arch[GAT] (ref GraphSAGE): β=0.005 (SE 0.016, p=0.7700)
+    OLS arch[TAGCN] (ref GraphSAGE): β=-0.008 (SE 0.013, p=0.5561)
+    OLS val_pr_auc: β=0.119 (SE 0.116, p=0.3178)
+    OLS n=21 R²=0.106
+  ⇒ H2: equivalencia (TOST)
+  H3 balanceo (sin 1:1): Friedman χ²=6.00 p=0.0498 W=0.750 (bloques=4) 
+    none vs class_weighting: Δ=-0.032 p_holm=0.2500 TOST p=0.0667
+    none vs focal_loss: Δ=0.018 p_holm=0.3125 TOST p=0.0243
+    class_weighting vs focal_loss: Δ=0.051 p_holm=0.0938 TOST p=0.5360
+  ⇒ H3: efecto significativo
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.368 IC95 boot [-0.096, 0.708] p=0.1012 (n=21)
+
+[PGExplainer | gate] n configuraciones = 21
+  H1 escenario: Friedman χ²=2.80 p=0.2466 W=0.280 (bloques=5, k=3) 
+    1:10 vs native: Δ=-0.103 IC90 [-0.256, 0.051] TOST p=0.7472 → no equivalente
+    1:10_os vs native: Δ=-0.092 IC90 [-0.220, 0.036] TOST p=0.7315 → no equivalente
+  ⇒ H1: no se detectó con esta potencia
+  H2 arquitectura: soporte GraphSAGE=8, GAT=5, TAGCN=8
+    Friedman χ²=3.50 p=0.1738 W=0.438 (bloques=4) ; Kruskal H=7.63 p=0.0220
+    GraphSAGE vs GAT: Δ=-0.112 Wilcoxon p_holm=0.3750 TOST p=0.7931 (n=4)
+    GraphSAGE vs TAGCN: Δ=0.092 Wilcoxon p_holm=0.3906 TOST p=0.7206 (n=8)
+    GAT vs TAGCN: Δ=0.180 Wilcoxon p_holm=0.3906 TOST p=0.8093 (n=4)
+    OLS intercepto: β=1.012 (SE 0.445, p=0.0362)
+    OLS arch[GAT] (ref GraphSAGE): β=0.171 (SE 0.145, p=0.2535)
+    OLS arch[TAGCN] (ref GraphSAGE): β=-0.153 (SE 0.117, p=0.2072)
+    OLS val_pr_auc: β=-1.896 (SE 1.079, p=0.0968)
+    OLS n=21 R²=0.424
+  ⇒ H2: no se detectó con esta potencia
+  H3 balanceo (sin 1:1): Friedman χ²=6.00 p=0.0498 W=0.750 (bloques=4) 
+    none vs class_weighting: Δ=0.562 p_holm=0.2500 TOST p=0.9979
+    none vs focal_loss: Δ=0.337 p_holm=0.1875 TOST p=0.9673
+    class_weighting vs focal_loss: Δ=-0.159 p_holm=0.2500 TOST p=0.9109
+  ⇒ H3: efecto significativo
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.392 IC95 boot [-0.656, -0.027] p=0.0787 (n=21)
+
+[ShapleyFeatures | gate] n configuraciones = 21
+  H1 escenario: Friedman χ²=2.80 p=0.2466 W=0.280 (bloques=5, k=3) 
+    1:10 vs native: Δ=0.001 IC90 [-0.001, 0.003] TOST p=6.733e-07 → equivalente
+    1:10_os vs native: Δ=-0.000663 IC90 [-0.004, 0.003] TOST p=4.94e-07 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GraphSAGE=8, GAT=5, TAGCN=8
+    Friedman χ²=4.50 p=0.1054 W=0.562 (bloques=4) ; Kruskal H=3.90 p=0.1420
+    GraphSAGE vs GAT: Δ=0.002 Wilcoxon p_holm=0.2500 TOST p=1.023e-07 (n=4)
+    GraphSAGE vs TAGCN: Δ=0.005 Wilcoxon p_holm=0.0469 TOST p=6.562e-09 (n=8)
+    GAT vs TAGCN: Δ=0.002 Wilcoxon p_holm=0.8750 TOST p=0.0001174 (n=4)
+    OLS intercepto: β=0.999 (SE 0.008, p=0.0000)
+    OLS arch[GAT] (ref GraphSAGE): β=-0.002 (SE 0.003, p=0.5170)
+    OLS arch[TAGCN] (ref GraphSAGE): β=-0.005 (SE 0.002, p=0.0192)
+    OLS val_pr_auc: β=-0.008 (SE 0.019, p=0.6749)
+    OLS n=21 R²=0.300
+  ⇒ H2: equivalencia (TOST)
+  H3 balanceo (sin 1:1): Friedman χ²=6.50 p=0.0388 W=0.812 (bloques=4) 
+    none vs class_weighting: Δ=0.008 p_holm=0.2500 TOST p=0.0001675
+    none vs focal_loss: Δ=0.000511 p_holm=1.0000 TOST p=4.482e-07
+    class_weighting vs focal_loss: Δ=-0.006 p_holm=0.0938 TOST p=3.259e-07
+  ⇒ H3: efecto significativo
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.127 IC95 boot [-0.556, 0.320] p=0.5825 (n=21)
+
+==============================================================================
+SENSIBILIDAD: sin filtro de compuerta
+==============================================================================
+(ninguna fila explicada falla la compuerta: la sensibilidad coincide con el análisis principal; corre explain_matrix con --include-gated para que difiera)
+[GNNExplainer | sin_filtro] n configuraciones = 21
+  H1 escenario: Friedman χ²=1.60 p=0.4493 W=0.160 (bloques=5, k=3) 
+    1:10 vs native: Δ=-0.005 IC90 [-0.020, 0.010] TOST p=0.0015 → equivalente
+    1:10_os vs native: Δ=-0.004 IC90 [-0.018, 0.010] TOST p=0.0005729 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GraphSAGE=8, GAT=5, TAGCN=8
+    Friedman χ²=1.50 p=0.4724 W=0.188 (bloques=4) ; Kruskal H=0.34 p=0.8455
+    GraphSAGE vs GAT: Δ=-0.013 Wilcoxon p_holm=0.5859 TOST p=0.0037 (n=4)
+    GraphSAGE vs TAGCN: Δ=0.011 Wilcoxon p_holm=0.5859 TOST p=0.0016 (n=8)
+    GAT vs TAGCN: Δ=0.018 Wilcoxon p_holm=0.5859 TOST p=0.0350 (n=4)
+    OLS intercepto: β=0.889 (SE 0.048, p=1.01e-12)
+    OLS arch[GAT] (ref GraphSAGE): β=0.005 (SE 0.016, p=0.7700)
+    OLS arch[TAGCN] (ref GraphSAGE): β=-0.008 (SE 0.013, p=0.5561)
+    OLS val_pr_auc: β=0.119 (SE 0.116, p=0.3178)
+    OLS n=21 R²=0.106
+  ⇒ H2: equivalencia (TOST)
+  H3 balanceo (sin 1:1): Friedman χ²=6.00 p=0.0498 W=0.750 (bloques=4) 
+    none vs class_weighting: Δ=-0.032 p_holm=0.2500 TOST p=0.0667
+    none vs focal_loss: Δ=0.018 p_holm=0.3125 TOST p=0.0243
+    class_weighting vs focal_loss: Δ=0.051 p_holm=0.0938 TOST p=0.5360
+  ⇒ H3: efecto significativo
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.368 IC95 boot [-0.096, 0.708] p=0.1012 (n=21)
+
+[PGExplainer | sin_filtro] n configuraciones = 21
+  H1 escenario: Friedman χ²=2.80 p=0.2466 W=0.280 (bloques=5, k=3) 
+    1:10 vs native: Δ=-0.103 IC90 [-0.256, 0.051] TOST p=0.7472 → no equivalente
+    1:10_os vs native: Δ=-0.092 IC90 [-0.220, 0.036] TOST p=0.7315 → no equivalente
+  ⇒ H1: no se detectó con esta potencia
+  H2 arquitectura: soporte GraphSAGE=8, GAT=5, TAGCN=8
+    Friedman χ²=3.50 p=0.1738 W=0.438 (bloques=4) ; Kruskal H=7.63 p=0.0220
+    GraphSAGE vs GAT: Δ=-0.112 Wilcoxon p_holm=0.3750 TOST p=0.7931 (n=4)
+    GraphSAGE vs TAGCN: Δ=0.092 Wilcoxon p_holm=0.3906 TOST p=0.7206 (n=8)
+    GAT vs TAGCN: Δ=0.180 Wilcoxon p_holm=0.3906 TOST p=0.8093 (n=4)
+    OLS intercepto: β=1.012 (SE 0.445, p=0.0362)
+    OLS arch[GAT] (ref GraphSAGE): β=0.171 (SE 0.145, p=0.2535)
+    OLS arch[TAGCN] (ref GraphSAGE): β=-0.153 (SE 0.117, p=0.2072)
+    OLS val_pr_auc: β=-1.896 (SE 1.079, p=0.0968)
+    OLS n=21 R²=0.424
+  ⇒ H2: no se detectó con esta potencia
+  H3 balanceo (sin 1:1): Friedman χ²=6.00 p=0.0498 W=0.750 (bloques=4) 
+    none vs class_weighting: Δ=0.562 p_holm=0.2500 TOST p=0.9979
+    none vs focal_loss: Δ=0.337 p_holm=0.1875 TOST p=0.9673
+    class_weighting vs focal_loss: Δ=-0.159 p_holm=0.2500 TOST p=0.9109
+  ⇒ H3: efecto significativo
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.392 IC95 boot [-0.656, -0.027] p=0.0787 (n=21)
+
+[ShapleyFeatures | sin_filtro] n configuraciones = 21
+  H1 escenario: Friedman χ²=2.80 p=0.2466 W=0.280 (bloques=5, k=3) 
+    1:10 vs native: Δ=0.001 IC90 [-0.001, 0.003] TOST p=6.733e-07 → equivalente
+    1:10_os vs native: Δ=-0.000663 IC90 [-0.004, 0.003] TOST p=4.94e-07 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GraphSAGE=8, GAT=5, TAGCN=8
+    Friedman χ²=4.50 p=0.1054 W=0.562 (bloques=4) ; Kruskal H=3.90 p=0.1420
+    GraphSAGE vs GAT: Δ=0.002 Wilcoxon p_holm=0.2500 TOST p=1.023e-07 (n=4)
+    GraphSAGE vs TAGCN: Δ=0.005 Wilcoxon p_holm=0.0469 TOST p=6.562e-09 (n=8)
+    GAT vs TAGCN: Δ=0.002 Wilcoxon p_holm=0.8750 TOST p=0.0001174 (n=4)
+    OLS intercepto: β=0.999 (SE 0.008, p=0.0000)
+    OLS arch[GAT] (ref GraphSAGE): β=-0.002 (SE 0.003, p=0.5170)
+    OLS arch[TAGCN] (ref GraphSAGE): β=-0.005 (SE 0.002, p=0.0192)
+    OLS val_pr_auc: β=-0.008 (SE 0.019, p=0.6749)
+    OLS n=21 R²=0.300
+  ⇒ H2: equivalencia (TOST)
+  H3 balanceo (sin 1:1): Friedman χ²=6.50 p=0.0388 W=0.812 (bloques=4) 
+    none vs class_weighting: Δ=0.008 p_holm=0.2500 TOST p=0.0001675
+    none vs focal_loss: Δ=0.000511 p_holm=1.0000 TOST p=4.482e-07
+    class_weighting vs focal_loss: Δ=-0.006 p_holm=0.0938 TOST p=3.259e-07
+  ⇒ H3: efecto significativo
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.127 IC95 boot [-0.556, 0.320] p=0.5825 (n=21)
+
+==============================================================================
+RENDIMIENTO en 'native' (todos los modelos; F1 = clase ilícita; test con umbral calibrado en validación)
+  GCN        PR-AUC val 0.095 test 0.009 | F1 val 0.140 test 0.016 (n=9)
+  GraphSAGE  PR-AUC val 0.314 test 0.007 | F1 val 0.339 test 0.005 (n=9)
+  GAT        PR-AUC val 0.285 test 0.006 | F1 val 0.288 test 0.010 (n=9)
+  TAGCN      PR-AUC val 0.229 test 0.007 | F1 val 0.240 test 0.005 (n=9)
+  Referencia Weber et al. (2019): F1 ilícito en test, GCN 0,628 y Random Forest 0,788 (todas las variables); comparar con cautela: otro split temporal y umbral.
+
+ESTABILIDAD ENTRE SEMILLAS (elliptic_v4_cross_seed.csv; media de cs_primary por pares):
+  GNNExplainer     GAT        0.928
+  GNNExplainer     GraphSAGE  0.945
+  GNNExplainer     TAGCN      0.953
+  PGExplainer      GAT        0.517
+  PGExplainer      GraphSAGE  0.614
+  PGExplainer      TAGCN      0.316
+  ShapleyFeatures  GAT        0.944
+  ShapleyFeatures  GraphSAGE  0.956
+  ShapleyFeatures  TAGCN      0.942
+
+RAMAS (análisis principal):
+  GNNExplainer     H1: equivalencia (TOST) | H2: equivalencia (TOST) | H3: efecto significativo
+  PGExplainer      H1: no se detectó con esta potencia | H2: no se detectó con esta potencia | H3: efecto significativo
+  ShapleyFeatures  H1: equivalencia (TOST) | H2: equivalencia (TOST) | H3: efecto significativo

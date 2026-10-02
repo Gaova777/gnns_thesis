@@ -1,0 +1,225 @@
+{
+  "run_id": "1:10_os_GAT_class_weighting_s43",
+  "pipeline_version": "v4",
+  "scenario": "1:10_os",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.1,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "1:10_os",
+    "kind": "oversample",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 6924,
+    "n_synthetic_illicit": 3462,
+    "n_licit": 69240,
+    "negative_origin": {
+      "licit": 13781,
+      "unknown": 55459
+    },
+    "total": 76164,
+    "ratio": 0.1,
+    "ratio_str": "1:10.0",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "07027587adca21a16b2706e78e74ef9933498d67",
+    "val_test_subsampled": false,
+    "smote": {
+      "n_new": 3462,
+      "k": 5,
+      "n_edges_added": 7028
+    }
+  },
+  "n_train_illicit": 6924,
+  "n_train_licit": 69240,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.892156862745098,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.730674294301786,
+        "f1": 0.5730909090909091,
+        "mcc": 0.5822114293348762,
+        "recall": 0.4310722100656455,
+        "precision": 0.8546637744034707
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.3391114074170326,
+        "f1": 0.41278156102671554,
+        "mcc": 0.3930333499725785,
+        "recall": 0.4310722100656455,
+        "precision": 0.39597989949748746
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.32270880502410343,
+        "f1": 0.39878542510121456,
+        "mcc": 0.3838876842589463,
+        "recall": 0.4310722100656455,
+        "precision": 0.3709981167608286
+      },
+      "flag_rate": {
+        "illicit": 0.4310722053050995,
+        "licit": 0.007387804798781872,
+        "unknown": 0.021589970216155052
+      },
+      "mean_prob": {
+        "illicit": 0.7389175891876221,
+        "licit": 0.11723711341619492,
+        "unknown": 0.23703329265117645
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.061288171490811894,
+        "f1": 0.11583011583011583,
+        "mcc": 0.10522259677445717,
+        "recall": 0.08875739644970414,
+        "precision": 0.16666666666666666
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.011449894725662067,
+        "f1": 0.04120879120879121,
+        "mcc": 0.03610329324959565,
+        "recall": 0.08875739644970414,
+        "precision": 0.026833631484794274
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.009735849652414513,
+        "f1": 0.037359900373599,
+        "mcc": 0.03527611178999115,
+        "recall": 0.08875739644970414,
+        "precision": 0.02365930599369085
+      },
+      "flag_rate": {
+        "illicit": 0.08875739574432373,
+        "licit": 0.011506597511470318,
+        "unknown": 0.023655259981751442
+      },
+      "mean_prob": {
+        "illicit": 0.31038567423820496,
+        "licit": 0.1584777534008026,
+        "unknown": 0.23493775725364685
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GAT",
+  "balancing": "class_weighting",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 128,
+    "num_layers": 2,
+    "dropout": 0.21649165607921678,
+    "lr": 0.0016738085788752138,
+    "weight_decay": 1.9010245319870364e-05,
+    "heads": 4
+  },
+  "optuna_best_score": 0.350473667058449,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 23,
+  "epochs_run": 43,
+  "best_val_score": 0.17983519146873486,
+  "best_val_mcc": 0.24585425958805684,
+  "val_metrics": {
+    "loss": 0.3856181800365448,
+    "f1": 0.17983519146873486,
+    "mcc": 0.24585425958805684,
+    "pr_auc": 0.32270880502410343
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.3856181800365448,
+    "f1": 0.39878542510121456,
+    "mcc": 0.3838876842589463,
+    "pr_auc": 0.32270880502410343
+  },
+  "test_metrics": {
+    "loss": 0.4878547191619873,
+    "f1": 0.037359900373599,
+    "mcc": 0.03527611178999115,
+    "pr_auc": 0.009735849652414513
+  },
+  "test_metrics_argmax": {
+    "loss": 0.4878547191619873,
+    "f1": 0.016107382550335572,
+    "mcc": 0.0169827081981214,
+    "pr_auc": 0.009735849652414513
+  },
+  "calibrated_threshold": 0.892156862745098,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.39878542510121456,
+  "calibration_resample": null,
+  "quality_passed": false,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.17983519146873486,
+  "val_mcc_best_epoch": 0.24585425958805684,
+  "mlflow_run_id": "72edbcf8aefb4dc480a0ef73a32ef98e",
+  "checkpoint": "1-10_os_GAT_class_weighting_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 14.5,
+  "finished_at": "2026-09-29T21:26:43"
+}

@@ -1,6 +1,16 @@
 # Guía del proyecto — XAI Stability in GNNs (AML / Elliptic)
 
-> ## ⚠️ Estado 28-sep-2026: pipeline v4 en curso — lee `RUNBOOK_V4.md` antes de hacer nada
+> ## ⚠️ Estado 02-oct-2026: corridas v4 del eje Elliptic terminadas. Lee `RUNBOOK_V4.md` y `runs_v4/DECISIONES.md` antes de hacer nada
+>
+> **Corrida v4 completa (30-sep, máquina de Juan Diego):** 144 modelos (4 arquitecturas × semillas
+> 42/43/44 × 4 escenarios native/1:10/1:1/1:10_os × 3 balanceos), entrenados y explicados en modo C.
+> Resultados en `results_v4/analysis_v4_summary.txt` y `results_v4/tables/`. En corto: el desbalance
+> no tiene efecto (equivalencia por TOST), **las arquitecturas salen equivalentes** (la partición en
+> dos grupos de la v3 no sobrevive), **el balanceo sí tiene efecto** (Friedman p=0,039) y GCN casi no
+> aprende en modo C. GAT corre con heads=4 y 2 capas por el límite de VRAM de la RTX 4060 (ver
+> `runs_v4/DECISIONES.md`). Pendiente: el eje sintético v4 (THE-13, máquina de Alejandro) y la reunión
+> con Cristian (THE-19, agenda en `docs/AGENDA_CRISTIAN.md`) antes de reescribir el manuscrito.
+> **El `main.pdf`, el deck y el discurso todavía tienen las cifras v3 retractadas.**
 >
 > El eje Elliptic de la v3 se entrenó con las **etiquetas invertidas** (los 157.205 nodos sin
 > etiqueta como «lícitos»; los 42.019 lícitos reales fuera). Todas las cifras de Elliptic de este

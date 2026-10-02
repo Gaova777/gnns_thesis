@@ -1,0 +1,706 @@
+
+[2026-09-28 22:45:25] ── 0/4 preflight (sin exigir GPU si --cpu) (t=0s)
+PREFLIGHT v4 — /home/juan/Escritorio/gnn_thesis/gnns_thesis
+[1] Elliptic (data/raw)
+  OK     conteo directo global {'illicit': 4545, 'licit': 42019, 'unknown': 157205}
+  OK     conteo directo por partición {'train': {'illicit': 3462, 'licit': 26432}, 'val': {'illicit': 914, 'licit': 9069}, 'test': {'illicit': 169, 'licit': 6518}}
+  Train: 29,894 nodes (3,462 illicit, 26,432 licit, ratio 1:7.6)
+  Val  :  9,983 nodes (914 illicit, 9,069 licit, ratio 1:9.9)
+  Test :  6,687 nodes (169 illicit, 6,518 licit, ratio 1:38.6)
+  OK     loader del pipeline: etiquetas y particiones validadas {'train': {'illicit': 3462, 'licit': 26432}, 'val': {'illicit': 914, 'licit': 9069}, 'test': {'illicit': 169, 'licit': 6518}}
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  OK     modo de etiquetas licit_unknown: train {'illicit': 3462, 'licit': 132803} · test {'illicit': 169, 'licit': 29515}
+  Train: 29,894 nodes (3,462 illicit, 26,432 licit, ratio 1:7.6)
+  Val  :  9,983 nodes (914 illicit, 9,069 licit, ratio 1:9.9)
+  Test :  6,687 nodes (169 illicit, 6,518 licit, ratio 1:38.6)
+  OK     modo de etiquetas licit: train {'illicit': 3462, 'licit': 26432} · test {'illicit': 169, 'licit': 6518}
+  Train: 109,833 nodes (3,462 illicit, 106,371 licit, ratio 1:30.7)
+  Val  : 28,751 nodes (914 illicit, 27,837 licit, ratio 1:30.5)
+  Test : 23,166 nodes (169 illicit, 22,997 licit, ratio 1:136.1)
+  OK     modo de etiquetas unknown: train {'illicit': 3462, 'licit': 106371} · test {'illicit': 169, 'licit': 22997}
+[2] Config /home/juan/Escritorio/gnn_thesis/gnns_thesis/configs/experiment_v4.yaml
+  OK     4 arquitecturas: ['GAT', 'GCN', 'GraphSAGE', 'TAGCN']
+  OK     ninguna arquitectura sobrescribe el presupuesto común
+  OK     presupuesto común: trials=8 epochs=150 patience=20 seeds=[42, 43, 44]
+[3] Disco
+  OK     libre 210.2 GB (mínimo 20.0 GB)
+[4] GPU
+  OK     cuda:0 NVIDIA GeForce RTX 4060: libre 6.7 / 7.6 GB (mínimo 3.0 GB)
+[5] Directorios de salida
+  OK     ./results_v4 no existe todavía (se creará)
+  OK     ./results_models_v4 no existe todavía (se creará)
+  OK     ./runs_v4 sin resultados v3
+  OK     runs_smoke sin resultados v3
+  OK     results_smoke sin resultados v3
+  OK     results_models_smoke sin resultados v3
+
+PREFLIGHT OK
+
+[2026-09-28 22:45:30] ── 1/4 entrenar (native, class_weighting, seed 42, HP por defecto, 3 épocas) (t=5s)
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 1 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/1 [00:00<?]Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]Train matrix: 100%|██████████| 1/1 [00:01<00:00]Train matrix: 100%|██████████| 1/1 [00:01<00:00]
+
+======================================================================
+CONFIG: native_GCN_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: defaults (trials=0 / --quick)
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Val (argmax): F1=0.0372 MCC=-0.0737 PR-AUC=0.0174 | Test PR-AUC=0.0081
+  Calibrated on val (t=0.01): val F1=0.0470 | test F1=0.0112 MCC=-0.0171
+  Cross-label test PR-AUC: vs licit=0.0213 vs unknown=0.0102 vs all=0.0081 | unknown flagged=99.878%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_smoke/native_GCN_class_weighting_meta.json (1s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        1
+    - native_GCN_class_weighting
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_smoke
+  Progress log: runs_smoke/progress.jsonl
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 1 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/1 [00:00<?]Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]Train matrix: 100%|██████████| 1/1 [00:01<00:00]Train matrix: 100%|██████████| 1/1 [00:01<00:00]
+
+======================================================================
+CONFIG: native_GraphSAGE_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: defaults (trials=0 / --quick)
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Val (argmax): F1=0.0817 MCC=0.1204 PR-AUC=0.0843 | Test PR-AUC=0.0057
+  Calibrated on val (t=0.76): val F1=0.1614 | test F1=0.0018 MCC=-0.0172
+  Cross-label test PR-AUC: vs licit=0.0299 vs unknown=0.0070 vs all=0.0057 | unknown flagged=7.323%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_smoke/native_GraphSAGE_class_weighting_meta.json (1s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        1
+    - native_GraphSAGE_class_weighting
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_smoke
+  Progress log: runs_smoke/progress.jsonl
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 1 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/1 [00:00<?]Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]Train matrix: 100%|██████████| 1/1 [00:01<00:00]Train matrix: 100%|██████████| 1/1 [00:01<00:00]
+
+======================================================================
+CONFIG: native_GAT_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: defaults (trials=0 / --quick)
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Val (argmax): F1=0.0790 MCC=0.1208 PR-AUC=0.1108 | Test PR-AUC=0.0094
+  Calibrated on val (t=0.97): val F1=0.1926 | test F1=0.0179 MCC=0.0117
+  Cross-label test PR-AUC: vs licit=0.0447 vs unknown=0.0119 vs all=0.0094 | unknown flagged=3.135%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_smoke/native_GAT_class_weighting_meta.json (1s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        1
+    - native_GAT_class_weighting
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_smoke
+  Progress log: runs_smoke/progress.jsonl
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 1 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/1 [00:00<?]Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]                                            Train matrix:   0%|          | 0/1 [00:01<?]Train matrix: 100%|██████████| 1/1 [00:01<00:00]Train matrix: 100%|██████████| 1/1 [00:01<00:00]
+
+======================================================================
+CONFIG: native_TAGCN_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: defaults (trials=0 / --quick)
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Val (argmax): F1=0.0838 MCC=0.1038 PR-AUC=0.0469 | Test PR-AUC=0.0061
+  Calibrated on val (t=0.58): val F1=0.1045 | test F1=0.0091 MCC=-0.0078
+  Cross-label test PR-AUC: vs licit=0.0301 vs unknown=0.0076 vs all=0.0061 | unknown flagged=24.908%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_smoke/native_TAGCN_class_weighting_meta.json (1s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        1
+    - native_TAGCN_class_weighting
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_smoke
+  Progress log: runs_smoke/progress.jsonl
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 1 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/1 [00:00<?]Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]                                            Train matrix:   0%|          | 0/1 [00:00<?]Train matrix: 100%|██████████| 1/1 [00:01<00:00]Train matrix: 100%|██████████| 1/1 [00:01<00:00]
+
+======================================================================
+CONFIG: 1:10_os_GCN_class_weighting
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Hyperparams: defaults (trials=0 / --quick)
+  Class weights: [0.550000011920929, 5.5]
+  Val (argmax): F1=0.0372 MCC=-0.0742 PR-AUC=0.0174 | Test PR-AUC=0.0081
+  Calibrated on val (t=0.01): val F1=0.0470 | test F1=0.0112 MCC=-0.0171
+  Cross-label test PR-AUC: vs licit=0.0213 vs unknown=0.0102 vs all=0.0081 | unknown flagged=99.878%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_smoke/1-10_os_GCN_class_weighting_meta.json (1s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        1
+    - 1:10_os_GCN_class_weighting
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_smoke
+  Progress log: runs_smoke/progress.jsonl
+
+[2026-09-28 22:46:01] ── 2/4 explicar (3 explicadores, 3 nodos, 2 réplicas; --include-gated: 3 épocas no pasan la compuerta) (t=36s)
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 3 illicit val nodes (seed 1234, pool 914) -> results_smoke/explain_nodes_v4.json
+1 checkpoints | 3 units to explain (0 already complete) | 0 checkpoints gated out
+  native_GCN_class_weighting__GNNExplainer: primary=0.956 full=0.956 edges=0.000 jac=0.500 (n=3, tp=1) 1.5s
+  PGExplainer training complete (loss=0.3266)
+  PGExplainer training complete (loss=0.5824)
+  native_GCN_class_weighting__PGExplainer: primary=-1.000 full=nan edges=-1.000 jac=0.000 (n=2, tp=1) 32.6s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_GCN_class_weighting__ShapleyFeatures: primary=0.997 full=0.997 edges=nan jac=nan (n=3, tp=1) 1.0s
+
+Done: 3 ok, 0 failed, 0.6 min. CSV: results_smoke/elliptic_v4_stability.csv
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 3 illicit val nodes (seed 1234, pool 914) -> results_smoke/explain_nodes_v4.json
+1 checkpoints | 3 units to explain (0 already complete) | 0 checkpoints gated out
+  native_GraphSAGE_class_weighting__GNNExplainer: primary=0.963 full=0.963 edges=1.000 jac=1.000 (n=3, tp=3) 1.2s
+  PGExplainer training complete (loss=0.5095)
+  PGExplainer training complete (loss=0.5629)
+  native_GraphSAGE_class_weighting__PGExplainer: primary=-1.000 full=nan edges=-1.000 jac=0.000 (n=2, tp=3) 25.5s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_GraphSAGE_class_weighting__ShapleyFeatures: primary=0.998 full=0.998 edges=nan jac=nan (n=3, tp=3) 0.9s
+
+Done: 3 ok, 0 failed, 0.5 min. CSV: results_smoke/elliptic_v4_stability.csv
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 3 illicit val nodes (seed 1234, pool 914) -> results_smoke/explain_nodes_v4.json
+1 checkpoints | 3 units to explain (0 already complete) | 0 checkpoints gated out
+  native_GAT_class_weighting__GNNExplainer: primary=0.952 full=0.952 edges=1.000 jac=1.000 (n=3, tp=3) 1.9s
+  PGExplainer training complete (loss=0.6460)
+  PGExplainer training complete (loss=0.6603)
+  native_GAT_class_weighting__PGExplainer: primary=0.000 full=nan edges=0.000 jac=0.500 (n=2, tp=3) 40.3s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_GAT_class_weighting__ShapleyFeatures: primary=0.996 full=0.996 edges=nan jac=nan (n=3, tp=3) 1.0s
+
+Done: 3 ok, 0 failed, 0.8 min. CSV: results_smoke/elliptic_v4_stability.csv
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 3 illicit val nodes (seed 1234, pool 914) -> results_smoke/explain_nodes_v4.json
+1 checkpoints | 3 units to explain (0 already complete) | 0 checkpoints gated out
+  native_TAGCN_class_weighting__GNNExplainer: primary=0.943 full=0.943 edges=-0.500 jac=0.333 (n=3, tp=2) 1.8s
+  PGExplainer training complete (loss=0.3524)
+  PGExplainer training complete (loss=0.3495)
+  native_TAGCN_class_weighting__PGExplainer: primary=1.000 full=nan edges=1.000 jac=1.000 (n=2, tp=2) 39.4s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_TAGCN_class_weighting__ShapleyFeatures: primary=0.998 full=0.998 edges=nan jac=nan (n=3, tp=2) 1.0s
+
+Done: 3 ok, 0 failed, 0.8 min. CSV: results_smoke/elliptic_v4_stability.csv
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 3 illicit val nodes (seed 1234, pool 914) -> results_smoke/explain_nodes_v4.json
+1 checkpoints | 3 units to explain (0 already complete) | 0 checkpoints gated out
+  1:10_os_GCN_class_weighting__GNNExplainer: primary=0.956 full=0.956 edges=0.000 jac=0.500 (n=3, tp=1) 1.5s
+  PGExplainer training complete (loss=0.3264)
+  PGExplainer training complete (loss=0.5824)
+  1:10_os_GCN_class_weighting__PGExplainer: primary=-1.000 full=nan edges=-1.000 jac=0.000 (n=2, tp=1) 33.3s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_os_GCN_class_weighting__ShapleyFeatures: primary=0.997 full=0.997 edges=nan jac=nan (n=3, tp=1) 1.0s
+
+Done: 3 ok, 0 failed, 0.6 min. CSV: results_smoke/elliptic_v4_stability.csv
+
+[2026-09-28 22:49:32] ── 3/4 análisis --selftest + análisis real sobre el CSV de humo (no debe romper) (t=247s)
+Análisis v4 Elliptic — métrica: stability_primary; unidad: configuración (media de semillas); α=0.05; margen TOST ±0.05; soporte mínimo 5 configuraciones por arquitectura.
+Fuente: /tmp/v4_analysis_selftest_2nof7py6/elliptic_v4_stability.csv (432 filas 'ok'; 333 pasan la compuerta).
+
+==============================================================================
+PRINCIPAL: solo modelos que pasan la compuerta
+==============================================================================
+[GNNExplainer | gate] n configuraciones = 48
+  H1 escenario: Friedman χ²=1.00 p=0.8013 W=0.028 (bloques=12, k=4) 
+    1:10 vs native: Δ=-0.004 IC90 [-0.011, 0.002] TOST p=2.975e-08 → equivalente
+    1:10_os vs native: Δ=-0.002 IC90 [-0.007, 0.003] TOST p=7.194e-10 → equivalente
+    1:1 vs native: Δ=0.001 IC90 [-0.006, 0.009] TOST p=7.941e-08 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GCN=12, GraphSAGE=12, GAT=12, TAGCN=12
+    Friedman χ²=32.50 p=4.106e-07 W=0.903 (bloques=12) ; Kruskal H=41.17 p=6.008e-09
+    GCN vs GraphSAGE: Δ=0.051 Wilcoxon p_holm=0.0029 TOST p=0.6453 (n=12)
+    GCN vs GAT: Δ=0.008 Wilcoxon p_holm=0.0640 TOST p=1.282e-08 (n=12)
+    GCN vs TAGCN: Δ=0.117 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    GraphSAGE vs GAT: Δ=-0.043 Wilcoxon p_holm=0.0029 TOST p=0.0828 (n=12)
+    GraphSAGE vs TAGCN: Δ=0.066 Wilcoxon p_holm=0.0029 TOST p=0.9996 (n=12)
+    GAT vs TAGCN: Δ=0.109 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    OLS intercepto: β=0.771 (SE 0.007, p=0.0000)
+    OLS arch[GraphSAGE] (ref GCN): β=-0.051 (SE 0.004, p=0.0000)
+    OLS arch[GAT] (ref GCN): β=-0.008 (SE 0.004, p=0.0370)
+    OLS arch[TAGCN] (ref GCN): β=-0.117 (SE 0.004, p=0.0000)
+    OLS val_pr_auc: β=0.008 (SE 0.018, p=0.6546)
+    OLS n=48 R²=0.965
+  ⇒ H2: efecto significativo
+  H3 balanceo (sin 1:1): Friedman χ²=2.17 p=0.3385 W=0.090 (bloques=12) 
+    none vs class_weighting: Δ=-0.004 p_holm=0.4541 TOST p=5.355e-10
+    none vs focal_loss: Δ=-0.005 p_holm=0.5322 TOST p=9.967e-09
+    class_weighting vs focal_loss: Δ=-0.000839 p_holm=0.7910 TOST p=1.608e-08
+  ⇒ H3: equivalencia (TOST)
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.158 IC95 boot [-0.426, 0.180] p=0.2826 (n=48)
+
+[PGExplainer | gate] n configuraciones = 48
+  H1 escenario: Friedman χ²=1.10 p=0.7771 W=0.031 (bloques=12, k=4) 
+    1:10 vs native: Δ=-0.004 IC90 [-0.012, 0.004] TOST p=3.807e-07 → equivalente
+    1:10_os vs native: Δ=-0.005 IC90 [-0.011, 0.001] TOST p=2.742e-08 → equivalente
+    1:1 vs native: Δ=-0.008 IC90 [-0.020, 0.003] TOST p=1.73e-05 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GCN=12, GraphSAGE=12, GAT=12, TAGCN=12
+    Friedman χ²=32.50 p=4.106e-07 W=0.903 (bloques=12) ; Kruskal H=40.23 p=9.522e-09
+    GCN vs GraphSAGE: Δ=0.042 Wilcoxon p_holm=0.0029 TOST p=0.0160 (n=12)
+    GCN vs GAT: Δ=-0.009 Wilcoxon p_holm=0.1294 TOST p=5.104e-07 (n=12)
+    GCN vs TAGCN: Δ=0.101 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    GraphSAGE vs GAT: Δ=-0.051 Wilcoxon p_holm=0.0029 TOST p=0.5537 (n=12)
+    GraphSAGE vs TAGCN: Δ=0.060 Wilcoxon p_holm=0.0029 TOST p=0.9554 (n=12)
+    GAT vs TAGCN: Δ=0.110 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    OLS intercepto: β=0.584 (SE 0.010, p=0.0000)
+    OLS arch[GraphSAGE] (ref GCN): β=-0.042 (SE 0.005, p=2.043e-10)
+    OLS arch[GAT] (ref GCN): β=0.009 (SE 0.005, p=0.0975)
+    OLS arch[TAGCN] (ref GCN): β=-0.102 (SE 0.005, p=0.0000)
+    OLS val_pr_auc: β=0.017 (SE 0.024, p=0.4857)
+    OLS n=48 R²=0.933
+  ⇒ H2: efecto significativo
+  H3 balanceo (sin 1:1): Friedman χ²=2.17 p=0.3385 W=0.090 (bloques=12) 
+    none vs class_weighting: Δ=0.008 p_holm=0.3882 TOST p=1.084e-07
+    none vs focal_loss: Δ=0.005 p_holm=0.6221 TOST p=6.718e-06
+    class_weighting vs focal_loss: Δ=-0.003 p_holm=0.5322 TOST p=6.557e-09
+  ⇒ H3: equivalencia (TOST)
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.097 IC95 boot [-0.344, 0.218] p=0.5103 (n=48)
+
+[ShapleyFeatures | gate] n configuraciones = 48
+  H1 escenario: Friedman χ²=5.90 p=0.1166 W=0.164 (bloques=12, k=4) 
+    1:10 vs native: Δ=-0.002 IC90 [-0.009, 0.005] TOST p=3.929e-08 → equivalente
+    1:10_os vs native: Δ=0.003 IC90 [-0.005, 0.011] TOST p=2.585e-07 → equivalente
+    1:1 vs native: Δ=-0.006 IC90 [-0.012, 0.000468] TOST p=2.117e-08 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GCN=12, GraphSAGE=12, GAT=12, TAGCN=12
+    Friedman χ²=32.80 p=3.549e-07 W=0.911 (bloques=12) ; Kruskal H=40.66 p=7.734e-09
+    GCN vs GraphSAGE: Δ=0.055 Wilcoxon p_holm=0.0029 TOST p=0.8716 (n=12)
+    GCN vs GAT: Δ=0.009 Wilcoxon p_holm=0.1099 TOST p=2.442e-06 (n=12)
+    GCN vs TAGCN: Δ=0.114 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    GraphSAGE vs GAT: Δ=-0.046 Wilcoxon p_holm=0.0029 TOST p=0.1999 (n=12)
+    GraphSAGE vs TAGCN: Δ=0.059 Wilcoxon p_holm=0.0029 TOST p=0.9760 (n=12)
+    GAT vs TAGCN: Δ=0.105 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    OLS intercepto: β=0.938 (SE 0.008, p=0.0000)
+    OLS arch[GraphSAGE] (ref GCN): β=-0.055 (SE 0.004, p=2.22e-16)
+    OLS arch[GAT] (ref GCN): β=-0.009 (SE 0.004, p=0.0308)
+    OLS arch[TAGCN] (ref GCN): β=-0.117 (SE 0.004, p=0.0000)
+    OLS val_pr_auc: β=0.044 (SE 0.020, p=0.0361)
+    OLS n=48 R²=0.955
+  ⇒ H2: efecto significativo
+  H3 balanceo (sin 1:1): Friedman χ²=1.17 p=0.5580 W=0.049 (bloques=12) 
+    none vs class_weighting: Δ=0.003 p_holm=0.6787 TOST p=1.091e-07
+    none vs focal_loss: Δ=-0.005 p_holm=0.6787 TOST p=1.033e-06
+    class_weighting vs focal_loss: Δ=-0.008 p_holm=0.6108 TOST p=7.765e-07
+  ⇒ H3: equivalencia (TOST)
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.066 IC95 boot [-0.297, 0.208] p=0.6569 (n=48)
+
+==============================================================================
+SENSIBILIDAD: sin filtro de compuerta
+==============================================================================
+[GNNExplainer | sin_filtro] n configuraciones = 48
+  H1 escenario: Friedman χ²=1.70 p=0.6369 W=0.047 (bloques=12, k=4) 
+    1:10 vs native: Δ=-0.002 IC90 [-0.008, 0.004] TOST p=8.11e-09 → equivalente
+    1:10_os vs native: Δ=0.001 IC90 [-0.003, 0.006] TOST p=3.55e-10 → equivalente
+    1:1 vs native: Δ=-0.001 IC90 [-0.007, 0.005] TOST p=9.867e-09 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GCN=12, GraphSAGE=12, GAT=12, TAGCN=12
+    Friedman χ²=32.80 p=3.549e-07 W=0.911 (bloques=12) ; Kruskal H=40.29 p=9.233e-09
+    GCN vs GraphSAGE: Δ=0.052 Wilcoxon p_holm=0.0029 TOST p=0.6572 (n=12)
+    GCN vs GAT: Δ=0.006 Wilcoxon p_holm=0.2661 TOST p=1.05e-08 (n=12)
+    GCN vs TAGCN: Δ=0.115 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    GraphSAGE vs GAT: Δ=-0.046 Wilcoxon p_holm=0.0029 TOST p=0.1457 (n=12)
+    GraphSAGE vs TAGCN: Δ=0.063 Wilcoxon p_holm=0.0029 TOST p=0.9998 (n=12)
+    GAT vs TAGCN: Δ=0.109 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    OLS intercepto: β=0.769 (SE 0.008, p=0.0000)
+    OLS arch[GraphSAGE] (ref GCN): β=-0.051 (SE 0.003, p=0.0000)
+    OLS arch[GAT] (ref GCN): β=-0.006 (SE 0.003, p=0.1088)
+    OLS arch[TAGCN] (ref GCN): β=-0.115 (SE 0.003, p=0.0000)
+    OLS val_pr_auc: β=0.008 (SE 0.020, p=0.6827)
+    OLS n=48 R²=0.971
+  ⇒ H2: efecto significativo
+  H3 balanceo (sin 1:1): Friedman χ²=4.17 p=0.1245 W=0.174 (bloques=12) 
+    none vs class_weighting: Δ=-0.005 p_holm=0.3296 TOST p=2.787e-08
+    none vs focal_loss: Δ=-0.003 p_holm=0.5322 TOST p=3.27e-10
+    class_weighting vs focal_loss: Δ=0.002 p_holm=0.5322 TOST p=4.849e-08
+  ⇒ H3: equivalencia (TOST)
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.109 IC95 boot [-0.188, 0.425] p=0.4618 (n=48)
+
+[PGExplainer | sin_filtro] n configuraciones = 48
+  H1 escenario: Friedman χ²=2.30 p=0.5125 W=0.064 (bloques=12, k=4) 
+    1:10 vs native: Δ=-0.005 IC90 [-0.011, 0.001] TOST p=3.347e-08 → equivalente
+    1:10_os vs native: Δ=-0.004 IC90 [-0.012, 0.003] TOST p=1.855e-07 → equivalente
+    1:1 vs native: Δ=-0.002 IC90 [-0.010, 0.006] TOST p=2.585e-07 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GCN=12, GraphSAGE=12, GAT=12, TAGCN=12
+    Friedman χ²=32.50 p=4.106e-07 W=0.903 (bloques=12) ; Kruskal H=40.12 p=1.003e-08
+    GCN vs GraphSAGE: Δ=0.046 Wilcoxon p_holm=0.0029 TOST p=0.0717 (n=12)
+    GCN vs GAT: Δ=-0.006 Wilcoxon p_holm=0.3804 TOST p=3.55e-07 (n=12)
+    GCN vs TAGCN: Δ=0.109 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    GraphSAGE vs GAT: Δ=-0.052 Wilcoxon p_holm=0.0029 TOST p=0.6214 (n=12)
+    GraphSAGE vs TAGCN: Δ=0.063 Wilcoxon p_holm=0.0029 TOST p=0.9994 (n=12)
+    GAT vs TAGCN: Δ=0.115 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    OLS intercepto: β=0.594 (SE 0.009, p=0.0000)
+    OLS arch[GraphSAGE] (ref GCN): β=-0.046 (SE 0.004, p=4.441e-16)
+    OLS arch[GAT] (ref GCN): β=0.006 (SE 0.004, p=0.1254)
+    OLS arch[TAGCN] (ref GCN): β=-0.109 (SE 0.004, p=0.0000)
+    OLS val_pr_auc: β=0.004 (SE 0.021, p=0.8672)
+    OLS n=48 R²=0.968
+  ⇒ H2: efecto significativo
+  H3 balanceo (sin 1:1): Friedman χ²=3.17 p=0.2053 W=0.132 (bloques=12) 
+    none vs class_weighting: Δ=0.006 p_holm=0.7002 TOST p=2.62e-07
+    none vs focal_loss: Δ=0.003 p_holm=0.7910 TOST p=5.254e-07
+    class_weighting vs focal_loss: Δ=-0.003 p_holm=0.7002 TOST p=2.506e-09
+  ⇒ H3: equivalencia (TOST)
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.017 IC95 boot [-0.245, 0.337] p=0.9067 (n=48)
+
+[ShapleyFeatures | sin_filtro] n configuraciones = 48
+  H1 escenario: Friedman χ²=2.60 p=0.4575 W=0.072 (bloques=12, k=4) 
+    1:10 vs native: Δ=-0.002 IC90 [-0.009, 0.006] TOST p=5.92e-08 → equivalente
+    1:10_os vs native: Δ=0.001 IC90 [-0.005, 0.008] TOST p=1.721e-08 → equivalente
+    1:1 vs native: Δ=-0.003 IC90 [-0.008, 0.001] TOST p=1.147e-09 → equivalente
+  ⇒ H1: equivalencia (TOST)
+  H2 arquitectura: soporte GCN=12, GraphSAGE=12, GAT=12, TAGCN=12
+    Friedman χ²=32.50 p=4.106e-07 W=0.903 (bloques=12) ; Kruskal H=40.29 p=9.233e-09
+    GCN vs GraphSAGE: Δ=0.055 Wilcoxon p_holm=0.0029 TOST p=0.8982 (n=12)
+    GCN vs GAT: Δ=0.007 Wilcoxon p_holm=0.1763 TOST p=3.278e-07 (n=12)
+    GCN vs TAGCN: Δ=0.115 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    GraphSAGE vs GAT: Δ=-0.048 Wilcoxon p_holm=0.0029 TOST p=0.3386 (n=12)
+    GraphSAGE vs TAGCN: Δ=0.060 Wilcoxon p_holm=0.0029 TOST p=0.9959 (n=12)
+    GAT vs TAGCN: Δ=0.109 Wilcoxon p_holm=0.0029 TOST p=1.0000 (n=12)
+    OLS intercepto: β=0.930 (SE 0.008, p=0.0000)
+    OLS arch[GraphSAGE] (ref GCN): β=-0.054 (SE 0.003, p=0.0000)
+    OLS arch[GAT] (ref GCN): β=-0.006 (SE 0.003, p=0.0650)
+    OLS arch[TAGCN] (ref GCN): β=-0.116 (SE 0.003, p=0.0000)
+    OLS val_pr_auc: β=0.060 (SE 0.020, p=0.0035)
+    OLS n=48 R²=0.972
+  ⇒ H2: efecto significativo
+  H3 balanceo (sin 1:1): Friedman χ²=3.50 p=0.1738 W=0.146 (bloques=12) 
+    none vs class_weighting: Δ=0.000241 p_holm=0.8501 TOST p=1.352e-07
+    none vs focal_loss: Δ=-0.007 p_holm=0.3525 TOST p=3.987e-07
+    class_weighting vs focal_loss: Δ=-0.007 p_holm=0.2769 TOST p=6.555e-08
+  ⇒ H3: equivalencia (TOST)
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.197 IC95 boot [-0.087, 0.466] p=0.1785 (n=48)
+
+==============================================================================
+RENDIMIENTO en 'native' (todos los modelos; F1 = clase ilícita; test con umbral calibrado en validación)
+  GCN        PR-AUC val 0.415 test 0.207 | F1 val 0.373 test 0.166 (n=9)
+  GraphSAGE  PR-AUC val 0.400 test 0.200 | F1 val 0.360 test 0.160 (n=9)
+  GAT        PR-AUC val 0.410 test 0.205 | F1 val 0.369 test 0.164 (n=9)
+  TAGCN      PR-AUC val 0.467 test 0.234 | F1 val 0.421 test 0.187 (n=9)
+  Referencia Weber et al. (2019): F1 ilícito en test, GCN 0,628 y Random Forest 0,788 (todas las variables); comparar con cautela: otro split temporal y umbral.
+
+RAMAS (análisis principal):
+  GNNExplainer     H1: equivalencia (TOST) | H2: efecto significativo | H3: equivalencia (TOST)
+  PGExplainer      H1: equivalencia (TOST) | H2: efecto significativo | H3: equivalencia (TOST)
+  ShapleyFeatures  H1: equivalencia (TOST) | H2: efecto significativo | H3: equivalencia (TOST)
+
+SELFTEST OK (/tmp/v4_analysis_selftest_2nof7py6)
+Análisis v4 Elliptic — métrica: stability_primary; unidad: configuración (media de semillas); α=0.05; margen TOST ±0.05; soporte mínimo 5 configuraciones por arquitectura.
+Fuente: results_smoke/elliptic_v4_stability.csv (15 filas 'ok'; 0 pasan la compuerta).
+
+==============================================================================
+PRINCIPAL: solo modelos que pasan la compuerta
+==============================================================================
+[GNNExplainer | gate] n configuraciones = 0
+  sin datos
+[PGExplainer | gate] n configuraciones = 0
+  sin datos
+[ShapleyFeatures | gate] n configuraciones = 0
+  sin datos
+==============================================================================
+SENSIBILIDAD: sin filtro de compuerta
+==============================================================================
+[GNNExplainer | sin_filtro] n configuraciones = 5
+  H1 escenario: Friedman χ²=n/d p=n/d W=n/d (bloques=1, k=2) no aplicable (k=2, bloques completos=1)
+    1:10_os vs native: Δ=n/d IC90 [n/d, n/d] TOST p=n/d → no equivalente
+  ⇒ H1: no se detectó con esta potencia
+  H2 arquitectura: soporte GCN=2 (sin soporte), GraphSAGE=1 (sin soporte), GAT=1 (sin soporte), TAGCN=1 (sin soporte)
+    Friedman χ²=n/d p=n/d W=n/d (bloques=0) no aplicable (k=0, bloques completos=0); Kruskal no aplicable
+  ⇒ H2: no se detectó con esta potencia
+  H3 balanceo (sin 1:1): Friedman χ²=n/d p=n/d W=n/d (bloques=5) no aplicable (k=1, bloques completos=5)
+  ⇒ H3: no se detectó con esta potencia
+  Control: Spearman(estabilidad, val PR-AUC) ρ=-0.200 IC95 boot [-1.000, 1.000] p=0.7471 (n=5)
+
+[PGExplainer | sin_filtro] n configuraciones = 5
+  H1 escenario: Friedman χ²=n/d p=n/d W=n/d (bloques=1, k=2) no aplicable (k=2, bloques completos=1)
+    1:10_os vs native: Δ=n/d IC90 [n/d, n/d] TOST p=n/d → no equivalente
+  ⇒ H1: no se detectó con esta potencia
+  H2 arquitectura: soporte GCN=2 (sin soporte), GraphSAGE=1 (sin soporte), GAT=1 (sin soporte), TAGCN=1 (sin soporte)
+    Friedman χ²=n/d p=n/d W=n/d (bloques=0) no aplicable (k=0, bloques completos=0); Kruskal no aplicable
+  ⇒ H2: no se detectó con esta potencia
+  H3 balanceo (sin 1:1): Friedman χ²=n/d p=n/d W=n/d (bloques=5) no aplicable (k=1, bloques completos=5)
+  ⇒ H3: no se detectó con esta potencia
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.447 IC95 boot [-0.875, 1.000] p=0.4502 (n=5)
+
+[ShapleyFeatures | sin_filtro] n configuraciones = 5
+  H1 escenario: Friedman χ²=n/d p=n/d W=n/d (bloques=1, k=2) no aplicable (k=2, bloques completos=1)
+    1:10_os vs native: Δ=n/d IC90 [n/d, n/d] TOST p=n/d → no equivalente
+  ⇒ H1: no se detectó con esta potencia
+  H2 arquitectura: soporte GCN=2 (sin soporte), GraphSAGE=1 (sin soporte), GAT=1 (sin soporte), TAGCN=1 (sin soporte)
+    Friedman χ²=n/d p=n/d W=n/d (bloques=0) no aplicable (k=0, bloques completos=0); Kruskal no aplicable
+  ⇒ H2: no se detectó con esta potencia
+  H3 balanceo (sin 1:1): Friedman χ²=n/d p=n/d W=n/d (bloques=5) no aplicable (k=1, bloques completos=5)
+  ⇒ H3: no se detectó con esta potencia
+  Control: Spearman(estabilidad, val PR-AUC) ρ=0.000 IC95 boot [-1.000, 1.000] p=1.0000 (n=5)
+
+==============================================================================
+RENDIMIENTO en 'native' (todos los modelos; F1 = clase ilícita; test con umbral calibrado en validación)
+  GCN        PR-AUC val 0.017 test 0.008 | F1 val 0.037 test 0.011 (n=1)
+  GraphSAGE  PR-AUC val 0.084 test 0.006 | F1 val 0.082 test 0.002 (n=1)
+  GAT        PR-AUC val 0.111 test 0.009 | F1 val 0.079 test 0.018 (n=1)
+  TAGCN      PR-AUC val 0.047 test 0.006 | F1 val 0.084 test 0.009 (n=1)
+  Referencia Weber et al. (2019): F1 ilícito en test, GCN 0,628 y Random Forest 0,788 (todas las variables); comparar con cautela: otro split temporal y umbral.
+
+RAMAS (análisis principal):
+  GNNExplainer     H1: n/d | H2: n/d | H3: n/d
+  PGExplainer      H1: n/d | H2: n/d | H3: n/d
+  ShapleyFeatures  H1: n/d | H2: n/d | H3: n/d
+
+[2026-09-28 22:49:35] ── 4/4 monitor --once (umbrales de PR-AUC/compuerta relajados: 3 épocas no aprenden) (t=250s)
+== monitor v4 · 2026-09-29T03:49:35+00:00 · runs_smoke · 50 eventos ==
+[train] 1/1 (100%) · ok=1 skip=0 err=0 · 1 s/unidad · ETA 0.0 h · TERMINADA
+        acumulado: 5 terminadas, 0 errores
+        compuerta: 0/5 · mediana val_pr_auc 0.0469
+[explain] 3/3 (100%) · ok=3 skip=0 err=0 · 12 s/unidad · ETA 0.0 h · TERMINADA
+        acumulado: 15 terminadas, 0 errores
+        no_aplica: GNNExplainer 0/5, PGExplainer 0/5, ShapleyFeatures 0/5
+  latido explain: hace 0.1 min · 1:10_os_GCN_class_weighting__ShapleyFeatures end
+  latido train: hace 3.6 min · 1:10_os_GCN_class_weighting end
+-- señales de alerta --
+  ninguna
+modelos=5 (esperado 5) · filas explain=15 ok=15 (esperado 15)
+
+[2026-09-28 22:49:35] humo terminado en 250 s · monitor rc=0 · estructura rc=0 · log: runs_smoke/smoke.log
+HUMO OK

@@ -1,0 +1,220 @@
+{
+  "run_id": "native_GraphSAGE_class_weighting",
+  "pipeline_version": "v4",
+  "scenario": "native",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.026068688207344714,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "native",
+    "kind": "native",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 3462,
+    "n_synthetic_illicit": 0,
+    "n_licit": 132803,
+    "negative_origin": {
+      "licit": 26432,
+      "unknown": 106371
+    },
+    "total": 136265,
+    "ratio": 0.026068688207344714,
+    "ratio_str": "1:38.4",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "a8f788619e531bdea36646909aaaeea45e1918cb",
+    "val_test_subsampled": false,
+    "smote": null
+  },
+  "n_train_illicit": 3462,
+  "n_train_licit": 132803,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.8333333333333333,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.8234116732338163,
+        "f1": 0.7117726657645467,
+        "mcc": 0.7136360450361926,
+        "recall": 0.5754923413566739,
+        "precision": 0.9326241134751773
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.49569860765044593,
+        "f1": 0.5244267198404786,
+        "mcc": 0.5095334280659353,
+        "recall": 0.5754923413566739,
+        "precision": 0.4816849816849817
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.48450123747254764,
+        "f1": 0.5146771037181996,
+        "mcc": 0.5043343371299436,
+        "recall": 0.5754923413566739,
+        "precision": 0.4654867256637168
+      },
+      "flag_rate": {
+        "illicit": 0.5754923224449158,
+        "licit": 0.004190098028630018,
+        "unknown": 0.02033265121281147
+      },
+      "mean_prob": {
+        "illicit": 0.707456111907959,
+        "licit": 0.053143005818128586,
+        "unknown": 0.0918337032198906
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.04920401448656714,
+        "f1": 0.023622047244094488,
+        "mcc": 0.007244730380090898,
+        "recall": 0.01775147928994083,
+        "precision": 0.03529411764705882
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.012843278622712357,
+        "f1": 0.020066889632107024,
+        "mcc": 0.013931419935153963,
+        "recall": 0.01775147928994083,
+        "precision": 0.023076923076923078
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.010245930987894074,
+        "f1": 0.015748031496062992,
+        "mcc": 0.009533887646845948,
+        "recall": 0.01775147928994083,
+        "precision": 0.014150943396226415
+      },
+      "flag_rate": {
+        "illicit": 0.017751479521393776,
+        "licit": 0.01258054655045271,
+        "unknown": 0.005522459279745817
+      },
+      "mean_prob": {
+        "illicit": 0.1083279475569725,
+        "licit": 0.0565713495016098,
+        "unknown": 0.05957481265068054
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GraphSAGE",
+  "balancing": "class_weighting",
+  "seed": 42,
+  "best_params": {
+    "hidden_dim": 64,
+    "num_layers": 2,
+    "dropout": 0.4879639408647978,
+    "lr": 0.004622589001020831,
+    "weight_decay": 2.6587543983272695e-05
+  },
+  "optuna_best_score": 0.4446771846241492,
+  "optuna_metric": "pr_auc",
+  "hp_source": "optuna",
+  "early_stop_metric": "f1",
+  "best_epoch": 145,
+  "epochs_run": 150,
+  "best_val_score": 0.39498249708284716,
+  "best_val_mcc": 0.4259372971048503,
+  "val_metrics": {
+    "loss": 0.48699623346328735,
+    "f1": 0.39498249708284716,
+    "mcc": 0.4259372971048503,
+    "pr_auc": 0.48450123747254775
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.48699623346328735,
+    "f1": 0.5146771037181996,
+    "mcc": 0.5043343371299436,
+    "pr_auc": 0.48450123747254764
+  },
+  "test_metrics": {
+    "loss": 0.7129996418952942,
+    "f1": 0.015748031496062992,
+    "mcc": 0.009533887646845948,
+    "pr_auc": 0.010245930987894074
+  },
+  "test_metrics_argmax": {
+    "loss": 0.7129996418952942,
+    "f1": 0.01364522417153996,
+    "mcc": 0.005671205012145014,
+    "pr_auc": 0.010245930987894074
+  },
+  "calibrated_threshold": 0.8333333333333333,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.5146771037181996,
+  "calibration_resample": null,
+  "quality_passed": true,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.39498249708284716,
+  "val_mcc_best_epoch": 0.4259372971048503,
+  "mlflow_run_id": "d13fafba6f3048889e127e3689ee60cd",
+  "checkpoint": "native_GraphSAGE_class_weighting_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 56.2,
+  "finished_at": "2026-09-28T22:54:07"
+}

@@ -1,0 +1,221 @@
+{
+  "run_id": "native_TAGCN_focal_loss_s43",
+  "pipeline_version": "v4",
+  "scenario": "native",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.026068688207344714,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "native",
+    "kind": "native",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 3462,
+    "n_synthetic_illicit": 0,
+    "n_licit": 132803,
+    "negative_origin": {
+      "licit": 26432,
+      "unknown": 106371
+    },
+    "total": 136265,
+    "ratio": 0.026068688207344714,
+    "ratio_str": "1:38.4",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "a8f788619e531bdea36646909aaaeea45e1918cb",
+    "val_test_subsampled": false,
+    "smote": null
+  },
+  "n_train_illicit": 3462,
+  "n_train_licit": 132803,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.4803921568627451,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.6151219955625372,
+        "f1": 0.592032967032967,
+        "mcc": 0.5845934524738723,
+        "recall": 0.47155361050328226,
+        "precision": 0.7952029520295203
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.1967420751224577,
+        "f1": 0.3312836279784781,
+        "mcc": 0.31821830783738847,
+        "recall": 0.47155361050328226,
+        "precision": 0.2553317535545024
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.18463356269669276,
+        "f1": 0.31772945079248066,
+        "mcc": 0.3134760575106117,
+        "recall": 0.47155361050328226,
+        "precision": 0.23957754307948861
+      },
+      "flag_rate": {
+        "illicit": 0.47155362367630005,
+        "licit": 0.012239497154951096,
+        "unknown": 0.04515572637319565
+      },
+      "mean_prob": {
+        "illicit": 0.435673326253891,
+        "licit": 0.24423745274543762,
+        "unknown": 0.2936882972717285
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.03335201338080141,
+        "f1": 0.008064516129032258,
+        "mcc": -0.008787915963501808,
+        "recall": 0.005917159763313609,
+        "precision": 0.012658227848101266
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.006482859068741666,
+        "f1": 0.001869158878504673,
+        "mcc": -0.014621221085190577,
+        "recall": 0.005917159763313609,
+        "precision": 0.0011098779134295228
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.005428868364877475,
+        "f1": 0.0017421602787456446,
+        "mcc": -0.011467251935269112,
+        "recall": 0.005917159763313609,
+        "precision": 0.0010214504596527069
+      },
+      "flag_rate": {
+        "illicit": 0.005917159840464592,
+        "licit": 0.011966860853135586,
+        "unknown": 0.039135538041591644
+      },
+      "mean_prob": {
+        "illicit": 0.33625200390815735,
+        "licit": 0.27061930298805237,
+        "unknown": 0.31280961632728577
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "TAGCN",
+  "balancing": "focal_loss",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 128,
+    "num_layers": 3,
+    "dropout": 0.20351199264000677,
+    "lr": 0.0021137059440645744,
+    "weight_decay": 4.201672054372529e-05,
+    "K": 3
+  },
+  "optuna_best_score": 0.348739954113126,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 15,
+  "epochs_run": 35,
+  "best_val_score": 0.2831293241085684,
+  "best_val_mcc": 0.2649840950756849,
+  "val_metrics": {
+    "loss": 0.0198927391320467,
+    "f1": 0.2831293241085684,
+    "mcc": 0.2649840950756849,
+    "pr_auc": 0.18463356269669282
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.0198927391320467,
+    "f1": 0.31772945079248066,
+    "mcc": 0.3134760575106117,
+    "pr_auc": 0.18463356269669282
+  },
+  "test_metrics": {
+    "loss": 0.015938302502036095,
+    "f1": 0.0017421602787456446,
+    "mcc": -0.011467251935269112,
+    "pr_auc": 0.005428868364877475
+  },
+  "test_metrics_argmax": {
+    "loss": 0.015938302502036095,
+    "f1": 0.0,
+    "mcc": -0.00927103895293424,
+    "pr_auc": 0.005428868364877475
+  },
+  "calibrated_threshold": 0.4803921568627451,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.31772945079248066,
+  "calibration_resample": null,
+  "quality_passed": false,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.2831293241085684,
+  "val_mcc_best_epoch": 0.2649840950756849,
+  "mlflow_run_id": "f5462986ded64664b98172c85bc61854",
+  "checkpoint": "native_TAGCN_focal_loss_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 9.7,
+  "finished_at": "2026-09-29T21:28:01"
+}

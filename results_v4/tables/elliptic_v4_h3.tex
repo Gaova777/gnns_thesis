@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering\small
+\caption{H3: contrastes sobre configuraciones (modelos que pasan la compuerta)}
+\label{tab:v4-h3}
+\begin{tabular}{llrrrrrr}
+\toprule
+Explicador & Contraste & Estad. & p & p Holm & Δ & p TOST & n \\
+\midrule
+GNNExplainer & balanceos sin 1:1 (bloques escenario×arch) & 6,000 & 0,050 & n/d & n/d & n/d & 4 \\
+GNNExplainer & none vs class\_weighting & 0,000 & 0,125 & 0,250 & -0,032 & 0,067 & 4 \\
+GNNExplainer & none vs focal\_loss & 5,000 & 0,312 & 0,312 & 0,018 & 0,024 & 6 \\
+GNNExplainer & class\_weighting vs focal\_loss & 0,000 & 0,031 & 0,094 & 0,051 & 0,536 & 6 \\
+PGExplainer & balanceos sin 1:1 (bloques escenario×arch) & 6,000 & 0,050 & n/d & n/d & n/d & 4 \\
+PGExplainer & none vs class\_weighting & 0,000 & 0,125 & 0,250 & 0,562 & 0,998 & 4 \\
+PGExplainer & none vs focal\_loss & 1,000 & 0,062 & 0,188 & 0,337 & 0,967 & 6 \\
+PGExplainer & class\_weighting vs focal\_loss & 3,000 & 0,156 & 0,250 & -0,159 & 0,911 & 6 \\
+ShapleyFeatures & balanceos sin 1:1 (bloques escenario×arch) & 6,500 & 0,039 & n/d & n/d & n/d & 4 \\
+ShapleyFeatures & none vs class\_weighting & 0,000 & 0,125 & 0,250 & 0,008 & 0,000168 & 4 \\
+ShapleyFeatures & none vs focal\_loss & 10,000 & 1,000 & 1,000 & 0,000511 & 4,48e-07 & 6 \\
+ShapleyFeatures & class\_weighting vs focal\_loss & 0,000 & 0,031 & 0,094 & -0,006 & 3,26e-07 & 6 \\
+\bottomrule
+\end{tabular}
+\end{table}

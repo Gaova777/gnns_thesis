@@ -1,0 +1,1181 @@
+[2026-09-28 23:57:34] run_all_v4 · stages=all · config=configs/experiment_v4.yaml · device=cuda · resume=1 · only=P1 · from=P0 · escenarios=native 1:10 1:1 1:10_os
+PREFLIGHT v4 — /home/juan/Escritorio/gnn_thesis/gnns_thesis
+[1] Elliptic (data/raw)
+  OK     conteo directo global {'illicit': 4545, 'licit': 42019, 'unknown': 157205}
+  OK     conteo directo por partición {'train': {'illicit': 3462, 'licit': 26432}, 'val': {'illicit': 914, 'licit': 9069}, 'test': {'illicit': 169, 'licit': 6518}}
+  Train: 29,894 nodes (3,462 illicit, 26,432 licit, ratio 1:7.6)
+  Val  :  9,983 nodes (914 illicit, 9,069 licit, ratio 1:9.9)
+  Test :  6,687 nodes (169 illicit, 6,518 licit, ratio 1:38.6)
+  OK     loader del pipeline: etiquetas y particiones validadas {'train': {'illicit': 3462, 'licit': 26432}, 'val': {'illicit': 914, 'licit': 9069}, 'test': {'illicit': 169, 'licit': 6518}}
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  OK     modo de etiquetas licit_unknown: train {'illicit': 3462, 'licit': 132803} · test {'illicit': 169, 'licit': 29515}
+  Train: 29,894 nodes (3,462 illicit, 26,432 licit, ratio 1:7.6)
+  Val  :  9,983 nodes (914 illicit, 9,069 licit, ratio 1:9.9)
+  Test :  6,687 nodes (169 illicit, 6,518 licit, ratio 1:38.6)
+  OK     modo de etiquetas licit: train {'illicit': 3462, 'licit': 26432} · test {'illicit': 169, 'licit': 6518}
+  Train: 109,833 nodes (3,462 illicit, 106,371 licit, ratio 1:30.7)
+  Val  : 28,751 nodes (914 illicit, 27,837 licit, ratio 1:30.5)
+  Test : 23,166 nodes (169 illicit, 22,997 licit, ratio 1:136.1)
+  OK     modo de etiquetas unknown: train {'illicit': 3462, 'licit': 106371} · test {'illicit': 169, 'licit': 22997}
+[2] Config /home/juan/Escritorio/gnn_thesis/gnns_thesis/configs/experiment_v4.yaml
+  OK     4 arquitecturas: ['GAT', 'GCN', 'GraphSAGE', 'TAGCN']
+  OK     ninguna arquitectura sobrescribe el presupuesto común
+  OK     presupuesto común: trials=8 epochs=150 patience=20 seeds=[42, 43, 44]
+[3] Disco
+  OK     libre 210.0 GB (mínimo 20.0 GB)
+[4] GPU
+  OK     cuda:0 NVIDIA GeForce RTX 4060: libre 6.7 / 7.6 GB (mínimo 3.0 GB)
+[5] Directorios de salida
+  OK     ./results_v4 sin resultados v3
+  OK     ./results_models_v4 sin resultados v3
+  OK     ./runs_v4 sin resultados v3
+  AVISO  ./runs_v4/progress.jsonl ya tiene 176 eventos (¿de un smoke? el monitor los mezclará; muévelo si es una corrida nueva)
+  OK     results_phase1_v4 no existe todavía (se creará)
+
+PREFLIGHT OK  (1 avisos)
+[2026-09-28 23:57:38] === P1: semilla 42 · GAT + TAGCN ===
+[2026-09-28 23:57:38]   $ uv run --frozen python scripts/train_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --seed 42 --resume > ./runs_v4/P1_train_GAT_s42.log
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 12 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?][I 2026-09-28 23:57:43,519] A new study created in memory with name: GAT_none_pr_auc
+[W 2026-09-28 23:57:44,050] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:44,051] Trial 0 failed with value None.
+                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   8%|▊         | 1/12 [00:00<00:09]Train matrix:   8%|▊         | 1/12 [00:00<00:09]                                                 Train matrix:   8%|▊         | 1/12 [00:00<00:09]                                                 Train matrix:   8%|▊         | 1/12 [00:00<00:09][I 2026-09-28 23:57:44,376] A new study created in memory with name: GAT_class_weighting_pr_auc
+[W 2026-09-28 23:57:44,635] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:44,635] Trial 0 failed with value None.
+                                                 Train matrix:   8%|▊         | 1/12 [00:01<00:09]Train matrix:  17%|█▋        | 2/12 [00:01<00:06]Train matrix:  17%|█▋        | 2/12 [00:01<00:06]                                                 Train matrix:  17%|█▋        | 2/12 [00:01<00:06]                                                 Train matrix:  17%|█▋        | 2/12 [00:01<00:06][I 2026-09-28 23:57:44,959] A new study created in memory with name: GAT_focal_loss_pr_auc
+[W 2026-09-28 23:57:45,225] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:45,225] Trial 0 failed with value None.
+                                                 Train matrix:  17%|█▋        | 2/12 [00:01<00:06]Train matrix:  25%|██▌       | 3/12 [00:02<00:05]Train matrix:  25%|██▌       | 3/12 [00:02<00:05]                                                 Train matrix:  25%|██▌       | 3/12 [00:02<00:05]                                                 Train matrix:  25%|██▌       | 3/12 [00:02<00:05][I 2026-09-28 23:57:45,551] A new study created in memory with name: GAT_none_pr_auc
+[W 2026-09-28 23:57:45,807] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:45,807] Trial 0 failed with value None.
+                                                 Train matrix:  25%|██▌       | 3/12 [00:02<00:05]Train matrix:  33%|███▎      | 4/12 [00:02<00:04]Train matrix:  33%|███▎      | 4/12 [00:02<00:04]                                                 Train matrix:  33%|███▎      | 4/12 [00:02<00:04]                                                 Train matrix:  33%|███▎      | 4/12 [00:02<00:04][I 2026-09-28 23:57:46,134] A new study created in memory with name: GAT_class_weighting_pr_auc
+[W 2026-09-28 23:57:46,391] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:46,391] Trial 0 failed with value None.
+                                                 Train matrix:  33%|███▎      | 4/12 [00:03<00:04]Train matrix:  42%|████▏     | 5/12 [00:03<00:04]Train matrix:  42%|████▏     | 5/12 [00:03<00:04]                                                 Train matrix:  42%|████▏     | 5/12 [00:03<00:04]                                                 Train matrix:  42%|████▏     | 5/12 [00:03<00:04][I 2026-09-28 23:57:46,710] A new study created in memory with name: GAT_focal_loss_pr_auc
+[W 2026-09-28 23:57:46,968] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 75.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:46,968] Trial 0 failed with value None.
+                                                 Train matrix:  42%|████▏     | 5/12 [00:03<00:04]Train matrix:  50%|█████     | 6/12 [00:03<00:03]Train matrix:  50%|█████     | 6/12 [00:03<00:03]                                                 Train matrix:  50%|█████     | 6/12 [00:03<00:03]                                                 Train matrix:  50%|█████     | 6/12 [00:03<00:03][I 2026-09-28 23:57:47,284] A new study created in memory with name: GAT_none_pr_auc
+[W 2026-09-28 23:57:47,540] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:47,541] Trial 0 failed with value None.
+                                                 Train matrix:  50%|█████     | 6/12 [00:04<00:03]Train matrix:  58%|█████▊    | 7/12 [00:04<00:02]Train matrix:  58%|█████▊    | 7/12 [00:04<00:02]                                                 Train matrix:  58%|█████▊    | 7/12 [00:04<00:02]                                                 Train matrix:  58%|█████▊    | 7/12 [00:04<00:02][I 2026-09-28 23:57:47,849] A new study created in memory with name: GAT_class_weighting_pr_auc
+[W 2026-09-28 23:57:48,107] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:48,108] Trial 0 failed with value None.
+                                                 Train matrix:  58%|█████▊    | 7/12 [00:04<00:02]Train matrix:  67%|██████▋   | 8/12 [00:04<00:02]Train matrix:  67%|██████▋   | 8/12 [00:04<00:02]                                                 Train matrix:  67%|██████▋   | 8/12 [00:04<00:02]                                                 Train matrix:  67%|██████▋   | 8/12 [00:04<00:02][I 2026-09-28 23:57:48,416] A new study created in memory with name: GAT_focal_loss_pr_auc
+[W 2026-09-28 23:57:48,673] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.16 GiB memory in use. Of the allocated memory 4.97 GiB is allocated by PyTorch, and 73.44 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:48,673] Trial 0 failed with value None.
+                                                 Train matrix:  67%|██████▋   | 8/12 [00:05<00:02]Train matrix:  75%|███████▌  | 9/12 [00:05<00:01]Train matrix:  75%|███████▌  | 9/12 [00:05<00:01]                                                 Train matrix:  75%|███████▌  | 9/12 [00:05<00:01]                                                 Train matrix:  75%|███████▌  | 9/12 [00:05<00:01][I 2026-09-28 23:57:49,030] A new study created in memory with name: GAT_none_pr_auc
+[W 2026-09-28 23:57:49,293] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.30 GiB memory in use. Of the allocated memory 5.08 GiB is allocated by PyTorch, and 101.31 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.30 GiB memory in use. Of the allocated memory 5.08 GiB is allocated by PyTorch, and 101.31 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:49,293] Trial 0 failed with value None.
+                                                 
+======================================================================
+CONFIG: native_GAT_none
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  ERROR in native_GAT_none — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: native_GAT_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  ERROR in native_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: native_GAT_focal_loss
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in native_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_GAT_none
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  ERROR in 1:10_GAT_none — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Class weights: [0.550000011920929, 5.5]
+  ERROR in 1:10_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in 1:10_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:1_GAT_none
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  ERROR in 1:1_GAT_none — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:1_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Class weights: [1.0, 1.0]
+  ERROR in 1:1_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:1_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in 1:1_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 1.93 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.62 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_os_GAT_none
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  ERROR in 1:10_os_GAT_none — OOM: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.Train matrix:  75%|███████▌  | 9/12 [00:06<00:01]Train matrix:  83%|████████▎ | 10/12 [00:06<00:01]Train matrix:  83%|████████▎ | 10/12 [00:06<00:01]                                                  Train matrix:  83%|████████▎ | 10/12 [00:06<00:01]                                                  Train matrix:  83%|████████▎ | 10/12 [00:06<00:01][I 2026-09-28 23:57:49,674] A new study created in memory with name: GAT_class_weighting_pr_auc
+[W 2026-09-28 23:57:49,937] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.30 GiB memory in use. Of the allocated memory 5.08 GiB is allocated by PyTorch, and 101.31 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.30 GiB memory in use. Of the allocated memory 5.08 GiB is allocated by PyTorch, and 101.31 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:49,938] Trial 0 failed with value None.
+                                                  Train matrix:  83%|████████▎ | 10/12 [00:06<00:01]Train matrix:  92%|█████████▏| 11/12 [00:06<00:00]Train matrix:  92%|█████████▏| 11/12 [00:06<00:00]                                                  Train matrix:  92%|█████████▏| 11/12 [00:06<00:00]                                                  Train matrix:  92%|█████████▏| 11/12 [00:06<00:00][I 2026-09-28 23:57:50,315] A new study created in memory with name: GAT_focal_loss_pr_auc
+[W 2026-09-28 23:57:50,663] Trial 0 failed with parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.36 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.30 GiB memory in use. Process 636734 has 117.01 MiB memory in use. Of the allocated memory 5.08 GiB is allocated by PyTorch, and 101.31 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 260, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 175, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.36 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91 MiB memory in use. Process 359874 has 55.91 MiB memory in use. Including non-PyTorch memory, this process has 5.30 GiB memory in use. Process 636734 has 117.01 MiB memory in use. Of the allocated memory 5.08 GiB is allocated by PyTorch, and 101.31 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-28 23:57:50,663] Trial 0 failed with value None.
+                                                  Train matrix:  92%|█████████▏| 11/12 [00:07<00:00]Train matrix: 100%|██████████| 12/12 [00:07<00:00]Train matrix: 100%|██████████| 12/12 [00:07<00:00]
+
+
+======================================================================
+CONFIG: 1:10_os_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Class weights: [0.550000011920929, 5.5]
+  ERROR in 1:10_os_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_os_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 8}
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in 1:10_os_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.36 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. P. Continuing with next config.
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        0
+  Errors (OOM / timeout / exception):         12
+    ! native_GAT_none (OOM)
+    ! native_GAT_class_weighting (OOM)
+    ! native_GAT_focal_loss (OOM)
+    ! 1:10_GAT_none (OOM)
+    ! 1:10_GAT_class_weighting (OOM)
+    ! 1:10_GAT_focal_loss (OOM)
+    ! 1:1_GAT_none (OOM)
+    ! 1:1_GAT_class_weighting (OOM)
+    ! 1:1_GAT_focal_loss (OOM)
+    ! 1:10_os_GAT_none (OOM)
+    ! 1:10_os_GAT_class_weighting (OOM)
+    ! 1:10_os_GAT_focal_loss (OOM)
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl
+[2026-09-28 23:57:51]   $ uv run --frozen python scripts/train_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --seed 42 --resume > ./runs_v4/P1_train_TAGCN_s42.log
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 12 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?][I 2026-09-28 23:57:56,473] A new study created in memory with name: TAGCN_none_pr_auc
+[I 2026-09-28 23:58:04,377] Trial 0 finished with value: 0.28050236183610916 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.28050236183610916.
+[I 2026-09-28 23:58:16,965] Trial 1 finished with value: 0.0710176684001416 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.28050236183610916.
+[I 2026-09-28 23:58:24,956] Trial 2 finished with value: 0.1097522908149205 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.28050236183610916.
+[I 2026-09-28 23:58:32,101] Trial 3 finished with value: 0.10028739513546317 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.28050236183610916.
+[I 2026-09-28 23:58:34,860] Trial 4 finished with value: 0.04673685198176682 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.28050236183610916.
+[I 2026-09-28 23:58:38,222] Trial 5 finished with value: 0.04237536887263457 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.28050236183610916.
+[I 2026-09-28 23:58:48,516] Trial 6 finished with value: 0.36643618054886135 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.36643618054886135.
+[I 2026-09-28 23:59:02,977] Trial 7 finished with value: 0.3612678771580776 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 6 with value: 0.36643618054886135.
+                                             Train matrix:   0%|          | 0/12 [01:06<?]                                             Train matrix:   0%|          | 0/12 [01:25<?]                                             Train matrix:   0%|          | 0/12 [01:25<?]                                             Train matrix:   0%|          | 0/12 [01:25<?]                                             Train matrix:   0%|          | 0/12 [01:25<?]Train matrix:  33%|███▎      | 4/12 [01:25<02:51]Train matrix:  33%|███▎      | 4/12 [01:25<02:51]                                                 Train matrix:  33%|███▎      | 4/12 [01:25<02:51]                                                 Train matrix:  33%|███▎      | 4/12 [01:25<02:51][I 2026-09-28 23:59:22,252] A new study created in memory with name: TAGCN_class_weighting_pr_auc
+[I 2026-09-28 23:59:30,058] Trial 0 finished with value: 0.32243882698877535 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.32243882698877535.
+[I 2026-09-28 23:59:42,686] Trial 1 finished with value: 0.12159516196077445 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.32243882698877535.
+[I 2026-09-28 23:59:50,708] Trial 2 finished with value: 0.18213851115686783 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.32243882698877535.
+[I 2026-09-28 23:59:57,868] Trial 3 finished with value: 0.168083854018767 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.32243882698877535.
+[I 2026-09-29 00:00:05,894] Trial 4 finished with value: 0.08698097384968748 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.32243882698877535.
+[I 2026-09-29 00:00:14,175] Trial 5 finished with value: 0.1091474808723407 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.32243882698877535.
+[I 2026-09-29 00:00:20,390] Trial 6 finished with value: 0.3931332515226103 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.3931332515226103.
+[I 2026-09-29 00:00:26,532] Trial 7 finished with value: 0.33058188321129445 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 6 with value: 0.3931332515226103.
+                                                 Train matrix:  33%|███▎      | 4/12 [02:30<02:51]                                                 Train matrix:  33%|███▎      | 4/12 [03:05<02:51]                                                 Train matrix:  33%|███▎      | 4/12 [03:05<02:51]                                                 Train matrix:  33%|███▎      | 4/12 [03:05<02:51]                                                 Train matrix:  33%|███▎      | 4/12 [03:05<02:51]Train matrix:  42%|████▏     | 5/12 [03:05<04:54]Train matrix:  42%|████▏     | 5/12 [03:05<04:54]                                                 Train matrix:  42%|████▏     | 5/12 [03:05<04:54]                                                 Train matrix:  42%|████▏     | 5/12 [03:05<04:54][I 2026-09-29 00:01:02,285] A new study created in memory with name: TAGCN_focal_loss_pr_auc
+[I 2026-09-29 00:01:06,077] Trial 0 finished with value: 0.20668580697216116 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:18,660] Trial 1 finished with value: 0.10801899471926493 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:26,644] Trial 2 finished with value: 0.19077227555821497 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:33,758] Trial 3 finished with value: 0.15001842526047449 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:37,305] Trial 4 finished with value: 0.05283904369542793 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:42,767] Trial 5 finished with value: 0.0842030113672838 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:45,297] Trial 6 finished with value: 0.17236167929775947 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 0 with value: 0.20668580697216116.
+[I 2026-09-29 00:01:59,730] Trial 7 finished with value: 0.3946965386298936 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 7 with value: 0.3946965386298936.
+                                                 Train matrix:  42%|████▏     | 5/12 [04:03<04:54]                                                 Train matrix:  42%|████▏     | 5/12 [04:17<04:54]                                                 Train matrix:  42%|████▏     | 5/12 [04:17<04:54]                                                 Train matrix:  42%|████▏     | 5/12 [04:17<04:54]                                                 Train matrix:  42%|████▏     | 5/12 [04:17<04:54]Train matrix:  50%|█████     | 6/12 [04:17<05:01]Train matrix:  50%|█████     | 6/12 [04:17<05:01]                                                 Train matrix:  50%|█████     | 6/12 [04:17<05:01]  SKIP (resume — native_TAGCN_none_meta.json exists): native_TAGCN_none
+  SKIP (resume — native_TAGCN_class_weighting_meta.json exists): native_TAGCN_class_weighting
+  SKIP (resume — native_TAGCN_focal_loss_meta.json exists): native_TAGCN_focal_loss
+
+======================================================================
+CONFIG: 1:10_TAGCN_none
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+
+  Best trial (val pr_auc=0.3664):
+    hidden_dim: 128
+    num_layers: 3
+    dropout: 0.20351199264000677
+    lr: 0.0021137059440645744
+    weight_decay: 4.201672054372529e-05
+    K: 3
+  Best Optuna val pr_auc=0.3664: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}
+  Epoch  10 | Train Loss: 0.2369 | Val Loss: 0.1773 | Val F1: 0.0151 | Val MCC: 0.0001 | Val PR-AUC: 0.0860
+  Epoch  20 | Train Loss: 0.1825 | Val Loss: 0.1702 | Val F1: 0.3044 | Val MCC: 0.2868 | Val PR-AUC: 0.1536
+  Epoch  30 | Train Loss: 0.1529 | Val Loss: 0.1637 | Val F1: 0.3238 | Val MCC: 0.3251 | Val PR-AUC: 0.2635
+  Epoch  40 | Train Loss: 0.1345 | Val Loss: 0.1164 | Val F1: 0.3834 | Val MCC: 0.3678 | Val PR-AUC: 0.2885
+  Epoch  50 | Train Loss: 0.1198 | Val Loss: 0.1004 | Val F1: 0.4157 | Val MCC: 0.4022 | Val PR-AUC: 0.3345
+  Epoch  60 | Train Loss: 0.1071 | Val Loss: 0.0946 | Val F1: 0.4282 | Val MCC: 0.4143 | Val PR-AUC: 0.3794
+  Epoch  70 | Train Loss: 0.0966 | Val Loss: 0.0906 | Val F1: 0.4270 | Val MCC: 0.4130 | Val PR-AUC: 0.3669
+  Early stopping at epoch 79 (best: 59)
+  Val (argmax): F1=0.4335 MCC=0.4197 PR-AUC=0.3809 | Test PR-AUC=0.0091
+  Calibrated on val (t=0.48): val F1=0.4353 | test F1=0.0078 MCC=0.0002
+  Cross-label test PR-AUC: vs licit=0.0438 vs unknown=0.0113 vs all=0.0091 | unknown flagged=1.100%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-10_TAGCN_none_meta.json (86s)
+
+======================================================================
+CONFIG: 1:10_TAGCN_class_weighting
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+
+  Best trial (val pr_auc=0.3931):
+    hidden_dim: 128
+    num_layers: 3
+    dropout: 0.20351199264000677
+    lr: 0.0021137059440645744
+    weight_decay: 4.201672054372529e-05
+    K: 3
+  Best Optuna val pr_auc=0.3931: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}
+  Class weights: [0.550000011920929, 5.5]
+  Epoch  10 | Train Loss: 0.4290 | Val Loss: 0.5134 | Val F1: 0.1245 | Val MCC: 0.1846 | Val PR-AUC: 0.2641
+  Epoch  20 | Train Loss: 0.3085 | Val Loss: 0.4708 | Val F1: 0.1460 | Val MCC: 0.2133 | Val PR-AUC: 0.3572
+  Epoch  30 | Train Loss: 0.2565 | Val Loss: 0.4260 | Val F1: 0.1660 | Val MCC: 0.2334 | Val PR-AUC: 0.3142
+  Epoch  40 | Train Loss: 0.2229 | Val Loss: 0.3983 | Val F1: 0.1831 | Val MCC: 0.2517 | Val PR-AUC: 0.3128
+  Epoch  50 | Train Loss: 0.1912 | Val Loss: 0.3758 | Val F1: 0.1995 | Val MCC: 0.2683 | Val PR-AUC: 0.3396
+  Epoch  60 | Train Loss: 0.1665 | Val Loss: 0.3505 | Val F1: 0.2317 | Val MCC: 0.2982 | Val PR-AUC: 0.3403
+  Epoch  70 | Train Loss: 0.1433 | Val Loss: 0.3263 | Val F1: 0.2656 | Val MCC: 0.3275 | Val PR-AUC: 0.3604
+  Epoch  80 | Train Loss: 0.1274 | Val Loss: 0.3230 | Val F1: 0.2823 | Val MCC: 0.3387 | Val PR-AUC: 0.3779
+  Epoch  90 | Train Loss: 0.1149 | Val Loss: 0.3270 | Val F1: 0.3025 | Val MCC: 0.3514 | Val PR-AUC: 0.3712
+  Epoch 100 | Train Loss: 0.1017 | Val Loss: 0.3358 | Val F1: 0.3383 | Val MCC: 0.3752 | Val PR-AUC: 0.3728
+  Epoch 110 | Train Loss: 0.0934 | Val Loss: 0.3411 | Val F1: 0.3682 | Val MCC: 0.3979 | Val PR-AUC: 0.3785
+  Epoch 120 | Train Loss: 0.0826 | Val Loss: 0.3799 | Val F1: 0.3803 | Val MCC: 0.4002 | Val PR-AUC: 0.3583
+  Epoch 130 | Train Loss: 0.0733 | Val Loss: 0.4014 | Val F1: 0.3940 | Val MCC: 0.4095 | Val PR-AUC: 0.3681
+  Epoch 140 | Train Loss: 0.0681 | Val Loss: 0.4366 | Val F1: 0.4269 | Val MCC: 0.4354 | Val PR-AUC: 0.3734
+  Epoch 150 | Train Loss: 0.0645 | Val Loss: 0.4659 | Val F1: 0.4084 | Val MCC: 0.4204 | Val PR-AUC: 0.3661
+  Val (argmax): F1=0.4269 MCC=0.4354 PR-AUC=0.3734 | Test PR-AUC=0.0093
+  Calibrated on val (t=0.85): val F1=0.4739 | test F1=0.0049 MCC=-0.0019
+  Cross-label test PR-AUC: vs licit=0.0452 vs unknown=0.0117 vs all=0.0093 | unknown flagged=0.657%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-10_TAGCN_class_weighting_meta.json (100s)
+
+======================================================================
+CONFIG: 1:10_TAGCN_focal_loss
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+
+  Best trial (val pr_auc=0.3947):
+    hidden_dim: 148
+    num_layers: 3
+    dropout: 0.4757995766256756
+    lr: 0.006161049539380964
+    weight_decay: 0.0001569639638866114
+    K: 4
+  Best Optuna val pr_auc=0.3947: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0422 | Val Loss: 0.0416 | Val F1: 0.1507 | Val MCC: 0.2023 | Val PR-AUC: 0.2767
+  Epoch  20 | Train Loss: 0.0304 | Val Loss: 0.0231 | Val F1: 0.4193 | Val MCC: 0.4181 | Val PR-AUC: 0.3644
+  Epoch  30 | Train Loss: 0.0251 | Val Loss: 0.0188 | Val F1: 0.4085 | Val MCC: 0.4173 | Val PR-AUC: 0.3847
+  Epoch  40 | Train Loss: 0.0219 | Val Loss: 0.0183 | Val F1: 0.3694 | Val MCC: 0.3921 | Val PR-AUC: 0.3869
+  Early stopping at epoch 43 (best: 23)
+  Val (argmax): F1=0.4479 MCC=0.4455 PR-AUC=0.3891 | Test PR-AUC=0.0040
+  Calibrated on val (t=0.54): val F1=0.4885 | test F1=0.0000 MCC=-0.0065
+  Cross-label test PR-AUC: vs licit=0.0210 vs unknown=0.0049 vs all=0.0040 | unknown flagged=0.918%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-10_TAGCN_focal_loss_meta.json (72s)
+
+======================================================================
+CONFIG: 1:1_TAGCN_none
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)                                                 Train matrix:  50%|█████     | 6/12 [04:17<05:01][I 2026-09-29 00:02:14,328] A new study created in memory with name: TAGCN_none_pr_auc
+[I 2026-09-29 00:02:22,115] Trial 0 finished with value: 0.2859196750524909 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.2859196750524909.
+[I 2026-09-29 00:02:34,696] Trial 1 finished with value: 0.1234842258774241 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.2859196750524909.
+[I 2026-09-29 00:02:42,682] Trial 2 finished with value: 0.18040462804518484 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.2859196750524909.
+[I 2026-09-29 00:02:49,805] Trial 3 finished with value: 0.1727746631083355 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.2859196750524909.
+[I 2026-09-29 00:02:57,795] Trial 4 finished with value: 0.08941555471276627 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.2859196750524909.
+[I 2026-09-29 00:03:06,061] Trial 5 finished with value: 0.10934578922619868 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.2859196750524909.
+[I 2026-09-29 00:03:12,489] Trial 6 finished with value: 0.38758626873373103 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.38758626873373103.
+[I 2026-09-29 00:03:19,199] Trial 7 finished with value: 0.3309530694424633 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 6 with value: 0.38758626873373103.
+                                                 Train matrix:  50%|█████     | 6/12 [05:22<05:01]                                                 Train matrix:  50%|█████     | 6/12 [05:58<05:01]                                                 Train matrix:  50%|█████     | 6/12 [05:58<05:01]                                                 Train matrix:  50%|█████     | 6/12 [05:58<05:01]                                                 Train matrix:  50%|█████     | 6/12 [05:58<05:01]Train matrix:  58%|█████▊    | 7/12 [05:58<05:22]Train matrix:  58%|█████▊    | 7/12 [05:58<05:22]                                                 Train matrix:  58%|█████▊    | 7/12 [05:58<05:22]                                                 Train matrix:  58%|█████▊    | 7/12 [05:58<05:22][I 2026-09-29 00:03:54,948] A new study created in memory with name: TAGCN_class_weighting_pr_auc
+[I 2026-09-29 00:04:02,736] Trial 0 finished with value: 0.2859196907560347 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.2859196907560347.
+[I 2026-09-29 00:04:15,325] Trial 1 finished with value: 0.12348477504286835 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.2859196907560347.
+[I 2026-09-29 00:04:23,326] Trial 2 finished with value: 0.18040462804518484 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.2859196907560347.
+[I 2026-09-29 00:04:30,445] Trial 3 finished with value: 0.1727742828241337 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.2859196907560347.
+[I 2026-09-29 00:04:38,437] Trial 4 finished with value: 0.08941567104531718 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.2859196907560347.
+[I 2026-09-29 00:04:46,696] Trial 5 finished with value: 0.10934578922619868 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.2859196907560347.
+[I 2026-09-29 00:04:53,100] Trial 6 finished with value: 0.387548653522161 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.387548653522161.
+[I 2026-09-29 00:04:59,808] Trial 7 finished with value: 0.32995391116053685 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 6 with value: 0.387548653522161.
+                                                 Train matrix:  58%|█████▊    | 7/12 [07:03<05:22]                                                 Train matrix:  58%|█████▊    | 7/12 [07:34<05:22]                                                 Train matrix:  58%|█████▊    | 7/12 [07:35<05:22]                                                 Train matrix:  58%|█████▊    | 7/12 [07:35<05:22]                                                 Train matrix:  58%|█████▊    | 7/12 [07:35<05:22]Train matrix:  67%|██████▋   | 8/12 [07:35<04:54]Train matrix:  67%|██████▋   | 8/12 [07:35<04:54]                                                 Train matrix:  67%|██████▋   | 8/12 [07:35<04:54]                                                 Train matrix:  67%|██████▋   | 8/12 [07:35<04:54][I 2026-09-29 00:05:31,734] A new study created in memory with name: TAGCN_focal_loss_pr_auc
+[I 2026-09-29 00:05:39,525] Trial 0 finished with value: 0.2106942630206448 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.2106942630206448.
+[I 2026-09-29 00:05:52,111] Trial 1 finished with value: 0.08827931384078333 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.2106942630206448.
+[I 2026-09-29 00:05:56,773] Trial 2 finished with value: 0.08025038716045728 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.2106942630206448.
+[I 2026-09-29 00:06:03,889] Trial 3 finished with value: 0.1338115101455019 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.2106942630206448.
+[I 2026-09-29 00:06:11,878] Trial 4 finished with value: 0.07817697472541266 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.2106942630206448.
+[I 2026-09-29 00:06:23,651] Trial 5 finished with value: 0.10990334226622292 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.2106942630206448.
+[I 2026-09-29 00:06:31,483] Trial 6 finished with value: 0.33930743596197765 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.33930743596197765.
+[I 2026-09-29 00:06:39,627] Trial 7 finished with value: 0.39380032326189607 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 7 with value: 0.39380032326189607.
+                                                 Train matrix:  67%|██████▋   | 8/12 [08:43<04:54]                                                 Train matrix:  67%|██████▋   | 8/12 [08:52<04:54]                                                 Train matrix:  67%|██████▋   | 8/12 [08:52<04:54]                                                 Train matrix:  67%|██████▋   | 8/12 [08:52<04:54]                                                 Train matrix:  67%|██████▋   | 8/12 [08:52<04:54]Train matrix:  75%|███████▌  | 9/12 [08:52<03:44]Train matrix:  75%|███████▌  | 9/12 [08:52<03:44]                                                 Train matrix:  75%|███████▌  | 9/12 [08:52<03:44]                                                 Train matrix:  75%|███████▌  | 9/12 [08:52<03:44][I 2026-09-29 00:06:49,230] A new study created in memory with name: TAGCN_none_pr_auc
+
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+
+  Best trial (val pr_auc=0.3876):
+    hidden_dim: 128
+    num_layers: 3
+    dropout: 0.20351199264000677
+    lr: 0.0021137059440645744
+    weight_decay: 4.201672054372529e-05
+    K: 3
+  Best Optuna val pr_auc=0.3876: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}
+  Epoch  10 | Train Loss: 0.4006 | Val Loss: 0.5339 | Val F1: 0.1252 | Val MCC: 0.1866 | Val PR-AUC: 0.2592
+  Epoch  20 | Train Loss: 0.3061 | Val Loss: 0.5570 | Val F1: 0.1382 | Val MCC: 0.2069 | Val PR-AUC: 0.3309
+  Epoch  30 | Train Loss: 0.2525 | Val Loss: 0.5102 | Val F1: 0.1517 | Val MCC: 0.2206 | Val PR-AUC: 0.2592
+  Epoch  40 | Train Loss: 0.2122 | Val Loss: 0.4938 | Val F1: 0.1624 | Val MCC: 0.2345 | Val PR-AUC: 0.2955
+  Epoch  50 | Train Loss: 0.1737 | Val Loss: 0.4807 | Val F1: 0.1707 | Val MCC: 0.2453 | Val PR-AUC: 0.2934
+  Epoch  60 | Train Loss: 0.1456 | Val Loss: 0.5054 | Val F1: 0.1742 | Val MCC: 0.2517 | Val PR-AUC: 0.2894
+  Epoch  70 | Train Loss: 0.1216 | Val Loss: 0.4807 | Val F1: 0.1880 | Val MCC: 0.2635 | Val PR-AUC: 0.2785
+  Epoch  80 | Train Loss: 0.1045 | Val Loss: 0.4974 | Val F1: 0.1946 | Val MCC: 0.2687 | Val PR-AUC: 0.2638
+  Epoch  90 | Train Loss: 0.0895 | Val Loss: 0.4747 | Val F1: 0.2063 | Val MCC: 0.2790 | Val PR-AUC: 0.2532
+  Epoch 100 | Train Loss: 0.0763 | Val Loss: 0.5415 | Val F1: 0.2004 | Val MCC: 0.2742 | Val PR-AUC: 0.2430
+  Epoch 110 | Train Loss: 0.0685 | Val Loss: 0.4974 | Val F1: 0.2182 | Val MCC: 0.2896 | Val PR-AUC: 0.2428
+  Epoch 120 | Train Loss: 0.0598 | Val Loss: 0.5815 | Val F1: 0.2089 | Val MCC: 0.2832 | Val PR-AUC: 0.2364
+  Epoch 130 | Train Loss: 0.0506 | Val Loss: 0.5651 | Val F1: 0.2226 | Val MCC: 0.2953 | Val PR-AUC: 0.2356
+  Epoch 140 | Train Loss: 0.0445 | Val Loss: 0.5807 | Val F1: 0.2260 | Val MCC: 0.2967 | Val PR-AUC: 0.2349
+  Epoch 150 | Train Loss: 0.0418 | Val Loss: 0.6316 | Val F1: 0.2232 | Val MCC: 0.2958 | Val PR-AUC: 0.2355
+  Val (argmax): F1=0.2260 MCC=0.2967 PR-AUC=0.2349 | Test PR-AUC=0.0095
+  Calibrated on val (t=0.99): val F1=0.3451 | test F1=0.0112 MCC=0.0026
+  Cross-label test PR-AUC: vs licit=0.0423 vs unknown=0.0121 vs all=0.0095 | unknown flagged=2.122%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-1_TAGCN_none_meta.json (100s)
+
+======================================================================
+CONFIG: 1:1_TAGCN_class_weighting
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+
+  Best trial (val pr_auc=0.3875):
+    hidden_dim: 128
+    num_layers: 3
+    dropout: 0.20351199264000677
+    lr: 0.0021137059440645744
+    weight_decay: 4.201672054372529e-05
+    K: 3
+  Best Optuna val pr_auc=0.3875: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}
+  Class weights: [1.0, 1.0]
+  Epoch  10 | Train Loss: 0.4006 | Val Loss: 0.5339 | Val F1: 0.1252 | Val MCC: 0.1866 | Val PR-AUC: 0.2592
+  Epoch  20 | Train Loss: 0.3061 | Val Loss: 0.5570 | Val F1: 0.1382 | Val MCC: 0.2069 | Val PR-AUC: 0.3309
+  Epoch  30 | Train Loss: 0.2525 | Val Loss: 0.5103 | Val F1: 0.1516 | Val MCC: 0.2205 | Val PR-AUC: 0.2592
+  Epoch  40 | Train Loss: 0.2122 | Val Loss: 0.4935 | Val F1: 0.1626 | Val MCC: 0.2347 | Val PR-AUC: 0.2959
+  Epoch  50 | Train Loss: 0.1738 | Val Loss: 0.4811 | Val F1: 0.1703 | Val MCC: 0.2448 | Val PR-AUC: 0.2933
+  Epoch  60 | Train Loss: 0.1457 | Val Loss: 0.5060 | Val F1: 0.1745 | Val MCC: 0.2521 | Val PR-AUC: 0.2891
+  Epoch  70 | Train Loss: 0.1216 | Val Loss: 0.4845 | Val F1: 0.1869 | Val MCC: 0.2625 | Val PR-AUC: 0.2773
+  Epoch  80 | Train Loss: 0.1042 | Val Loss: 0.4986 | Val F1: 0.1943 | Val MCC: 0.2685 | Val PR-AUC: 0.2619
+  Epoch  90 | Train Loss: 0.0894 | Val Loss: 0.4762 | Val F1: 0.2057 | Val MCC: 0.2785 | Val PR-AUC: 0.2528
+  Epoch 100 | Train Loss: 0.0762 | Val Loss: 0.5483 | Val F1: 0.2001 | Val MCC: 0.2740 | Val PR-AUC: 0.2443
+  Epoch 110 | Train Loss: 0.0688 | Val Loss: 0.4840 | Val F1: 0.2200 | Val MCC: 0.2907 | Val PR-AUC: 0.2499
+  Epoch 120 | Train Loss: 0.0605 | Val Loss: 0.5734 | Val F1: 0.2113 | Val MCC: 0.2860 | Val PR-AUC: 0.2348
+  Epoch 130 | Train Loss: 0.0511 | Val Loss: 0.5881 | Val F1: 0.2173 | Val MCC: 0.2902 | Val PR-AUC: 0.2369
+  Early stopping at epoch 130 (best: 110)
+  Val (argmax): F1=0.2200 MCC=0.2907 PR-AUC=0.2499 | Test PR-AUC=0.0104
+  Calibrated on val (t=0.98): val F1=0.3497 | test F1=0.0119 MCC=0.0036
+  Cross-label test PR-AUC: vs licit=0.0461 vs unknown=0.0134 vs all=0.0104 | unknown flagged=1.818%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-1_TAGCN_class_weighting_meta.json (97s)
+
+======================================================================
+CONFIG: 1:1_TAGCN_focal_loss
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+
+  Best trial (val pr_auc=0.3938):
+    hidden_dim: 148
+    num_layers: 3
+    dropout: 0.4757995766256756
+    lr: 0.006161049539380964
+    weight_decay: 0.0001569639638866114
+    K: 4
+  Best Optuna val pr_auc=0.3938: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0612 | Val Loss: 0.0577 | Val F1: 0.0781 | Val MCC: 0.1216 | Val PR-AUC: 0.2357
+  Epoch  20 | Train Loss: 0.0382 | Val Loss: 0.0576 | Val F1: 0.0797 | Val MCC: 0.1257 | Val PR-AUC: 0.3788
+  Early stopping at epoch 27 (best: 7)
+  Val (argmax): F1=0.0878 MCC=0.1348 PR-AUC=0.1576 | Test PR-AUC=0.0068
+  Calibrated on val (t=0.64): val F1=0.2858 | test F1=0.0000 MCC=-0.0143
+  Cross-label test PR-AUC: vs licit=0.0396 vs unknown=0.0082 vs all=0.0068 | unknown flagged=3.744%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-1_TAGCN_focal_loss_meta.json (77s)
+
+======================================================================
+CONFIG: 1:10_os_TAGCN_none
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}[I 2026-09-29 00:06:56,990] Trial 0 finished with value: 0.3082132140284145 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.3082132140284145.
+[I 2026-09-29 00:07:09,699] Trial 1 finished with value: 0.07157928345562564 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.3082132140284145.
+[I 2026-09-29 00:07:17,681] Trial 2 finished with value: 0.10704642305373241 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.3082132140284145.
+[I 2026-09-29 00:07:24,785] Trial 3 finished with value: 0.10427827182046372 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.3082132140284145.
+[I 2026-09-29 00:07:27,551] Trial 4 finished with value: 0.04691956570698158 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.3082132140284145.
+[I 2026-09-29 00:07:30,935] Trial 5 finished with value: 0.04253709219295185 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.3082132140284145.
+[I 2026-09-29 00:07:41,293] Trial 6 finished with value: 0.3587593615276224 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.3587593615276224.
+[I 2026-09-29 00:07:55,886] Trial 7 finished with value: 0.3593098773351982 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 7 with value: 0.3593098773351982.
+                                                 Train matrix:  75%|███████▌  | 9/12 [09:59<03:44]                                                 Train matrix:  75%|███████▌  | 9/12 [10:31<03:44]                                                 Train matrix:  75%|███████▌  | 9/12 [10:31<03:44]                                                 Train matrix:  75%|███████▌  | 9/12 [10:31<03:44]                                                 Train matrix:  75%|███████▌  | 9/12 [10:31<03:44]Train matrix:  83%|████████▎ | 10/12 [10:31<02:43]Train matrix:  83%|████████▎ | 10/12 [10:31<02:43]                                                  Train matrix:  83%|████████▎ | 10/12 [10:31<02:43]                                                  Train matrix:  83%|████████▎ | 10/12 [10:32<02:43][I 2026-09-29 00:08:28,435] A new study created in memory with name: TAGCN_class_weighting_pr_auc
+[I 2026-09-29 00:08:36,208] Trial 0 finished with value: 0.3349709539063605 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.3349709539063605.
+[I 2026-09-29 00:08:48,935] Trial 1 finished with value: 0.12382775233465342 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.3349709539063605.
+[I 2026-09-29 00:08:52,502] Trial 2 finished with value: 0.09322588262379643 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.3349709539063605.
+[I 2026-09-29 00:08:59,618] Trial 3 finished with value: 0.17296545199911015 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.3349709539063605.
+[I 2026-09-29 00:09:07,626] Trial 4 finished with value: 0.0848163621860047 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.3349709539063605.
+[I 2026-09-29 00:09:15,953] Trial 5 finished with value: 0.10826246143125877 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.3349709539063605.
+[I 2026-09-29 00:09:22,413] Trial 6 finished with value: 0.37748031604718885 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 6 with value: 0.37748031604718885.
+[I 2026-09-29 00:09:28,321] Trial 7 finished with value: 0.34879277815202964 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 6 with value: 0.37748031604718885.
+                                                  Train matrix:  83%|████████▎ | 10/12 [11:31<02:43]                                                  Train matrix:  83%|████████▎ | 10/12 [12:07<02:43]                                                  Train matrix:  83%|████████▎ | 10/12 [12:07<02:43]                                                  Train matrix:  83%|████████▎ | 10/12 [12:07<02:43]                                                  Train matrix:  83%|████████▎ | 10/12 [12:07<02:43]Train matrix:  92%|█████████▏| 11/12 [12:07<01:26]Train matrix:  92%|█████████▏| 11/12 [12:07<01:26]                                                  Train matrix:  92%|█████████▏| 11/12 [12:07<01:26]                                                  Train matrix:  92%|█████████▏| 11/12 [12:07<01:26][I 2026-09-29 00:10:04,302] A new study created in memory with name: TAGCN_focal_loss_pr_auc
+[I 2026-09-29 00:10:08,051] Trial 0 finished with value: 0.2220708977219992 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:20,738] Trial 1 finished with value: 0.10857612100672248 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'K': 4}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:25,064] Trial 2 finished with value: 0.0997345999837325 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.4329770563201687, 'lr': 0.00026587543983272726, 'weight_decay': 2.3102018878452926e-05, 'K': 2}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:32,130] Trial 3 finished with value: 0.15585833555496348 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.34474115788895177, 'lr': 0.00019010245319870352, 'weight_decay': 3.8396292998041685e-05, 'K': 3}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:35,671] Trial 4 finished with value: 0.05273210327551348 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.33696582754481696, 'lr': 0.0001238513729886094, 'weight_decay': 0.000164092867306479, 'K': 2}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:41,153] Trial 5 finished with value: 0.08533525211752839 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2218455076693483, 'lr': 0.0001567993391672301, 'weight_decay': 0.000233596350262616, 'K': 3}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:43,693] Trial 6 finished with value: 0.20511787286238914 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}. Best is trial 0 with value: 0.2220708977219992.
+[I 2026-09-29 00:10:57,372] Trial 7 finished with value: 0.4057684881964672 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}. Best is trial 7 with value: 0.4057684881964672.
+                                                  Train matrix:  92%|█████████▏| 11/12 [13:00<01:26]                                                  Train matrix:  92%|█████████▏| 11/12 [13:17<01:26]                                                  Train matrix:  92%|█████████▏| 11/12 [13:17<01:26]                                                  Train matrix:  92%|█████████▏| 11/12 [13:17<01:26]                                                  Train matrix:  92%|█████████▏| 11/12 [13:17<01:26]Train matrix: 100%|██████████| 12/12 [13:17<00:00]Train matrix: 100%|██████████| 12/12 [13:17<00:00]
+
+
+  Best trial (val pr_auc=0.3593):
+    hidden_dim: 148
+    num_layers: 3
+    dropout: 0.4757995766256756
+    lr: 0.006161049539380964
+    weight_decay: 0.0001569639638866114
+    K: 4
+  Best Optuna val pr_auc=0.3593: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}
+  Epoch  10 | Train Loss: 0.2574 | Val Loss: 0.2211 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0488
+  Epoch  20 | Train Loss: 0.1943 | Val Loss: 0.2073 | Val F1: 0.2931 | Val MCC: 0.2876 | Val PR-AUC: 0.1855
+  Epoch  30 | Train Loss: 0.1672 | Val Loss: 0.1520 | Val F1: 0.3818 | Val MCC: 0.3679 | Val PR-AUC: 0.2933
+  Epoch  40 | Train Loss: 0.1454 | Val Loss: 0.1260 | Val F1: 0.3875 | Val MCC: 0.3786 | Val PR-AUC: 0.3122
+  Epoch  50 | Train Loss: 0.1299 | Val Loss: 0.1194 | Val F1: 0.3822 | Val MCC: 0.3666 | Val PR-AUC: 0.3308
+  Epoch  60 | Train Loss: 0.1195 | Val Loss: 0.1060 | Val F1: 0.4033 | Val MCC: 0.3886 | Val PR-AUC: 0.3618
+  Epoch  70 | Train Loss: 0.1094 | Val Loss: 0.1009 | Val F1: 0.4089 | Val MCC: 0.3940 | Val PR-AUC: 0.3813
+  Epoch  80 | Train Loss: 0.1005 | Val Loss: 0.0961 | Val F1: 0.4245 | Val MCC: 0.4101 | Val PR-AUC: 0.3946
+  Epoch  90 | Train Loss: 0.0948 | Val Loss: 0.0943 | Val F1: 0.4323 | Val MCC: 0.4187 | Val PR-AUC: 0.3923
+  Early stopping at epoch 99 (best: 79)
+  Val (argmax): F1=0.4715 MCC=0.4613 PR-AUC=0.4269 | Test PR-AUC=0.0089
+  Calibrated on val (t=0.58): val F1=0.4786 | test F1=0.0000 MCC=-0.0036
+  Cross-label test PR-AUC: vs licit=0.0449 vs unknown=0.0111 vs all=0.0089 | unknown flagged=0.287%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-10_os_TAGCN_none_meta.json (99s)
+
+======================================================================
+CONFIG: 1:10_os_TAGCN_class_weighting
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+
+  Best trial (val pr_auc=0.3775):
+    hidden_dim: 128
+    num_layers: 3
+    dropout: 0.20351199264000677
+    lr: 0.0021137059440645744
+    weight_decay: 4.201672054372529e-05
+    K: 3
+  Best Optuna val pr_auc=0.3775: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.20351199264000677, 'lr': 0.0021137059440645744, 'weight_decay': 4.201672054372529e-05, 'K': 3}
+  Class weights: [0.550000011920929, 5.5]
+  Epoch  10 | Train Loss: 0.4363 | Val Loss: 0.4964 | Val F1: 0.1294 | Val MCC: 0.1902 | Val PR-AUC: 0.2622
+  Epoch  20 | Train Loss: 0.3071 | Val Loss: 0.4838 | Val F1: 0.1431 | Val MCC: 0.2122 | Val PR-AUC: 0.3471
+  Epoch  30 | Train Loss: 0.2541 | Val Loss: 0.4265 | Val F1: 0.1634 | Val MCC: 0.2284 | Val PR-AUC: 0.2893
+  Epoch  40 | Train Loss: 0.2183 | Val Loss: 0.3842 | Val F1: 0.1905 | Val MCC: 0.2565 | Val PR-AUC: 0.3005
+  Epoch  50 | Train Loss: 0.1874 | Val Loss: 0.3604 | Val F1: 0.2099 | Val MCC: 0.2753 | Val PR-AUC: 0.3141
+  Epoch  60 | Train Loss: 0.1621 | Val Loss: 0.3315 | Val F1: 0.2468 | Val MCC: 0.3020 | Val PR-AUC: 0.3227
+  Epoch  70 | Train Loss: 0.1400 | Val Loss: 0.3225 | Val F1: 0.2883 | Val MCC: 0.3299 | Val PR-AUC: 0.3178
+  Epoch  80 | Train Loss: 0.1232 | Val Loss: 0.3291 | Val F1: 0.3085 | Val MCC: 0.3453 | Val PR-AUC: 0.3251
+  Epoch  90 | Train Loss: 0.1108 | Val Loss: 0.3521 | Val F1: 0.3203 | Val MCC: 0.3446 | Val PR-AUC: 0.3183
+  Epoch 100 | Train Loss: 0.0994 | Val Loss: 0.3616 | Val F1: 0.3463 | Val MCC: 0.3634 | Val PR-AUC: 0.3293
+  Epoch 110 | Train Loss: 0.0890 | Val Loss: 0.3932 | Val F1: 0.3756 | Val MCC: 0.3829 | Val PR-AUC: 0.3365
+  Epoch 120 | Train Loss: 0.0806 | Val Loss: 0.4277 | Val F1: 0.3803 | Val MCC: 0.3843 | Val PR-AUC: 0.3232
+  Epoch 130 | Train Loss: 0.0739 | Val Loss: 0.4507 | Val F1: 0.4057 | Val MCC: 0.4038 | Val PR-AUC: 0.3396
+  Epoch 140 | Train Loss: 0.0698 | Val Loss: 0.4481 | Val F1: 0.4157 | Val MCC: 0.4133 | Val PR-AUC: 0.3491
+  Epoch 150 | Train Loss: 0.0633 | Val Loss: 0.5255 | Val F1: 0.4194 | Val MCC: 0.4104 | Val PR-AUC: 0.3392
+  Val (argmax): F1=0.4218 MCC=0.4173 PR-AUC=0.3554 | Test PR-AUC=0.0096
+  Calibrated on val (t=0.78): val F1=0.4494 | test F1=0.0046 MCC=-0.0024
+  Cross-label test PR-AUC: vs licit=0.0414 vs unknown=0.0124 vs all=0.0096 | unknown flagged=0.526%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-10_os_TAGCN_class_weighting_meta.json (96s)
+
+======================================================================
+CONFIG: 1:10_os_TAGCN_focal_loss
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 211→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for TAGCN: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.3, 'lr': 0.0008475, 'weight_decay': 0.0005, 'K': 3}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+
+  Best trial (val pr_auc=0.4058):
+    hidden_dim: 148
+    num_layers: 3
+    dropout: 0.4757995766256756
+    lr: 0.006161049539380964
+    weight_decay: 0.0001569639638866114
+    K: 4
+  Best Optuna val pr_auc=0.4058: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.4757995766256756, 'lr': 0.006161049539380964, 'weight_decay': 0.0001569639638866114, 'K': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0430 | Val Loss: 0.0419 | Val F1: 0.1413 | Val MCC: 0.1914 | Val PR-AUC: 0.2545
+  Epoch  20 | Train Loss: 0.0307 | Val Loss: 0.0247 | Val F1: 0.3474 | Val MCC: 0.3561 | Val PR-AUC: 0.3307
+  Epoch  30 | Train Loss: 0.0251 | Val Loss: 0.0196 | Val F1: 0.4206 | Val MCC: 0.4215 | Val PR-AUC: 0.4045
+  Epoch  40 | Train Loss: 0.0206 | Val Loss: 0.0175 | Val F1: 0.3345 | Val MCC: 0.3650 | Val PR-AUC: 0.3554
+  Early stopping at epoch 48 (best: 28)
+  Val (argmax): F1=0.4508 MCC=0.4493 PR-AUC=0.4087 | Test PR-AUC=0.0039
+  Calibrated on val (t=0.54): val F1=0.4860 | test F1=0.0000 MCC=-0.0062
+  Cross-label test PR-AUC: vs licit=0.0205 vs unknown=0.0048 vs all=0.0039 | unknown flagged=0.835%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-10_os_TAGCN_focal_loss_meta.json (70s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 6
+    + 1:10_TAGCN_none
+    + 1:10_TAGCN_class_weighting
+    + 1:10_TAGCN_focal_loss
+    + 1:10_os_TAGCN_none
+    + 1:10_os_TAGCN_class_weighting
+    + 1:10_os_TAGCN_focal_loss
+  Failed quality gate:                        3
+    - 1:1_TAGCN_none
+    - 1:1_TAGCN_class_weighting
+    - 1:1_TAGCN_focal_loss
+  Errors (OOM / timeout / exception):         0
+  Skipped (resume):                           3
+
+  Total time: 0.22 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl
+[2026-09-29 00:11:14]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario native --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 00:11:16]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario 1:10 --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 00:11:19]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario 1:1 --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 00:11:21]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario 1:10_os --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 00:11:23]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --scenario native --seed 42 --resume > ./runs_v4/P1_explain_TAGCN_s42.log
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 6 units to explain (0 already complete) | 1 checkpoints gated out
+  native_TAGCN_class_weighting__GNNExplainer: primary=0.956 full=0.956 edges=0.054 jac=0.586 (n=30, tp=20) 44.7s
+  PGExplainer training complete (loss=0.0668)
+  PGExplainer training complete (loss=0.1893)
+  PGExplainer training complete (loss=0.1514)
+  PGExplainer training complete (loss=0.0716)
+  PGExplainer training complete (loss=0.1551)
+  native_TAGCN_class_weighting__PGExplainer: primary=0.049 full=nan edges=0.049 jac=0.558 (n=16, tp=20) 116.7s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_TAGCN_class_weighting__ShapleyFeatures: primary=0.985 full=0.985 edges=nan jac=nan (n=27, tp=20) 26.8s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_TAGCN_focal_loss__GNNExplainer: primary=0.929 full=0.929 edges=0.098 jac=0.588 (n=30, tp=11) 44.0s
+  PGExplainer training complete (loss=0.3792)
+  PGExplainer training complete (loss=0.4859)
+  PGExplainer training complete (loss=0.4522)
+  PGExplainer training complete (loss=0.4035)
+  PGExplainer training complete (loss=0.4110)
+  native_TAGCN_focal_loss__PGExplainer: primary=0.038 full=nan edges=0.038 jac=0.587 (n=16, tp=11) 117.0s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  native_TAGCN_focal_loss__ShapleyFeatures: primary=0.995 full=0.995 edges=nan jac=nan (n=27, tp=11) 26.8s
+
+Done: 6 ok, 0 failed, 6.4 min. CSV: results_v4/elliptic_v4_stability.csv
+[2026-09-29 00:17:47]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --scenario 1:10 --seed 42 --resume > ./runs_v4/P1_explain_TAGCN_s42.log
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 9 units to explain (0 already complete) | 0 checkpoints gated out
+  1:10_TAGCN_class_weighting__GNNExplainer: primary=0.954 full=0.954 edges=0.098 jac=0.594 (n=30, tp=22) 44.3s
+  PGExplainer training complete (loss=0.0651)
+  PGExplainer training complete (loss=0.1766)
+  PGExplainer training complete (loss=0.1559)
+  PGExplainer training complete (loss=0.0659)
+  PGExplainer training complete (loss=0.1575)
+  1:10_TAGCN_class_weighting__PGExplainer: primary=-0.128 full=nan edges=-0.128 jac=0.521 (n=16, tp=22) 116.4s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_TAGCN_class_weighting__ShapleyFeatures: primary=0.986 full=0.986 edges=nan jac=nan (n=27, tp=22) 26.6s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_TAGCN_focal_loss__GNNExplainer: primary=0.881 full=0.881 edges=0.083 jac=0.571 (n=30, tp=19) 51.6s
+  PGExplainer training complete (loss=0.5189)
+  PGExplainer training complete (loss=0.5214)
+  PGExplainer training complete (loss=0.4640)
+  PGExplainer training complete (loss=0.4730)
+  PGExplainer training complete (loss=0.4460)
+  1:10_TAGCN_focal_loss__PGExplainer: primary=-0.081 full=nan edges=-0.081 jac=0.558 (n=16, tp=19) 133.7s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_TAGCN_focal_loss__ShapleyFeatures: primary=0.995 full=0.995 edges=nan jac=nan (n=25, tp=19) 28.6s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_TAGCN_none__GNNExplainer: primary=0.944 full=0.944 edges=0.047 jac=0.558 (n=30, tp=15) 45.2s
+  PGExplainer training complete (loss=0.2095)
+  PGExplainer training complete (loss=0.3398)
+  PGExplainer training complete (loss=0.4802)
+  PGExplainer training complete (loss=0.4186)
+  PGExplainer training complete (loss=0.4516)
+  1:10_TAGCN_none__PGExplainer: primary=0.134 full=nan edges=0.134 jac=0.629 (n=16, tp=15) 116.9s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_TAGCN_none__ShapleyFeatures: primary=0.996 full=0.996 edges=nan jac=nan (n=27, tp=15) 26.5s
+
+Done: 9 ok, 0 failed, 10.0 min. CSV: results_v4/elliptic_v4_stability.csv
+[2026-09-29 00:27:46]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --scenario 1:1 --seed 42 --resume > ./runs_v4/P1_explain_TAGCN_s42.log
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 0 units to explain (0 already complete) | 3 checkpoints gated out
+
+Done: 0 ok, 0 failed, 0.0 min. CSV: results_v4/elliptic_v4_stability.csv
+[2026-09-29 00:27:51]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --scenario 1:10_os --seed 42 --resume > ./runs_v4/P1_explain_TAGCN_s42.log
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 9 units to explain (0 already complete) | 0 checkpoints gated out
+  1:10_os_TAGCN_class_weighting__GNNExplainer: primary=0.955 full=0.955 edges=0.006 jac=0.563 (n=30, tp=16) 44.6s
+  PGExplainer training complete (loss=0.0650)
+  PGExplainer training complete (loss=0.1627)
+  PGExplainer training complete (loss=0.1193)
+  PGExplainer training complete (loss=0.0898)
+  PGExplainer training complete (loss=0.1300)
+  1:10_os_TAGCN_class_weighting__PGExplainer: primary=0.075 full=nan edges=0.075 jac=0.604 (n=16, tp=16) 116.5s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_os_TAGCN_class_weighting__ShapleyFeatures: primary=0.984 full=0.984 edges=nan jac=nan (n=27, tp=16) 26.7s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_os_TAGCN_focal_loss__GNNExplainer: primary=0.881 full=0.881 edges=0.075 jac=0.575 (n=30, tp=20) 51.6s
+  PGExplainer training complete (loss=0.5145)
+  PGExplainer training complete (loss=0.5342)
+  PGExplainer training complete (loss=0.4743)
+  PGExplainer training complete (loss=0.4798)
+  PGExplainer training complete (loss=0.4649)
+  1:10_os_TAGCN_focal_loss__PGExplainer: primary=-0.018 full=nan edges=-0.018 jac=0.567 (n=16, tp=20) 133.9s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_os_TAGCN_focal_loss__ShapleyFeatures: primary=0.995 full=0.995 edges=nan jac=nan (n=26, tp=20) 28.7s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_os_TAGCN_none__GNNExplainer: primary=0.944 full=0.944 edges=0.080 jac=0.596 (n=30, tp=13) 51.0s
+  PGExplainer training complete (loss=0.2328)
+  PGExplainer training complete (loss=0.4746)
+  PGExplainer training complete (loss=0.2458)
+  PGExplainer training complete (loss=0.4607)
+  PGExplainer training complete (loss=0.4132)
+  1:10_os_TAGCN_none__PGExplainer: primary=0.662 full=nan edges=0.662 jac=0.637 (n=16, tp=13) 133.4s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:237: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:10_os_TAGCN_none__ShapleyFeatures: primary=0.995 full=0.995 edges=nan jac=nan (n=27, tp=13) 28.7s
+
+Done: 9 ok, 0 failed, 10.4 min. CSV: results_v4/elliptic_v4_stability.csv
+[2026-09-29 00:38:16] CHECKPOINT P1 — monitor --once
+== monitor v4 · 2026-09-29T05:38:16+00:00 · runs_v4 · 287 eventos ==
+[train] 12/12 (100%) · ok=9 skip=3 err=0 · 88 s/unidad · ETA 0.0 h · TERMINADA
+        acumulado: 36 terminadas, 15 errores
+        compuerta: 16/36 (44%) · mediana val_pr_auc 0.2987
+        ERROR 1:10_os_GAT_none: OutOfMemoryError: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91
+        ERROR 1:10_os_GAT_class_weighting: OutOfMemoryError: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.48 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91
+        ERROR 1:10_os_GAT_focal_loss: OutOfMemoryError: CUDA out of memory. Tried to allocate 1.98 GiB. GPU 0 has a total capacity of 7.62 GiB of which 1.36 GiB is free. Process 6266 has 96.00 MiB memory in use. Process 11793 has 13.41 MiB memory in use. Process 12049 has 87.91
+[explain] 9/9 (100%) · ok=9 skip=0 err=0 · 68 s/unidad · ETA 0.0 h · TERMINADA
+        acumulado: 48 terminadas, 0 errores
+        no_aplica: GNNExplainer 0/16, PGExplainer 0/16, ShapleyFeatures 0/16
+  latido explain: hace 0.0 min · 1:10_os_TAGCN_none__ShapleyFeatures end
+  latido train: hace 27.1 min · 1:10_os_TAGCN_focal_loss end
+-- señales de alerta --
+  [aviso] train: hubo una racha de 12 OOM seguidos (ya se recuperó)
+[2026-09-29 00:38:16] CHECKPOINT P1 superado (rc=1)
+[2026-09-29 00:38:16] run_all_v4 terminado

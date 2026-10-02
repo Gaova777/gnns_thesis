@@ -1,0 +1,182 @@
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 3 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?][I 2026-09-28 22:52:29,528] A new study created in memory with name: GraphSAGE_none_pr_auc
+[I 2026-09-28 22:52:30,884] Trial 0 finished with value: 0.042802707629291725 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}. Best is trial 0 with value: 0.042802707629291725.
+[I 2026-09-28 22:52:36,783] Trial 1 finished with value: 0.026842892476574776 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05}. Best is trial 0 with value: 0.042802707629291725.
+[I 2026-09-28 22:52:40,550] Trial 2 finished with value: 0.28047490943595915 and parameters: {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}. Best is trial 2 with value: 0.28047490943595915.
+[I 2026-09-28 22:52:47,402] Trial 3 finished with value: 0.07189190905500117 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2727780074568463, 'lr': 0.0003823475224675188, 'weight_decay': 0.00016738085788752134}. Best is trial 2 with value: 0.28047490943595915.
+[I 2026-09-28 22:52:52,398] Trial 4 finished with value: 0.03900555812362612 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.41407038455720546, 'lr': 0.00025081156860452336, 'weight_decay': 0.00010677482709481354}. Best is trial 2 with value: 0.28047490943595915.
+[I 2026-09-28 22:52:55,206] Trial 5 finished with value: 0.13795374076858125 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}. Best is trial 2 with value: 0.28047490943595915.
+[I 2026-09-28 22:52:59,899] Trial 6 finished with value: 0.02679601677903968 and parameters: {'hidden_dim': 64, 'num_layers': 3, 'dropout': 0.27606099749584057, 'lr': 0.00017541893487450815, 'weight_decay': 9.7803370166594e-05}. Best is trial 2 with value: 0.28047490943595915.
+[I 2026-09-28 22:53:05,996] Trial 7 finished with value: 0.26623400850882467 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.2246844304357644, 'lr': 0.001096821720752952, 'weight_decay': 0.00012399967836846095}. Best is trial 2 with value: 0.28047490943595915.
+                                            Train matrix:   0%|          | 0/3 [00:36<?]                                            Train matrix:   0%|          | 0/3 [00:41<?]                                            Train matrix:   0%|          | 0/3 [00:41<?]                                            Train matrix:   0%|          | 0/3 [00:41<?]                                            Train matrix:   0%|          | 0/3 [00:41<?]Train matrix:  33%|███▎      | 1/3 [00:41<01:22]Train matrix:  33%|███▎      | 1/3 [00:41<01:22]                                                Train matrix:  33%|███▎      | 1/3 [00:41<01:22]                                                Train matrix:  33%|███▎      | 1/3 [00:41<01:22][I 2026-09-28 22:53:10,875] A new study created in memory with name: GraphSAGE_class_weighting_pr_auc
+[I 2026-09-28 22:53:15,994] Trial 0 finished with value: 0.4040799994587712 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}. Best is trial 0 with value: 0.4040799994587712.
+[I 2026-09-28 22:53:22,123] Trial 1 finished with value: 0.1855148373517369 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05}. Best is trial 0 with value: 0.4040799994587712.
+[I 2026-09-28 22:53:24,531] Trial 2 finished with value: 0.4446771846241492 and parameters: {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}. Best is trial 2 with value: 0.4446771846241492.
+[I 2026-09-28 22:53:31,359] Trial 3 finished with value: 0.33729128623640026 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2727780074568463, 'lr': 0.0003823475224675188, 'weight_decay': 0.00016738085788752134}. Best is trial 2 with value: 0.4446771846241492.
+[I 2026-09-28 22:53:36,384] Trial 4 finished with value: 0.2601272292542722 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.41407038455720546, 'lr': 0.00025081156860452336, 'weight_decay': 0.00010677482709481354}. Best is trial 2 with value: 0.4446771846241492.
+[I 2026-09-28 22:53:40,119] Trial 5 finished with value: 0.413667589838979 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}. Best is trial 2 with value: 0.4446771846241492.
+[I 2026-09-28 22:53:44,813] Trial 6 finished with value: 0.15337879297611387 and parameters: {'hidden_dim': 64, 'num_layers': 3, 'dropout': 0.27606099749584057, 'lr': 0.00017541893487450815, 'weight_decay': 9.7803370166594e-05}. Best is trial 2 with value: 0.4446771846241492.
+[I 2026-09-28 22:53:50,902] Trial 7 finished with value: 0.3912679858844356 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.2246844304357644, 'lr': 0.001096821720752952, 'weight_decay': 0.00012399967836846095}. Best is trial 2 with value: 0.4446771846241492.
+                                                Train matrix:  33%|███▎      | 1/3 [01:21<01:22]                                                Train matrix:  33%|███▎      | 1/3 [01:37<01:22]                                                Train matrix:  33%|███▎      | 1/3 [01:37<01:22]                                                Train matrix:  33%|███▎      | 1/3 [01:37<01:22]                                                Train matrix:  33%|███▎      | 1/3 [01:37<01:22]Train matrix:  67%|██████▋   | 2/3 [01:37<00:50]Train matrix:  67%|██████▋   | 2/3 [01:37<00:50]                                                Train matrix:  67%|██████▋   | 2/3 [01:37<00:50]                                                Train matrix:  67%|██████▋   | 2/3 [01:37<00:50][I 2026-09-28 22:54:07,168] A new study created in memory with name: GraphSAGE_focal_loss_pr_auc
+[I 2026-09-28 22:54:10,925] Trial 0 finished with value: 0.34596374193427687 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:17,011] Trial 1 finished with value: 0.099324302148694 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:19,459] Trial 2 finished with value: 0.2976248076768775 and parameters: {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:26,190] Trial 3 finished with value: 0.31171168274784644 and parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2727780074568463, 'lr': 0.0003823475224675188, 'weight_decay': 0.00016738085788752134}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:31,140] Trial 4 finished with value: 0.16859513819547417 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.41407038455720546, 'lr': 0.00025081156860452336, 'weight_decay': 0.00010677482709481354}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:33,839] Trial 5 finished with value: 0.21037697911948483 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:38,440] Trial 6 finished with value: 0.04179920080703094 and parameters: {'hidden_dim': 64, 'num_layers': 3, 'dropout': 0.27606099749584057, 'lr': 0.00017541893487450815, 'weight_decay': 9.7803370166594e-05}. Best is trial 0 with value: 0.34596374193427687.
+[I 2026-09-28 22:54:44,437] Trial 7 finished with value: 0.25653123598583966 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.2246844304357644, 'lr': 0.001096821720752952, 'weight_decay': 0.00012399967836846095}. Best is trial 0 with value: 0.34596374193427687.
+                                                Train matrix:  67%|██████▋   | 2/3 [02:14<00:50]                                                Train matrix:  67%|██████▋   | 2/3 [02:22<00:50]                                                Train matrix:  67%|██████▋   | 2/3 [02:22<00:50]                                                Train matrix:  67%|██████▋   | 2/3 [02:22<00:50]                                                Train matrix:  67%|██████▋   | 2/3 [02:22<00:50]Train matrix: 100%|██████████| 3/3 [02:23<00:00]Train matrix: 100%|██████████| 3/3 [02:23<00:00]
+
+======================================================================
+CONFIG: native_GraphSAGE_none
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 140→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for GraphSAGE: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}
+
+  Best trial (val pr_auc=0.2805):
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.4879639408647978
+    lr: 0.004622589001020831
+    weight_decay: 2.6587543983272695e-05
+  Best Optuna val pr_auc=0.2805: {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Epoch  10 | Train Loss: 0.2818 | Val Loss: 0.2201 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0413
+  Epoch  20 | Train Loss: 0.1422 | Val Loss: 0.1399 | Val F1: 0.2905 | Val MCC: 0.2727 | Val PR-AUC: 0.1985
+  Epoch  30 | Train Loss: 0.1019 | Val Loss: 0.1065 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.1311
+  Epoch  40 | Train Loss: 0.0871 | Val Loss: 0.0902 | Val F1: 0.0361 | Val MCC: 0.1054 | Val PR-AUC: 0.2660
+  Early stopping at epoch 40 (best: 20)
+  Val (argmax): F1=0.2905 MCC=0.2727 PR-AUC=0.1985 | Test PR-AUC=0.0044
+  Calibrated on val (t=0.41): val F1=0.3270 | test F1=0.0000 MCC=-0.0155
+  Cross-label test PR-AUC: vs licit=0.0253 vs unknown=0.0053 vs all=0.0044 | unknown flagged=4.818%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/native_GraphSAGE_none_meta.json (41s)
+
+======================================================================
+CONFIG: native_GraphSAGE_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 140→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for GraphSAGE: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+
+  Best trial (val pr_auc=0.4447):
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.4879639408647978
+    lr: 0.004622589001020831
+    weight_decay: 2.6587543983272695e-05
+  Best Optuna val pr_auc=0.4447: {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Epoch  10 | Train Loss: 0.3830 | Val Loss: 0.4404 | Val F1: 0.1252 | Val MCC: 0.1912 | Val PR-AUC: 0.3824
+  Epoch  20 | Train Loss: 0.3077 | Val Loss: 0.3953 | Val F1: 0.1819 | Val MCC: 0.2518 | Val PR-AUC: 0.4228
+  Epoch  30 | Train Loss: 0.2675 | Val Loss: 0.3812 | Val F1: 0.1982 | Val MCC: 0.2714 | Val PR-AUC: 0.3979
+  Epoch  40 | Train Loss: 0.2436 | Val Loss: 0.3576 | Val F1: 0.2206 | Val MCC: 0.2965 | Val PR-AUC: 0.4438
+  Epoch  50 | Train Loss: 0.2210 | Val Loss: 0.3539 | Val F1: 0.2349 | Val MCC: 0.3083 | Val PR-AUC: 0.4554
+  Epoch  60 | Train Loss: 0.2048 | Val Loss: 0.3543 | Val F1: 0.2691 | Val MCC: 0.3377 | Val PR-AUC: 0.4735
+  Epoch  70 | Train Loss: 0.1874 | Val Loss: 0.3625 | Val F1: 0.2850 | Val MCC: 0.3507 | Val PR-AUC: 0.4799
+  Epoch  80 | Train Loss: 0.1833 | Val Loss: 0.3735 | Val F1: 0.3005 | Val MCC: 0.3618 | Val PR-AUC: 0.4811
+  Epoch  90 | Train Loss: 0.1720 | Val Loss: 0.3899 | Val F1: 0.3263 | Val MCC: 0.3799 | Val PR-AUC: 0.4787
+  Epoch 100 | Train Loss: 0.1662 | Val Loss: 0.4019 | Val F1: 0.3340 | Val MCC: 0.3843 | Val PR-AUC: 0.4795
+  Epoch 110 | Train Loss: 0.1553 | Val Loss: 0.4072 | Val F1: 0.3413 | Val MCC: 0.3913 | Val PR-AUC: 0.4840
+  Epoch 120 | Train Loss: 0.1492 | Val Loss: 0.4439 | Val F1: 0.3660 | Val MCC: 0.4048 | Val PR-AUC: 0.4737
+  Epoch 130 | Train Loss: 0.1481 | Val Loss: 0.4402 | Val F1: 0.3766 | Val MCC: 0.4164 | Val PR-AUC: 0.4874
+  Epoch 140 | Train Loss: 0.1395 | Val Loss: 0.4825 | Val F1: 0.3879 | Val MCC: 0.4203 | Val PR-AUC: 0.4780
+  Epoch 150 | Train Loss: 0.1333 | Val Loss: 0.4715 | Val F1: 0.3945 | Val MCC: 0.4289 | Val PR-AUC: 0.4910
+  Val (argmax): F1=0.3950 MCC=0.4259 PR-AUC=0.4845 | Test PR-AUC=0.0102
+  Calibrated on val (t=0.83): val F1=0.5147 | test F1=0.0157 MCC=0.0095
+  Cross-label test PR-AUC: vs licit=0.0492 vs unknown=0.0128 vs all=0.0102 | unknown flagged=0.552%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/native_GraphSAGE_class_weighting_meta.json (56s)
+
+======================================================================
+CONFIG: native_GraphSAGE_focal_loss
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start hidden_dim snapped 140→148 (config limited to [64, 128, 148])
+  Warm-start trial enqueued for GraphSAGE: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+
+  Best trial (val pr_auc=0.3460):
+    hidden_dim: 148
+    num_layers: 2
+    dropout: 0.1135
+    lr: 0.0005302
+    weight_decay: 0.0005
+  Best Optuna val pr_auc=0.3460: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.1135, 'lr': 0.0005302, 'weight_decay': 0.0005}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0230 | Val Loss: 0.0198 | Val F1: 0.0756 | Val MCC: 0.0570 | Val PR-AUC: 0.0621
+  Epoch  20 | Train Loss: 0.0153 | Val Loss: 0.0253 | Val F1: 0.2229 | Val MCC: 0.2676 | Val PR-AUC: 0.1925
+  Epoch  30 | Train Loss: 0.0129 | Val Loss: 0.0134 | Val F1: 0.4182 | Val MCC: 0.4056 | Val PR-AUC: 0.3398
+  Epoch  40 | Train Loss: 0.0117 | Val Loss: 0.0128 | Val F1: 0.4374 | Val MCC: 0.4253 | Val PR-AUC: 0.3483
+  Epoch  50 | Train Loss: 0.0109 | Val Loss: 0.0124 | Val F1: 0.4203 | Val MCC: 0.4059 | Val PR-AUC: 0.3403
+  Epoch  60 | Train Loss: 0.0104 | Val Loss: 0.0122 | Val F1: 0.4122 | Val MCC: 0.3973 | Val PR-AUC: 0.3427
+  Early stopping at epoch 60 (best: 40)
+  Val (argmax): F1=0.4374 MCC=0.4253 PR-AUC=0.3483 | Test PR-AUC=0.0053
+  Calibrated on val (t=0.52): val F1=0.4481 | test F1=0.0000 MCC=-0.0083
+  Cross-label test PR-AUC: vs licit=0.0325 vs unknown=0.0063 vs all=0.0053 | unknown flagged=1.435%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/native_GraphSAGE_focal_loss_meta.json (45s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 2
+    + native_GraphSAGE_class_weighting
+    + native_GraphSAGE_focal_loss
+  Failed quality gate:                        1
+    - native_GraphSAGE_none
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.04 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl

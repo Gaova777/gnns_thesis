@@ -1,0 +1,225 @@
+{
+  "run_id": "1:10_os_GAT_none_s43",
+  "pipeline_version": "v4",
+  "scenario": "1:10_os",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.1,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "1:10_os",
+    "kind": "oversample",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 6924,
+    "n_synthetic_illicit": 3462,
+    "n_licit": 69240,
+    "negative_origin": {
+      "licit": 13781,
+      "unknown": 55459
+    },
+    "total": 76164,
+    "ratio": 0.1,
+    "ratio_str": "1:10.0",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "07027587adca21a16b2706e78e74ef9933498d67",
+    "val_test_subsampled": false,
+    "smote": {
+      "n_new": 3462,
+      "k": 5,
+      "n_edges_added": 7028
+    }
+  },
+  "n_train_illicit": 6924,
+  "n_train_licit": 69240,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.588235294117647,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.7532645769433809,
+        "f1": 0.5681470137825421,
+        "mcc": 0.5992677739623112,
+        "recall": 0.4059080962800875,
+        "precision": 0.9464285714285714
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.38742671182587074,
+        "f1": 0.4344262295081967,
+        "mcc": 0.41829827774188155,
+        "recall": 0.4059080962800875,
+        "precision": 0.4672544080604534
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.3773313862725486,
+        "f1": 0.4291497975708502,
+        "mcc": 0.41655637574076065,
+        "recall": 0.4059080962800875,
+        "precision": 0.45521472392638035
+      },
+      "flag_rate": {
+        "illicit": 0.40590810775756836,
+        "licit": 0.0023155806120485067,
+        "unknown": 0.015195602551102638
+      },
+      "mean_prob": {
+        "illicit": 0.45493602752685547,
+        "licit": 0.026187030598521233,
+        "unknown": 0.06508193910121918
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.026582859329340063,
+        "f1": 0.010309278350515464,
+        "mcc": 0.005747979356316681,
+        "recall": 0.005917159763313609,
+        "precision": 0.04
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.005633671022299601,
+        "f1": 0.0044943820224719105,
+        "mcc": -0.004738105384146694,
+        "recall": 0.005917159763313609,
+        "precision": 0.0036231884057971015
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.004650313459485481,
+        "f1": 0.0042643923240938165,
+        "mcc": -0.0031693428956729567,
+        "recall": 0.005917159763313609,
+        "precision": 0.0033333333333333335
+      },
+      "flag_rate": {
+        "illicit": 0.005917159840464592,
+        "licit": 0.003682111157104373,
+        "unknown": 0.011958081275224686
+      },
+      "mean_prob": {
+        "illicit": 0.021047746762633324,
+        "licit": 0.03146975114941597,
+        "unknown": 0.05893651396036148
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GAT",
+  "balancing": "none",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 128,
+    "num_layers": 2,
+    "dropout": 0.21649165607921678,
+    "lr": 0.0016738085788752138,
+    "weight_decay": 1.9010245319870364e-05,
+    "heads": 4
+  },
+  "optuna_best_score": 0.4070335362276952,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 20,
+  "epochs_run": 40,
+  "best_val_score": 0.41855969067182214,
+  "best_val_mcc": 0.4053511389268695,
+  "val_metrics": {
+    "loss": 0.11090312153100967,
+    "f1": 0.41855969067182214,
+    "mcc": 0.4053511389268695,
+    "pr_auc": 0.3773313862725486
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.11090312153100967,
+    "f1": 0.4291497975708502,
+    "mcc": 0.41655637574076065,
+    "pr_auc": 0.3773313862725486
+  },
+  "test_metrics": {
+    "loss": 0.11464626342058182,
+    "f1": 0.0042643923240938165,
+    "mcc": -0.0031693428956729567,
+    "pr_auc": 0.004650313459485481
+  },
+  "test_metrics_argmax": {
+    "loss": 0.11464626342058182,
+    "f1": 0.0029069767441860465,
+    "mcc": -0.00667806593512663,
+    "pr_auc": 0.004650313459485481
+  },
+  "calibrated_threshold": 0.588235294117647,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.4291497975708502,
+  "calibration_resample": null,
+  "quality_passed": true,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.41855969067182214,
+  "val_mcc_best_epoch": 0.4053511389268695,
+  "mlflow_run_id": "62535c272aa942328210a346b8c517b2",
+  "checkpoint": "1-10_os_GAT_none_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 13.2,
+  "finished_at": "2026-09-29T21:26:29"
+}

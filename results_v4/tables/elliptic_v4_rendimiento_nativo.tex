@@ -1,0 +1,27 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Rendimiento en el escenario nativo (media sobre semillas; F1 de la clase ilícita). Referencia: Weber et al. (2019)}
+\label{tab:v4-rendimiento}
+\begin{tabular}{llrrrrr}
+\toprule
+Arquitectura & Balanceo & PR-AUC val & F1 val & PR-AUC test & F1 test & n \\
+\midrule
+GCN & class\_weighting & 0,097 & 0,108 & 0,008 & 0,014 & 3 \\
+GCN & focal\_loss & 0,105 & 0,177 & 0,012 & 0,019 & 3 \\
+GCN & none & 0,083 & 0,134 & 0,008 & 0,016 & 3 \\
+GCN & todos & 0,095 & 0,140 & 0,009 & 0,016 & 9 \\
+GraphSAGE & class\_weighting & 0,462 & 0,406 & 0,010 & 0,012 & 3 \\
+GraphSAGE & focal\_loss & 0,305 & 0,401 & 0,006 & 0,002 & 3 \\
+GraphSAGE & none & 0,177 & 0,210 & 0,004 & 0,001 & 3 \\
+GraphSAGE & todos & 0,314 & 0,339 & 0,007 & 0,005 & 9 \\
+GAT & class\_weighting & 0,320 & 0,201 & 0,008 & 0,022 & 3 \\
+GAT & focal\_loss & 0,332 & 0,391 & 0,005 & 0,009 & 3 \\
+GAT & none & 0,202 & 0,273 & 0,005 & 0,000816 & 3 \\
+GAT & todos & 0,285 & 0,288 & 0,006 & 0,010 & 9 \\
+TAGCN & class\_weighting & 0,299 & 0,360 & 0,008 & 0,006 & 3 \\
+TAGCN & focal\_loss & 0,290 & 0,357 & 0,008 & 0,008 & 3 \\
+TAGCN & none & 0,097 & 0,003 & 0,004 & 0,000138 & 3 \\
+TAGCN & todos & 0,229 & 0,240 & 0,007 & 0,005 & 9 \\
+\bottomrule
+\end{tabular}
+\end{table}

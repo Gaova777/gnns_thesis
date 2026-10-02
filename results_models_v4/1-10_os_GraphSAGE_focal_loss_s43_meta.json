@@ -1,0 +1,224 @@
+{
+  "run_id": "1:10_os_GraphSAGE_focal_loss_s43",
+  "pipeline_version": "v4",
+  "scenario": "1:10_os",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.1,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "1:10_os",
+    "kind": "oversample",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 6924,
+    "n_synthetic_illicit": 3462,
+    "n_licit": 69240,
+    "negative_origin": {
+      "licit": 13781,
+      "unknown": 55459
+    },
+    "total": 76164,
+    "ratio": 0.1,
+    "ratio_str": "1:10.0",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected": {
+      "n_illicit": 6924,
+      "n_licit": 69240
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "07027587adca21a16b2706e78e74ef9933498d67",
+    "val_test_subsampled": false,
+    "smote": {
+      "n_new": 3462,
+      "k": 5,
+      "n_edges_added": 7028
+    }
+  },
+  "n_train_illicit": 6924,
+  "n_train_licit": 69240,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.5686274509803921,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.7744357207958888,
+        "f1": 0.564945226917058,
+        "mcc": 0.607203495961501,
+        "recall": 0.3949671772428884,
+        "precision": 0.9917582417582418
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.43337029792987564,
+        "f1": 0.4589955499046408,
+        "mcc": 0.4504822827085653,
+        "recall": 0.3949671772428884,
+        "precision": 0.5477996965098634
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.42296203187891723,
+        "f1": 0.4581218274111675,
+        "mcc": 0.452965999120424,
+        "recall": 0.3949671772428884,
+        "precision": 0.5453172205438066
+      },
+      "flag_rate": {
+        "illicit": 0.3949671685695648,
+        "licit": 0.0003307972219772637,
+        "unknown": 0.010705176740884781
+      },
+      "mean_prob": {
+        "illicit": 0.4948606491088867,
+        "licit": 0.15375731885433197,
+        "unknown": 0.1828809231519699
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.06267384991221969,
+        "f1": 0.011695906432748537,
+        "mcc": 0.052316549546755214,
+        "recall": 0.005917159763313609,
+        "precision": 0.5
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.012588182651778017,
+        "f1": 0.008333333333333333,
+        "mcc": 0.004423534447085003,
+        "recall": 0.005917159763313609,
+        "precision": 0.014084507042253521
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.010260054927618821,
+        "f1": 0.008298755186721992,
+        "mcc": 0.005371184515235896,
+        "recall": 0.005917159763313609,
+        "precision": 0.013888888888888888
+      },
+      "flag_rate": {
+        "illicit": 0.005917159840464592,
+        "licit": 0.0001534212933620438,
+        "unknown": 0.0030438753310590982
+      },
+      "mean_prob": {
+        "illicit": 0.21516956388950348,
+        "licit": 0.12894746661186218,
+        "unknown": 0.14804358780384064
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GraphSAGE",
+  "balancing": "focal_loss",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 64,
+    "num_layers": 2,
+    "dropout": 0.4879639408647978,
+    "lr": 0.004622589001020831,
+    "weight_decay": 2.6587543983272695e-05
+  },
+  "optuna_best_score": 0.39160316241539533,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 137,
+  "epochs_run": 150,
+  "best_val_score": 0.4477884176926585,
+  "best_val_mcc": 0.4382455351104658,
+  "val_metrics": {
+    "loss": 0.012071036733686924,
+    "f1": 0.4477884176926585,
+    "mcc": 0.4382455351104658,
+    "pr_auc": 0.42296203187891723
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.012071036733686924,
+    "f1": 0.4581218274111675,
+    "mcc": 0.452965999120424,
+    "pr_auc": 0.42296203187891723
+  },
+  "test_metrics": {
+    "loss": 0.008832242339849472,
+    "f1": 0.008298755186721992,
+    "mcc": 0.005371184515235896,
+    "pr_auc": 0.010260054927618821
+  },
+  "test_metrics_argmax": {
+    "loss": 0.008832242339849472,
+    "f1": 0.01084010840108401,
+    "mcc": 0.004714371606569772,
+    "pr_auc": 0.010260054927618821
+  },
+  "calibrated_threshold": 0.5686274509803921,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.4581218274111675,
+  "calibration_resample": null,
+  "quality_passed": true,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.4477884176926585,
+  "val_mcc_best_epoch": 0.4382455351104658,
+  "mlflow_run_id": "fa671e09786442d6b584477a4cab14f5",
+  "checkpoint": "1-10_os_GraphSAGE_focal_loss_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 15.1,
+  "finished_at": "2026-09-29T21:24:24"
+}

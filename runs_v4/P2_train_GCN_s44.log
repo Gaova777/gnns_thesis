@@ -1,0 +1,257 @@
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.3s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 12 configs (1 seed(s): 44)
+Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:04<?]                                             Train matrix:   0%|          | 0/12 [00:04<?]                                             Train matrix:   0%|          | 0/12 [00:04<?]                                             Train matrix:   0%|          | 0/12 [00:04<?]Train matrix:   8%|▊         | 1/12 [00:04<00:48]Train matrix:   8%|▊         | 1/12 [00:04<00:48]                                                 Train matrix:   8%|▊         | 1/12 [00:04<00:48]                                                 Train matrix:   8%|▊         | 1/12 [00:04<00:48]                                                 Train matrix:   8%|▊         | 1/12 [00:07<00:48]                                                 Train matrix:   8%|▊         | 1/12 [00:07<00:48]                                                 Train matrix:   8%|▊         | 1/12 [00:07<00:48]                                                 Train matrix:   8%|▊         | 1/12 [00:07<00:48]Train matrix:  17%|█▋        | 2/12 [00:07<00:39]Train matrix:  17%|█▋        | 2/12 [00:07<00:39]                                                 Train matrix:  17%|█▋        | 2/12 [00:07<00:39]                                                 Train matrix:  17%|█▋        | 2/12 [00:08<00:39]                                                 Train matrix:  17%|█▋        | 2/12 [00:11<00:39]                                                 Train matrix:  17%|█▋        | 2/12 [00:11<00:39]                                                 Train matrix:  17%|█▋        | 2/12 [00:11<00:39]                                                 Train matrix:  17%|█▋        | 2/12 [00:11<00:39]Train matrix:  25%|██▌       | 3/12 [00:11<00:34]Train matrix:  25%|██▌       | 3/12 [00:11<00:34]                                                 Train matrix:  25%|██▌       | 3/12 [00:11<00:34]                                                 Train matrix:  25%|██▌       | 3/12 [00:11<00:34]                                                 Train matrix:  25%|██▌       | 3/12 [00:15<00:34]                                                 Train matrix:  25%|██▌       | 3/12 [00:15<00:34]                                                 Train matrix:  25%|██▌       | 3/12 [00:15<00:34]                                                 Train matrix:  25%|██▌       | 3/12 [00:15<00:34]Train matrix:  33%|███▎      | 4/12 [00:15<00:30]Train matrix:  33%|███▎      | 4/12 [00:15<00:30]                                                 Train matrix:  33%|███▎      | 4/12 [00:15<00:30]                                                 Train matrix:  33%|███▎      | 4/12 [00:15<00:30]                                                 Train matrix:  33%|███▎      | 4/12 [00:17<00:30]                                                 Train matrix:  33%|███▎      | 4/12 [00:17<00:30]                                                 Train matrix:  33%|███▎      | 4/12 [00:17<00:30]                                                 Train matrix:  33%|███▎      | 4/12 [00:17<00:30]Train matrix:  42%|████▏     | 5/12 [00:18<00:23]Train matrix:  42%|████▏     | 5/12 [00:18<00:23]                                                 Train matrix:  42%|████▏     | 5/12 [00:18<00:23]                                                 Train matrix:  42%|████▏     | 5/12 [00:18<00:23]                                                 Train matrix:  42%|████▏     | 5/12 [00:21<00:23]                                                 Train matrix:  42%|████▏     | 5/12 [00:21<00:23]                                                 Train matrix:  42%|████▏     | 5/12 [00:21<00:23]                                                 Train matrix:  42%|████▏     | 5/12 [00:21<00:23]Train matrix:  50%|█████     | 6/12 [00:21<00:20]Train matrix:  50%|█████     | 6/12 [00:21<00:20]                                                 Train matrix:  50%|█████     | 6/12 [00:21<00:20]                                                 Train matrix:  50%|█████     | 6/12 [00:21<00:20]
+======================================================================
+CONFIG: native_GCN_none_s44
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: reused from seed 42 (native_GCN_none_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Epoch  10 | Train Loss: 0.1785 | Val Loss: 0.1912 | Val F1: 0.1813 | Val MCC: 0.1625 | Val PR-AUC: 0.1198
+  Epoch  20 | Train Loss: 0.1018 | Val Loss: 0.1188 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0542
+  Epoch  30 | Train Loss: 0.0865 | Val Loss: 0.1133 | Val F1: 0.0384 | Val MCC: 0.1218 | Val PR-AUC: 0.0802
+  Early stopping at epoch 30 (best: 10)
+  Val (argmax): F1=0.1813 MCC=0.1625 PR-AUC=0.1198 | Test PR-AUC=0.0136
+  Calibrated on val (t=0.54): val F1=0.1847 | test F1=0.0457 MCC=0.0531
+  Cross-label test PR-AUC: vs licit=0.0751 vs unknown=0.0164 vs all=0.0136 | unknown flagged=3.761%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/native_GCN_none_s44_meta.json (4s)
+
+======================================================================
+CONFIG: native_GCN_class_weighting_s44
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: reused from seed 42 (native_GCN_class_weighting_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Epoch  10 | Train Loss: 0.6458 | Val Loss: 1.2436 | Val F1: 0.0583 | Val MCC: 0.0733 | Val PR-AUC: 0.0748
+  Epoch  20 | Train Loss: 0.4195 | Val Loss: 0.6136 | Val F1: 0.0765 | Val MCC: 0.1047 | Val PR-AUC: 0.1204
+  Early stopping at epoch 25 (best: 5)
+  Val (argmax): F1=0.1036 MCC=0.1188 PR-AUC=0.1095 | Test PR-AUC=0.0084
+  Calibrated on val (t=0.91): val F1=0.1940 | test F1=0.0151 MCC=0.0077
+  Cross-label test PR-AUC: vs licit=0.0708 vs unknown=0.0095 vs all=0.0084 | unknown flagged=1.905%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/native_GCN_class_weighting_s44_meta.json (3s)
+
+======================================================================
+CONFIG: native_GCN_focal_loss_s44
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Hyperparams: reused from seed 42 (native_GCN_focal_loss_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.1415 | Val Loss: 0.1047 | Val F1: 0.1181 | Val MCC: 0.1258 | Val PR-AUC: 0.1291
+  Epoch  20 | Train Loss: 0.0279 | Val Loss: 0.0285 | Val F1: 0.0401 | Val MCC: 0.0087 | Val PR-AUC: 0.0309
+  Early stopping at epoch 27 (best: 7)
+  Val (argmax): F1=0.1588 MCC=0.1380 PR-AUC=0.1206 | Test PR-AUC=0.0062
+  Calibrated on val (t=0.64): val F1=0.1881 | test F1=0.0000 MCC=-0.0109
+  Cross-label test PR-AUC: vs licit=0.0492 vs unknown=0.0071 vs all=0.0062 | unknown flagged=2.413%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/native_GCN_focal_loss_s44_meta.json (4s)
+
+======================================================================
+CONFIG: 1:10_GCN_none_s44
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Hyperparams: reused from seed 42 (1-10_GCN_none_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Epoch  10 | Train Loss: 0.3713 | Val Loss: 0.1723 | Val F1: 0.2004 | Val MCC: 0.1795 | Val PR-AUC: 0.1173
+  Epoch  20 | Train Loss: 0.2255 | Val Loss: 0.2177 | Val F1: 0.2048 | Val MCC: 0.1871 | Val PR-AUC: 0.1373
+  Early stopping at epoch 29 (best: 9)
+  Val (argmax): F1=0.2488 MCC=0.2335 PR-AUC=0.1558 | Test PR-AUC=0.0050
+  Calibrated on val (t=0.49): val F1=0.2501 | test F1=0.0037 MCC=-0.0082
+  Cross-label test PR-AUC: vs licit=0.0309 vs unknown=0.0060 vs all=0.0050 | unknown flagged=3.548%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-10_GCN_none_s44_meta.json (4s)
+
+======================================================================
+CONFIG: 1:10_GCN_class_weighting_s44
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Hyperparams: reused from seed 42 (1-10_GCN_class_weighting_meta.json): {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Class weights: [0.550000011920929, 5.5]
+  Epoch  10 | Train Loss: 0.6976 | Val Loss: 1.3459 | Val F1: 0.0674 | Val MCC: 0.0901 | Val PR-AUC: 0.0747
+  Epoch  20 | Train Loss: 0.4725 | Val Loss: 0.7765 | Val F1: 0.0760 | Val MCC: 0.1082 | Val PR-AUC: 0.1018
+  Early stopping at epoch 21 (best: 1)
+  Val (argmax): F1=0.0823 MCC=0.0828 PR-AUC=0.0421 | Test PR-AUC=0.0062
+  Calibrated on val (t=0.64): val F1=0.0940 | test F1=0.0096 MCC=-0.0038
+  Cross-label test PR-AUC: vs licit=0.0388 vs unknown=0.0073 vs all=0.0062 | unknown flagged=14.698%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-10_GCN_class_weighting_s44_meta.json (2s)
+
+======================================================================
+CONFIG: 1:10_GCN_focal_loss_s44
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Hyperparams: reused from seed 42 (1-10_GCN_focal_loss_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.1255 | Val Loss: 0.1887 | Val F1: 0.0780 | Val MCC: 0.1152 | Val PR-AUC: 0.1079
+  Epoch  20 | Train Loss: 0.0471 | Val Loss: 0.0226 | Val F1: 0.1379 | Val MCC: 0.1160 | Val PR-AUC: 0.0782
+  Early stopping at epoch 25 (best: 5)
+  Val (argmax): F1=0.1763 MCC=0.1548 PR-AUC=0.1137 | Test PR-AUC=0.0060
+  Calibrated on val (t=0.51): val F1=0.1778 | test F1=0.0000 MCC=-0.0130
+  Cross-label test PR-AUC: vs licit=0.0481 vs unknown=0.0069 vs all=0.0060 | unknown flagged=3.492%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-10_GCN_focal_loss_s44_meta.json (3s)
+
+======================================================================
+CONFIG: 1:1_GCN_none_s44
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Hyperparams: reused from seed 42 (1-1_GCN_none_meta.json): {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Epoch  10 | Train Loss: 0.6994 | Val Loss: 1.4819 | Val F1: 0.0690 | Val MCC: 0.0945 | Val PR-AUC: 0.0769
+  Epoch  20 | Train Loss: 0.4679 | Val Loss: 0.8949 | Val F1: 0.0770 | Val MCC: 0.1133 | Val PR-AUC: 0.1040
+  Epoch  30 | Train Loss: 0.4035 | Val Loss: 0.6818 | Val F1: 0.0916 | Val MCC: 0.1357 | Val PR-AUC: 0.1316
+  Epoch  40 | Train Loss: 0.3686 | Val Loss: 0.6781 | Val F1: 0.0930 | Val MCC: 0.1354 | Val PR-AUC: 0.1480                                                 Train matrix:  50%|█████     | 6/12 [00:35<00:20]                                                 Train matrix:  50%|█████     | 6/12 [00:35<00:20]                                                 Train matrix:  50%|█████     | 6/12 [00:35<00:20]                                                 Train matrix:  50%|█████     | 6/12 [00:35<00:20]Train matrix:  58%|█████▊    | 7/12 [00:35<00:34]Train matrix:  58%|█████▊    | 7/12 [00:35<00:34]                                                 Train matrix:  58%|█████▊    | 7/12 [00:35<00:34]                                                 Train matrix:  58%|█████▊    | 7/12 [00:35<00:34]                                                 Train matrix:  58%|█████▊    | 7/12 [00:49<00:34]                                                 Train matrix:  58%|█████▊    | 7/12 [00:49<00:34]                                                 Train matrix:  58%|█████▊    | 7/12 [00:49<00:34]                                                 Train matrix:  58%|█████▊    | 7/12 [00:49<00:34]Train matrix:  67%|██████▋   | 8/12 [00:49<00:36]Train matrix:  67%|██████▋   | 8/12 [00:49<00:36]                                                 Train matrix:  67%|██████▋   | 8/12 [00:49<00:36]                                                 Train matrix:  67%|██████▋   | 8/12 [00:49<00:36]                                                 Train matrix:  67%|██████▋   | 8/12 [00:52<00:36]                                                 Train matrix:  67%|██████▋   | 8/12 [00:53<00:36]                                                 Train matrix:  67%|██████▋   | 8/12 [00:53<00:36]                                                 Train matrix:  67%|██████▋   | 8/12 [00:53<00:36]Train matrix:  75%|███████▌  | 9/12 [00:53<00:22]Train matrix:  75%|███████▌  | 9/12 [00:53<00:22]                                                 Train matrix:  75%|███████▌  | 9/12 [00:53<00:22]                                                 Train matrix:  75%|███████▌  | 9/12 [00:53<00:22]                                                 Train matrix:  75%|███████▌  | 9/12 [00:56<00:22]                                                 Train matrix:  75%|███████▌  | 9/12 [00:57<00:22]                                                 Train matrix:  75%|███████▌  | 9/12 [00:57<00:22]                                                 Train matrix:  75%|███████▌  | 9/12 [00:57<00:22]Train matrix:  83%|████████▎ | 10/12 [00:57<00:12]Train matrix:  83%|████████▎ | 10/12 [00:57<00:12]                                                  Train matrix:  83%|████████▎ | 10/12 [00:57<00:12]                                                  Train matrix:  83%|████████▎ | 10/12 [00:57<00:12]                                                  Train matrix:  83%|████████▎ | 10/12 [00:59<00:12]                                                  Train matrix:  83%|████████▎ | 10/12 [00:59<00:12]                                                  Train matrix:  83%|████████▎ | 10/12 [00:59<00:12]                                                  Train matrix:  83%|████████▎ | 10/12 [00:59<00:12]Train matrix:  92%|█████████▏| 11/12 [00:59<00:05]Train matrix:  92%|█████████▏| 11/12 [00:59<00:05]                                                  Train matrix:  92%|█████████▏| 11/12 [00:59<00:05]                                                  
+  Epoch  50 | Train Loss: 0.3425 | Val Loss: 0.6753 | Val F1: 0.1025 | Val MCC: 0.1574 | Val PR-AUC: 0.1541
+  Epoch  60 | Train Loss: 0.3222 | Val Loss: 0.6388 | Val F1: 0.1108 | Val MCC: 0.1677 | Val PR-AUC: 0.1650
+  Epoch  70 | Train Loss: 0.3102 | Val Loss: 0.5872 | Val F1: 0.1211 | Val MCC: 0.1789 | Val PR-AUC: 0.1646
+  Epoch  80 | Train Loss: 0.2874 | Val Loss: 0.5652 | Val F1: 0.1280 | Val MCC: 0.1875 | Val PR-AUC: 0.1676
+  Epoch  90 | Train Loss: 0.2858 | Val Loss: 0.5227 | Val F1: 0.1363 | Val MCC: 0.1947 | Val PR-AUC: 0.1717
+  Epoch 100 | Train Loss: 0.2692 | Val Loss: 0.5128 | Val F1: 0.1407 | Val MCC: 0.1996 | Val PR-AUC: 0.1778
+  Epoch 110 | Train Loss: 0.2655 | Val Loss: 0.4861 | Val F1: 0.1467 | Val MCC: 0.2045 | Val PR-AUC: 0.1806
+  Epoch 120 | Train Loss: 0.2556 | Val Loss: 0.4884 | Val F1: 0.1482 | Val MCC: 0.2059 | Val PR-AUC: 0.1787
+  Epoch 130 | Train Loss: 0.2520 | Val Loss: 0.4849 | Val F1: 0.1499 | Val MCC: 0.2082 | Val PR-AUC: 0.1770
+  Epoch 140 | Train Loss: 0.2479 | Val Loss: 0.4645 | Val F1: 0.1558 | Val MCC: 0.2128 | Val PR-AUC: 0.1806
+  Epoch 150 | Train Loss: 0.2365 | Val Loss: 0.4516 | Val F1: 0.1615 | Val MCC: 0.2181 | Val PR-AUC: 0.1790
+  Val (argmax): F1=0.1615 MCC=0.2181 PR-AUC=0.1790 | Test PR-AUC=0.0118
+  Calibrated on val (t=0.88): val F1=0.2593 | test F1=0.0169 MCC=0.0101
+  Cross-label test PR-AUC: vs licit=0.0519 vs unknown=0.0151 vs all=0.0118 | unknown flagged=2.335%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-1_GCN_none_s44_meta.json (14s)
+
+======================================================================
+CONFIG: 1:1_GCN_class_weighting_s44
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Hyperparams: reused from seed 42 (1-1_GCN_class_weighting_meta.json): {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Class weights: [1.0, 1.0]
+  Epoch  10 | Train Loss: 0.6994 | Val Loss: 1.4819 | Val F1: 0.0690 | Val MCC: 0.0945 | Val PR-AUC: 0.0769
+  Epoch  20 | Train Loss: 0.4679 | Val Loss: 0.8949 | Val F1: 0.0770 | Val MCC: 0.1133 | Val PR-AUC: 0.1040
+  Epoch  30 | Train Loss: 0.4035 | Val Loss: 0.6818 | Val F1: 0.0916 | Val MCC: 0.1357 | Val PR-AUC: 0.1316
+  Epoch  40 | Train Loss: 0.3686 | Val Loss: 0.6781 | Val F1: 0.0930 | Val MCC: 0.1354 | Val PR-AUC: 0.1480
+  Epoch  50 | Train Loss: 0.3425 | Val Loss: 0.6753 | Val F1: 0.1025 | Val MCC: 0.1574 | Val PR-AUC: 0.1541
+  Epoch  60 | Train Loss: 0.3222 | Val Loss: 0.6388 | Val F1: 0.1108 | Val MCC: 0.1677 | Val PR-AUC: 0.1650
+  Epoch  70 | Train Loss: 0.3102 | Val Loss: 0.5872 | Val F1: 0.1211 | Val MCC: 0.1789 | Val PR-AUC: 0.1646
+  Epoch  80 | Train Loss: 0.2874 | Val Loss: 0.5652 | Val F1: 0.1280 | Val MCC: 0.1875 | Val PR-AUC: 0.1676
+  Epoch  90 | Train Loss: 0.2858 | Val Loss: 0.5227 | Val F1: 0.1363 | Val MCC: 0.1947 | Val PR-AUC: 0.1717
+  Epoch 100 | Train Loss: 0.2692 | Val Loss: 0.5128 | Val F1: 0.1407 | Val MCC: 0.1996 | Val PR-AUC: 0.1778
+  Epoch 110 | Train Loss: 0.2655 | Val Loss: 0.4861 | Val F1: 0.1467 | Val MCC: 0.2045 | Val PR-AUC: 0.1806
+  Epoch 120 | Train Loss: 0.2556 | Val Loss: 0.4884 | Val F1: 0.1482 | Val MCC: 0.2059 | Val PR-AUC: 0.1787
+  Epoch 130 | Train Loss: 0.2520 | Val Loss: 0.4849 | Val F1: 0.1499 | Val MCC: 0.2082 | Val PR-AUC: 0.1770
+  Epoch 140 | Train Loss: 0.2479 | Val Loss: 0.4645 | Val F1: 0.1558 | Val MCC: 0.2128 | Val PR-AUC: 0.1806
+  Epoch 150 | Train Loss: 0.2365 | Val Loss: 0.4516 | Val F1: 0.1615 | Val MCC: 0.2181 | Val PR-AUC: 0.1790
+  Val (argmax): F1=0.1615 MCC=0.2181 PR-AUC=0.1790 | Test PR-AUC=0.0118
+  Calibrated on val (t=0.88): val F1=0.2593 | test F1=0.0169 MCC=0.0101
+  Cross-label test PR-AUC: vs licit=0.0519 vs unknown=0.0151 vs all=0.0118 | unknown flagged=2.335%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-1_GCN_class_weighting_s44_meta.json (14s)
+
+======================================================================
+CONFIG: 1:1_GCN_focal_loss_s44
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Hyperparams: reused from seed 42 (1-1_GCN_focal_loss_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.1900 | Val Loss: 0.1757 | Val F1: 0.0740 | Val MCC: 0.1006 | Val PR-AUC: 0.0968
+  Epoch  20 | Train Loss: 0.0582 | Val Loss: 0.1657 | Val F1: 0.0611 | Val MCC: 0.0803 | Val PR-AUC: 0.0971
+  Early stopping at epoch 28 (best: 8)
+  Val (argmax): F1=0.0777 MCC=0.1091 PR-AUC=0.0962 | Test PR-AUC=0.0229
+  Calibrated on val (t=0.96): val F1=0.1776 | test F1=0.0416 MCC=0.0551
+  Cross-label test PR-AUC: vs licit=0.0934 vs unknown=0.0322 vs all=0.0229 | unknown flagged=5.566%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-1_GCN_focal_loss_s44_meta.json (4s)
+
+======================================================================
+CONFIG: 1:10_os_GCN_none_s44
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Hyperparams: reused from seed 42 (1-10_os_GCN_none_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Epoch  10 | Train Loss: 0.3870 | Val Loss: 0.1656 | Val F1: 0.1942 | Val MCC: 0.1734 | Val PR-AUC: 0.1268
+  Epoch  20 | Train Loss: 0.2204 | Val Loss: 0.2074 | Val F1: 0.1855 | Val MCC: 0.1644 | Val PR-AUC: 0.1338
+  Early stopping at epoch 29 (best: 9)
+  Val (argmax): F1=0.2548 MCC=0.2426 PR-AUC=0.1610 | Test PR-AUC=0.0053
+  Calibrated on val (t=0.52): val F1=0.2566 | test F1=0.0038 MCC=-0.0079
+  Cross-label test PR-AUC: vs licit=0.0338 vs unknown=0.0063 vs all=0.0053 | unknown flagged=3.466%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-10_os_GCN_none_s44_meta.json (4s)
+
+======================================================================
+CONFIG: 1:10_os_GCN_class_weighting_s44
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Hyperparams: reused from seed 42 (1-10_os_GCN_class_weighting_meta.json): {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Class weights: [0.550000011920929, 5.5]
+  Epoch  10 | Train Loss: 0.7077 | Val Loss: 1.3609 | Val F1: 0.0673 | Val MCC: 0.0904 | Val PR-AUC: 0.0751
+  Epoch  20 | Train Loss: 0.4739 | Val Loss: 0.7942 | Val F1: 0.0759 | Val MCC: 0.1094 | Val PR-AUC: 0.1002
+  Early stopping at epoch 21 (best: 1)
+  Val (argmax): F1=0.0825 MCC=0.0830 PR-AUC=0.0422 | Test PR-AUC=0.0062
+  Calibrated on val (t=0.63): val F1=0.0924 | test F1=0.0102 MCC=-0.0022
+  Cross-label test PR-AUC: vs licit=0.0388 vs unknown=0.0073 vs all=0.0062 | unknown flagged=15.202%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-10_os_GCN_class_weighting_s44_meta.json (2s)
+
+======================================================================
+CONFIG: 1:10_os_GCN_focal_loss_s44
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Hyperparams: reused from seed 42 (1-10_os_GCN_focal_loss_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}Train matrix:  92%|█████████▏| 11/12 [00:59<00:05]                                                  Train matrix:  92%|█████████▏| 11/12 [01:03<00:05]                                                  Train matrix:  92%|█████████▏| 11/12 [01:03<00:05]                                                  Train matrix:  92%|█████████▏| 11/12 [01:03<00:05]                                                  Train matrix:  92%|█████████▏| 11/12 [01:03<00:05]Train matrix: 100%|██████████| 12/12 [01:03<00:00]Train matrix: 100%|██████████| 12/12 [01:03<00:00]
+
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.1279 | Val Loss: 0.1852 | Val F1: 0.0782 | Val MCC: 0.1147 | Val PR-AUC: 0.1075
+  Epoch  20 | Train Loss: 0.0468 | Val Loss: 0.0228 | Val F1: 0.1186 | Val MCC: 0.0945 | Val PR-AUC: 0.0698
+  Early stopping at epoch 25 (best: 5)
+  Val (argmax): F1=0.1755 MCC=0.1538 PR-AUC=0.1119 | Test PR-AUC=0.0060
+  Calibrated on val (t=0.51): val F1=0.1790 | test F1=0.0000 MCC=-0.0136
+  Cross-label test PR-AUC: vs licit=0.0482 vs unknown=0.0069 vs all=0.0060 | unknown flagged=3.805%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-10_os_GCN_focal_loss_s44_meta.json (3s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        12
+    - native_GCN_none_s44
+    - native_GCN_class_weighting_s44
+    - native_GCN_focal_loss_s44
+    - 1:10_GCN_none_s44
+    - 1:10_GCN_class_weighting_s44
+    - 1:10_GCN_focal_loss_s44
+    - 1:1_GCN_none_s44
+    - 1:1_GCN_class_weighting_s44
+    - 1:1_GCN_focal_loss_s44
+    - 1:10_os_GCN_none_s44
+    - 1:10_os_GCN_class_weighting_s44
+    - 1:10_os_GCN_focal_loss_s44
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.02 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl

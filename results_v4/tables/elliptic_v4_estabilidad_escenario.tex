@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Estabilidad media por arquitectura y escenario (configuraciones que pasan la compuerta)}
+\label{tab:v4-estab-escenario}
+\begin{tabular}{llrrr}
+\toprule
+Explicador & Arquitectura & native & 1:10 & 1:10\_os \\
+\midrule
+GNNExplainer & GAT & 0,933 & 0,941 & 0,933 \\
+GNNExplainer & GraphSAGE & 0,941 & 0,935 & 0,938 \\
+GNNExplainer & TAGCN & 0,935 & 0,921 & 0,926 \\
+PGExplainer & GAT & 0,589 & 0,538 & 0,479 \\
+PGExplainer & GraphSAGE & 0,151 & 0,251 & 0,295 \\
+PGExplainer & TAGCN & 0,140 & 0,102 & 0,205 \\
+ShapleyFeatures & GAT & 0,993 & 0,996 & 0,995 \\
+ShapleyFeatures & GraphSAGE & 0,995 & 0,996 & 0,996 \\
+ShapleyFeatures & TAGCN & 0,990 & 0,992 & 0,989 \\
+\bottomrule
+\end{tabular}
+\end{table}

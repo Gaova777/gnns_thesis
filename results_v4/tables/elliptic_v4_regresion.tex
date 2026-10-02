@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering\small
+\caption{Estabilidad $\sim$ arquitectura + PR-AUC de validación (MCO)}
+\label{tab:v4-regresion}
+\begin{tabular}{llrrrr}
+\toprule
+Explicador & Término & β & EE & p & n \\
+\midrule
+GNNExplainer & intercepto & 0,889 & 0,048 & 1,01e-12 & 21 \\
+GNNExplainer & arch[GAT] (ref GraphSAGE) & 0,005 & 0,016 & 0,770 & 21 \\
+GNNExplainer & arch[TAGCN] (ref GraphSAGE) & -0,008 & 0,013 & 0,556 & 21 \\
+GNNExplainer & val\_pr\_auc & 0,119 & 0,116 & 0,318 & 21 \\
+PGExplainer & intercepto & 1,012 & 0,445 & 0,036 & 21 \\
+PGExplainer & arch[GAT] (ref GraphSAGE) & 0,171 & 0,145 & 0,253 & 21 \\
+PGExplainer & arch[TAGCN] (ref GraphSAGE) & -0,153 & 0,117 & 0,207 & 21 \\
+PGExplainer & val\_pr\_auc & -1,896 & 1,079 & 0,097 & 21 \\
+ShapleyFeatures & intercepto & 0,999 & 0,008 & 0,000 & 21 \\
+ShapleyFeatures & arch[GAT] (ref GraphSAGE) & -0,002 & 0,003 & 0,517 & 21 \\
+ShapleyFeatures & arch[TAGCN] (ref GraphSAGE) & -0,005 & 0,002 & 0,019 & 21 \\
+ShapleyFeatures & val\_pr\_auc & -0,008 & 0,019 & 0,675 & 21 \\
+\bottomrule
+\end{tabular}
+\end{table}

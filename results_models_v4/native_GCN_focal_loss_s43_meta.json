@@ -1,0 +1,220 @@
+{
+  "run_id": "native_GCN_focal_loss_s43",
+  "pipeline_version": "v4",
+  "scenario": "native",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.026068688207344714,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "native",
+    "kind": "native",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 3462,
+    "n_synthetic_illicit": 0,
+    "n_licit": 132803,
+    "negative_origin": {
+      "licit": 26432,
+      "unknown": 106371
+    },
+    "total": 136265,
+    "ratio": 0.026068688207344714,
+    "ratio_str": "1:38.4",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "a8f788619e531bdea36646909aaaeea45e1918cb",
+    "val_test_subsampled": false,
+    "smote": null
+  },
+  "n_train_illicit": 3462,
+  "n_train_licit": 132803,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.5196078431372548,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.45170302414553765,
+        "f1": 0.3887147335423197,
+        "mcc": 0.3992023575778664,
+        "recall": 0.2713347921225383,
+        "precision": 0.6850828729281768
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.13080091843402208,
+        "f1": 0.23440453686200377,
+        "mcc": 0.20779950402956374,
+        "recall": 0.2713347921225383,
+        "precision": 0.20632279534109818
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.12026389775443329,
+        "f1": 0.22242152466367712,
+        "mcc": 0.20311855305971,
+        "recall": 0.2713347921225383,
+        "precision": 0.1884498480243161
+      },
+      "flag_rate": {
+        "illicit": 0.27133479714393616,
+        "licit": 0.012570294551551342,
+        "unknown": 0.034270934760570526
+      },
+      "mean_prob": {
+        "illicit": 0.38026905059814453,
+        "licit": 0.10891792923212051,
+        "unknown": 0.1942482888698578
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.028985197636080616,
+        "f1": 0.015810276679841896,
+        "mcc": -0.0010516252265939195,
+        "recall": 0.011834319526627219,
+        "precision": 0.023809523809523808
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.005917009234412021,
+        "f1": 0.0057306590257879654,
+        "mcc": -0.006313185812033514,
+        "recall": 0.011834319526627219,
+        "precision": 0.003780718336483932
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.004912909104372939,
+        "f1": 0.005128205128205128,
+        "mcc": -0.004662782957443855,
+        "recall": 0.011834319526627219,
+        "precision": 0.0032733224222585926
+      },
+      "flag_rate": {
+        "illicit": 0.011834319680929184,
+        "licit": 0.01258054655045271,
+        "unknown": 0.022916032001376152
+      },
+      "mean_prob": {
+        "illicit": 0.12091042101383209,
+        "licit": 0.10728922486305237,
+        "unknown": 0.17064642906188965
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GCN",
+  "balancing": "focal_loss",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 148,
+    "num_layers": 2,
+    "dropout": 0.12602063719411183,
+    "lr": 0.007902619549708232,
+    "weight_decay": 0.0008536189862866829
+  },
+  "optuna_best_score": 0.10061404122691567,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 16,
+  "epochs_run": 36,
+  "best_val_score": 0.21544554455445544,
+  "best_val_mcc": 0.19871209272399742,
+  "val_metrics": {
+    "loss": 0.026477105915546417,
+    "f1": 0.21544554455445544,
+    "mcc": 0.19871209272399742,
+    "pr_auc": 0.12026389775443329
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.026477105915546417,
+    "f1": 0.22242152466367712,
+    "mcc": 0.20311855305971,
+    "pr_auc": 0.12026389775443329
+  },
+  "test_metrics": {
+    "loss": 0.018193090334534645,
+    "f1": 0.005128205128205128,
+    "mcc": -0.004662782957443855,
+    "pr_auc": 0.004912909104372939
+  },
+  "test_metrics_argmax": {
+    "loss": 0.018193090334534645,
+    "f1": 0.004347826086956522,
+    "mcc": -0.006488590023017178,
+    "pr_auc": 0.004912909104372939
+  },
+  "calibrated_threshold": 0.5196078431372548,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.22242152466367712,
+  "calibration_resample": null,
+  "quality_passed": false,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.21544554455445544,
+  "val_mcc_best_epoch": 0.19871209272399742,
+  "mlflow_run_id": "a604bd54109a4370be0f77ef01e36dd7",
+  "checkpoint": "native_GCN_focal_loss_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 4.5,
+  "finished_at": "2026-09-29T21:20:37"
+}

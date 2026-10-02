@@ -1,0 +1,653 @@
+[2026-09-29 20:33:01] run_all_v4 · stages=all · config=configs/experiment_v4.yaml · device=cuda · resume=1 · only=P1 · from=P0 · escenarios=native 1:10 1:1 1:10_os
+PREFLIGHT v4 — /home/juan/Escritorio/gnn_thesis/gnns_thesis
+[1] Elliptic (data/raw)
+  OK     conteo directo global {'illicit': 4545, 'licit': 42019, 'unknown': 157205}
+  OK     conteo directo por partición {'train': {'illicit': 3462, 'licit': 26432}, 'val': {'illicit': 914, 'licit': 9069}, 'test': {'illicit': 169, 'licit': 6518}}
+  Train: 29,894 nodes (3,462 illicit, 26,432 licit, ratio 1:7.6)
+  Val  :  9,983 nodes (914 illicit, 9,069 licit, ratio 1:9.9)
+  Test :  6,687 nodes (169 illicit, 6,518 licit, ratio 1:38.6)
+  OK     loader del pipeline: etiquetas y particiones validadas {'train': {'illicit': 3462, 'licit': 26432}, 'val': {'illicit': 914, 'licit': 9069}, 'test': {'illicit': 169, 'licit': 6518}}
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  OK     modo de etiquetas licit_unknown: train {'illicit': 3462, 'licit': 132803} · test {'illicit': 169, 'licit': 29515}
+  Train: 29,894 nodes (3,462 illicit, 26,432 licit, ratio 1:7.6)
+  Val  :  9,983 nodes (914 illicit, 9,069 licit, ratio 1:9.9)
+  Test :  6,687 nodes (169 illicit, 6,518 licit, ratio 1:38.6)
+  OK     modo de etiquetas licit: train {'illicit': 3462, 'licit': 26432} · test {'illicit': 169, 'licit': 6518}
+  Train: 109,833 nodes (3,462 illicit, 106,371 licit, ratio 1:30.7)
+  Val  : 28,751 nodes (914 illicit, 27,837 licit, ratio 1:30.5)
+  Test : 23,166 nodes (169 illicit, 22,997 licit, ratio 1:136.1)
+  OK     modo de etiquetas unknown: train {'illicit': 3462, 'licit': 106371} · test {'illicit': 169, 'licit': 22997}
+[2] Config /home/juan/Escritorio/gnn_thesis/gnns_thesis/configs/experiment_v4.yaml
+  OK     4 arquitecturas: ['GAT', 'GCN', 'GraphSAGE', 'TAGCN']
+  OK     ninguna arquitectura sobrescribe el presupuesto común
+  OK     presupuesto común: trials=8 epochs=150 patience=20 seeds=[42, 43, 44]
+[3] Disco
+  OK     libre 210.0 GB (mínimo 20.0 GB)
+[4] GPU
+  OK     cuda:0 NVIDIA GeForce RTX 4060: libre 6.5 / 7.6 GB (mínimo 3.0 GB)
+[5] Directorios de salida
+  OK     ./results_v4 sin resultados v3
+  OK     ./results_models_v4 sin resultados v3
+  OK     ./runs_v4 sin resultados v3
+  AVISO  ./runs_v4/progress.jsonl ya tiene 294 eventos (¿de un smoke? el monitor los mezclará; muévelo si es una corrida nueva)
+  OK     results_phase1_v4 no existe todavía (se creará)
+
+PREFLIGHT OK  (1 avisos)
+[2026-09-29 20:33:07] === P1: semilla 42 · GAT + TAGCN ===
+[2026-09-29 20:33:07]   $ uv run --frozen python scripts/train_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --seed 42 --resume > ./runs_v4/P1_train_GAT_s42.log
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 12 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?][I 2026-09-29 20:33:12,813] A new study created in memory with name: GAT_none_pr_auc
+[I 2026-09-29 20:33:24,057] Trial 0 finished with value: 0.20123933325512322 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.20123933325512322.
+[I 2026-09-29 20:33:27,891] Trial 1 finished with value: 0.04822438140603964 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.20123933325512322.
+[W 2026-09-29 20:33:28,135] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 464.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 165.59 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 72.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 464.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 165.59 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 72.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:33:28,138] Trial 2 failed with value None.
+                                             Train matrix:   0%|          | 0/12 [00:15<?]Train matrix:   8%|▊         | 1/12 [00:15<02:52]Train matrix:   8%|▊         | 1/12 [00:15<02:52]                                                 Train matrix:   8%|▊         | 1/12 [00:15<02:52]                                                 Train matrix:   8%|▊         | 1/12 [00:15<02:52][I 2026-09-29 20:33:28,487] A new study created in memory with name: GAT_class_weighting_pr_auc
+[I 2026-09-29 20:33:41,206] Trial 0 finished with value: 0.3352073749565958 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.3352073749565958.
+[I 2026-09-29 20:33:53,667] Trial 1 finished with value: 0.27165256057124954 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.3352073749565958.
+[W 2026-09-29 20:33:53,896] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 460.19 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 160.53 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 72.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 460.19 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 160.53 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 72.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:33:53,896] Trial 2 failed with value None.
+                                                 Train matrix:   8%|▊         | 1/12 [00:41<02:52]Train matrix:  17%|█▋        | 2/12 [00:41<03:36]Train matrix:  17%|█▋        | 2/12 [00:41<03:36]                                                 Train matrix:  17%|█▋        | 2/12 [00:41<03:36]                                                 Train matrix:  17%|█▋        | 2/12 [00:41<03:36][I 2026-09-29 20:33:54,247] A new study created in memory with name: GAT_focal_loss_pr_auc
+[I 2026-09-29 20:34:00,695] Trial 0 finished with value: 0.2281703422255389 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.2281703422255389.
+[I 2026-09-29 20:34:04,697] Trial 1 finished with value: 0.05022317021053446 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.2281703422255389.
+[W 2026-09-29 20:34:04,923] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 462.19 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 160.53 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 462.19 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 160.53 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:34:04,924] Trial 2 failed with value None.
+                                                 Train matrix:  17%|█▋        | 2/12 [00:52<03:36]Train matrix:  25%|██▌       | 3/12 [00:52<02:30]Train matrix:  25%|██▌       | 3/12 [00:52<02:30]                                                 Train matrix:  25%|██▌       | 3/12 [00:52<02:30]                                                 Train matrix:  25%|██▌       | 3/12 [00:52<02:30][I 2026-09-29 20:34:05,268] A new study created in memory with name: GAT_none_pr_auc
+[I 2026-09-29 20:34:19,156] Trial 0 finished with value: 0.37501399816716197 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.37501399816716197.
+[I 2026-09-29 20:34:31,606] Trial 1 finished with value: 0.16329169719930894 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.37501399816716197.
+[W 2026-09-29 20:34:31,836] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 460.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 161.78 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 460.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 161.78 MiB memory in use. Process 320424 has 48.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:34:31,837] Trial 2 failed with value None.
+                                                 Train matrix:  25%|██▌       | 3/12 [01:19<02:30]Train matrix:  33%|███▎      | 4/12 [01:19<02:46]Train matrix:  33%|███▎      | 4/12 [01:19<02:46]                                                 Train matrix:  33%|███▎      | 4/12 [01:19<02:46]                                                 Train matrix:  33%|███▎      | 4/12 [01:19<02:46][I 2026-09-29 20:34:32,237] A new study created in memory with name: GAT_class_weighting_pr_auc
+[I 2026-09-29 20:34:45,176] Trial 0 finished with value: 0.3365005415207941 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.3365005415207941.
+[I 2026-09-29 20:34:57,705] Trial 1 finished with value: 0.2661221647225842 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.3365005415207941.
+[W 2026-09-29 20:34:57,929] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 447.81 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 168.84 MiB memory in use. Process 320424 has 55.41 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 447.81 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 168.84 MiB memory in use. Process 320424 has 55.41 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:34:57,930] Trial 2 failed with value None.
+                                                 Train matrix:  33%|███▎      | 4/12 [01:45<02:46]Train matrix:  42%|████▏     | 5/12 [01:45<02:38]Train matrix:  42%|████▏     | 5/12 [01:45<02:38]                                                 Train matrix:  42%|████▏     | 5/12 [01:45<02:38]                                                 Train matrix:  42%|████▏     | 5/12 [01:45<02:38][I 2026-09-29 20:34:58,278] A new study created in memory with name: GAT_focal_loss_pr_auc
+[I 2026-09-29 20:35:08,245] Trial 0 finished with value: 0.2830441187132061 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.2830441187132061.
+[I 2026-09-29 20:35:13,527] Trial 1 finished with value: 0.07498258745443574 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.2830441187132061.
+[W 2026-09-29 20:35:13,738] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 417.62 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 63.72 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 417.62 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 63.72 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:35:13,739] Trial 2 failed with value None.
+                                                 Train matrix:  42%|████▏     | 5/12 [02:01<02:38]Train matrix:  50%|█████     | 6/12 [02:01<02:02]Train matrix:  50%|█████     | 6/12 [02:01<02:02]                                                 Train matrix:  50%|█████     | 6/12 [02:01<02:02]                                                 Train matrix:  50%|█████     | 6/12 [02:01<02:02][I 2026-09-29 20:35:14,068] A new study created in memory with name: GAT_none_pr_auc
+[I 2026-09-29 20:35:25,999] Trial 0 finished with value: 0.3478609971993468 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.3478609971993468.
+[I 2026-09-29 20:35:38,241] Trial 1 finished with value: 0.2649298734844503 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.3478609971993468.
+[W 2026-09-29 20:35:38,463] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 424.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 56.41 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 424.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 56.41 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:35:38,463] Trial 2 failed with value None.
+                                                 Train matrix:  50%|█████     | 6/12 [02:25<02:02]Train matrix:  58%|█████▊    | 7/12 [02:26<01:48]Train matrix:  58%|█████▊    | 7/12 [02:26<01:48]                                                 Train matrix:  58%|█████▊    | 7/12 [02:26<01:48]                                                 Train matrix:  58%|█████▊    | 7/12 [02:26<01:48][I 2026-09-29 20:35:38,824] A new study created in memory with name: GAT_class_weighting_pr_auc
+[I 2026-09-29 20:35:51,155] Trial 0 finished with value: 0.3478609971993469 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.3478609971993469.
+[I 2026-09-29 20:36:03,384] Trial 1 finished with value: 0.26492990089067625 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.3478609971993469.
+[W 2026-09-29 20:36:03,606] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 424.44 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 56.91 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 424.44 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 56.91 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:36:03,606] Trial 2 failed with value None.
+                                                 Train matrix:  58%|█████▊    | 7/12 [02:51<01:48]Train matrix:  67%|██████▋   | 8/12 [02:51<01:31]Train matrix:  67%|██████▋   | 8/12 [02:51<01:31]                                                 Train matrix:  67%|██████▋   | 8/12 [02:51<01:31]                                                 Train matrix:  67%|██████▋   | 8/12 [02:51<01:31][I 2026-09-29 20:36:03,964] A new study created in memory with name: GAT_focal_loss_pr_auc
+[I 2026-09-29 20:36:13,305] Trial 0 finished with value: 0.24765443740169665 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.24765443740169665.
+[I 2026-09-29 20:36:21,957] Trial 1 finished with value: 0.09021646535676042 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.24765443740169665.
+[W 2026-09-29 20:36:22,180] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 397.81 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 79.28 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 397.81 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 79.28 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.18 GiB memory in use. Of the allocated memory 5.99 GiB is allocated by PyTorch, and 70.41 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:36:22,181] Trial 2 failed with value None.
+                                                 Train matrix:  67%|██████▋   | 8/12 [03:09<01:31]Train matrix:  75%|███████▌  | 9/12 [03:09<01:04]Train matrix:  75%|███████▌  | 9/12 [03:09<01:04]                                                 Train matrix:  75%|███████▌  | 9/12 [03:09<01:04]
+======================================================================
+CONFIG: native_GAT_none
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  ERROR in native_GAT_none — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 464.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 165.59 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: native_GAT_class_weighting
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  Class weights: [0.5130343437194824, 19.680097579956055]
+  ERROR in native_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 460.19 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 160.53 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: native_GAT_focal_loss
+======================================================================
+  [v4 scenario native | licit_unknown] illicit=3,462 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:38.4 (subsample_seed=2026, idx sha1=a8f788619e)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in native_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 462.19 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 160.53 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_GAT_none
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  ERROR in 1:10_GAT_none — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 460.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 161.78 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  ERROR in 1:10_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 447.81 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 168.84 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:10 | licit_unknown] illicit=3,462 negatives=34,620 {'licit': 6890, 'unknown': 27730} ratio=1:10.0 (subsample_seed=2026, idx sha1=c5923cc170)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in 1:10_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 417.62 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:1_GAT_none
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  ERROR in 1:1_GAT_none — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 424.94 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:1_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  Class weights: [1.0, 1.0]
+  ERROR in 1:1_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 424.44 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:1_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:1 | licit_unknown] illicit=3,462 negatives=3,462 {'licit': 689, 'unknown': 2773} ratio=1:1.0 (subsample_seed=2026, idx sha1=9138b6a816)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in 1:1_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 990.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 397.81 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in u. Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_os_GAT_none
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)                                                 Train matrix:  75%|███████▌  | 9/12 [03:09<01:04][I 2026-09-29 20:36:22,603] A new study created in memory with name: GAT_none_pr_auc
+[I 2026-09-29 20:36:36,768] Trial 0 finished with value: 0.37354380348597765 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.37354380348597765.
+[I 2026-09-29 20:36:49,295] Trial 1 finished with value: 0.16033902685418921 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.37354380348597765.
+[W 2026-09-29 20:36:49,523] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 303.38 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 81.09 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.29 GiB memory in use. Of the allocated memory 6.12 GiB is allocated by PyTorch, and 58.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 303.38 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 81.09 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.29 GiB memory in use. Of the allocated memory 6.12 GiB is allocated by PyTorch, and 58.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:36:49,523] Trial 2 failed with value None.
+                                                 Train matrix:  75%|███████▌  | 9/12 [03:36<01:04]Train matrix:  83%|████████▎ | 10/12 [03:37<00:46]Train matrix:  83%|████████▎ | 10/12 [03:37<00:46]                                                  Train matrix:  83%|████████▎ | 10/12 [03:37<00:46]                                                  Train matrix:  83%|████████▎ | 10/12 [03:37<00:46][I 2026-09-29 20:36:49,910] A new study created in memory with name: GAT_class_weighting_pr_auc
+[I 2026-09-29 20:37:00,070] Trial 0 finished with value: 0.3349050640916344 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.3349050640916344.
+[I 2026-09-29 20:37:12,744] Trial 1 finished with value: 0.2746827855379461 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.3349050640916344.
+[W 2026-09-29 20:37:12,969] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 261.69 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 80.72 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.29 GiB memory in use. Of the allocated memory 6.12 GiB is allocated by PyTorch, and 58.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 261.69 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 80.72 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.29 GiB memory in use. Of the allocated memory 6.12 GiB is allocated by PyTorch, and 58.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:37:12,970] Trial 2 failed with value None.
+                                                  Train matrix:  83%|████████▎ | 10/12 [04:00<00:46]Train matrix:  92%|█████████▏| 11/12 [04:00<00:23]Train matrix:  92%|█████████▏| 11/12 [04:00<00:23]                                                  Train matrix:  92%|█████████▏| 11/12 [04:00<00:23]                                                  Train matrix:  92%|█████████▏| 11/12 [04:00<00:23][I 2026-09-29 20:37:13,373] A new study created in memory with name: GAT_focal_loss_pr_auc
+[I 2026-09-29 20:37:23,756] Trial 0 finished with value: 0.28874634073176414 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.28874634073176414.
+[I 2026-09-29 20:37:29,315] Trial 1 finished with value: 0.07289167137174495 and parameters: {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.1624074561769746, 'lr': 0.00020511104188433984, 'weight_decay': 1.3066739238053272e-05, 'heads': 2}. Best is trial 0 with value: 0.28874634073176414.
+[W 2026-09-29 20:37:29,541] Trial 2 failed with parameters: {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.18493564427131048, 'lr': 0.0002310201887845295, 'weight_decay': 2.3270677083837777e-05, 'heads': 4} because of the following error: OutOfMemoryError('CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 272.06 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 78.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.29 GiB memory in use. Of the allocated memory 6.12 GiB is allocated by PyTorch, and 58.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)').
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 265, in <lambda>
+    lambda trial: objective(
+                  ^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/hyperopt.py", line 180, in objective
+    results = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 270, in train
+    train_loss = self.train_epoch(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/training/trainer.py", line 121, in train_epoch
+    loss.backward()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 626, in backward
+    torch.autograd.backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 823, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 272.06 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in use. Process 320424 has 78.34 MiB memory in use. Process 368139 has 13.41 MiB memory in use. Including non-PyTorch memory, this process has 6.29 GiB memory in use. Of the allocated memory 6.12 GiB is allocated by PyTorch, and 58.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+[W 2026-09-29 20:37:29,542] Trial 2 failed with value None.
+                                                  Train matrix:  92%|█████████▏| 11/12 [04:16<00:23]Train matrix: 100%|██████████| 12/12 [04:17<00:00]Train matrix: 100%|██████████| 12/12 [04:17<00:00]
+
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  ERROR in 1:10_os_GAT_none — OOM: CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 303.38 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in . Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_os_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  Class weights: [0.550000011920929, 5.5]
+  ERROR in 1:10_os_GAT_class_weighting — OOM: CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 261.69 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in . Continuing with next config.
+
+======================================================================
+CONFIG: 1:10_os_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:10_os | licit_unknown] illicit=6,924 (+3,462 SMOTE) negatives=69,240 {'licit': 13781, 'unknown': 55459} ratio=1:10.0 (subsample_seed=2026, idx sha1=07027587ad)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  ERROR in 1:10_os_GAT_focal_loss — OOM: CUDA out of memory. Tried to allocate 1014.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 272.06 MiB is free. Process 6565 has 96.00 MiB memory in use. Process 54556 has 162.97 MiB memory in . Continuing with next config.
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        0
+  Errors (OOM / timeout / exception):         12
+    ! native_GAT_none (OOM)
+    ! native_GAT_class_weighting (OOM)
+    ! native_GAT_focal_loss (OOM)
+    ! 1:10_GAT_none (OOM)
+    ! 1:10_GAT_class_weighting (OOM)
+    ! 1:10_GAT_focal_loss (OOM)
+    ! 1:1_GAT_none (OOM)
+    ! 1:1_GAT_class_weighting (OOM)
+    ! 1:1_GAT_focal_loss (OOM)
+    ! 1:10_os_GAT_none (OOM)
+    ! 1:10_os_GAT_class_weighting (OOM)
+    ! 1:10_os_GAT_focal_loss (OOM)
+
+  Total time: 0.07 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl
+[2026-09-29 20:37:30]   $ uv run --frozen python scripts/train_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --seed 42 --resume > ./runs_v4/P1_train_TAGCN_s42.log
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 7441cc42d796)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.4s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 12 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix:   0%|          | 0/12 [00:00<?]                                             Train matrix:   0%|          | 0/12 [00:00<?]Train matrix: 100%|██████████| 12/12 [00:00<00:00]
+  SKIP (resume — native_TAGCN_none_meta.json exists): native_TAGCN_none
+  SKIP (resume — native_TAGCN_class_weighting_meta.json exists): native_TAGCN_class_weighting
+  SKIP (resume — native_TAGCN_focal_loss_meta.json exists): native_TAGCN_focal_loss
+  SKIP (resume — 1-10_TAGCN_none_meta.json exists): 1:10_TAGCN_none
+  SKIP (resume — 1-10_TAGCN_class_weighting_meta.json exists): 1:10_TAGCN_class_weighting
+  SKIP (resume — 1-10_TAGCN_focal_loss_meta.json exists): 1:10_TAGCN_focal_loss
+  SKIP (resume — 1-1_TAGCN_none_meta.json exists): 1:1_TAGCN_none
+  SKIP (resume — 1-1_TAGCN_class_weighting_meta.json exists): 1:1_TAGCN_class_weighting
+  SKIP (resume — 1-1_TAGCN_focal_loss_meta.json exists): 1:1_TAGCN_focal_loss
+  SKIP (resume — 1-10_os_TAGCN_none_meta.json exists): 1:10_os_TAGCN_none
+  SKIP (resume — 1-10_os_TAGCN_class_weighting_meta.json exists): 1:10_os_TAGCN_class_weighting
+  SKIP (resume — 1-10_os_TAGCN_focal_loss_meta.json exists): 1:10_os_TAGCN_focal_loss
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        0
+  Errors (OOM / timeout / exception):         0
+  Skipped (resume):                           12
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl
+[2026-09-29 20:37:36]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario native --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 20:37:39]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario 1:10 --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 20:37:42]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario 1:1 --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 20:37:45]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch GAT --scenario 1:10_os --seed 42 --resume > ./runs_v4/P1_explain_GAT_s42.log
+Device: cuda | torch threads: 2
+No checkpoints matched in results_models_v4.
+[2026-09-29 20:37:48]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --scenario native --seed 42 --resume > ./runs_v4/P1_explain_TAGCN_s42.log
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 6 units to explain (6 already complete) | 1 checkpoints gated out
+
+Done: 0 ok, 0 failed, 0.0 min. CSV: results_v4/elliptic_v4_stability.csv
+[2026-09-29 20:37:54]   $ uv run --frozen python scripts/explain_matrix.py --config configs/experiment_v4.yaml --device cuda --arch TAGCN --scenario 1:10 --seed 42 --resume > ./runs_v4/P1_explain_TAGCN_s42.log
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 9 units to explain (9 already complete) | 0 checkpoints gated out
+
+Done: 0 ok, 0 failed, 0.0 min. CSV: results_v4/elliptic_v4_stability.csv

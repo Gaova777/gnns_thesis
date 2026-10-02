@@ -1,0 +1,221 @@
+{
+  "run_id": "native_GAT_none_s43",
+  "pipeline_version": "v4",
+  "scenario": "native",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.026068688207344714,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "native",
+    "kind": "native",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 3462,
+    "n_synthetic_illicit": 0,
+    "n_licit": 132803,
+    "negative_origin": {
+      "licit": 26432,
+      "unknown": 106371
+    },
+    "total": 136265,
+    "ratio": 0.026068688207344714,
+    "ratio_str": "1:38.4",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "a8f788619e531bdea36646909aaaeea45e1918cb",
+    "val_test_subsampled": false,
+    "smote": null
+  },
+  "n_train_illicit": 3462,
+  "n_train_licit": 132803,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.44117647058823534,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.6297998339699105,
+        "f1": 0.5525238744884038,
+        "mcc": 0.5386772912134645,
+        "recall": 0.4431072210065646,
+        "precision": 0.7336956521739131
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.24247462817681933,
+        "f1": 0.3401931961360773,
+        "mcc": 0.32286701009238766,
+        "recall": 0.4431072210065646,
+        "precision": 0.27607361963190186
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.22571990365815106,
+        "f1": 0.3204113924050633,
+        "mcc": 0.31176848141193564,
+        "recall": 0.4431072210065646,
+        "precision": 0.25092936802973975
+      },
+      "flag_rate": {
+        "illicit": 0.4431072175502777,
+        "licit": 0.016209064051508904,
+        "unknown": 0.038150664418935776
+      },
+      "mean_prob": {
+        "illicit": 0.4183046221733093,
+        "licit": 0.022655528038740158,
+        "unknown": 0.050681959837675095
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.03297353867777357,
+        "f1": 0.007042253521126761,
+        "mcc": -0.013971525472191978,
+        "recall": 0.005917159763313609,
+        "precision": 0.008695652173913044
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.0068863761144556754,
+        "f1": 0.002844950213371266,
+        "mcc": -0.009787730736762,
+        "recall": 0.005917159763313609,
+        "precision": 0.0018726591760299626
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.005718994910477107,
+        "f1": 0.0024479804161566705,
+        "mcc": -0.008240140291076928,
+        "recall": 0.005917159763313609,
+        "precision": 0.0015432098765432098
+      },
+      "flag_rate": {
+        "illicit": 0.005917159840464592,
+        "licit": 0.017490027472376823,
+        "unknown": 0.02317693643271923
+      },
+      "mean_prob": {
+        "illicit": 0.013791967183351517,
+        "licit": 0.02300017885863781,
+        "unknown": 0.03376607969403267
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GAT",
+  "balancing": "none",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 148,
+    "num_layers": 2,
+    "dropout": 0.4100531293444458,
+    "lr": 0.007568292060167618,
+    "weight_decay": 0.0006161049539380963,
+    "heads": 4
+  },
+  "optuna_best_score": 0.31818211505320526,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 14,
+  "epochs_run": 34,
+  "best_val_score": 0.3160118293198141,
+  "best_val_mcc": 0.30357498766854013,
+  "val_metrics": {
+    "loss": 0.1692502349615097,
+    "f1": 0.3160118293198141,
+    "mcc": 0.30357498766854013,
+    "pr_auc": 0.22571990365815106
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.1692502349615097,
+    "f1": 0.3204113924050633,
+    "mcc": 0.31176848141193564,
+    "pr_auc": 0.22571990365815106
+  },
+  "test_metrics": {
+    "loss": 0.1365976482629776,
+    "f1": 0.0024479804161566705,
+    "mcc": -0.008240140291076928,
+    "pr_auc": 0.005718994910477107
+  },
+  "test_metrics_argmax": {
+    "loss": 0.1365976482629776,
+    "f1": 0.00273224043715847,
+    "mcc": -0.007238920687282387,
+    "pr_auc": 0.005718994910477107
+  },
+  "calibrated_threshold": 0.44117647058823534,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.3204113924050633,
+  "calibration_resample": null,
+  "quality_passed": true,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.3160118293198141,
+  "val_mcc_best_epoch": 0.30357498766854013,
+  "mlflow_run_id": "f8a3d02e2e254185a3d4b06f0071ee8d",
+  "checkpoint": "native_GAT_none_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 11.7,
+  "finished_at": "2026-09-29T21:24:41"
+}

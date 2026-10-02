@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\centering\small
+\caption{H2: contrastes sobre configuraciones (modelos que pasan la compuerta)}
+\label{tab:v4-h2}
+\begin{tabular}{llrrrrrr}
+\toprule
+Explicador & Contraste & Estad. & p & p Holm & Δ & p TOST & n \\
+\midrule
+GNNExplainer & arquitecturas (bloques escenario×balanceo) & 1,500 & 0,472 & n/d & n/d & n/d & 4 \\
+GNNExplainer & arquitecturas (configuraciones) & 0,336 & 0,845 & n/d & n/d & n/d & 21 \\
+GNNExplainer & GraphSAGE vs GAT & 1,000 & 0,250 & 0,586 & -0,013 & 0,004 & 4 \\
+GNNExplainer & GraphSAGE vs TAGCN & 8,000 & 0,195 & 0,586 & 0,011 & 0,002 & 8 \\
+GNNExplainer & GAT vs TAGCN & 1,000 & 0,250 & 0,586 & 0,018 & 0,035 & 4 \\
+PGExplainer & arquitecturas (bloques escenario×balanceo) & 3,500 & 0,174 & n/d & n/d & n/d & 4 \\
+PGExplainer & arquitecturas (configuraciones) & 7,631 & 0,022 & n/d & n/d & n/d & 21 \\
+PGExplainer & GraphSAGE vs GAT & 0,000 & 0,125 & 0,375 & -0,112 & 0,793 & 4 \\
+PGExplainer & GraphSAGE vs TAGCN & 8,000 & 0,195 & 0,391 & 0,092 & 0,721 & 8 \\
+PGExplainer & GAT vs TAGCN & 2,000 & 0,375 & 0,391 & 0,180 & 0,809 & 4 \\
+ShapleyFeatures & arquitecturas (bloques escenario×balanceo) & 4,500 & 0,105 & n/d & n/d & n/d & 4 \\
+ShapleyFeatures & arquitecturas (configuraciones) & 3,905 & 0,142 & n/d & n/d & n/d & 21 \\
+ShapleyFeatures & GraphSAGE vs GAT & 0,000 & 0,125 & 0,250 & 0,002 & 1,02e-07 & 4 \\
+ShapleyFeatures & GraphSAGE vs TAGCN & 1,000 & 0,016 & 0,047 & 0,005 & 6,56e-09 & 8 \\
+ShapleyFeatures & GAT vs TAGCN & 4,000 & 0,875 & 0,875 & 0,002 & 0,000117 & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}

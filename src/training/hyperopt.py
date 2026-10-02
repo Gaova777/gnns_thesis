@@ -10,6 +10,7 @@ as trial 0 so Optuna always evaluates a sensible starting config before random
 exploration.
 """
 
+import gc
 import optuna
 from optuna.trial import Trial
 import torch
@@ -44,7 +45,10 @@ _WARM_START_PRIORS = {
         "dropout": 0.2522,
         "lr": 6.999e-4,
         "weight_decay": 5e-4,
-        "heads": 8,
+        # heads=4 (el default de GAT), no 8: con hidden=148 y 8 cabezas el tensor de
+        # mensajes por arista (234k aristas x 1184) pide ~9,5 GiB y no cabe en la RTX 4060
+        # de 8 GB; heads=4 con hidden=148 pica en 4,5 GiB. Ver runs_v4/DECISIONES.md (29-sep).
+        "heads": 4,
     },
     # TAGCN has no published Elliptic baseline — reuse GCN prior + typical K.
     "TAGCN": {
@@ -126,7 +130,11 @@ def objective(
     do = sp.get("dropout") or [0.1, 0.5]
     lr_r = sp.get("learning_rate") or [1e-4, 1e-2]
     wd_r = sp.get("weight_decay") or [1e-5, 1e-3]
-    num_layers = trial.suggest_int("num_layers", int(min(nl)), int(max(nl)))
+    # GAT se capa a 2 capas: con 3 capas + heads=4 + hidden=148 sobre el grafo completo
+    # el pico pasa de ~7 GiB y hace OOM en la RTX 4060. 2 capas = campo receptivo de 2
+    # saltos (el default estándar en Elliptic) y pica en ~4,5 GiB. Ver runs_v4/DECISIONES.md.
+    nl_max = 2 if arch_name == "GAT" else int(max(nl))
+    num_layers = trial.suggest_int("num_layers", int(min(nl)), nl_max)
     dropout = trial.suggest_float("dropout", float(do[0]), float(do[1]))
     lr = trial.suggest_float("lr", float(lr_r[0]), float(lr_r[1]), log=True)
     weight_decay = trial.suggest_float("weight_decay", float(wd_r[0]), float(wd_r[1]), log=True)
@@ -134,7 +142,9 @@ def objective(
     # Architecture-specific params
     kwargs = {}
     if arch_name == "GAT":
-        kwargs["heads"] = trial.suggest_categorical("heads", [4, 8])
+        # {2,4} en vez de {4,8}: 8 cabezas con hidden=148 sobre el grafo completo no cabe
+        # en 8 GB de VRAM (OOM). El sobre {2,4} x {64,128,148} entra siempre. DECISIONES.md.
+        kwargs["heads"] = trial.suggest_categorical("heads", [2, 4])
     if arch_name == "TAGCN":
         kwargs["K"] = trial.suggest_int("K", 2, 4)
 
@@ -172,13 +182,25 @@ def objective(
         epoch_callback=epoch_callback,
     )
 
-    results = trainer.train(
-        data, epochs=epochs, verbose=False, run_name=f"trial_{trial.number}"
-    )
-
-    # best_val_score is captured at the best epoch (not last), using the same
-    # metric Optuna is maximizing. That's what we return.
-    return results["best_val_score"]
+    try:
+        results = trainer.train(
+            data, epochs=epochs, verbose=False, run_name=f"trial_{trial.number}"
+        )
+        # best_val_score is captured at the best epoch (not last), using the same
+        # metric Optuna is maximizing. That's what we return.
+        return results["best_val_score"]
+    finally:
+        # Liberar la VRAM del trial: sin esto el proceso acumula memoria trial a trial
+        # y el reentrenamiento final de GAT (grafo completo) hace OOM. No cambia el
+        # cómputo, solo devuelve la memoria al asignador. Ver runs_v4/DECISIONES.md.
+        try:
+            model.to("cpu")
+        except Exception:
+            pass
+        del model, optimizer, trainer
+        gc.collect()
+        if str(device) != "cpu":
+            torch.cuda.empty_cache()
 
 
 def run_hyperopt(

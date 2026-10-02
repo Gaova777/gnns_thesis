@@ -567,6 +567,12 @@ def run_one_config(ctx, data_raw, scenario_name, ratio, arch_name, balance_name,
         gamma=focal_cfg.get("gamma", 2.0), alpha=focal_cfg.get("alpha", 0.75),
         device=device,
     )
+    # Libera la VRAM acumulada por Optuna antes del reentrenamiento final: si no,
+    # GAT (grafo completo) puede quedarse sin memoria para el modelo final. DECISIONES.md.
+    import gc as _gc
+    _gc.collect()
+    if str(device) != "cpu":
+        torch.cuda.empty_cache()
     arch_kwargs = {}
     if arch_name == "GAT" and "heads" in best_hp:
         arch_kwargs["heads"] = best_hp["heads"]

@@ -1,0 +1,221 @@
+{
+  "run_id": "native_GAT_class_weighting_s44",
+  "pipeline_version": "v4",
+  "scenario": "native",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.026068688207344714,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "native",
+    "kind": "native",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 3462,
+    "n_synthetic_illicit": 0,
+    "n_licit": 132803,
+    "negative_origin": {
+      "licit": 26432,
+      "unknown": 106371
+    },
+    "total": 136265,
+    "ratio": 0.026068688207344714,
+    "ratio_str": "1:38.4",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "a8f788619e531bdea36646909aaaeea45e1918cb",
+    "val_test_subsampled": false,
+    "smote": null
+  },
+  "n_train_illicit": 3462,
+  "n_train_licit": 132803,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.8725490196078431,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.7058136070342634,
+        "f1": 0.5617328519855596,
+        "mcc": 0.5666096245115535,
+        "recall": 0.42560175054704596,
+        "precision": 0.8259023354564756
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.29492284959462384,
+        "f1": 0.37421837421837423,
+        "mcc": 0.35388330510923777,
+        "recall": 0.42560175054704596,
+        "precision": 0.3339055793991416
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.2793656295976463,
+        "f1": 0.3600185099490976,
+        "mcc": 0.3460316697847143,
+        "recall": 0.42560175054704596,
+        "precision": 0.3119486768243785
+      },
+      "flag_rate": {
+        "illicit": 0.4256017506122589,
+        "licit": 0.00904179085046053,
+        "unknown": 0.027876567095518112
+      },
+      "mean_prob": {
+        "illicit": 0.7364440560340881,
+        "licit": 0.15270505845546722,
+        "unknown": 0.2909630537033081
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.045628246680499335,
+        "f1": 0.0784313725490196,
+        "mcc": 0.06618291695674337,
+        "recall": 0.05917159763313609,
+        "precision": 0.11627906976744186
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.009589683949391857,
+        "f1": 0.031201248049921998,
+        "mcc": 0.023541245213688708,
+        "recall": 0.05917159763313609,
+        "precision": 0.0211864406779661
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.007970693565429468,
+        "f1": 0.02789400278940028,
+        "mcc": 0.022884703753362903,
+        "recall": 0.05917159763313609,
+        "precision": 0.01824817518248175
+      },
+      "flag_rate": {
+        "illicit": 0.05917159840464592,
+        "licit": 0.011660018004477024,
+        "unknown": 0.02008957602083683
+      },
+      "mean_prob": {
+        "illicit": 0.3031105101108551,
+        "licit": 0.1943766474723816,
+        "unknown": 0.25772666931152344
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GAT",
+  "balancing": "class_weighting",
+  "seed": 44,
+  "best_params": {
+    "hidden_dim": 128,
+    "num_layers": 2,
+    "dropout": 0.21649165607921678,
+    "lr": 0.0016738085788752138,
+    "weight_decay": 1.9010245319870364e-05,
+    "heads": 4
+  },
+  "optuna_best_score": 0.3510641221337138,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 22,
+  "epochs_run": 42,
+  "best_val_score": 0.1567202906071614,
+  "best_val_mcc": 0.2224677940925628,
+  "val_metrics": {
+    "loss": 0.4468280076980591,
+    "f1": 0.1567202906071614,
+    "mcc": 0.2224677940925628,
+    "pr_auc": 0.2793656295976463
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.4468280076980591,
+    "f1": 0.3600185099490976,
+    "mcc": 0.3460316697847143,
+    "pr_auc": 0.2793656295976463
+  },
+  "test_metrics": {
+    "loss": 0.7060481309890747,
+    "f1": 0.02789400278940028,
+    "mcc": 0.022884703753362903,
+    "pr_auc": 0.007970693565429468
+  },
+  "test_metrics_argmax": {
+    "loss": 0.7060481309890747,
+    "f1": 0.0156504727746984,
+    "mcc": 0.015687521157722994,
+    "pr_auc": 0.007970693565429468
+  },
+  "calibrated_threshold": 0.8725490196078431,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.3600185099490976,
+  "calibration_resample": null,
+  "quality_passed": false,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.1567202906071614,
+  "val_mcc_best_epoch": 0.2224677940925628,
+  "mlflow_run_id": "fc44659a3f8b4dc1bc2e80abe130f7c6",
+  "checkpoint": "native_GAT_class_weighting_s44_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 12.5,
+  "finished_at": "2026-09-29T22:32:04"
+}

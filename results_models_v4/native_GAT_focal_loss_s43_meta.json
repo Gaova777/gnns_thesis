@@ -1,0 +1,221 @@
+{
+  "run_id": "native_GAT_focal_loss_s43",
+  "pipeline_version": "v4",
+  "scenario": "native",
+  "scenario_mode": "v4",
+  "imbalance_ratio": 0.026068688207344714,
+  "subsample_seed": 2026,
+  "scenario_report": {
+    "scenario": "native",
+    "kind": "native",
+    "label_mode": "licit_unknown",
+    "subsample_seed": 2026,
+    "n_illicit": 3462,
+    "n_synthetic_illicit": 0,
+    "n_licit": 132803,
+    "negative_origin": {
+      "licit": 26432,
+      "unknown": 106371
+    },
+    "total": 136265,
+    "ratio": 0.026068688207344714,
+    "ratio_str": "1:38.4",
+    "native_train": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "target": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected": {
+      "n_illicit": 3462,
+      "n_licit": 132803
+    },
+    "expected_checked": true,
+    "train_idx_sha1": "a8f788619e531bdea36646909aaaeea45e1918cb",
+    "val_test_subsampled": false,
+    "smote": null
+  },
+  "n_train_illicit": 3462,
+  "n_train_licit": 132803,
+  "label_mode": "licit_unknown",
+  "label_encoding": {
+    "licit": 0,
+    "illicit": 1,
+    "unknown": -1
+  },
+  "negative_class": "licit+unknown",
+  "cross_label_eval": {
+    "threshold": 0.5196078431372548,
+    "val": {
+      "vs_licit": {
+        "n_illicit": 914,
+        "n_negative": 9069,
+        "pr_auc": 0.7444743674608271,
+        "f1": 0.5686125852918877,
+        "mcc": 0.5949181167843681,
+        "recall": 0.4102844638949672,
+        "precision": 0.9259259259259259
+      },
+      "vs_unknown": {
+        "n_illicit": 914,
+        "n_negative": 27837,
+        "pr_auc": 0.36175993853583555,
+        "f1": 0.40496760259179265,
+        "mcc": 0.38520323701218284,
+        "recall": 0.4102844638949672,
+        "precision": 0.3997867803837953
+      },
+      "vs_all": {
+        "n_illicit": 914,
+        "n_negative": 36906,
+        "pr_auc": 0.352357594366484,
+        "f1": 0.3985122210414453,
+        "mcc": 0.3833436750938822,
+        "recall": 0.4102844638949672,
+        "precision": 0.38739669421487605
+      },
+      "flag_rate": {
+        "illicit": 0.41028445959091187,
+        "licit": 0.003307972103357315,
+        "unknown": 0.020224880427122116
+      },
+      "mean_prob": {
+        "illicit": 0.42932644486427307,
+        "licit": 0.029923085123300552,
+        "unknown": 0.07551202178001404
+      }
+    },
+    "test": {
+      "vs_licit": {
+        "n_illicit": 169,
+        "n_negative": 6518,
+        "pr_auc": 0.027454770784705047,
+        "f1": 0.009950248756218905,
+        "mcc": 0.0026407117328127432,
+        "recall": 0.005917159763313609,
+        "precision": 0.03125
+      },
+      "vs_unknown": {
+        "n_illicit": 169,
+        "n_negative": 22997,
+        "pr_auc": 0.005724849288810168,
+        "f1": 0.0035842293906810036,
+        "mcc": -0.007255254482043967,
+        "recall": 0.005917159763313609,
+        "precision": 0.002570694087403599
+      },
+      "vs_all": {
+        "n_illicit": 169,
+        "n_negative": 29515,
+        "pr_auc": 0.0047423541247839755,
+        "f1": 0.003395585738539898,
+        "mcc": -0.005274141190859534,
+        "recall": 0.005917159763313609,
+        "precision": 0.002380952380952381
+      },
+      "flag_rate": {
+        "illicit": 0.005917159840464592,
+        "licit": 0.004756059963256121,
+        "unknown": 0.01687176525592804
+      },
+      "mean_prob": {
+        "illicit": 0.024220509454607964,
+        "licit": 0.03561292588710785,
+        "unknown": 0.06769523024559021
+      }
+    }
+  },
+  "data_counts": {
+    "total": {
+      "illicit": 4545,
+      "licit": 42019,
+      "unknown": 157205
+    },
+    "splits": {
+      "train": {
+        "illicit": 3462,
+        "licit": 132803
+      },
+      "val": {
+        "illicit": 914,
+        "licit": 36906
+      },
+      "test": {
+        "illicit": 169,
+        "licit": 29515
+      }
+    }
+  },
+  "architecture": "GAT",
+  "balancing": "focal_loss",
+  "seed": 43,
+  "best_params": {
+    "hidden_dim": 128,
+    "num_layers": 2,
+    "dropout": 0.21649165607921678,
+    "lr": 0.0016738085788752138,
+    "weight_decay": 1.9010245319870364e-05,
+    "heads": 4
+  },
+  "optuna_best_score": 0.3938505767076378,
+  "optuna_metric": "pr_auc",
+  "hp_source": "reused:42",
+  "early_stop_metric": "f1",
+  "best_epoch": 20,
+  "epochs_run": 40,
+  "best_val_score": 0.39758429793658784,
+  "best_val_mcc": 0.3827333793950793,
+  "val_metrics": {
+    "loss": 0.02665843814611435,
+    "f1": 0.39758429793658784,
+    "mcc": 0.3827333793950793,
+    "pr_auc": 0.352357594366484
+  },
+  "val_metrics_calibrated": {
+    "loss": 0.02665843814611435,
+    "f1": 0.3985122210414453,
+    "mcc": 0.3833436750938822,
+    "pr_auc": 0.3523575943664839
+  },
+  "test_metrics": {
+    "loss": 0.03644751384854317,
+    "f1": 0.003395585738539898,
+    "mcc": -0.005274141190859534,
+    "pr_auc": 0.0047423541247839755
+  },
+  "test_metrics_argmax": {
+    "loss": 0.03644751384854317,
+    "f1": 0.0030441400304414,
+    "mcc": -0.006261795403158988,
+    "pr_auc": 0.0047423541247839755
+  },
+  "calibrated_threshold": 0.5196078431372548,
+  "threshold_calibration": "val_only",
+  "val_f1_at_threshold": 0.3985122210414453,
+  "calibration_resample": null,
+  "quality_passed": true,
+  "quality_gate": {
+    "f1_min": 0.3,
+    "mcc_min": 0.15,
+    "evaluated_on": "val",
+    "decision": "argmax"
+  },
+  "val_f1_best_epoch": 0.39758429793658784,
+  "val_mcc_best_epoch": 0.3827333793950793,
+  "mlflow_run_id": "b2f0a8eb791b4225840e2c7e414d9647",
+  "checkpoint": "native_GAT_focal_loss_s43_best.pt",
+  "config_path": "configs/experiment_v4.yaml",
+  "config_sha256": "7441cc42d796807f1f3936aa937f35e6ac88cea906b971e14ed8ff280e874f60",
+  "effective_config_sha256": "c295a35dcf114911118f812958e8ad34e3f4b5326c0064d00cc7f261f5dfddee",
+  "cli_overrides": {
+    "epochs": null,
+    "trials": null,
+    "quick": false,
+    "max_minutes_per_config": 90.0
+  },
+  "device": "cuda",
+  "duration_s": 12.6,
+  "finished_at": "2026-09-29T21:25:07"
+}
