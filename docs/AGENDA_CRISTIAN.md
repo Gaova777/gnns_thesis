@@ -15,8 +15,9 @@
 
 2. **[Decisión de Cristian] La conclusión central de la v3 no sobrevive.** Con las etiquetas
    corregidas: la partición en dos grupos de estabilidad por arquitectura desaparece (las
-   cuatro salen equivalentes, TOST, Friedman p=0,11), y el balanceo pasa a tener efecto
-   (Friedman p=0,039) cuando antes se daba por despreciable. Cómo narrar esta reversión de
+   tres arquitecturas con soporte salen equivalentes; GNNExplainer: TOST, Friedman p=0,47),
+   y el balanceo pasa a tener efecto (GNNExplainer: Friedman p=0,0498, justo bajo el umbral,
+   y ningún par sobrevive a Holm) cuando antes se daba por despreciable. Cómo narrar esta reversión de
    forma honesta es la conversación clave.
 
 ## B. Decisiones de diseño del PR a validar
@@ -38,6 +39,16 @@
 5. **[Decisión de Cristian] GCN casi no aprende en modo C** (val PR-AUC 0,095) y queda fuera
    del soporte de H2. Qué significa que GCN, que en la v3 estaba en el grupo alto, ahora falle
    como clasificador, y cómo se reporta.
+
+   **Dato nuevo (sensibilidad sin compuerta, 02-oct).** Ninguno de los 36 modelos de GCN pasa la
+   compuerta, pero al explicarlos igual, sus explicaciones son casi tan estables entre semillas
+   como las de las demás (GNNExplainer: GCN 0,916, GAT 0,927, TAGCN 0,939, GraphSAGE 0,946),
+   aunque GCN rinde al nivel del azar. O sea, una estabilidad alta no certifica que el modelo
+   sirva. Con las cuatro arquitecturas y más datos, las diferencias entre ellas se vuelven
+   detectables (GNNExplainer, Friedman p=0,0023), pero son pequeñas (como mucho 0,02) y quedan
+   dentro del margen de equivalencia de ±0,05: se detectan, pero no pesan en la práctica.
+   Además, sobre todos los modelos la estabilidad de GNNExplainer sube algo con la calidad del
+   modelo (ρ=0,41, p=0,004). Pregunta: ¿esto va al cuerpo o al anexo?
 
 6. **[Informar] Escenarios.** La v4 corrió 4 escenarios (native, 1:10, 1:1, 1:10_os), no los
    6 del runbook original. Confirmar que basta para H1.

@@ -6,7 +6,7 @@
 > 42/43/44 × 4 escenarios native/1:10/1:1/1:10_os × 3 balanceos), entrenados y explicados en modo C.
 > Resultados en `results_v4/analysis_v4_summary.txt` y `results_v4/tables/`. En corto: el desbalance
 > no tiene efecto (equivalencia por TOST), **las arquitecturas salen equivalentes** (la partición en
-> dos grupos de la v3 no sobrevive), **el balanceo sí tiene efecto** (Friedman p=0,039) y GCN casi no
+> dos grupos de la v3 no sobrevive), **el balanceo sí tiene efecto** (GNNExplainer, Friedman p=0,0498) y GCN casi no
 > aprende en modo C. GAT corre con heads=4 y 2 capas por el límite de VRAM de la RTX 4060 (ver
 > `runs_v4/DECISIONES.md`). Pendiente: el eje sintético v4 (THE-13, máquina de Alejandro) y la reunión
 > con Cristian (THE-19, agenda en `docs/AGENDA_CRISTIAN.md`) antes de reescribir el manuscrito.

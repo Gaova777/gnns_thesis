@@ -11,11 +11,17 @@ es la más estable, H3 un explicador más estable señala mejor el patrón) más
 Las tres se refutaron ya en la v3. Con la v4, y las etiquetas corregidas, el cuadro se
 simplifica y a la vez cambia en un punto central:
 
-- El desbalance no gobierna la estabilidad (H1, equivalencia por TOST, Friedman p=0,25).
-- La arquitectura tampoco la gobierna (H2, equivalencia por TOST, Friedman p=0,11,
-  Kruskal p=0,14). Las cuatro salen equivalentes. La partición en dos grupos de la v3
+- El desbalance no gobierna la estabilidad (H1, equivalencia por TOST; GNNExplainer, Friedman p=0,45).
+- La arquitectura tampoco la gobierna (H2, equivalencia por TOST; GNNExplainer, Friedman
+  p=0,47, Kruskal p=0,85). Las tres arquitecturas con soporte salen equivalentes (GCN queda
+  fuera porque ninguno de sus modelos pasa la compuerta). La partición en dos grupos de la v3
   no sobrevive a las etiquetas corregidas.
-- El balanceo sí tiene un efecto (H3, Friedman p=0,039).
+- El balanceo sí tiene un efecto (H3; GNNExplainer, Friedman p=0,0498, al borde del umbral).
+- Sensibilidad sin compuerta (incluye los 36 modelos de GCN, ninguno pasa la compuerta): las
+  explicaciones de GCN son casi tan estables como las del resto (GNNExplainer 0,916 frente a
+  0,927 a 0,946) aunque GCN rinde al nivel del azar, así que una estabilidad alta no certifica
+  que el modelo sirva. Con más datos las diferencias entre arquitecturas se vuelven detectables,
+  pero quedan dentro del margen de equivalencia de ±0,05.
 - El explicador es la palanca dominante ya vista en la v3: GNNExplainer discrimina,
   PGExplainer degenera sobre variables, GNNShap (ShapleyFeatures) satura cerca del techo.
 - Las tres propiedades (estabilidad, plausibilidad, fidelidad) son independientes en el

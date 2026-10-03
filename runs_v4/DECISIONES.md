@@ -59,3 +59,19 @@ vecinos: cambiaría el régimen de entrenamiento respecto a las otras tres (conf
 `hyperopt.py` y ya construía GAT con `heads=4` (`phase1/v4_common.py` y los scripts de la v3). El
 recorte de Elliptic no afecta a esa corrida y deja los dos ejes con el mismo número de cabezas.
 La sonda del barrido de memoria quedó en `scripts/v4/probe_gat_memoria.py`.
+
+---
+
+## 2026-10-02 · Sensibilidad sin compuerta y estabilidad entre semillas principal
+
+**Qué se hizo.** Se explicaron los 87 modelos que no pasan la compuerta (`explain_matrix
+--include-gated --resume`, un proceso por arquitectura, escenario y semilla, igual que
+`run_all_v4.sh`), para que la sección SENSIBILIDAD de `analysis_v4_summary.txt` deje de coincidir
+con la principal, como pide el runbook. 48/48 procesos sin fallos, en 3 h 46 min. Logs en
+`runs_v4/SENS_*.log`.
+
+**Cambio de procedimiento.** `cross_seed_stability.py` no filtra por compuerta por defecto. Por eso,
+después de explicar los modelos sin compuerta, la versión principal se regenera con `--gate-only`
+(`results_v4/elliptic_v4_cross_seed.csv`, idéntica a la del commit `decaa23`: 153 pares, diferencia
+0,0) y la de todos los modelos se guarda aparte en `results_v4/elliptic_v4_cross_seed_sinfiltro.csv`.
+La sección PRINCIPAL del análisis no cambia (verificado contra el commit `decaa23`).
