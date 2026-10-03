@@ -8,8 +8,10 @@
 > no tiene efecto (equivalencia por TOST), **las arquitecturas salen equivalentes** (la partición en
 > dos grupos de la v3 no sobrevive), **el balanceo sí tiene efecto** (GNNExplainer, Friedman p=0,0498) y GCN casi no
 > aprende en modo C. GAT corre con heads=4 y 2 capas por el límite de VRAM de la RTX 4060 (ver
-> `runs_v4/DECISIONES.md`). Pendiente: el eje sintético v4 (THE-13, máquina de Alejandro) y la reunión
-> con Cristian (THE-19, agenda en `docs/AGENDA_CRISTIAN.md`) antes de reescribir el manuscrito.
+> `runs_v4/DECISIONES.md`). **El eje sintético v4 también terminó** (1-oct, máquina de Alejandro;
+> 144/144, en `results_phase1_v4/`, que trae un `README.md` con la advertencia de la plausibilidad de
+> aristas de TAGCN). Pendiente: la reunión con Cristian (THE-19, agenda en `docs/AGENDA_CRISTIAN.md`)
+> antes de reescribir el manuscrito.
 > **El `main.pdf`, el deck y el discurso todavía tienen las cifras v3 retractadas.**
 >
 > El eje Elliptic de la v3 se entrenó con las **etiquetas invertidas** (los 157.205 nodos sin

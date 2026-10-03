@@ -1,0 +1,15 @@
+N nodos: 11115 | edges: 58552 | feats: 20
+ilícitos: 1549 (13.9%)
+{
+ "in_deg": 0.547,
+ "out_deg": 0.56,
+ "total_deg": 0.574,
+ "in_out_ratio": 0.504,
+ "amount": 0.5,
+ "volume": 0.525,
+ "sig_1_own_typology": 0.58,
+ "sig_2_own_typology": 0.563,
+ "sig_3_own_typology": 0.617,
+ "sig_4_own_typology": 0.581,
+ "sig_max_all": 0.543
+}
