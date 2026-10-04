@@ -25,7 +25,11 @@ simplifica y a la vez cambia en un punto central:
 - El explicador es la palanca dominante ya vista en la v3: GNNExplainer discrimina,
   PGExplainer degenera sobre variables, GNNShap (ShapleyFeatures) satura cerca del techo.
 - Las tres propiedades (estabilidad, plausibilidad, fidelidad) son independientes en el
-  eje sintético.
+  eje sintético. La v4 lo confirma (`results_phase1_v4/`): ShapleyFeatures es el más estable
+  (0,95 a 0,97) y su plausibilidad de variables queda en el azar; GNNExplainer es menos
+  estable pero el más plausible y el más fiel. Matiz: en el sintético la estabilidad de
+  GNNExplainer baja con el desbalance (0,92 a 0,86), pero esos escenarios quitan ilícitas y
+  degradan el modelo, así que el efecto no se aísla del desbalance.
 
 Con eso, mantener tres hipótesis sueltas confunde. Conviene una sola, que sea falsable y
 que ordene toda la evidencia.

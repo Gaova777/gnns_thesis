@@ -2,7 +2,8 @@
 
 > Preparada por el Claude de Juan Diego a partir de la corrida v4 y sus decisiones.
 > Fecha objetivo de la reunión: 03-oct-2026. Fuentes: `results_v4/analysis_v4_summary.txt`,
-> `runs_v4/DECISIONES.md`, `results_v4_labels/label_comparison.md`, `docs/NARRATIVA_v4.md`.
+> `runs_v4/DECISIONES.md`, `results_v4_labels/label_comparison.md`, `docs/NARRATIVA_v4.md`,
+> `results_phase1_v4/README.md` (eje sintético v4, integrado el 03-oct).
 >
 > Cada punto marca si es **[Decisión de Cristian]** (necesita su visto bueno) o **[Informar]**
 > (solo dejarlo claro).
@@ -74,9 +75,29 @@
 11. **[Informar] Colapso validación a test** (shift temporal): se mantiene, y por eso la
     estabilidad se mide sobre los verdaderos positivos de validación. Confirmar el encuadre.
 
-12. **[Decisión de Cristian] Eje sintético (THE-13)**, en la máquina de Alejandro: GCN quedó
-    al borde en la prueba de alineamiento (margen +0,138, criterio ≥ 0,10). Decidir si su
-    plausibilidad se interpreta como calidad del explicador o va a anexo.
+12. **[Decisión de Cristian] Eje sintético (THE-13): terminado, 144/144, va a anexo.** Resultados
+    en `results_phase1_v4/` (verificados: el resumen se regenera idéntico desde los CSV). Tres
+    puntos para decidir:
+    - **GCN al borde en la prueba de alineamiento** (margen +0,138, criterio ≥ 0,10). ¿Su
+      plausibilidad se lee como calidad del explicador o se reporta con la advertencia?
+    - **Los escenarios 1:50 y 1:100 del sintético quitan ilícitas** (diseño del 23-sep), al contrario
+      de Elliptic v4, donde ningún escenario las quita. ¿Se declara como límite en el anexo o se
+      rehace con la regla nueva?
+    - **La plausibilidad de aristas no se compara entre arquitecturas.** TAGCN ve 6 saltos (unos
+      9.300 de los 11.115 nodos), así que su azar vale ≈ 0,001 frente a ≈ 0,47 en las de 2 saltos.
+      Su ganancia grande sale de esa línea base, no de explicar mejor. Propuesta: comparar solo
+      dentro de cada arquitectura.
+
+12b. **[Decisión de Cristian] Lo que el sintético aporta a la hipótesis única.**
+    - **Estable no es correcto.** ShapleyFeatures es el explicador más estable (Spearman 0,95 a
+      0,97) y su plausibilidad de variables queda en el azar (0,11 a 0,16, azar 0,15).
+      GNNExplainer es menos estable pero el más plausible (0,24 a 0,45) y el más fiel. Respalda
+      la segunda mitad de la hipótesis.
+    - **Matiz a la primera mitad.** En el sintético la estabilidad de GNNExplainer sí baja con el
+      desbalance (0,92 en natural y 1:1, 0,86 en 1:100), cosa que en Elliptic no pasa. Pero esos
+      escenarios quitan ilícitas y los modelos rinden peor (PR-AUC mediana 0,64 en natural, 0,28
+      en 1:100), así que no se puede separar el desbalance de la pérdida de calidad. ¿Se narra
+      como matiz o se rehace el sintético (punto 12)?
 
 13. **[Informar] Qué no se rehízo:** los CSV de la v3 y `phase1/` viejos se conservan; el
     manuscrito citará la v4 para el eje Elliptic.
