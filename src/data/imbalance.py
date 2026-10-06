@@ -215,6 +215,11 @@ def verify_scenario_integrity(data: Data, scenario_name: str = "") -> bool:
 #   1:1       all illicit, negatives undersampled                   3,462 /   3,462
 #   1:10_os   illicit ×2 with SMOTE (3,462 real + 3,462 synthetic),
 #             negatives undersampled to 10 per illicit              6,924 /  69,240
+#   1:20      all illicit, negatives undersampled (added 5-oct)     3,462 /  69,240
+# 1:1 was moved to an annex after the 4-oct meeting: with balanced classes the three losses
+# coincide (class weighting gives weight 1 and focal loss reduces to plain cross entropy),
+# so it cannot compare balancing strategies. 1:20 replaces it in the main analysis, between
+# 1:10 and the native ratio.
 # Legacy scenarios of the 23-sep design (drop illicit nodes; label mode B only; not run):
 #   1:10_subil, 1:50_subil, 1:100_subil, native_size_ctrl
 
@@ -229,6 +234,7 @@ V4_SCENARIOS = {
     "1:10": {"kind": "neg_per_illicit", "k": 10},
     "1:1": {"kind": "neg_per_illicit", "k": 1},
     "1:10_os": {"kind": "oversample", "factor": 2, "k": 10},
+    "1:20": {"kind": "neg_per_illicit", "k": 20},
     # legacy (23-sep design, label mode B): subsample ILLICIT — kills the fraud signal
     "native_size_ctrl": {"kind": "native_size_ctrl"},
     "1:10_subil": {"kind": "illicit_per_licit", "k": 10},
@@ -249,6 +255,7 @@ V4_EXPECTED_TRAIN_BY_MODE = {
         "1:10": (3462, 34620),
         "1:1": (3462, 3462),
         "1:10_os": (6924, 69240),
+        "1:20": (3462, 69240),
     },
     "licit": {
         "native": (3462, 26432),
