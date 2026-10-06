@@ -1,0 +1,8 @@
+criterio,total_48,sin_1:1_36,GCN,GraphSAGE,GAT,TAGCN,esc_native,esc_1:10,esc_1:10_os,esc_1:1
+g_model_any,21,21,0,8,5,8,6,7,8,0
+g_model_majority,21,21,0,8,5,8,6,7,8,0
+g_model_all,15,15,0,8,3,4,3,6,6,0
+g_cfg_mean,20,20,0,8,4,8,5,7,8,0
+g_cfg_mean_minus_sd,15,15,0,8,3,4,3,6,6,0
+g_cfg_ci_lo,15,15,0,8,3,4,3,6,6,0
+g_cfg_mean_cal,32,24,0,11,10,11,6,9,9,8

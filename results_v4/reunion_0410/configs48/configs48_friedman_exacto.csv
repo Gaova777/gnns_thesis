@@ -1,0 +1,91 @@
+filter,explainer,hypothesis,p_exact,method,n_blocks,k
+repro_v4_por_modelo,GNNExplainer,H1,0.5216049382716049,exacto (7776 permutaciones),5,3
+repro_v4_por_modelo,GNNExplainer,H2,0.6527777777777778,exacto (1296 permutaciones),4,3
+repro_v4_por_modelo,GNNExplainer,H3,0.06944444444444445,exacto (1296 permutaciones),4,3
+repro_v4_por_modelo,PGExplainer,H1,0.36728395061728397,exacto (7776 permutaciones),5,3
+repro_v4_por_modelo,PGExplainer,H2,0.27314814814814814,exacto (1296 permutaciones),4,3
+repro_v4_por_modelo,PGExplainer,H3,0.06944444444444445,exacto (1296 permutaciones),4,3
+repro_v4_por_modelo,ShapleyFeatures,H1,0.36728395061728397,exacto (7776 permutaciones),5,3
+repro_v4_por_modelo,ShapleyFeatures,H2,0.125,exacto (1296 permutaciones),4,3
+repro_v4_por_modelo,ShapleyFeatures,H3,0.041666666666666664,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1,GNNExplainer,H1,0.9305555555555556,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1,GNNExplainer,H2,,no aplicable,8,2
+cfg_media_sin1:1,GNNExplainer,H3,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1,PGExplainer,H1,0.6527777777777778,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1,PGExplainer,H2,,no aplicable,8,2
+cfg_media_sin1:1,PGExplainer,H3,0.06944444444444445,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1,ShapleyFeatures,H1,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1,ShapleyFeatures,H2,,no aplicable,8,2
+cfg_media_sin1:1,ShapleyFeatures,H3,0.041666666666666664,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,GNNExplainer,H1,0.9305555555555556,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,GNNExplainer,H2,0.6527777777777778,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,GNNExplainer,H3,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,PGExplainer,H1,0.6527777777777778,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,PGExplainer,H2,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,PGExplainer,H3,0.06944444444444445,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,ShapleyFeatures,H1,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,ShapleyFeatures,H2,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_sin1:1_soporte3,ShapleyFeatures,H3,0.041666666666666664,exacto (1296 permutaciones),4,3
+cfg_media_con1:1,GNNExplainer,H1,0.9305555555555556,exacto (1296 permutaciones),4,3
+cfg_media_con1:1,GNNExplainer,H2,,no aplicable,8,2
+cfg_media_con1:1,GNNExplainer,H3,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_con1:1,PGExplainer,H1,0.6527777777777778,exacto (1296 permutaciones),4,3
+cfg_media_con1:1,PGExplainer,H2,,no aplicable,8,2
+cfg_media_con1:1,PGExplainer,H3,0.06944444444444445,exacto (1296 permutaciones),4,3
+cfg_media_con1:1,ShapleyFeatures,H1,0.27314814814814814,exacto (1296 permutaciones),4,3
+cfg_media_con1:1,ShapleyFeatures,H2,,no aplicable,8,2
+cfg_media_con1:1,ShapleyFeatures,H3,0.041666666666666664,exacto (1296 permutaciones),4,3
+cfg_media-sd_sin1:1,GNNExplainer,H1,0.16666666666666666,exacto (36 permutaciones),2,3
+cfg_media-sd_sin1:1,GNNExplainer,H2,,no aplicable,8,1
+cfg_media-sd_sin1:1,GNNExplainer,H3,0.16666666666666666,exacto (36 permutaciones),2,3
+cfg_media-sd_sin1:1,PGExplainer,H1,0.8333333333333334,exacto (36 permutaciones),2,3
+cfg_media-sd_sin1:1,PGExplainer,H2,,no aplicable,8,1
+cfg_media-sd_sin1:1,PGExplainer,H3,0.16666666666666666,exacto (36 permutaciones),2,3
+cfg_media-sd_sin1:1,ShapleyFeatures,H1,0.8333333333333334,exacto (36 permutaciones),2,3
+cfg_media-sd_sin1:1,ShapleyFeatures,H2,,no aplicable,8,1
+cfg_media-sd_sin1:1,ShapleyFeatures,H3,0.5,exacto (36 permutaciones),2,3
+cfg_ICinf_sin1:1,GNNExplainer,H1,0.16666666666666666,exacto (36 permutaciones),2,3
+cfg_ICinf_sin1:1,GNNExplainer,H2,,no aplicable,8,1
+cfg_ICinf_sin1:1,GNNExplainer,H3,0.16666666666666666,exacto (36 permutaciones),2,3
+cfg_ICinf_sin1:1,PGExplainer,H1,0.8333333333333334,exacto (36 permutaciones),2,3
+cfg_ICinf_sin1:1,PGExplainer,H2,,no aplicable,8,1
+cfg_ICinf_sin1:1,PGExplainer,H3,0.16666666666666666,exacto (36 permutaciones),2,3
+cfg_ICinf_sin1:1,ShapleyFeatures,H1,0.8333333333333334,exacto (36 permutaciones),2,3
+cfg_ICinf_sin1:1,ShapleyFeatures,H2,,no aplicable,8,1
+cfg_ICinf_sin1:1,ShapleyFeatures,H3,0.5,exacto (36 permutaciones),2,3
+cfg_calibrada_sin1:1,GNNExplainer,H1,0.956275720164609,exacto (46656 permutaciones),6,3
+cfg_calibrada_sin1:1,GNNExplainer,H2,0.11972379401005945,exacto (1679616 permutaciones),8,3
+cfg_calibrada_sin1:1,GNNExplainer,H3,0.07214506172839506,exacto (46656 permutaciones),6,3
+cfg_calibrada_sin1:1,PGExplainer,H1,0.5704732510288066,exacto (46656 permutaciones),6,3
+cfg_calibrada_sin1:1,PGExplainer,H2,0.007969678783721994,exacto (1679616 permutaciones),8,3
+cfg_calibrada_sin1:1,PGExplainer,H3,0.052083333333333336,exacto (46656 permutaciones),6,3
+cfg_calibrada_sin1:1,ShapleyFeatures,H1,0.4296553497942387,exacto (46656 permutaciones),6,3
+cfg_calibrada_sin1:1,ShapleyFeatures,H2,0.07891446616369456,exacto (1679616 permutaciones),8,3
+cfg_calibrada_sin1:1,ShapleyFeatures,H3,0.4296553497942387,exacto (46656 permutaciones),6,3
+cfg_calibrada_con1:1,GNNExplainer,H1,0.40646,Monte Carlo (200000),5,4
+cfg_calibrada_con1:1,GNNExplainer,H2,0.025785,Monte Carlo (200000),10,3
+cfg_calibrada_con1:1,GNNExplainer,H3,0.07214506172839506,exacto (46656 permutaciones),6,3
+cfg_calibrada_con1:1,PGExplainer,H1,0.56234,Monte Carlo (200000),5,4
+cfg_calibrada_con1:1,PGExplainer,H2,0.00123,Monte Carlo (200000),10,3
+cfg_calibrada_con1:1,PGExplainer,H3,0.052083333333333336,exacto (46656 permutaciones),6,3
+cfg_calibrada_con1:1,ShapleyFeatures,H1,0.29802,Monte Carlo (200000),5,4
+cfg_calibrada_con1:1,ShapleyFeatures,H2,0.026305,Monte Carlo (200000),10,3
+cfg_calibrada_con1:1,ShapleyFeatures,H3,0.4296553497942387,exacto (46656 permutaciones),6,3
+sin_compuerta_sin1:1,GNNExplainer,H1,0.249205,Monte Carlo (200000),12,3
+sin_compuerta_sin1:1,GNNExplainer,H2,0.00634,Monte Carlo (200000),9,4
+sin_compuerta_sin1:1,GNNExplainer,H3,0.000875,Monte Carlo (200000),12,3
+sin_compuerta_sin1:1,PGExplainer,H1,0.49858,Monte Carlo (200000),12,3
+sin_compuerta_sin1:1,PGExplainer,H2,0.0007,Monte Carlo (200000),9,4
+sin_compuerta_sin1:1,PGExplainer,H3,0.00239,Monte Carlo (200000),12,3
+sin_compuerta_sin1:1,ShapleyFeatures,H1,0.50025,Monte Carlo (200000),12,3
+sin_compuerta_sin1:1,ShapleyFeatures,H2,0.000365,Monte Carlo (200000),9,4
+sin_compuerta_sin1:1,ShapleyFeatures,H3,0.19128,Monte Carlo (200000),12,3
+sin_compuerta_con1:1,GNNExplainer,H1,0.4287,Monte Carlo (200000),12,4
+sin_compuerta_con1:1,GNNExplainer,H2,0.001215,Monte Carlo (200000),12,4
+sin_compuerta_con1:1,GNNExplainer,H3,0.000875,Monte Carlo (200000),12,3
+sin_compuerta_con1:1,PGExplainer,H1,0.08363,Monte Carlo (200000),12,4
+sin_compuerta_con1:1,PGExplainer,H2,9.5e-05,Monte Carlo (200000),12,4
+sin_compuerta_con1:1,PGExplainer,H3,0.00239,Monte Carlo (200000),12,3
+sin_compuerta_con1:1,ShapleyFeatures,H1,0.62113,Monte Carlo (200000),12,4
+sin_compuerta_con1:1,ShapleyFeatures,H2,5e-06,Monte Carlo (200000),12,4
+sin_compuerta_con1:1,ShapleyFeatures,H3,0.19128,Monte Carlo (200000),12,3
