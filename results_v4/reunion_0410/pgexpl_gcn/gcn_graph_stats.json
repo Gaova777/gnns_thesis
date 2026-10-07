@@ -1,0 +1,17 @@
+{
+  "train_indeg_median_illicit": 1.0,
+  "train_indeg_median_neg": 1.0,
+  "train_frac_indeg0_illicit": 0.2596764862537384,
+  "train_frac_isolated_illicit": 0.0,
+  "train_frac_deg_le2_illicit": 0.9341421127319336,
+  "val_indeg_median_illicit": 1.0,
+  "val_indeg_median_neg": 1.0,
+  "val_frac_indeg0_illicit": 0.19256018102169037,
+  "val_frac_isolated_illicit": 0.0,
+  "val_frac_deg_le2_illicit": 0.9376367330551147,
+  "homophily_labelled_edges_illicit": 0.3704528510570526,
+  "homophily_labelled_edges_licit": 0.9523943066596985,
+  "modeC_frac_neighbours_illicit_given_illicit": 0.12252915650606155,
+  "modeC_prevalence_illicit": 0.02230466902256012,
+  "num_node_features": 165
+}

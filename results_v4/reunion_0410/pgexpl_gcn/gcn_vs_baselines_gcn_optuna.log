@@ -1,0 +1,29 @@
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+{
+  "train_indeg_median_illicit": 1.0,
+  "train_indeg_median_neg": 1.0,
+  "train_frac_indeg0_illicit": 0.2596764862537384,
+  "train_frac_isolated_illicit": 0.0,
+  "train_frac_deg_le2_illicit": 0.9341421127319336,
+  "val_indeg_median_illicit": 1.0,
+  "val_indeg_median_neg": 1.0,
+  "val_frac_indeg0_illicit": 0.19256018102169037,
+  "val_frac_isolated_illicit": 0.0,
+  "val_frac_deg_le2_illicit": 0.9376367330551147,
+  "homophily_labelled_edges_illicit": 0.3704528510570526,
+  "homophily_labelled_edges_licit": 0.9523943066596985,
+  "modeC_frac_neighbours_illicit_given_illicit": 0.12252915650606155,
+  "modeC_prevalence_illicit": 0.02230466902256012,
+  "num_node_features": 165
+}
+{'model': 'MLP', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.46844289286512875, 'best_epoch': 265, 'final_val_pr_auc': 0.44532989678617674, 'test_pr_auc_at_best': 0.010110174088984573, 'val_pr_auc_ep50': 0.429871757743324, 'val_pr_auc_ep150': 0.4149377279909219, 'seconds': 73.3, 'hp': 'gcn_optuna'}
+{'model': 'GCN', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.23551696408632158, 'best_epoch': 285, 'final_val_pr_auc': 0.22206359944261342, 'test_pr_auc_at_best': 0.006565556814472284, 'val_pr_auc_ep50': 0.04050363639212002, 'val_pr_auc_ep150': 0.15174482693005847, 'seconds': 146.1, 'hp': 'gcn_optuna'}
+{'model': 'GCN_root', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.49546024942849304, 'best_epoch': 235, 'final_val_pr_auc': 0.4913701285750301, 'test_pr_auc_at_best': 0.006947198665028883, 'val_pr_auc_ep50': 0.1369853798175443, 'val_pr_auc_ep150': 0.39122720254929755, 'seconds': 187.4, 'hp': 'gcn_optuna'}

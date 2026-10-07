@@ -1,0 +1,61 @@
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+{
+  "train_indeg_median_illicit": 1.0,
+  "train_indeg_median_neg": 1.0,
+  "train_frac_indeg0_illicit": 0.2596764862537384,
+  "train_frac_isolated_illicit": 0.0,
+  "train_frac_deg_le2_illicit": 0.9341421127319336,
+  "val_indeg_median_illicit": 1.0,
+  "val_indeg_median_neg": 1.0,
+  "val_frac_indeg0_illicit": 0.19256018102169037,
+  "val_frac_isolated_illicit": 0.0,
+  "val_frac_deg_le2_illicit": 0.9376367330551147,
+  "homophily_labelled_edges_illicit": 0.3704528510570526,
+  "homophily_labelled_edges_licit": 0.9523943066596985,
+  "modeC_frac_neighbours_illicit_given_illicit": 0.12252915650606155,
+  "modeC_prevalence_illicit": 0.02230466902256012,
+  "num_node_features": 165
+}
+{'model': 'MLP', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.4722923757390734, 'best_epoch': 270, 'final_val_pr_auc': 0.4680979647462921, 'test_pr_auc_at_best': 0.009759899688778498, 'val_pr_auc_ep50': 0.4314492332085115, 'val_pr_auc_ep150': 0.38296469231126146, 'seconds': 8.8, 'hp': 'gcn_optuna'}
+Traceback (most recent call last):
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/v4/reunion_0410/gcn_vs_baselines.py", line 189, in <module>
+    main()
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/v4/reunion_0410/gcn_vs_baselines.py", line 181, in main
+    r = run(mn, bal, seed, data, cfg, a.device)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/v4/reunion_0410/gcn_vs_baselines.py", line 132, in run
+    out = model(x, ei)
+          ^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/src/models/gcn.py", line 50, in forward
+    x = conv(x, edge_index)
+        ^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch_geometric/nn/conv/gcn_conv.py", line 263, in forward
+    out = self.propagate(edge_index, x=x, edge_weight=edge_weight)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/torch_geometric.nn.conv.gcn_conv_GCNConv_propagate_naouxxyc.py", line 209, in propagate
+    out = self.message(
+          ^^^^^^^^^^^^^
+  File "/home/juan/Escritorio/gnn_thesis/gnns_thesis/.venv/lib/python3.12/site-packages/torch_geometric/nn/conv/gcn_conv.py", line 271, in message
+    return x_j if edge_weight is None else edge_weight.view(-1, 1) * x_j
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 248.00 MiB. GPU 0 has a total capacity of 7.62 GiB of which 42.31 MiB is free. Process 10665 has 96.00 MiB memory in use. Process 24588 has 186.47 MiB memory in use. Process 27745 has 27.28 MiB memory in use. Process 31697 has 271.28 MiB memory in use. Process 42760 has 41.16 MiB memory in use. Process 121047 has 150.00 MiB memory in use. Process 171840 has 5.43 GiB memory in use. Including non-PyTorch memory, this process has 756.00 MiB memory in use. Of the allocated memory 522.86 MiB is allocated by PyTorch, and 109.14 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

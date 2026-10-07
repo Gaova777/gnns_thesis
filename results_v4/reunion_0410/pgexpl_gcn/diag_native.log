@@ -1,0 +1,21 @@
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  PGExplainer training complete (loss=0.2283)
+  PGExplainer training complete (loss=0.2761)
+  PGExplainer training complete (loss=0.2239)
+  PGExplainer training complete (loss=0.2054)
+  PGExplainer training complete (loss=0.2470)
+{"run_id": "native_GraphSAGE_none", "arch": "GraphSAGE", "scenario": "native", "balancing": "none", "train_frac_pred_illicit": 0.007830330170691013, "train_margin_std": 4.679191589355469, "train_abs_margin_median": 5.530508995056152, "train_frac_p_sat": 0.5893369317054749, "explained_frac_pred_illicit": 0.46666666865348816, "pg_train_frac_pred_illicit": 0.047999999672174457, "ce_gap_all_vs_none_mean": 0.11261483803014553, "train_abs_dmargin_noedges_median": 1.4356401205062865, "n_nodes_2plus": 16, "sp_edges_mask_repro": 0.3916666666666666, "sp_edges_mlp_logit": -0.2, "occ_gap_median": 1.1973843276500702, "input_sep_median": 4.169238090515137, "rho_pg_vs_occlusion_mean": -0.125, "seconds": 82.6}
+  PGExplainer training complete (loss=0.1133)
+  PGExplainer training complete (loss=0.1811)
+  PGExplainer training complete (loss=0.0947)
+  PGExplainer training complete (loss=0.0929)
+  PGExplainer training complete (loss=0.1549)
+{"run_id": "native_GraphSAGE_class_weighting", "arch": "GraphSAGE", "scenario": "native", "balancing": "class_weighting", "train_frac_pred_illicit": 0.0643598884344101, "train_margin_std": 6.616982460021973, "train_abs_margin_median": 6.377379417419434, "train_frac_p_sat": 0.6496312618255615, "explained_frac_pred_illicit": 0.7333333492279053, "pg_train_frac_pred_illicit": 0.5, "ce_gap_all_vs_none_mean": 0.1659076645830229, "train_abs_dmargin_noedges_median": 1.7813493371009828, "n_nodes_2plus": 16, "sp_edges_mask_repro": 0.42222222222222217, "sp_edges_mlp_logit": 0.2749999999999999, "occ_gap_median": 1.0763131529092789, "input_sep_median": 6.480941534042358, "rho_pg_vs_occlusion_mean": 0.04375, "seconds": 471.7}

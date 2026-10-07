@@ -1,0 +1,42 @@
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+{
+  "train_indeg_median_illicit": 1.0,
+  "train_indeg_median_neg": 1.0,
+  "train_frac_indeg0_illicit": 0.2596764862537384,
+  "train_frac_isolated_illicit": 0.0,
+  "train_frac_deg_le2_illicit": 0.9341421127319336,
+  "val_indeg_median_illicit": 1.0,
+  "val_indeg_median_neg": 1.0,
+  "val_frac_indeg0_illicit": 0.19256018102169037,
+  "val_frac_isolated_illicit": 0.0,
+  "val_frac_deg_le2_illicit": 0.9376367330551147,
+  "homophily_labelled_edges_illicit": 0.3704528510570526,
+  "homophily_labelled_edges_licit": 0.9523943066596985,
+  "modeC_frac_neighbours_illicit_given_illicit": 0.12252915650606155,
+  "modeC_prevalence_illicit": 0.02230466902256012,
+  "num_node_features": 165
+}
+{'model': 'MLP', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.49394510959465393, 'best_epoch': 90, 'final_val_pr_auc': 0.44070957205350564, 'test_pr_auc_at_best': 0.008672950634417411, 'val_pr_auc_ep50': 0.4386872977617282, 'val_pr_auc_ep150': 0.4818565338551063, 'seconds': 2.9, 'hp': 'common'}
+{'model': 'GCN', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.16639085083784763, 'best_epoch': 295, 'final_val_pr_auc': 0.16511304988603082, 'test_pr_auc_at_best': 0.0068586971499943646, 'val_pr_auc_ep50': 0.06186971408710909, 'val_pr_auc_ep150': 0.118896284565995, 'seconds': 5.7, 'hp': 'common'}
+{'model': 'GCN_root', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.36018915771484905, 'best_epoch': 295, 'final_val_pr_auc': 0.35801941903158074, 'test_pr_auc_at_best': 0.008251731231244269, 'val_pr_auc_ep50': 0.12139397144865048, 'val_pr_auc_ep150': 0.25627549742858324, 'seconds': 7.0, 'hp': 'common'}
+{'model': 'GraphSAGE', 'balancing': 'none', 'seed': 42, 'best_val_pr_auc': 0.5008887974726203, 'best_epoch': 300, 'final_val_pr_auc': 0.5008887974726203, 'test_pr_auc_at_best': 0.007779860817806181, 'val_pr_auc_ep50': 0.3242358518957048, 'val_pr_auc_ep150': 0.4524792808830554, 'seconds': 8.1, 'hp': 'common'}
+{'model': 'MLP', 'balancing': 'class_weighting', 'seed': 42, 'best_val_pr_auc': 0.49233267937204883, 'best_epoch': 290, 'final_val_pr_auc': 0.4736593217699079, 'test_pr_auc_at_best': 0.010010903332089446, 'val_pr_auc_ep50': 0.4537327104611796, 'val_pr_auc_ep150': 0.4334502187971238, 'seconds': 2.7, 'hp': 'common'}
+{'model': 'GCN', 'balancing': 'class_weighting', 'seed': 42, 'best_val_pr_auc': 0.24128224266580398, 'best_epoch': 230, 'final_val_pr_auc': 0.2332958488707396, 'test_pr_auc_at_best': 0.005436442135904758, 'val_pr_auc_ep50': 0.1493949503058563, 'val_pr_auc_ep150': 0.23077648204795867, 'seconds': 5.7, 'hp': 'common'}
+{'model': 'GCN_root', 'balancing': 'class_weighting', 'seed': 42, 'best_val_pr_auc': 0.5051868718668249, 'best_epoch': 285, 'final_val_pr_auc': 0.4939694705117381, 'test_pr_auc_at_best': 0.00828680668240954, 'val_pr_auc_ep50': 0.37066238836974447, 'val_pr_auc_ep150': 0.45528885824195553, 'seconds': 9.4, 'hp': 'common'}
+{'model': 'GraphSAGE', 'balancing': 'class_weighting', 'seed': 42, 'best_val_pr_auc': 0.49254194479381186, 'best_epoch': 260, 'final_val_pr_auc': 0.47302186566539384, 'test_pr_auc_at_best': 0.01171126977200122, 'val_pr_auc_ep50': 0.45550174587519704, 'val_pr_auc_ep150': 0.49202335719085916, 'seconds': 11.7, 'hp': 'common'}
+{'model': 'MLP', 'balancing': 'none', 'seed': 43, 'best_val_pr_auc': 0.46337583481743233, 'best_epoch': 300, 'final_val_pr_auc': 0.46337583481743233, 'test_pr_auc_at_best': 0.008154167082743344, 'val_pr_auc_ep50': 0.4036370110113745, 'val_pr_auc_ep150': 0.3989107254700551, 'seconds': 4.5, 'hp': 'common'}
+{'model': 'GCN', 'balancing': 'none', 'seed': 43, 'best_val_pr_auc': 0.20032210074523055, 'best_epoch': 295, 'final_val_pr_auc': 0.1996331466041255, 'test_pr_auc_at_best': 0.007680942345224822, 'val_pr_auc_ep50': 0.07801831273284823, 'val_pr_auc_ep150': 0.1558060857490511, 'seconds': 8.6, 'hp': 'common'}
+{'model': 'GCN_root', 'balancing': 'none', 'seed': 43, 'best_val_pr_auc': 0.4778916913364495, 'best_epoch': 300, 'final_val_pr_auc': 0.4778916913364495, 'test_pr_auc_at_best': 0.006527493755467339, 'val_pr_auc_ep50': 0.08280836936765679, 'val_pr_auc_ep150': 0.35206797124292916, 'seconds': 10.3, 'hp': 'common'}
+{'model': 'GraphSAGE', 'balancing': 'none', 'seed': 43, 'best_val_pr_auc': 0.4580938758028552, 'best_epoch': 300, 'final_val_pr_auc': 0.4580938758028552, 'test_pr_auc_at_best': 0.007286308656002473, 'val_pr_auc_ep50': 0.27797801745654543, 'val_pr_auc_ep150': 0.37253582783580286, 'seconds': 11.4, 'hp': 'common'}
+{'model': 'MLP', 'balancing': 'class_weighting', 'seed': 43, 'best_val_pr_auc': 0.48926177113820984, 'best_epoch': 255, 'final_val_pr_auc': 0.47039243857173485, 'test_pr_auc_at_best': 0.009297527785838684, 'val_pr_auc_ep50': 0.45558210464120774, 'val_pr_auc_ep150': 0.463892844141647, 'seconds': 3.5, 'hp': 'common'}
+{'model': 'GCN', 'balancing': 'class_weighting', 'seed': 43, 'best_val_pr_auc': 0.24740386956306085, 'best_epoch': 260, 'final_val_pr_auc': 0.2375721763496775, 'test_pr_auc_at_best': 0.005904838533864395, 'val_pr_auc_ep50': 0.15973926200112024, 'val_pr_auc_ep150': 0.2339021691543958, 'seconds': 8.1, 'hp': 'common'}
+{'model': 'GCN_root', 'balancing': 'class_weighting', 'seed': 43, 'best_val_pr_auc': 0.5129133668725839, 'best_epoch': 210, 'final_val_pr_auc': 0.5036044776917576, 'test_pr_auc_at_best': 0.008978328609307305, 'val_pr_auc_ep50': 0.38245928634657533, 'val_pr_auc_ep150': 0.48342275184679806, 'seconds': 9.9, 'hp': 'common'}
+{'model': 'GraphSAGE', 'balancing': 'class_weighting', 'seed': 43, 'best_val_pr_auc': 0.4705649989367396, 'best_epoch': 155, 'final_val_pr_auc': 0.44411624002320144, 'test_pr_auc_at_best': 0.00928644286109438, 'val_pr_auc_ep50': 0.44229702119516867, 'val_pr_auc_ep150': 0.4501617357452643, 'seconds': 11.9, 'hp': 'common'}

@@ -1,0 +1,2 @@
+run_id,arch,scenario,balancing,repeat,device,spearman_edges,n_measurable,n_nodes_constant,original_csv,original_device,seconds
+native_GraphSAGE_class_weighting,GraphSAGE,native,class_weighting,0,cuda,0.4222222222222222,15,1,0.0375,cuda,339.2

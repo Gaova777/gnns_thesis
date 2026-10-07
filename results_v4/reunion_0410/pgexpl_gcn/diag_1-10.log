@@ -1,0 +1,15 @@
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  PGExplainer training complete (loss=0.3350)
+  PGExplainer training complete (loss=0.3723)
+  PGExplainer training complete (loss=0.2419)
+  PGExplainer training complete (loss=0.2466)
+  PGExplainer training complete (loss=0.3181)
+{"run_id": "1:10_GraphSAGE_none", "arch": "GraphSAGE", "scenario": "1:10", "balancing": "none", "train_frac_pred_illicit": 0.026609914377331734, "train_margin_std": 3.729738235473633, "train_abs_margin_median": 5.078071594238281, "train_frac_p_sat": 0.5596227645874023, "explained_frac_pred_illicit": 0.5333333611488342, "pg_train_frac_pred_illicit": 0.28400000035762785, "ce_gap_all_vs_none_mean": 0.2876058446306345, "train_abs_dmargin_noedges_median": 0.9578369677066803, "n_nodes_2plus": 16, "sp_edges_mask_repro": 0.42916666666666664, "sp_edges_mlp_logit": -0.14999999999999997, "occ_gap_median": 1.0438145399093628, "input_sep_median": 3.6695849895477295, "rho_pg_vs_occlusion_mean": 0.10624999999999998, "seconds": 354.5}
