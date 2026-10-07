@@ -74,6 +74,12 @@ for n,k in {2:"agarwal",3:"lakens",4:"chawla",5:"weber",6:"gnns",7:"hamilton",8:
 # ── 3. Sin Optuna en las láminas
 h=h.replace("Candidato top con Optuna completo","Candidato top con optimización completa de hiperparámetros")
 h=h.replace("Optuna completo cuando salga el candidato","Optimización completa cuando salga el candidato")
+# THE-32 y THE-33 cerrados (7-oct): cifras nuevas en las láminas de H2 y H3
+for x,y in [("Por qué class weighting lo empeora más: en verificación.",
+             "El mismo modelo, explicado dos veces, da 0,04 y 0,42: la diferencia entre pérdidas cabe en ese ruido."),
+            ("Con un peso propio, GCN pasa de 0,21 a 0,46.",
+             "Con un peso propio pasa de 0,21 a 0,46, como Skip-GCN en Weber et al. (2019).")]:
+    assert h.count(x)==1,x; h=h.replace(x,y)
 assert "Optuna" not in re.sub(r'<aside.*?</aside>','',h,flags=re.S)
 
 # ── 4. Láminas nuevas
