@@ -67,6 +67,9 @@ LOSS_COLOR = dict(zip(LOSSES, PAL))
 LOSS_LS = {"none": "-", "class_weighting": "--", "focal_loss": "-."}
 ARCH_COLOR = dict(zip(ARCHS, PAL))
 ARCH_LS = {"GCN": "-", "GraphSAGE": "--", "GAT": "-.", "TAGCN": ":"}
+# --deck: versión para láminas (sin título interno, que va en el pie de la lámina, y letra
+# más grande). Se guarda en figuras/deck/.
+DECK = False
 
 GRID = np.linspace(0.0, 1.0, 501)
 
@@ -374,8 +377,10 @@ def _style():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    fs = (15, 17, 15, 14) if DECK else (11, 12, 11, 10)
     plt.rcParams.update({
-        "font.size": 11, "axes.titlesize": 12, "axes.labelsize": 11, "legend.fontsize": 10,
+        "font.size": fs[0], "axes.titlesize": fs[1], "axes.labelsize": fs[2],
+        "legend.fontsize": fs[3],
         "axes.spines.top": False, "axes.spines.right": False, "axes.edgecolor": "#52514e",
         "axes.labelcolor": "#0b0b0b", "xtick.color": "#52514e", "ytick.color": "#52514e",
         "axes.formatter.use_locale": False, "figure.facecolor": "white",
@@ -433,9 +438,11 @@ def _axes_setup(ax, kind, split, prevalence, logy):
 
 
 def _save(fig, name):
-    FIGS.mkdir(parents=True, exist_ok=True)
-    for ext, kw in (("png", {"dpi": 200}), ("pdf", {})):
-        fig.savefig(FIGS / f"{name}.{ext}", bbox_inches="tight", **kw)
+    out = FIGS / "deck" if DECK else FIGS
+    out.mkdir(parents=True, exist_ok=True)
+    fmts = (("png", {"dpi": 200}),) if DECK else (("png", {"dpi": 200}), ("pdf", {}))
+    for ext, kw in fmts:
+        fig.savefig(out / f"{name}.{ext}", bbox_inches="tight", **kw)
 
 
 def _legend_handles(plt, items):
@@ -493,16 +500,17 @@ def stage_figures():
                         yy = (y0 + (len(txt) - 1 - k) * 0.075) if kind == "roc" \
                             else y0 - k * 0.075
                         ax.text(0.97, yy, f"{lab} {t}", transform=ax.transAxes, ha="right",
-                                va=va, fontsize=9.5, color="#0b0b0b",
+                                va=va, fontsize=13 if DECK else 9.5, color="#0b0b0b",
                                 bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=col, lw=1.5))
             fig.legend(handles=_legend_handles(
                 plt, [(LOSS_LABEL[l], LOSS_COLOR[l], LOSS_LS[l]) for l in LOSSES]),
                 loc="lower center", ncol=6, frameon=False, bbox_to_anchor=(0.5, -0.035))
             extra = " (anexo)" if scen == "1:1" else ""
-            fig.suptitle(f"Curvas ROC y PR en {SPLIT_LABEL[split]} · escenario "
-                         f"{SCEN_LABEL[scen]}{extra} · media de 3 semillas · prevalencia "
-                         f"{prev[split] * 100:.2f} %".replace(".", ","), fontsize=13.5)
-            fig.tight_layout(rect=(0, 0.02, 1, 0.97))
+            if not DECK:
+                fig.suptitle(f"Curvas ROC y PR en {SPLIT_LABEL[split]} · escenario "
+                             f"{SCEN_LABEL[scen]}{extra} · media de 3 semillas · prevalencia "
+                             f"{prev[split] * 100:.2f} %".replace(".", ","), fontsize=13.5)
+            fig.tight_layout(rect=(0, 0.03 if DECK else 0.02, 1, 1 if DECK else 0.97))
             pref = "anexo_" if scen == "1:1" else ""
             _save(fig, f"{pref}curvas_{scen.replace(':', '-')}_{split}")
             plt.close(fig)
@@ -526,12 +534,14 @@ def stage_figures():
             _axes_setup(ax, kind, split, prev[split], logy)
             ax.set_title(f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]} "
                          f"(prevalencia {prev[split] * 100:.2f} %)".replace(".", ","))
-            ax.legend(loc="lower right" if kind == "roc" else "upper right", fontsize=9.5,
+            ax.legend(loc="lower right" if kind == "roc" else "upper right",
+                      fontsize=12 if DECK else 9.5,
                       frameon=True, framealpha=0.9)
-    fig.suptitle("Escenario nativo: mejor pérdida de cada arquitectura (elegida por PR-AUC de "
-                 "validación)\nmedia de 3 semillas, banda mín.-máx., puntos = umbral calibrado "
-                 "de cada semilla", fontsize=13)
-    fig.tight_layout(rect=(0, 0, 1, 0.95))
+    if not DECK:
+        fig.suptitle("Escenario nativo: mejor pérdida de cada arquitectura (elegida por PR-AUC "
+                     "de validación)\nmedia de 3 semillas, banda mín.-máx., puntos = umbral "
+                     "calibrado de cada semilla", fontsize=13)
+    fig.tight_layout(rect=(0, 0, 1, 1 if DECK else 0.95))
     _save(fig, "resumen_native_mejor_por_arquitectura")
     plt.close(fig)
     print(f"Figuras en {FIGS}")
@@ -542,7 +552,11 @@ def main():
     ap.add_argument("--stage", default="all", choices=["all", "scores", "metrics", "figures"])
     ap.add_argument("--device", default="auto", choices=["auto", "cuda", "cpu"])
     ap.add_argument("--force", action="store_true", help="recalcular scores ya guardados")
+    ap.add_argument("--deck", action="store_true",
+                    help="figuras para láminas: sin título interno y letra grande (figuras/deck/)")
     a = ap.parse_args()
+    global DECK
+    DECK = a.deck
     OUT.mkdir(parents=True, exist_ok=True)
     if a.stage in ("all", "scores"):
         stage_scores(a.device, a.force)
