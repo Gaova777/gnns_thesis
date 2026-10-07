@@ -1,0 +1,10 @@
+,B|GCN|class_weighting|42,B|GCN|focal_loss|42,B|GCN|none|42,B|GraphSAGE|class_weighting|42,B|GraphSAGE|focal_loss|42,B|GraphSAGE|none|42,B|TAGCN|class_weighting|42,B|TAGCN|focal_loss|42,B|TAGCN|none|42
+B|GCN|class_weighting|42,1.0,0.371,0.406,0.135,0.154,0.118,0.119,0.112,0.149
+B|GCN|focal_loss|42,0.371,1.0,0.849,0.187,0.195,0.166,0.163,0.137,0.206
+B|GCN|none|42,0.406,0.849,1.0,0.187,0.195,0.165,0.162,0.14,0.206
+B|GraphSAGE|class_weighting|42,0.135,0.187,0.187,1.0,0.58,0.73,0.618,0.5,0.549
+B|GraphSAGE|focal_loss|42,0.154,0.195,0.195,0.58,1.0,0.616,0.436,0.386,0.454
+B|GraphSAGE|none|42,0.118,0.166,0.165,0.73,0.616,1.0,0.57,0.507,0.561
+B|TAGCN|class_weighting|42,0.119,0.163,0.162,0.618,0.436,0.57,1.0,0.556,0.61
+B|TAGCN|focal_loss|42,0.112,0.137,0.14,0.5,0.386,0.507,0.556,1.0,0.55
+B|TAGCN|none|42,0.149,0.206,0.206,0.549,0.454,0.561,0.61,0.55,1.0

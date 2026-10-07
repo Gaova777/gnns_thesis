@@ -1,0 +1,251 @@
+{
+  "comparacion_B_C_mediana": [
+    {
+      "split": "test",
+      "comparador": "C_mayoria_3_semillas",
+      "frac_marcados_B_tambien_C": 0.067,
+      "tasa_C_en_todos_sinetq": 0.0181,
+      "lift": 20.2778,
+      "auc_scoreC_marcadosB": NaN
+    },
+    {
+      "split": "test",
+      "comparador": "C_mejor",
+      "frac_marcados_B_tambien_C": 0.0333,
+      "tasa_C_en_todos_sinetq": 0.0055,
+      "lift": 33.2493,
+      "auc_scoreC_marcadosB": 0.76
+    },
+    {
+      "split": "test",
+      "comparador": "C_misma_config_s42",
+      "frac_marcados_B_tambien_C": 0.0924,
+      "tasa_C_en_todos_sinetq": 0.0266,
+      "lift": 22.6682,
+      "auc_scoreC_marcadosB": 0.8269
+    },
+    {
+      "split": "val",
+      "comparador": "C_mayoria_3_semillas",
+      "frac_marcados_B_tambien_C": 0.1226,
+      "tasa_C_en_todos_sinetq": 0.0212,
+      "lift": 35.5201,
+      "auc_scoreC_marcadosB": NaN
+    },
+    {
+      "split": "val",
+      "comparador": "C_mejor",
+      "frac_marcados_B_tambien_C": 0.117,
+      "tasa_C_en_todos_sinetq": 0.0203,
+      "lift": 49.9059,
+      "auc_scoreC_marcadosB": 0.8285
+    },
+    {
+      "split": "val",
+      "comparador": "C_misma_config_s42",
+      "frac_marcados_B_tambien_C": 0.1286,
+      "tasa_C_en_todos_sinetq": 0.0288,
+      "lift": 24.3285,
+      "auc_scoreC_marcadosB": 0.8718
+    }
+  ],
+  "recall_ilicitas_C_mejor": {
+    "val": 0.5754923413566739,
+    "test": 0.01775147928994083
+  },
+  "consenso_B_val": {
+    "distribucion_n_modelos_9": [
+      9237,
+      8020,
+      1871,
+      3843,
+      1216,
+      848,
+      1244,
+      539,
+      415,
+      604
+    ],
+    "frac_marcado_por_al_menos_1": 0.6681754499407264,
+    "frac_marcado_por_mayoria_5de9": 0.13112045119804577,
+    "frac_marcado_por_los_9": 0.02169774041743004,
+    "frac_marcado_por_los_6_SAGE_TAGCN": 0.05992025002694256,
+    "n_marcado_por_los_6_SAGE_TAGCN": 1668,
+    "jaccard_mediano_entre_B": 0.2886648265518098
+  },
+  "acuerdo_entre_B_val": {
+    "ilicita_6_SAGE_TAGCN": {
+      "kappa_mediana": 0.7187762231242114,
+      "kappa_min": 0.5951654299114755,
+      "kappa_max": 0.857202672216077,
+      "jaccard_mediana": 0.8599167822468793
+    },
+    "ilicita_9_B": {
+      "kappa_mediana": 0.43829020823009934,
+      "kappa_min": 0.14611829487440164,
+      "kappa_max": 0.9206956722936169,
+      "jaccard_mediana": 0.6385369225419604
+    },
+    "licita_6_SAGE_TAGCN": {
+      "kappa_mediana": 0.5695379764860208,
+      "kappa_min": 0.36033350694354505,
+      "kappa_max": 0.7495106147818229,
+      "jaccard_mediana": 0.40540540540540543
+    },
+    "licita_9_B": {
+      "kappa_mediana": 0.24545146674573692,
+      "kappa_min": 0.04571611297961364,
+      "kappa_max": 0.8340779608549129,
+      "jaccard_mediana": 0.1680427352612783
+    },
+    "sin_etiqueta_6_SAGE_TAGCN": {
+      "kappa_mediana": 0.6717941226592228,
+      "kappa_min": 0.48195200980473174,
+      "kappa_max": 0.8193427389589154,
+      "jaccard_mediana": 0.5563714902807776
+    },
+    "sin_etiqueta_9_B": {
+      "kappa_mediana": 0.25721220442845544,
+      "kappa_min": -0.02004671556036497,
+      "kappa_max": 0.8923991963147667,
+      "jaccard_mediana": 0.2886648265518098
+    }
+  },
+  "clasificadores_sin_grafo": {
+    "hgb_tipo_B": {
+      "umbral": 0.8651493296168374,
+      "train_licita": 0.00011349878934624698,
+      "train_ilicita": 0.9927787406123628,
+      "train_sin_etiqueta": 0.05740286356243713,
+      "val_licita": 0.0008821259234755762,
+      "val_ilicita": 0.8424507658643327,
+      "val_sin_etiqueta": 0.07252936738872723,
+      "test_licita": 0.0023013194231359313,
+      "test_ilicita": 0.01775147928994083,
+      "test_sin_etiqueta": 0.06487802756881332,
+      "val_roc_auc_vs_licitas": 0.9755405494418793,
+      "jaccard_con_mejor_B_sinetq_val": 0.3274935762672273,
+      "frac_marcados_mejorB_tambien_este": 0.3826419213973799
+    },
+    "hgb_tipo_C": {
+      "umbral": 0.6252421032788965,
+      "train_licita": 0.002421307506053269,
+      "train_ilicita": 0.9930675909878682,
+      "train_sin_etiqueta": 0.0110086395728159,
+      "val_licita": 0.004851692579115669,
+      "val_ilicita": 0.7024070021881839,
+      "val_sin_etiqueta": 0.01911125480475626,
+      "test_licita": 0.0035286897821417613,
+      "test_ilicita": 0.029585798816568046,
+      "test_sin_etiqueta": 0.011523242162021134,
+      "val_roc_auc_vs_licitas": 0.974791490380219,
+      "jaccard_con_mejor_B_sinetq_val": 0.09128738621586475,
+      "frac_marcados_mejorB_tambien_este": 0.09579694323144104
+    },
+    "logistica_tipo_B": {
+      "umbral": 0.9632420520816543,
+      "train_licita": 0.003594128329297821,
+      "train_ilicita": 0.5311958405545927,
+      "train_sin_etiqueta": 0.05510900527399385,
+      "val_licita": 0.01984783327820046,
+      "val_ilicita": 0.6936542669584245,
+      "val_sin_etiqueta": 0.11172180910299243,
+      "test_licita": 0.03697453206505063,
+      "test_ilicita": 0.01775147928994083,
+      "test_sin_etiqueta": 0.12432056355176763,
+      "val_roc_auc_vs_licitas": 0.949140228826746,
+      "jaccard_con_mejor_B_sinetq_val": 0.36106088004822184,
+      "frac_marcados_mejorB_tambien_este": 0.4904475982532751
+    },
+    "logistica_tipo_C": {
+      "umbral": 0.9688811290085331,
+      "train_licita": 0.0036319612590799033,
+      "train_ilicita": 0.2345465049104564,
+      "train_sin_etiqueta": 0.0071448045049872615,
+      "val_licita": 0.023817399933840556,
+      "val_ilicita": 0.4562363238512035,
+      "val_sin_etiqueta": 0.030175665481194096,
+      "test_licita": 0.04096348573181958,
+      "test_ilicita": 0.01775147928994083,
+      "test_sin_etiqueta": 0.024394486237335304,
+      "val_roc_auc_vs_licitas": 0.9261120613589034,
+      "jaccard_con_mejor_B_sinetq_val": 0.1265632816408204,
+      "frac_marcados_mejorB_tambien_este": 0.1381004366812227
+    }
+  },
+  "cotas_mezcla": {
+    "auc_licitas_vs_sinetq_val": 0.9837313430367185,
+    "pi_min_val": 0.967462686073437,
+    "auc_licitas_vs_sinetq_train": 0.9903459674999999,
+    "pi_min_train": 0.9806919349999998,
+    "por_B": [
+      {
+        "B": "B|GCN|class_weighting|42",
+        "n_marcados": 15474,
+        "auc_ilicitas_vs_marcados": 0.9951704122026953,
+        "rho_max": 0.009659175594609382,
+        "auc_licitas_vs_marcados": 0.9871212265996879
+      },
+      {
+        "B": "B|GCN|focal_loss|42",
+        "n_marcados": 6330,
+        "auc_ilicitas_vs_marcados": 0.9948206069531009,
+        "rho_max": 0.010358786093798145,
+        "auc_licitas_vs_marcados": 0.9923664926627992
+      },
+      {
+        "B": "B|GCN|none|42",
+        "n_marcados": 7021,
+        "auc_ilicitas_vs_marcados": 0.9943858639773084,
+        "rho_max": 0.011228272045383125,
+        "auc_licitas_vs_marcados": 0.9913180767072944
+      },
+      {
+        "B": "B|GraphSAGE|class_weighting|42",
+        "n_marcados": 3975,
+        "auc_ilicitas_vs_marcados": 0.9931535994935523,
+        "rho_max": 0.013692801012895384,
+        "auc_licitas_vs_marcados": 0.9971381671337356
+      },
+      {
+        "B": "B|GraphSAGE|focal_loss|42",
+        "n_marcados": 4349,
+        "auc_ilicitas_vs_marcados": 0.9946201068381122,
+        "rho_max": 0.01075978632377561,
+        "auc_licitas_vs_marcados": 0.9962048707539227
+      },
+      {
+        "B": "B|GraphSAGE|none|42",
+        "n_marcados": 3664,
+        "auc_ilicitas_vs_marcados": 0.9941350821285582,
+        "rho_max": 0.011729835742883665,
+        "auc_licitas_vs_marcados": 0.9976503827280514
+      },
+      {
+        "B": "B|TAGCN|class_weighting|42",
+        "n_marcados": 3441,
+        "auc_ilicitas_vs_marcados": 0.9941022055442893,
+        "rho_max": 0.011795588911421406,
+        "auc_licitas_vs_marcados": 0.9966148001105797
+      },
+      {
+        "B": "B|TAGCN|focal_loss|42",
+        "n_marcados": 3765,
+        "auc_ilicitas_vs_marcados": 0.9930233842165982,
+        "rho_max": 0.013953231566803614,
+        "auc_licitas_vs_marcados": 0.9957937646993531
+      },
+      {
+        "B": "B|TAGCN|none|42",
+        "n_marcados": 4369,
+        "auc_ilicitas_vs_marcados": 0.9936167538050308,
+        "rho_max": 0.012766492389938433,
+        "auc_licitas_vs_marcados": 0.9955172900542448
+      }
+    ],
+    "auc_licitas_vs_sinetq_val_rep_min_max": [
+      0.9828039695666556,
+      0.9836322417025032
+    ]
+  }
+}

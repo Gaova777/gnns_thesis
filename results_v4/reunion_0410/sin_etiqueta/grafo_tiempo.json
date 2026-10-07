@@ -1,0 +1,232 @@
+{
+  "modelo": "B|GraphSAGE|none|42",
+  "grafo_por_grupo_val": [
+    {
+      "grupo": "licita",
+      "n": 9069,
+      "in_deg_media": 2.0159,
+      "in_deg_mediana": 1.0,
+      "out_deg_media": 1.2192,
+      "out_deg_mediana": 1.0,
+      "deg_total_media": 3.2351,
+      "deg_total_mediana": 2.0,
+      "comp_size_media": 5241.641,
+      "comp_size_mediana": 5507.0,
+      "n_vec_ilicitos_media": 0.0406,
+      "n_vec_ilicitos_mediana": 0.0,
+      "n_vec_licitos_media": 1.6441,
+      "n_vec_licitos_mediana": 1.0,
+      "n_vec_sinetq_media": 1.5504,
+      "n_vec_sinetq_mediana": 1.0,
+      "frac_vec_sinetq_media": 0.3871,
+      "frac_vec_sinetq_mediana": 0.25,
+      "n_ilicitas_2saltos_media": 0.3756,
+      "n_ilicitas_2saltos_mediana": 0.0,
+      "tam_vecindario_2saltos_media": 38.3003,
+      "tam_vecindario_2saltos_mediana": 11.0,
+      "clustering_media": 0.0065,
+      "clustering_mediana": 0.0,
+      "frac_con_vecino_ilicito": 0.0257,
+      "frac_con_ilicita_2saltos": 0.1256,
+      "frac_sin_vecinos_etiquetados": 0.2565,
+      "frac_clustering_pos": 0.0475
+    },
+    {
+      "grupo": "ilicita",
+      "n": 914,
+      "in_deg_media": 1.2757,
+      "in_deg_mediana": 1.0,
+      "out_deg_media": 0.5875,
+      "out_deg_mediana": 1.0,
+      "deg_total_media": 1.8632,
+      "deg_total_mediana": 1.0,
+      "comp_size_media": 5161.8687,
+      "comp_size_mediana": 5342.0,
+      "n_vec_ilicitos_media": 0.2823,
+      "n_vec_ilicitos_mediana": 0.0,
+      "n_vec_licitos_media": 0.4026,
+      "n_vec_licitos_mediana": 0.0,
+      "n_vec_sinetq_media": 1.1783,
+      "n_vec_sinetq_mediana": 1.0,
+      "frac_vec_sinetq_media": 0.6103,
+      "frac_vec_sinetq_mediana": 1.0,
+      "n_ilicitas_2saltos_media": 6.4267,
+      "n_ilicitas_2saltos_mediana": 2.0,
+      "tam_vecindario_2saltos_media": 18.8107,
+      "tam_vecindario_2saltos_mediana": 7.0,
+      "clustering_media": 0.0,
+      "clustering_mediana": 0.0,
+      "frac_con_vecino_ilicito": 0.2309,
+      "frac_con_ilicita_2saltos": 0.6947,
+      "frac_sin_vecinos_etiquetados": 0.5109,
+      "frac_clustering_pos": 0.0022
+    },
+    {
+      "grupo": "sin_etiqueta_marcado",
+      "n": 3664,
+      "in_deg_media": 1.0044,
+      "in_deg_mediana": 1.0,
+      "out_deg_media": 0.7293,
+      "out_deg_mediana": 1.0,
+      "deg_total_media": 1.7336,
+      "deg_total_mediana": 2.0,
+      "comp_size_media": 5351.6174,
+      "comp_size_mediana": 5507.0,
+      "n_vec_ilicitos_media": 0.0445,
+      "n_vec_ilicitos_mediana": 0.0,
+      "n_vec_licitos_media": 0.3515,
+      "n_vec_licitos_mediana": 0.0,
+      "n_vec_sinetq_media": 1.3376,
+      "n_vec_sinetq_mediana": 1.0,
+      "frac_vec_sinetq_media": 0.745,
+      "frac_vec_sinetq_mediana": 1.0,
+      "n_ilicitas_2saltos_media": 0.3087,
+      "n_ilicitas_2saltos_mediana": 0.0,
+      "tam_vecindario_2saltos_media": 11.9026,
+      "tam_vecindario_2saltos_mediana": 4.0,
+      "clustering_media": 0.0044,
+      "clustering_mediana": 0.0,
+      "frac_con_vecino_ilicito": 0.03,
+      "frac_con_ilicita_2saltos": 0.1362,
+      "frac_sin_vecinos_etiquetados": 0.6676,
+      "frac_clustering_pos": 0.0093
+    },
+    {
+      "grupo": "sin_etiqueta_no_marcado",
+      "n": 24173,
+      "in_deg_media": 0.8574,
+      "in_deg_mediana": 1.0,
+      "out_deg_media": 1.224,
+      "out_deg_mediana": 1.0,
+      "deg_total_media": 2.0813,
+      "deg_total_mediana": 2.0,
+      "comp_size_media": 5205.6354,
+      "comp_size_mediana": 5342.0,
+      "n_vec_ilicitos_media": 0.0378,
+      "n_vec_ilicitos_mediana": 0.0,
+      "n_vec_licitos_media": 0.5284,
+      "n_vec_licitos_mediana": 0.0,
+      "n_vec_sinetq_media": 1.5151,
+      "n_vec_sinetq_mediana": 2.0,
+      "frac_vec_sinetq_media": 0.7315,
+      "frac_vec_sinetq_mediana": 1.0,
+      "n_ilicitas_2saltos_media": 0.2806,
+      "n_ilicitas_2saltos_mediana": 0.0,
+      "tam_vecindario_2saltos_media": 26.5617,
+      "tam_vecindario_2saltos_mediana": 5.0,
+      "clustering_media": 0.0149,
+      "clustering_mediana": 0.0,
+      "frac_con_vecino_ilicito": 0.028,
+      "frac_con_ilicita_2saltos": 0.1088,
+      "frac_sin_vecinos_etiquetados": 0.6117,
+      "frac_clustering_pos": 0.0321
+    }
+  ],
+  "marcado_por_grado": [
+    [
+      "1",
+      10344,
+      0.17382057231245165
+    ],
+    [
+      "2",
+      12365,
+      0.12139102304892843
+    ],
+    [
+      "3-4",
+      4297,
+      0.07935769141261345
+    ],
+    [
+      "5-9",
+      628,
+      0.020700636942675158
+    ],
+    [
+      ">=10",
+      203,
+      0.054187192118226604
+    ]
+  ],
+  "marcado_por_vecino_ilicito_1salto": [
+    [
+      false,
+      27049,
+      0.1313911789714962
+    ],
+    [
+      true,
+      788,
+      0.13959390862944163
+    ]
+  ],
+  "marcado_por_ilicita_2saltos": [
+    [
+      false,
+      24708,
+      0.12809616318601263
+    ],
+    [
+      true,
+      3129,
+      0.15947587088526685
+    ]
+  ],
+  "marcado_sin_vecinos_etiquetados": [
+    [
+      false,
+      10605,
+      0.11485148514851486
+    ],
+    [
+      true,
+      17232,
+      0.1419452181987001
+    ]
+  ],
+  "frac_marcados_con_ilicita_2saltos": 0.13618995633187772,
+  "auc_estructura_predice_marca": {
+    "in_deg": 0.5576426710879745,
+    "out_deg": 0.6379112640018267,
+    "deg_total": 0.5881832820081303,
+    "comp_size": 0.5243572611237375,
+    "n_vec_ilicitos": 0.5009722098277392,
+    "n_vec_licitos": 0.5335737529348581,
+    "n_vec_sinetq": 0.5612834294262048,
+    "frac_vec_sinetq": 0.5181428172324783,
+    "n_ilicitas_2saltos": 0.5134774441132759,
+    "tam_vecindario_2saltos": 0.6052370776825781,
+    "clustering": 0.5114149538344145
+  },
+  "frac_sinetq_val_con_ilicita_2saltos": 0.112404353917448,
+  "aristas_entre_grupos": {
+    "ilicita": {
+      "ilicita": 998,
+      "licita": 781,
+      "sin_etiqueta": 3993
+    },
+    "licita": {
+      "ilicita": 915,
+      "licita": 33930,
+      "sin_etiqueta": 45386
+    },
+    "sin_etiqueta": {
+      "ilicita": 1458,
+      "licita": 15116,
+      "sin_etiqueta": 131778
+    }
+  },
+  "tiempo": {
+    "licita_train": 0.0036697941888619856,
+    "licita_val": 0.01179843422648583,
+    "licita_test_43_49": 0.01595581466707579,
+    "ilicita_train": 0.840265742345465,
+    "ilicita_val": 0.7450765864332604,
+    "ilicita_test_43_49": 0.01775147928994083,
+    "sin_etiqueta_train": 0.09154750824942888,
+    "sin_etiqueta_val": 0.13162337895606566,
+    "sin_etiqueta_test_43_49": 0.12645127625342437,
+    "corr_tasa_sinetq_vs_drift": -0.11561224489795918
+  }
+}
