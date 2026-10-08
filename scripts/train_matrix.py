@@ -125,6 +125,11 @@ def parse_args():
     # Overrides (smoke tests / debugging)
     p.add_argument("--epochs", type=int, default=None, help="Override training.epochs "
                    "(also caps Optuna trial epochs)")
+    p.add_argument("--hp-from", type=str, default=None,
+                   help="Reuse, for EVERY seed, the hyperparameters of the canonical-seed meta.json "
+                        "of the same configuration found in this models dir (no search).")
+    p.add_argument("--early-stop-metric", type=str, default=None,
+                   help="Override training.early_stop_metric (f1 | mcc | pr_auc)")
     p.add_argument("--trials", type=int, default=None,
                    help="Override optuna_trials (0 = default HPs, no search)")
     p.add_argument("--models-dir", type=str, default=None, help="Override tracking.models_dir")
@@ -315,7 +320,7 @@ def main():
     warm_start = hyp_cfg.get("warm_start", True) and not args.no_warm_start
     epochs = train_cfg.get("epochs", 600)
     patience = train_cfg.get("patience", 50)
-    early_stop_metric = train_cfg.get("early_stop_metric", "f1")
+    early_stop_metric = args.early_stop_metric or train_cfg.get("early_stop_metric", "f1")
     trial_epochs = min(int(hyp_cfg.get("trial_epochs", 50)), epochs)
     trial_patience = min(int(hyp_cfg.get("trial_patience", 10)), patience)
     search_space = {k: hyp_cfg[k] for k in ("num_layers", "dropout", "learning_rate",
@@ -367,8 +372,9 @@ def main():
             continue
 
         reuse_hp_src = None
-        if args.reuse_hp and seed != canonical_seed:
-            base_meta = _meta_path(models_dir, f"{scenario_name}_{arch_name}_{balance_name}")
+        if args.hp_from or (args.reuse_hp and seed != canonical_seed):
+            hp_dir = Path(args.hp_from) if args.hp_from else models_dir
+            base_meta = _meta_path(hp_dir, f"{scenario_name}_{arch_name}_{balance_name}")
             if not base_meta.exists():
                 msg = f"--reuse-hp: missing {base_meta.name} (seed {canonical_seed})"
                 tqdm.write(f"  SKIP ({msg}): {run_id}")
@@ -377,7 +383,7 @@ def main():
                 continue
             with open(base_meta, encoding="utf-8") as f:
                 reuse_hp_src = json.load(f)
-            reuse_hp_src["_path"] = base_meta.name
+            reuse_hp_src["_path"] = str(base_meta) if args.hp_from else base_meta.name
 
         tqdm.write(f"\n{'='*70}\nCONFIG: {run_id}\n{'='*70}")
         if torch.cuda.is_available():
@@ -528,7 +534,7 @@ def run_one_config(ctx, data_raw, scenario_name, ratio, arch_name, balance_name,
     if reuse_hp_src is not None:
         best_hp = reuse_hp_src["best_params"]
         best_score = reuse_hp_src.get("optuna_best_score")
-        hp_source = f"reused:{ctx['canonical_seed']}"
+        hp_source = f"reused:{ctx['canonical_seed']}" + (f":{reuse_hp_src['_path']}" if '/' in reuse_hp_src['_path'] else '')
         tqdm.write(f"  Hyperparams: reused from seed {ctx['canonical_seed']} "
                    f"({reuse_hp_src['_path']}): {best_hp}")
     elif opt_trials == 0:
