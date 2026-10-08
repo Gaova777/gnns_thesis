@@ -6,7 +6,7 @@ incertidumbre de las 3 semillas (media + banda), marcando el umbral calibrado de
 
 Dos etapas:
 
-  --stage scores   (GPU si hay memoria, si no CPU) reconstruye los 144 modelos de
+  --stage scores   (GPU si hay memoria, si no CPU) reconstruye los 180 modelos de
                    results_models_v4/, hace UNA pasada hacia adelante por modelo sobre el grafo
                    del escenario (create_v4_scenario con la semilla de datos fija del config) y
                    guarda las probabilidades de la clase ilicita de validacion y test en
@@ -48,15 +48,16 @@ FIGS = OUT / "figuras"
 MODELS = REPO / "results_models_v4"
 CONFIG = REPO / "configs" / "experiment_v4.yaml"
 
-SCENARIOS = ["native", "1:10", "1:10_os", "1:1"]
-MAIN_SCENARIOS = ["native", "1:10", "1:10_os"]
+SCENARIOS = ["native", "1:10", "1:10_os", "1:20", "1:1"]
+MAIN_SCENARIOS = ["native", "1:10", "1:10_os", "1:20"]  # 1:20 reemplaza al 1:1 (7-oct)
 ARCHS = ["GCN", "GraphSAGE", "GAT", "TAGCN"]
 LOSSES = ["none", "class_weighting", "focal_loss"]
 SEEDS = [42, 43, 44]
 SPLITS = ["val", "test"]
 
 SCEN_LABEL = {"native": "nativo (1:38,4)", "1:10": "1:10 (submuestreo)",
-              "1:10_os": "1:10 con SMOTE", "1:1": "1:1 (submuestreo)"}
+              "1:10_os": "1:10 con SMOTE", "1:20": "1:20 (submuestreo)",
+              "1:1": "1:1 (submuestreo)"}
 SPLIT_LABEL = {"val": "validación", "test": "test"}
 LOSS_LABEL = {"none": "sin balanceo", "class_weighting": "pesos por clase",
               "focal_loss": "focal loss"}

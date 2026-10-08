@@ -2,7 +2,8 @@
 Parte de la versión publicada 1 (13 láminas) y aplica: título de sección arriba con el
 formato «Sección: frase corta» (el titular queda como subtítulo), una cita en cada lámina en
 la banda naranja, pie de figura pegado a su figura, desbalance genérico (≈1:40), sin Optuna,
-definir antes de usar (cómo leer las curvas), ROC-AUC con PR-AUC y F1 con KS, y el 1:1 al anexo."""
+definir antes de usar (cómo leer las curvas), ROC-AUC con PR-AUC y F1 con KS, y el 1:1 al anexo.
+Desde el 7-oct (THE-35) el 1:20 entra al análisis principal: láminas de H1 a H3 y de curvas con 1:20."""
 import base64, io, re
 import pandas as pd
 from PIL import Image
@@ -82,6 +83,129 @@ for x,y in [("Por qué class weighting lo empeora más: en verificación.",
     assert h.count(x)==1,x; h=h.replace(x,y)
 assert "Optuna" not in re.sub(r'<aside.*?</aside>','',h,flags=re.S)
 
+# ── 3b. 1:20 reemplaza al 1:1 en el análisis principal (7-oct, THE-35): cifras desde los CSV
+U=pd.read_csv(REPO+"results_v4/reunion_0410/configs48/configs48_units_estabilidad.csv")
+U=U[U["filter"]=="cfg_media_sin1:1"]
+G=U[U.explainer=="GNNExplainer"]
+CF=pd.read_csv(REPO+"results_v4/reunion_0410/configs48/configs48_metricas.csv")
+EXF=pd.read_csv(REPO+"results_v4/reunion_0410/configs48/configs48_friedman_exacto.csv")
+def pex(ex,hy):
+    r=EXF[(EXF["filter"]=="cfg_media_sin1:1")&(EXF.explainer==ex)&(EXF.hypothesis==hy)].iloc[0]
+    return r.p_exact, int(r.n_blocks)
+def c(x,d=3): return f"{x:.{d}f}".replace(".",",")
+def X(v): return 300+(v-0.80)*3300
+def subst(n, pat, new, cnt=1):
+    """Reemplaza dentro de la lámina l{n} del original."""
+    global h
+    m=re.search(r'<section class="slide lamina l%d".*?</section>'%n,h,re.S); sl=m.group(0)
+    sl2,k=re.subn(pat,lambda _:new,sl,flags=re.S); assert k==cnt,(n,pat[:50],k)
+    h=h.replace(sl,sl2)
+def barras(rows, centro, y0=48, paso=72):
+    """Barras horizontales de estabilidad (media ± sd) con el margen de equivalencia ±0,05."""
+    out=[f'<g class="aparece" style="--d:1.1s"><rect class="margen" x="{X(centro)-165:.1f}" y="{y0-18}" width="330.0" height="{paso*len(rows)}" rx="6"/><text class="t2 tc" x="{X(centro):.1f}" y="{y0-26}" font-size="24">margen de equivalencia ±0,05</text></g>']
+    for i,(lab,sub,m,sd) in enumerate(rows):
+        y=y0+i*paso; cy=y+22; d=0.15*i
+        out.append(f'<text class="t" x="0" y="{y+28}" font-size="29">{lab}</text><text class="t3" x="0" y="{y+56}" font-size="21">{sub}</text>'
+                   f'<rect class="barra-s crece" x="300" y="{y}" width="{X(m)-300:.1f}" height="44" style="--d:{d:.2f}s"/>'
+                   f'<g class="aparece" style="--d:{0.8+d:.2f}s"><path class="bigote" d="M{X(m-sd):.1f} {cy}L{X(m+sd):.1f} {cy}M{X(m-sd):.1f} {cy-12}L{X(m-sd):.1f} {cy+12}M{X(m+sd):.1f} {cy-12}L{X(m+sd):.1f} {cy+12}"/>'
+                   f'<circle cx="{X(m):.1f}" cy="{cy}" r="9" class="marca"/><text class="t tb" x="{X(m+sd)+16:.1f}" y="{cy+11}" font-size="30">{c(m)}</text></g>')
+    return "".join(out)
+def eje(y):
+    t=f'<path class="eje" d="M300 {y}L960 {y}"/>'
+    for k in range(5):
+        x=300+k*165; t+=f'<path class="eje" d="M{x:.1f} {y}L{x:.1f} {y+10}"/><text class="t3 tc" x="{x:.1f}" y="{y+38}" font-size="23">{c(0.80+0.05*k,2)}</text>'
+    return t
+
+# Lámina 3: el embudo pasa a 60 → 48 (sin 1:1, con 1:20) → las que aprenden
+NG=int(CF[(CF.scenario!="1:1")].g_cfg_mean.sum())
+porA={a:int(CF[(CF.scenario!="1:1")&(CF.arch==a)].g_cfg_mean.sum()) for a in ["GraphSAGE","TAGCN","GAT","GCN"]}
+subst(3,r'sobre las 20 configuraciones que aprenden',f'sobre las {NG} configuraciones que aprenden')
+subst(3,r'aria-label="De 48 configuraciones.*?">',f'aria-label="De 60 configuraciones, 48 sin el 1:1 y {NG} que aprenden: GraphSAGE {porA["GraphSAGE"]}, TAGCN {porA["TAGCN"]}, GAT {porA["GAT"]} y GCN {porA["GCN"]}.">')
+subst(3,r'font-size="72">48</text>(.*?)4 arquitecturas × 4 escenarios','font-size="72">60</text><text class="t" x="128" y="60" font-size="29">configuraciones</text><text class="t3" x="128" y="94" font-size="23">4 arquitecturas × 5 escenarios')
+subst(3,r'font-size="72">36</text><text class="t" x="188" y="210" font-size="29">sin el 1:1</text>','font-size="72">48</text><text class="t" x="188" y="210" font-size="29">sin el 1:1 (entra el 1:20)</text>')
+subst(3,r'font-size="72">20</text>',f'font-size="72">{NG}</text>')
+subst(3,r'<text class="t2" x="150" y="476".*?GCN 0 de 9</text>',
+      f'<text class="t2" x="130" y="476" font-size="24">GraphSAGE {porA["GraphSAGE"]} de 12</text><text class="t2" x="390" y="476" font-size="24">TAGCN {porA["TAGCN"]} de 12</text><text class="t2" x="610" y="476" font-size="24">GAT {porA["GAT"]} de 12</text><text class="t2" x="790" y="476" font-size="24">GCN {porA["GCN"]} de 12</text>')
+subst(3,r'Ya no contamos 144 modelos: son 48 configuraciones con tres semillas cada una\. Sacamos el 1:1 al anexo, porque ahí las tres pérdidas son la misma\.',
+      'Ya no contamos modelos: son 60 configuraciones con tres semillas cada una. Sacamos el 1:1 al anexo, porque ahí las tres pérdidas son la misma, y en su lugar entra el 1:20: quedan 48.')
+subst(3,r'Quedan 20\. GCN no tiene ninguna\.',f'Quedan {NG}. GCN no tiene ninguna.')
+
+# Lámina 4 (H1): cuatro escenarios
+ESC4=[("1:10","1:10"),("1:10_os","1:10 + SMOTE"),("1:20","1:20"),("native","Nativo (≈1:40)")]
+st={k:(G[G.scenario==k].y.mean(),G[G.scenario==k].y.std(),len(G[G.scenario==k])) for k,_ in ESC4}
+rows=[(lab,f"{st[k][2]} configuraciones",st[k][0],st[k][1]) for k,lab in ESC4]
+svg4=(f'<svg class="fig" data-desde="3" viewBox="0 0 1040 440" style="left:800px;top:380px;width:1040px;height:440px" role="img" aria-label="Estabilidad de GNNExplainer: '
+      +", ".join(f"{lab} {c(st[k][0])}" for k,lab in ESC4)+'. Las cuatro caben en el margen de ±0,05.">'
+      +barras(rows,st["native"][0])+eje(345)+'<text class="t3 tc" x="630.0" y="425" font-size="23">estabilidad de GNNExplainer (media ± sd entre configuraciones)</text></svg>')
+subst(4,r'<svg class="fig" data-desde="3".*?</svg>',svg4)
+subst(4,r'Las tres son equivalentes \(TOST','Las cuatro son equivalentes (TOST')
+subst(4,r'Pero la estabilidad sale igual en los tres escenarios: 0,928, 0,928 y 0,931,',
+      'Pero la estabilidad sale igual en los cuatro escenarios: '+", ".join(c(st[k][0]) for k,_ in ESC4[:-1])+" y "+c(st["native"][0])+',')
+
+# Lámina 5 (H1, por qué): cuatro filas de composición
+pr={k:CF[(CF.scenario==k)&CF.g_cfg_mean].val_pr_auc_mean.mean() for k,_ in ESC4}
+roc=[CF[(CF.scenario==k)&CF.g_cfg_mean].val_roc_auc_mean.mean() for k,_ in ESC4]
+NEG={"1:10":34620,"1:10_os":69240,"1:20":69240,"native":132803}; K=584.8/132803
+svg5=['<svg class="fig" data-desde="1" viewBox="0 0 1080 430" style="left:80px;top:380px;width:1080px;height:430px" role="img" aria-label="Composición del entrenamiento: las mismas 3.462 ilícitas en los cuatro escenarios y 34.620, 69.240 (con SMOTE), 69.240 o 132.803 negativos. PR-AUC de validación '
+      +", ".join(c(pr[k],2) for k,_ in ESC4)+'."><text class="t3 tb" x="250" y="26" font-size="22" letter-spacing="1">LO QUE VE EL MODELO AL ENTRENAR</text><text class="t3 tb tc" x="975" y="26" font-size="22" letter-spacing="1">PR-AUC VAL</text>']
+for i,(k,lab) in enumerate(ESC4):
+    y=56+i*78; d=0.15*i; x0=267.2
+    r=f'<text class="t" x="0" y="{y+32}" font-size="30">{lab}</text><rect class="il" x="250" y="{y}" width="15.2" height="46"/>'
+    if k=="1:10_os":
+        r+=f'<rect class="smote" x="266.2" y="{y+1}" width="13.2" height="44"/>'; x0=282.5
+    r+=(f'<rect class="un crece" x="{x0}" y="{y}" width="{NEG[k]*K:.1f}" height="46" style="--d:{d:.2f}s"/><text class="t" x="{x0+12}" y="{y+31}" font-size="23">{NEG[k]:,} negativos</text>'.replace(",",".")
+        +f'<text class="t tb tc aparece" x="975" y="{y+34}" font-size="34" style="--d:{0.6+d:.2f}s">{c(pr[k],2)}</text>')
+    svg5.append(r)
+svg5.append('<rect class="il" x="250" y="388" width="26" height="26"/><text class="t2" x="288" y="410" font-size="23">ilícitas: las mismas 3.462 siempre</text><rect class="smote" x="660" y="388" width="26" height="26"/><text class="t2" x="698" y="410" font-size="23">ilícitas sintéticas</text></svg>')
+subst(5,r'<svg class="fig" data-desde="1".*?</svg>',"".join(svg5))
+subst(5,r'El fraude es el mismo en los tres escenarios y el modelo rinde parecido \(ROC-AUC 0,89 a 0,90\)',
+      f'El fraude es el mismo en los cuatro escenarios y el modelo rinde parecido (ROC-AUC {c(min(roc),2)} a {c(max(roc),2)})')
+subst(5,r'Con 1:20 \(en ejecución\) la escalera queda 1:10, 1:20, ≈1:40\.',
+      f'Con el 1:20 la escalera queda 1:10, 1:20, ≈1:40, y el 1:20 también es equivalente al nativo (diferencia de {c(abs(st["1:20"][0]-st["native"][0]))}).')
+subst(5,r'Y el rendimiento en validación es parecido: 0,38, 0,38 y 0,34\.',
+      'Y el rendimiento en validación es parecido: '+", ".join(c(pr[k],2) for k,_ in ESC4[:-1])+" y "+c(pr["native"],2)+'.')
+subst(5,r'Por eso agregamos el 1:20, que ya está corriendo\.',
+      'Por eso agregamos el 1:20, que queda en medio, y da lo mismo.')
+
+# Lámina 6 (H2): tres arquitecturas con las 28 configuraciones
+AR=["GraphSAGE","GAT","TAGCN"]
+sa={a:(G[G.arch==a].y.mean(),G[G.arch==a].y.std(),len(G[G.arch==a])) for a in AR}
+svg6=(f'<svg class="fig" data-desde="3" viewBox="0 0 1040 540" style="left:800px;top:380px;width:1040px;height:540px" role="img" aria-label="'
+      +", ".join(f"{a} {c(sa[a][0])}" for a in AR)+', dentro del margen. GCN no aprende en ninguna configuración.">'
+      +barras([(a,f"{sa[a][2]} configuraciones",sa[a][0],sa[a][1]) for a in AR],G.y.mean(),y0=48,paso=85)
+      +'<text class="t3" x="0" y="337" font-size="31">GCN</text><text class="t3" x="300" y="337" font-size="27">ninguna configuración aprende: no se explica</text>'
+      +eje(410)+'</svg>')
+subst(6,r'<svg class="fig" data-desde="3".*?</svg>',svg6)
+subst(6,r'Las tres que aprenden quedan juntas: 0,938, 0,932 y 0,919, dentro del margen\.',
+      'Las tres que aprenden quedan juntas: '+", ".join(c(sa[a][0]) for a in AR[:-1])+" y "+c(sa["TAGCN"][0])+', dentro del margen. Con Shapley la prueba detecta diferencias, pero son menores de cinco milésimas: equivalentes para efectos prácticos.')
+
+# Lámina 8 (H3): barras con las 28 configuraciones y el p exacto
+P=U[U.explainer=="PGExplainer"]
+gb={b:G[G.balancing==b].y.mean() for b in ["none","class_weighting","focal_loss"]}
+pb={b:P[P.balancing==b].y.mean() for b in ["none","class_weighting","focal_loss"]}
+pg,nbg=pex("GNNExplainer","H3"); pp,nbp=pex("PGExplainer","H3")
+def bar(x,v,cl,d):
+    hh=v*340; return f'<rect class="{cl} creceY" x="{x}" y="{370-hh:.1f}" width="100" height="{hh:.1f}" style="--d:{d:.2f}s"/><text class="t tb tc" x="{x+50}" y="{358-hh:.1f}" font-size="28">{c(v,2)}</text>'
+CL={"none":"cat-n","class_weighting":"cat-c","focal_loss":"cat-f"}
+gG="".join(bar(150+120*i,gb[b],CL[b],0.12*i) for i,b in enumerate(CL))
+gP="".join(bar(600+120*i,pb[b],CL[b],0.12*i) for i,b in enumerate(CL))
+subst(8,r'aria-label="GNNExplainer: 0,931.*?">',
+      f'aria-label="GNNExplainer: {c(gb["none"])}, {c(gb["class_weighting"])} y {c(gb["focal_loss"])}, sin efecto (p exacto {c(pg,2)}). PGExplainer: {c(pb["none"])}, {c(pb["class_weighting"])} y {c(pb["focal_loss"])} (p exacto {c(pp)}).">')
+subst(8,r'<g class="aparece" style="--d:0.2s">.*?<text class="t tb tc" x="320" y="408"',f'<g class="aparece" style="--d:0.2s">{gG}<text class="t tb tc" x="320" y="408"')
+subst(8,r'p exacto = 0,27: sin efecto',f'p exacto = {c(pg,2)}: sin efecto')
+subst(8,r'<g class="aparece" style="--d:0.6s">.*?<text class="t tb tc" x="770" y="408"',f'<g class="aparece" style="--d:0.6s">{gP}<text class="t tb tc" x="770" y="408"')
+subst(8,r'p exacto = 0,07, caída grande',f'p exacto = {c(pp)}: caída grande')
+subst(8,r'PGExplainer: ≈ 0 con class weighting\.',f'PGExplainer ({c(pb["class_weighting"],2)}).')
+subst(8,r'Friedman exacto por permutación \(4 bloques\)',f'Friedman exacto por permutación ({nbg} bloques)')
+subst(8,r'GNNExplainer ya no muestra efecto: el p exacto es 0,27\. Antes daba 0,0498, pero era porque promediábamos solo las semillas que pasaban, justo lo de la semilla con suerte, y además era la aproximación asintótica con solo cuatro bloques\. Lo que sí se ve grande es la caída de PGExplainer con class weighting: casi cero\. Con cuatro bloques no alcanza significancia, p exacto 0,07, pero la caída aparece en GraphSAGE y en TAGCN\.',
+      f'GNNExplainer ya no muestra efecto: el p exacto es {c(pg,2)} y las diferencias caben en el margen de equivalencia. Antes daba 0,0498, pero era porque promediábamos solo las semillas que pasaban, justo lo de la semilla con suerte, y además era la aproximación asintótica con pocos bloques. Lo que sí se ve grande es la caída de PGExplainer con class weighting: {c(pb["class_weighting"],2)}. Con el 1:20 ya hay {nbp} bloques y es significativa, p exacto {c(pp)}.')
+
+# Láminas 12 y 13
+subst(12,r'Igual \(0,93 en los tres\)','Igual (0,93 en los cuatro)')
+subst(13,r'<span class="estado">1:20 en ejecución</span><span class="estado">Análisis de los sin etiqueta \(PSI, PCA, grafo\) en curso</span>',
+      '<span class="estado ok">✓ 1:20 en el análisis principal</span><span class="estado ok">✓ Análisis de los sin etiqueta</span>')
+subst(13,r'✓ Curvas ROC y PR de las 48 configuraciones','✓ Curvas ROC y PR de las 60 configuraciones')
+
 # ── 4. Láminas nuevas
 TOP=330
 def notas(ns): return "".join(f'<div data-paso="{k}" data-cue="{c}"><p data-voz="J">{t}</p></div>' for k,(c,t) in enumerate(ns))
@@ -159,7 +283,7 @@ s_tab=lamina(SR,"Las cuatro métricas dicen lo mismo: los modelos aprenden en va
   ("Clic 2","GCN apenas se separa del azar: por eso no pasa la compuerta."),
   ("Clic 3","En test el F1 es casi cero y el PR-AUC queda en el azar. El KS de test sigue alto, pero se alcanza con muchas falsas alarmas, así que no sirve para operar.")],3)
 
-ESC=[("native","con el desbalance real (≈1:40)"),("1-10","1:10"),("1-10_os","1:10 con SMOTE")]
+ESC=[("native","con el desbalance real (≈1:40)"),("1-10","1:10"),("1-10_os","1:10 con SMOTE"),("1-20","1:20")]
 porsc=[
  ("native","val","Con el desbalance real, no compensar el desbalance da la peor curva en las cuatro arquitecturas",
   [("La curva azul (sin balanceo) queda por debajo de las otras dos en todo el recall en 7 de los 8 pares.","media"),
@@ -207,8 +331,23 @@ porsc=[
   ["Y en test.","Las PR otra vez en el azar.",
    "Lo que se separa del azar está a la derecha de la ROC, con muchas falsas alarmas.",
    "SMOTE no cambia la caída en test."]),
+ ("1-20","val","Con 20 lícitas por cada ilícita, GraphSAGE con pesos por clase repite el resultado del desbalance real",
+  [("GraphSAGE con pesos por clase vuelve a ser la mejor curva (PR-AUC 0,46, igual que con el desbalance real).","media"),
+   ("Las curvas se cruzan en GAT y TAGCN: como en 1:10, compensar el desbalance ya no ordena las pérdidas.","media"),
+   ("TAGCN con focal loss es la segunda y la que menos varía entre semillas: su sombra casi no se ve.","media")],C["davis"],
+  ["El 1:20, que pidió Cristian para tener un punto entre 1:10 y el desbalance real.",
+   "GraphSAGE con pesos por clase da lo mismo que con el desbalance real: 0,46.",
+   "En GAT y TAGCN las curvas se cruzan, como en 1:10.",
+   "TAGCN con focal loss queda segunda, con una sombra casi invisible: las tres semillas coinciden."]),
+ ("1-20","test","En test, con 1:20, se repite la caída al azar y GraphSAGE sin balanceo vuelve a ordenar al revés",
+  [("Las curvas PR quedan sobre la línea de azar: a lo sumo el doble del azar.","media"),
+   ("GraphSAGE sin balanceo queda bajo la diagonal ROC (0,35), como con el desbalance real.","media"),
+   ("Pesos por clase vuelve a ser la que mejor resiste: ROC-AUC 0,72 en GraphSAGE.","media")],C["weber"],
+  ["Y el 1:20 en test.","Otra vez pegadas al azar.",
+   "GraphSAGE sin balanceo vuelve a ordenar al revés.",
+   "Pesos por clase vuelve a ser la más robusta al cambio en el tiempo."]),
 ]
-NOM={"native":"con el desbalance real (≈1:40)","1-10":"1:10","1-10_os":"1:10 con SMOTE"}
+NOM={"native":"con el desbalance real (≈1:40)","1-10":"1:10","1-10_os":"1:10 con SMOTE","1-20":"1:20"}
 def escena(sc,sp,tit,ll,ref,ns,pref="",secc=SR):
     pie=f"Curvas ROC (arriba) y PR (abajo) {NOM.get(sc,'1:1')}, en {'validación' if sp=='val' else 'test'}. Color: forma de compensar el desbalance."+LEE+(LOG if sp=="test" else "")
     cues=[f"{sc} · {sp}"]+[f"Clic {k}" for k in range(1,len(ns))]

@@ -56,7 +56,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ALIASES = {"GNNShap": "ShapleyFeatures"}
 ARCH_ORDER = ["GCN", "GraphSAGE", "GAT", "TAGCN"]
 BAL_ORDER = ["none", "class_weighting", "focal_loss"]
-SCEN_ORDER = ["native", "1:10", "1:10_os", "1:1",
+SCEN_ORDER = ["native", "1:10", "1:10_os", "1:20", "1:1",
               "native_size_ctrl", "1:10_subil", "1:50_subil", "1:100_subil"]
 MAIN_SCEN = ["native", "1:10", "1:10_os", "1:1"]  # label mode C (28-sep design)
 SIG = "efecto significativo"

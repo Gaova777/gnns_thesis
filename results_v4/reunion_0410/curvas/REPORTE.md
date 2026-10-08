@@ -21,7 +21,7 @@ Pedido del director: reportar PR-AUC junto con ROC-AUC y F1 junto con KS, mostra
 | Métricas por modelo (288 filas) | `results_v4/reunion_0410/curvas/curvas_metricas_por_modelo.csv` |
 | Métricas por configuración (media, sd) | `results_v4/reunion_0410/curvas/curvas_metricas_por_config.csv` |
 | Dominancia y cruces entre pérdidas | `results_v4/reunion_0410/curvas/curvas_dominancia.csv` |
-| Figuras por escenario (val y test) | `figuras/curvas_{native,1-10,1-10_os}_{val,test}.{png,pdf}` |
+| Figuras por escenario (val y test) | `figuras/curvas_{native,1-10,1-10_os,1-20}_{val,test}.{png,pdf}` |
 | Figura resumen (nativo) | `figuras/resumen_native_mejor_por_arquitectura.{png,pdf}` |
 | Anexo 1:1 | `figuras/anexo_curvas_1-1_{val,test}.{png,pdf}` |
 
@@ -54,6 +54,32 @@ Azar: ROC-AUC 0,5; PR-AUC igual a la prevalencia (0,024 en validación, 0,0057 e
 4. **El umbral calibrado se desploma al origen.** Los puntos de test caen cerca de (0, 0): FPR mediana 0,014 (el 75 % por debajo de 0,026) y, salvo en GCN, recall entre 0 y 0,09. El umbral de validación casi no marca ilícitas en test. Las excepciones son semillas sueltas de GCN (por ejemplo nativo con focal loss, semilla 42: recall 0,48 con precisión 0,028 y FPR 0,095), que marcan más nodos pero con precisión de apenas cinco veces el azar. Por eso el F1 de test queda entre 0,000 y 0,028 en las 48 configuraciones.
 5. **Pesos por clase es la pérdida más robusta al cambio temporal.** Es la curva superior de la ROC de test en GraphSAGE (los tres escenarios), GAT (1:10 y 1:10 SMOTE) y TAGCN (nativo y 1:10), y la que menos veces cae bajo la diagonal. No cambia la conclusión de fondo (en test nada se separa del azar en la zona de FPR baja), pero es el patrón de forma más consistente del test.
 6. **El ranking de validación no se conserva en test.** GAT con focal loss, segunda en PR-AUC de validación en el nativo, es la peor en test (ROC-AUC 0,476); GCN, la peor en validación, tiene el PR-AUC de test más alto (0,012), con una banda que va de 0,004 a 0,029 entre semillas: es suerte de semilla, no una ventaja. Esto respalda medir la estabilidad sobre validación y no sobre test.
+
+## Escenario 1:20 (agregado el 7-oct, THE-35)
+
+El 1:20 reemplaza al 1:1 en el análisis principal (`scripts/v4/run_1to20.sh`, 36 modelos con el mismo protocolo). Sus curvas se generaron con el mismo script: `figuras/curvas_1-20_{val,test}.{png,pdf}` y la versión para láminas en `figuras/deck/`. El PR-AUC recalculado coincide con el meta.json (diferencia máxima 8×10⁻⁸ en los 180 modelos). La tabla plana de las 60 configuraciones está en `PR_AUC_todas.{csv,md}` (`scripts/v4/reunion_0410/pr_auc_tabla.py`).
+
+| Arquitectura | Pérdida | ROC-AUC val | PR-AUC val | KS val | ROC-AUC test | PR-AUC test | Compuerta |
+|---|---|---|---|---|---|---|---|
+| GCN | sin balanceo | 0,728 ± 0,018 | 0,110 ± 0,026 | 0,332 ± 0,024 | 0,581 ± 0,140 | 0,011 ± 0,010 | 0/3 |
+| GCN | pesos por clase | 0,790 ± 0,116 | 0,166 ± 0,107 | 0,472 ± 0,198 | 0,520 ± 0,043 | 0,006 ± 0,001 | 0/3 |
+| GCN | focal loss | 0,699 ± 0,039 | 0,092 ± 0,015 | 0,284 ± 0,057 | 0,541 ± 0,043 | 0,006 ± 0,000 | 0/3 |
+| GraphSAGE | sin balanceo | 0,856 ± 0,012 | 0,232 ± 0,054 | 0,563 ± 0,029 | 0,350 ± 0,037 | 0,004 ± 0,000 | 2/3 |
+| GraphSAGE | pesos por clase | 0,923 ± 0,006 | 0,457 ± 0,032 | 0,725 ± 0,015 | 0,722 ± 0,017 | 0,011 ± 0,001 | 3/3 |
+| GraphSAGE | focal loss | 0,908 ± 0,020 | 0,365 ± 0,051 | 0,677 ± 0,060 | 0,640 ± 0,041 | 0,008 ± 0,001 | 3/3 |
+| GAT | sin balanceo | 0,894 ± 0,007 | 0,368 ± 0,034 | 0,643 ± 0,023 | 0,500 ± 0,060 | 0,005 ± 0,001 | 3/3 |
+| GAT | pesos por clase | 0,900 ± 0,016 | 0,320 ± 0,043 | 0,658 ± 0,045 | 0,615 ± 0,052 | 0,009 ± 0,000 | 0/3 |
+| GAT | focal loss | 0,875 ± 0,008 | 0,296 ± 0,054 | 0,594 ± 0,012 | 0,491 ± 0,089 | 0,005 ± 0,001 | 3/3 |
+| TAGCN | sin balanceo | 0,902 ± 0,005 | 0,347 ± 0,042 | 0,655 ± 0,004 | 0,697 ± 0,022 | 0,010 ± 0,001 | 3/3 |
+| TAGCN | pesos por clase | 0,871 ± 0,067 | 0,295 ± 0,136 | 0,609 ± 0,113 | 0,661 ± 0,028 | 0,008 ± 0,001 | 2/3 |
+| TAGCN | focal loss | 0,884 ± 0,012 | 0,436 ± 0,003 | 0,641 ± 0,009 | 0,560 ± 0,080 | 0,006 ± 0,001 | 3/3 |
+
+Lectura:
+
+1. **El 1:20 se comporta como un punto intermedio entre el nativo y el 1:10.** GraphSAGE con pesos por clase repite su resultado del nativo (PR-AUC de validación 0,457 frente a 0,462) y vuelve a ser la mejor configuración. TAGCN con focal loss es la segunda (0,436) y la más estable entre semillas (sd 0,003).
+2. **Como en 1:10, la pérdida deja de ordenar las curvas.** En la PR de validación solo 4 de los 12 pares de pérdidas tienen una curva que domina a la otra en todo el recall (nativo 8 de 12, 1:10 6, 1:10 SMOTE 3). Con los cuatro escenarios principales, el 44 % de los pares tiene dominancia completa (47 % con los tres del 4-oct).
+3. **El test repite el colapso.** ROC-AUC de test entre 0,35 y 0,72 por configuración; 11 de los 36 modelos de 1:20 quedan bajo 0,5 (6 sin balanceo, 4 focal loss, 1 pesos por clase) y GraphSAGE sin balanceo vuelve a invertir el orden (0,350). PR-AUC de test entre 0,004 y 0,011, a lo sumo dos veces el azar. Pesos por clase sigue siendo la pérdida más robusta en test (ROC-AUC medio 0,630, frente a 0,558 focal y 0,532 sin balanceo).
+4. **Compuerta:** pasan 8 de las 12 configuraciones de 1:20 con la media de las semillas (todas menos las tres de GCN y GAT con pesos por clase).
 
 ## Anexo 1:1
 

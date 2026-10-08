@@ -19,10 +19,13 @@ Las semillas 42/43/44 no son modelos distintos: son la incertidumbre de una conf
   3. H1/H2/H3 sobre la estabilidad con la configuración como unidad (media de las 3 semillas de
      ``stability_primary``, SIEMPRE las 3, no solo las que pasan), reutilizando
      ``analyze_elliptic_v4.analyse`` (TOST ±0,05, Friedman/Kruskal, Wilcoxon + Holm). Principal:
-     configuraciones que pasan la compuerta de configuración, sin 1:1. Sensibilidades: con 1:1,
-     compuerta conservadora, sin compuerta, y la reproducción del análisis v4 original.
-  4. Selección del candidato arquitectura × pérdida por val PR-AUC en native, 1:10 y 1:10_os,
-     y costo proyectado de un Optuna de 100 trials por escenario a partir de ``duration_s``.
+     configuraciones que pasan la compuerta de configuración en los cuatro escenarios
+     principales (native, 1:10, 1:10_os y 1:20, que reemplaza al 1:1 desde el 7-oct; THE-35).
+     Sensibilidades: con 1:1 (anexo), compuerta conservadora, sin compuerta, y la reproducción
+     del análisis v4 original (solo sus cuatro escenarios, sin 1:20).
+  4. Selección del candidato arquitectura × pérdida por val PR-AUC en native, 1:10, 1:10_os y
+     1:20, y costo proyectado de un Optuna de 100 trials por escenario a partir de
+     ``duration_s``.
 
 Solo CPU. No modifica nada fuera de results_v4/reunion_0410/configs48/.
 
@@ -52,8 +55,9 @@ _spec.loader.exec_module(A)
 
 ARCHS = ["GCN", "GraphSAGE", "GAT", "TAGCN"]
 BALS = ["none", "class_weighting", "focal_loss"]
-SCENS = ["native", "1:10", "1:10_os", "1:1"]
-SEL_SCENS = ["native", "1:10", "1:10_os"]
+SCENS = ["native", "1:10", "1:10_os", "1:20", "1:1"]
+SEL_SCENS = ["native", "1:10", "1:10_os", "1:20"]
+V4_SCENS = ["native", "1:10", "1:10_os", "1:1"]  # matriz v4 original (30-sep)
 EXPLAINERS = ["GNNExplainer", "PGExplainer", "ShapleyFeatures"]
 F1_MIN, MCC_MIN = 0.30, 0.15
 N_TRIALS_V4 = 8
@@ -65,8 +69,8 @@ METRICS = ["val_pr_auc", "val_f1", "val_mcc", "val_roc_auc",
 
 
 def _in_matrix(meta: dict) -> bool:
-    """Only the 144 models of the v4 matrix (4 scenarios × 3 seeds, label mode C); other runs
-    written later to the same models dir (e.g. extra scenarios) are ignored."""
+    """The 180 models of the v4 matrix plus the 1:20 scenario (5 scenarios × 4 archs × 3
+    losses × 3 seeds, label mode C); other runs in the same models dir are ignored."""
     return (meta.get("scenario") in SCENS and int(meta.get("seed", -1)) in (42, 43, 44)
             and meta.get("label_mode", "licit_unknown") == "licit_unknown")
 
@@ -89,11 +93,14 @@ def compute_roc(models_dir: Path, out_csv: Path, threads: int) -> pd.DataFrame:
     apply_label_mode(data, "licit_unknown")
     preprocess(data, train_range=(1, 34), val_range=(35, 42), test_range=(43, 49))
     x, ei = data.x, data.edge_index
+    # Incremental: models already in the cache are not recomputed.
+    prev = pd.read_csv(out_csv) if out_csv.exists() else pd.DataFrame(columns=["run_id"])
+    done = set(prev.run_id)
     rows = []
     metas = sorted(models_dir.glob("*_meta.json"))
     for i, p in enumerate(metas, 1):
         m = json.loads(p.read_text(encoding="utf-8"))
-        if not _in_matrix(m):
+        if not _in_matrix(m) or m["run_id"] in done:
             continue
         bp = m.get("best_params", {}) or {}
         kw = {}
@@ -125,7 +132,8 @@ def compute_roc(models_dir: Path, out_csv: Path, threads: int) -> pd.DataFrame:
         print(f"  [{i}/{len(metas)}] {m['run_id']}: val ROC-AUC {r['val_roc_auc']:.4f} "
               f"test ROC-AUC {r['test_roc_auc']:.4f}", flush=True)
         del model, out
-    df = pd.DataFrame(rows)
+    df = pd.concat([prev, pd.DataFrame(rows)], ignore_index=True) if len(prev) else \
+        pd.DataFrame(rows)
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_csv, index=False)
     return df
@@ -161,7 +169,7 @@ def load_models(models_dir: Path, roc_csv: Path) -> pd.DataFrame:
             "dropout": bp.get("dropout"), "weight_decay": bp.get("weight_decay"),
         })
     df = pd.DataFrame(rows)
-    assert len(df) == 144, f"expected the 144 models of the v4 matrix, found {len(df)}"
+    assert len(df) == 180, f"expected 180 models (v4 matrix + 1:20), found {len(df)}"
     # Sanity: the stored gate must be exactly val argmax F1/MCC against 0,30/0,15.
     recomputed = (df.val_f1 >= F1_MIN) & (df.val_mcc >= MCC_MIN)
     assert (recomputed == df.quality_passed).all(), "quality_passed != val_metrics gate"
@@ -229,8 +237,8 @@ GATES = ["g_model_any", "g_model_majority", "g_model_all", "g_cfg_mean",
 def gate_summary(cfg: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for g in GATES:
-        r = {"criterio": g, "total_48": int(cfg[g].sum()),
-             "sin_1:1_36": int(cfg[cfg.scenario != "1:1"][g].sum())}
+        r = {"criterio": g, "total_60": int(cfg[g].sum()),
+             "principal_48": int(cfg[cfg.scenario != "1:1"][g].sum())}
         for a in ARCHS:
             r[a] = int(cfg[cfg.arch == a][g].sum())
         for s in SCENS:
@@ -306,7 +314,8 @@ def exact_friedman_rows(units: pd.DataFrame, variants: list) -> pd.DataFrame:
 def run_hypotheses(stab_csv: Path, cfg: pd.DataFrame, out: Path):
     u = stability_units(stab_csv, cfg)
     # Original v4 units (per-model gate, mean over passing seeds) to check reproduction.
-    orig = A.config_units(A.load_rows(stab_csv, "stability_primary"), True)
+    rows_v4 = A.load_rows(stab_csv, "stability_primary")
+    orig = A.config_units(rows_v4[rows_v4.scenario.isin(V4_SCENS)], True)
     orig["filter"] = "repro_v4_por_modelo"
 
     # (name, gate column, drop 1:1, title, min support per architecture)
@@ -315,11 +324,11 @@ def run_hypotheses(stab_csv: Path, cfg: pd.DataFrame, out: Path):
          "CONTROL: reproducción del análisis v4 original (compuerta por modelo, media de las "
          "semillas que pasan)", 5),
         ("cfg_media_sin1:1", "g_cfg_mean", True,
-         "PRINCIPAL: compuerta de configuración (media), sin 1:1", 5),
+         "PRINCIPAL: compuerta de configuración (media), native/1:10/1:10_os/1:20, sin 1:1", 5),
         ("cfg_media_sin1:1_soporte3", "g_cfg_mean", True,
          "SENSIBILIDAD: igual a la principal con soporte mínimo 3 (entra GAT)", 3),
         ("cfg_media_con1:1", "g_cfg_mean", False,
-         "SENSIBILIDAD: compuerta de configuración (media), con 1:1 (ninguna 1:1 pasa)", 5),
+         "SENSIBILIDAD: compuerta de configuración (media), con 1:1 (anexo)", 5),
         ("cfg_media-sd_sin1:1", "g_cfg_mean_minus_sd", True,
          "SENSIBILIDAD: compuerta conservadora (media - sd), sin 1:1", 5),
         ("cfg_ICinf_sin1:1", "g_cfg_ci_lo", True,
@@ -329,9 +338,9 @@ def run_hypotheses(stab_csv: Path, cfg: pd.DataFrame, out: Path):
         ("cfg_calibrada_con1:1", "g_cfg_mean_cal", False,
          "SENSIBILIDAD: compuerta de configuración con F1/MCC al umbral calibrado, con 1:1", 5),
         ("sin_compuerta_sin1:1", None, True,
-         "SENSIBILIDAD: sin compuerta (36 configuraciones), sin 1:1", 5),
+         "SENSIBILIDAD: sin compuerta (48 configuraciones), sin 1:1", 5),
         ("sin_compuerta_con1:1", None, False,
-         "SENSIBILIDAD: sin compuerta (48 configuraciones), con 1:1", 5),
+         "SENSIBILIDAD: sin compuerta (60 configuraciones), con 1:1", 5),
     ]
     frames = [orig]
     for name, gate, drop11, _, _ in variants[1:]:
@@ -523,7 +532,7 @@ def main(argv=None):
     print(f"Kendall W ranking val PR-AUC entre {SEL_SCENS}: W={kw['kendall_W']:.3f} "
           f"chi2={kw['chi2']:.2f} p={kw['p']:.4g}")
     (out / "configs48_kendall.json").write_text(json.dumps(kw, indent=2), encoding="utf-8")
-    print(sel[["combo", "native_rank", "1:10_rank", "1:10_os_rank", "rank_mean",
+    print(sel[["combo"] + [f"{s}_rank" for s in SEL_SCENS] + ["rank_mean",
                "pooled9_val_pr_auc", "n_scen_gate_cfg"]].to_string(index=False))
     print(proj.to_string(index=False))
     if "val_pr_auc_absdiff_cpu" in models:

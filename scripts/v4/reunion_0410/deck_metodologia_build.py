@@ -281,9 +281,11 @@ s = s.replace("Solo los modelos que aprenden a detectar el fraude pasan a ser ex
               "La matriz es una fase de selección: solo las configuraciones que aprenden pasan a ser explicadas")
 s = s.replace('<text class="t tc" x="455" y="218" font-size="30">1:1</text>', '<text class="t tc" x="455" y="218" font-size="30">1:20</text>')
 s = s.replace(">× 3 semillas<", ">× 3 semillas (incertidumbre)<")
+s = s.replace('<text class="t2 tc" x="1110" y="285" font-size="32">× 3 semillas (incertidumbre)</text>',
+              '<text class="t2 tc" x="1090" y="285" font-size="28">× 3 semillas (incertidumbre)</text>')
 s = s.replace(">Solo los que pasan se explican<", ">Solo se explican las que aprenden<")
 s = s.replace(">Compuerta en validación: F1 ≥ 0,30 y MCC ≥ 0,15<", ">Media de 3 semillas en validación: F1 ≥ 0,30 y MCC ≥ 0,15<")
-s = s.replace(">Cuántos pasan: pendiente de la corrida v4<", ">Pasan 20 de 48 configuraciones (1:20 en ejecución)<")
+s = s.replace(">Cuántos pasan: pendiente de la corrida v4<", ">Pasan 28 de 48 configuraciones (media de 3 semillas)<")
 s = s.replace('<p class="llamada" data-desde="3" style="left:80px;top:740px;width:1000px;--d:1s">Las cuatro arquitecturas reciben el mismo presupuesto de búsqueda: 8 ensayos de Optuna y 150 épocas.</p>',
               '<p class="llamada" data-desde="3" style="left:80px;top:740px;width:1000px;--d:1s">Todas usan la misma configuración de hiperparámetros; las 3 semillas miden la variación estadística.</p>')
 s = s.replace("Figura 8. Matriz de la versión 4. El umbral de decisión se calibra solo con validación; la compuerta usa F1 y MCC de validación.",
