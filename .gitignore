@@ -129,6 +129,8 @@ README_ACCESO_REMOTO_CLAUDE.md
 # Pipeline v4 (salidas de corridas; se versionan solo los CSV/tablas finales que se decida publicar)
 /results_v4/
 /results_models_v4/
+/results_models_v4_top/
+/results_v4_top/
 /runs_v4/
 /results_phase1_v4/
 /runs_smoke/
