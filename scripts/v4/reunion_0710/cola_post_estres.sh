@@ -4,7 +4,7 @@
 # estrés (scripts/v4/run_estres.sh). Nada corre al tiempo con la GPU.
 #
 #   0. espera a que termine el driver de estrés (por PID) y comprueba que cerró bien
-#   1. reanuda el control de pesos al azar, que quedó en pausa (kill -CONT), y espera
+#   1. control de pesos al azar: lo reanuda si quedó en pausa (kill -CONT) o lo corre completo
 #   2. explicadores por gradiente sobre los modelos de 1:100 y 1:200 (CPU)
 #   3. estabilidad entre semillas de los explicadores por gradiente
 #   4. análisis de la reunión del 7-oct (analisis.py y metrica_robusta.py)
@@ -49,13 +49,17 @@ if ! grep -q "fin estrés" runs_v4/EST_driver.log; then
 fi
 say "corrida de estrés terminada"
 
-# 1. control de pesos al azar (estaba en pausa)
+# 1. control de pesos al azar: se reanuda si quedó en pausa; si no, se corre completo
 if [[ -n "$CONTROL_PID" ]] && kill -0 "$CONTROL_PID" 2>/dev/null; then
   kill -CONT "$CONTROL_PID"
   say "control de pesos al azar reanudado"
   while kill -0 "$CONTROL_PID" 2>/dev/null; do sleep 15; done
-  say "control de pesos al azar terminado ($(($(wc -l < "$OUT/control_aleatorio.csv") - 1)) filas)"
+else
+  "${PY[@]}" scripts/v4/reunion_0710/control_aleatorio.py --seeds 42 43 44 \
+    > "$GLOGS/control_aleatorio.log" 2>&1
+  say "control de pesos al azar rc=$?"
 fi
+say "control de pesos al azar terminado ($(($(wc -l < "$OUT/control_aleatorio.csv") - 1)) filas)"
 
 # 2. explicadores por gradiente en los escenarios de estrés
 for SCEN in "1:100_subil" "1:200_subil"; do

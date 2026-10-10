@@ -9,6 +9,7 @@ Parte de la versión VIVA del artefacto (la 7, publicada por otra sesión) y apl
   - H2: lámina nueva con la ecuación de cada capa;
   - H3: redacción nueva con los explicadores de variables y lámina nueva del explicador
     adicional (Integrated Gradients y Expected Gradients);
+  - lámina nueva de validez: control de pesos al azar y medidas que no se inflan (THE-46);
   - cierre con el candidato optimizado (THE-36), resumen y plan al día.
 
 Las cifras salen de results_v4/reunion_0410/ y results_v4/reunion_0710/ (correr antes
@@ -43,6 +44,7 @@ REF = dict(
     focal="Lin, T.-Y. et al. (2017). Focal loss for dense object detection. ICCV.",
     ig="Sundararajan, M. et al. (2017). Axiomatic attribution for deep networks. ICML · Erion, G. et al. (2021). Nature Machine Intelligence, 3, 620-631.",
     krishna="Krishna, S. et al. (2022). The disagreement problem in explainable machine learning: a practitioner's perspective. arXiv:2202.01602.",
+    adebayo="Adebayo, J. et al. (2018). Sanity checks for saliency maps. NeurIPS.",
     bergstra="Bergstra, J. et al. (2011). Algorithms for hyper-parameter optimization. NeurIPS.",
     weber="Weber, M. et al. (2019). Anti-money laundering in Bitcoin: experimenting with graph convolutional networks. arXiv:1908.02591.",
     yuan="Yuan, H. et al. (2023). Explainability in graph neural networks: a taxonomic survey. IEEE TPAMI, 45(5), 5782-5799.",
@@ -481,6 +483,52 @@ EXPLICADORES = lamina(
      ])
 
 # ═════════════════════════════════════════════════════════════════════════════
+# Lámina nueva: qué mide la estabilidad (control de pesos al azar, THE-46)
+# ═════════════════════════════════════════════════════════════════════════════
+VALIDEZ = None
+_fc, _fr = R7 / "control_aleatorio.csv", R7 / "robusta_config.csv"
+if _fc.exists() and _fr.exists() and len(pd.read_csv(_fc)) == 48:
+    ctl = pd.read_csv(_fc).groupby("explainer")[["estab_entrenado", "estab_azar",
+                                                 "rho_entrenado_azar"]].mean()
+    rob = pd.read_csv(_fr)
+    rg = rob[(rob.explainer == "GNNExplainer") & rob.arch.isin(APR) & rob.scenario.isin(MAIN)
+             & (rob.balancing == CW)][["sp_all", "sp_nz", "jac10"]].mean()
+    # 46 % de variables en 0 y piso de 0,74 a 0,82: validación del 10-oct (sección G del acta)
+    tv = "".join(
+        f'<tr data-desde="1"><td class="h">{nom}</td>'
+        f'<td style="text-align:right">{"1" if ex == "IntegratedGradients" else c(ctl.loc[ex, "estab_entrenado"], 2)}</td>'
+        f'<td class="r" style="text-align:right">{"1" if ex == "IntegratedGradients" else c(ctl.loc[ex, "estab_azar"], 2)}</td>'
+        f'<td style="text-align:right">{c(ctl.loc[ex, "rho_entrenado_azar"], 2)}</td></tr>'
+        for ex, nom, _ in FAM)
+    VALIDEZ = lamina(
+        "<b>Resultados:</b> qué mide la estabilidad",
+        "Una red sin entrenar da la misma estabilidad: la medida describe al explicador y a "
+        "los datos, no a lo que el modelo aprendió",
+        '<table class="tabla" style="left:80px;top:340px;width:900px"><thead><tr><th>Explicador</th>'
+        '<th style="text-align:right">Modelo entrenado</th><th style="text-align:right">Red sin entrenar</th>'
+        '<th style="text-align:right">Acuerdo entre ambas</th>'
+        f'</tr></thead><tbody>{tv}</tbody></table>'
+        '<p class="llamada media" data-desde="3" style="left:80px;top:700px;width:900px">Con medidas que no '
+        f'se inflan, GNNExplainer baja de {c(rg.sp_all, 2)} a <b>{c(rg.sp_nz, 2)}</b> (solo variables '
+        f'distintas de 0) y a <b>{c(rg.jac10, 2)}</b> (coincidencia de las 10 más importantes).</p>'
+        '<div class="ficha" data-desde="2" style="left:1040px;top:340px;width:800px;height:320px">'
+        '<p class="etq">Por qué</p><p class="txt">El <b>46 %</b> de las variables de un nodo vale 0 '
+        'después del escalado. Los cuatro explicadores las dejan al fondo del orden, con cualquier '
+        'modelo.</p><p class="txt">Solo ese bloque ya da un Spearman de 0,74 a 0,82.</p></div>'
+        '<div class="veredicto" data-desde="4" style="left:1040px;top:690px;width:800px"><p class="etq">'
+        'Qué cambia</p><p class="txt"><b>H1 se sostiene</b> con las tres medidas. H2 y H3 hay que '
+        'volver a probarlas con las medidas nuevas.</p></div>',
+        "Tabla 4. Escenario con el desbalance real, pesos por clase, 4 arquitecturas, 3 semillas. "
+        "Estabilidad entre repeticiones y acuerdo: Spearman sobre las 165 variables, 30 nodos.",
+        REF["adebayo"],
+        [("Validez de la medida", "J", "Nos preguntó por qué todo salía estable. Para responder hicimos la prueba que propone Adebayo: explicar la misma arquitectura con los pesos entrenados y con pesos al azar, sin entrenar, sobre los mismos nodos."),
+         ("Clic 1 · el control", "J", "Si la estabilidad dependiera de lo que el modelo aprendió, con pesos al azar debería caer. No cae: la red sin entrenar da prácticamente la misma cifra. Y la explicación del modelo entrenado se parece mucho a la de la red al azar."),
+         ("Clic 2 · la causa", "J", "La causa está en los datos. Después del escalado, casi la mitad de las variables de un nodo vale exactamente cero, porque son iguales a su mediana. Por la forma en que se calcula cada explicador, una variable en cero recibe importancia cero. Entonces casi media lista queda siempre al fondo, y solo eso ya da una correlación de 0,74 a 0,82."),
+         ("Clic 3 · medidas que no se inflan", "J", "Por eso calculamos dos medidas más: la misma correlación solo sobre las variables distintas de cero, y cuántas de las diez variables más importantes coinciden. Con ellas el nivel baja de forma apreciable."),
+         ("Clic 4 · qué cambia", "J", "Qué cambia en las hipótesis. H1 se sostiene con las tres medidas: el escenario no agrega nada a lo que ya mueve la semilla. En H2 y H3 las diferencias dejan de verse planas con las medidas nuevas, y hay que repetir las pruebas antes de afirmar algo."),
+         ])
+
+# ═════════════════════════════════════════════════════════════════════════════
 # Cierre: el candidato optimizado (THE-36)
 # ═════════════════════════════════════════════════════════════════════════════
 ot = pd.read_csv(R4 / "optuna_top/comparacion_config.csv")
@@ -581,8 +629,10 @@ rep(24, "<p>H1, H2 y H3 con las seis preguntas</p>",
 orden_final = [S[i] for i in range(1, 7)] + [COMPUERTA] + [S[i] for i in range(7, 17)]
 if ESTRES:
     orden_final.append("@@ESTRES@@")
-orden_final += [S[17], S[18], ECUACIONES, S[19], S[20], EXPLICADORES, S[21], S[22], CANDIDATO,
-                S[23], S[24], S[25], S[26]]
+orden_final += [S[17], S[18], ECUACIONES, S[19], S[20], EXPLICADORES]
+if VALIDEZ:
+    orden_final.append(VALIDEZ)
+orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]]
 ESTRES_SLOT = orden_final.index("@@ESTRES@@") if ESTRES else None
 if __name__ == "__main__":
     extra = {}
