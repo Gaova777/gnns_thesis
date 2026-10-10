@@ -27,10 +27,13 @@
 6. **Tener un motivo para cada decisión.** Sobre todo para dos: por qué la compuerta está en
    validación y por qué se siguió con un test que se sabe que no es representativo.
 
+**Aviso (10-oct):** al validar los resultados apareció un problema de medición que cambia la
+lectura de todo lo anterior. Está en la sección G y conviene leerla primero.
+
 La sección A recoge cada pedido con su tarea. La sección B es el banco de respuestas a lo que
 no supimos contestar. La sección C adelanta el porqué de cada hipótesis. La sección D lista las
-correcciones de láminas. La sección E trae dos hallazgos que salieron al preparar este
-documento y que cambian cómo se aplica lo que pidió Cristian.
+correcciones de láminas. La sección E trae los hallazgos que salieron al preparar este
+documento y la sección G la validación de la medida de estabilidad.
 
 ## A. Lo que pidió Cristian y qué hacemos
 
@@ -292,23 +295,18 @@ número.»
 
 ### C.1 H1: por qué el desbalance no movió la estabilidad
 
-**Mecanismo.** Los escenarios principales cambian la proporción de clases submuestreando
-negativos al azar. Eso cambia la probabilidad a priori de cada clase, pero no la distribución
-de las variables dentro de cada clase. Para un clasificador probabilístico, si se conserva una
-fracción β de los negativos:
+> Esta sección se corrigió el 10-oct después de validar cada afirmación
+> (`results_v4/reunion_0710/VALIDACION.md`). La primera versión daba por hecho un mecanismo que
+> los datos solo respaldan en parte.
 
-    logit_escenario(x) = logit_nativo(x) + log(1/β)
-
-El submuestreo solo suma una constante al logit (Elkan 2001; Dal Pozzolo et al. 2015). La
-frontera se desplaza, pero qué variables suben o bajan el logit no cambia. Un explicador ordena
-las variables por su efecto en la salida, así que el orden se conserva.
-
-Con pesos por clase el argumento es todavía más directo: la pérdida es ½ · promedio(ilícitas)
-+ ½ · promedio(negativos) en todos los escenarios. Solo cambia la muestra de negativos con la
-que se estima el segundo promedio.
-
-**Evidencia propia.** Con pesos por clase, la estabilidad de GNNExplainer por arquitectura
-coincide al tercer decimal entre los cuatro escenarios:
+**Lo que se sostiene.** Con pesos por clase la función de pérdida es la misma en todos los
+escenarios principales: ½ · promedio(ilícitas) + ½ · promedio(negativos). Se comprobó
+numéricamente que es exactamente lo que calcula PyTorch. Al submuestrear negativos solo cambia
+la muestra con la que se estima el segundo promedio. Como además los modelos de una misma
+semilla parten de los mismos pesos iniciales y usan los mismos hiperparámetros, terminan casi
+idénticos: el coseno entre sus pesos es de 0,90 a 1,00 (entre dos semillas es de 0,02) y sus
+puntajes sobre validación tienen correlación de 0,96 a 0,99. Por eso la estabilidad coincide al
+tercer decimal entre escenarios:
 
 | Arquitectura | Nativo | 1:10 | 1:10 con SMOTE | 1:20 |
 |---|---|---|---|---|
@@ -316,14 +314,33 @@ coincide al tercer decimal entre los cuatro escenarios:
 | TAGCN | 0,937 | 0,936 | 0,937 | 0,937 |
 | GAT | 0,939 | 0,939 | 0,941 | 0,939 |
 
-**Qué implica.** H1, tal como se probó, no podía fallar: los escenarios cambiaban algo que la
-explicación no ve. Para que el desbalance afecte la explicación tiene que cambiar lo que el
-modelo aprende del fraude, y eso solo pasa si cambia la información sobre las ilícitas. Es el
-argumento para los escenarios 1:100 y 1:200, que quitan ilícitas.
+**La evidencia directa.** Se comparó la explicación del mismo nodo entre modelos
+(GNNExplainer; GraphSAGE, GAT y TAGCN):
 
-**Qué falta.** La evidencia directa: comparar la explicación del mismo nodo entre escenarios
-(¿el modelo entrenado a 1:10 señala las mismas variables que el nativo?). Se puede calcular
-con los puntajes ya guardados, sin GPU.
+| Comparación | Pesos por clase | Sin ajuste | Focal loss |
+|---|---|---|---|
+| Mismo escenario, otra semilla (referencia) | 0,940 | 0,936 | 0,924 |
+| Otro escenario y otra semilla | 0,941 | 0,918 | 0,915 |
+| Otro escenario, misma semilla | 0,987 | 0,924 | 0,925 |
+
+Cambiar el escenario no mueve la explicación más de lo que ya la mueve cambiar la semilla. El
+0,99 de la última fila no es una propiedad del desbalance: es que esos modelos son casi el
+mismo modelo.
+
+**Lo que no se sostiene.** La teoría dice que submuestrear negativos al azar solo desplaza el
+logit del clasificador óptimo en una constante, log(1/β) (Elkan 2001; Dal Pozzolo et al. 2015).
+En los modelos sin ajuste eso **no se observa**: entre el nativo y el 1:10 el desplazamiento
+mediano es de −0,4 a 0,2 (la teoría predice +1,34) y la correlación de los puntajes es de 0,40
+a 0,80. Esos modelos se detienen entre las épocas 17 y 59 y están lejos del óptimo. El
+argumento del desplazamiento se puede citar como expectativa teórica, no como lo que pasó.
+
+**Qué implica.** Con pesos por clase, H1 no podía fallar: los escenarios principales cambian
+algo que casi no altera el modelo. Para que el desbalance afecte la explicación tiene que
+cambiar lo que el modelo aprende del fraude. Es el argumento para los escenarios 1:100 y
+1:200, que quitan ilícitas.
+
+**Advertencia de diseño.** El 1:10 con SMOTE y el 1:20 usan exactamente los mismos negativos
+reales (69.240, mismo sorteo). Se diferencian solo en las 3.462 ilícitas sintéticas.
 
 **Cómo lo leyó Cristian** (min. 78): no como hipótesis, sino como decisión de diseño. Se
 escogió no tocar el fraude porque es lo más representativo, y el resultado respalda que se
@@ -345,9 +362,16 @@ de los vecinos de una ilícita es ilícito, y un MLP sin grafo rinde igual que G
 frente a 0,481). GCN mezcla al nodo con vecinos que no se le parecen y diluye la señal. Al
 agregarle un peso propio sube de 0,214 a 0,464.
 
-Las tres que conservan al nodo llegan al mismo techo y terminan apoyándose en las mismas
-variables. Por eso sus explicaciones son igual de estables. La arquitectura decide **si el
-modelo aprende**, no qué tan estable explica.
+Las tres que conservan al nodo llegan al mismo techo de rendimiento. La arquitectura decide
+**si el modelo aprende**.
+
+**Lo que no se puede afirmar** (validación del 10-oct): que las tres «se apoyan en las mismas
+variables». Entre arquitecturas, con el mismo escenario, la misma pérdida y la misma semilla,
+solo coinciden de 2 a 5 de las 10 variables más importantes (Jaccard de 0,20 a 0,50). El
+Spearman sobre las 165 variables da 0,84 a 0,97, pero ese valor está inflado por la razón que
+se explica en la sección G. Tampoco es cierto que «expliquen igual» con una medida que no se
+infle: en GNNExplainer la estabilidad sobre las variables distintas de 0 es 0,84 en GraphSAGE,
+0,73 en GAT y 0,68 en TAGCN.
 
 Cristian encontró interesante la frase de GCN (min. 80) pero dijo que así no se entiende:
 necesita la ecuación. Detalle en `results_v4/reunion_0410/pgexpl_gcn/REPORTE.md`, parte B.
@@ -404,6 +428,10 @@ tomar los autores con Cristian (THE-42), porque cambia el conteo de configuracio
 Es la tabla de C.1. Refuerza el mecanismo de H1 y explica por qué Cristian tiene razón al decir
 que submuestreando no se va a romper.
 
+### E.3 La medida de estabilidad está inflada por las variables en cero
+
+Ver la sección G. Es el hallazgo más importante de la validación.
+
 ## F. Orden de ejecución
 
 | Orden | Tarea | Depende de | Estado |
@@ -416,6 +444,27 @@ que submuestreando no se va a romper.
 | 6 | Texto del porqué para la tesis (THE-41) | 4 | ⏳ |
 | 7 | Partición antes del cierre (THE-44) | después del envío | ⏳ |
 
+## G. Validación del 10-oct: la medida de estabilidad
+
+Detalle completo en `results_v4/reunion_0710/VALIDACION.md`.
+
+1. **El 46 % de las variables de los 30 nodos explicados vale exactamente 0.** Son variables
+   iguales a su mediana, que el escalado robusto lleva a 0. Un explicador casi no puede
+   atribuirle nada a una variable en 0, así que queda al fondo del orden en cualquier modelo.
+2. **Solo ese bloque de ceros ya da un Spearman de 0,74 a 0,82** entre dos órdenes al azar.
+3. **Una red sin entrenar da casi la misma estabilidad** que la entrenada (control de pesos al
+   azar, la prueba de Adebayo et al. 2018). La explicación del modelo entrenado coincide en
+   0,88 a 0,96 con la de la misma arquitectura con pesos al azar.
+4. **Con medidas que no se inflan el nivel baja.** En GNNExplainer, de 0,95 a 0,75 (Spearman
+   sobre las variables distintas de 0) y a 0,62 (coincidencia de las 10 variables más
+   importantes). Entre semillas del modelo, las 10 más importantes coinciden en 0,39.
+5. **Qué conclusiones aguantan.** H1 aguanta con las tres medidas: el escenario no agrega nada
+   a la semilla. H2 y H3, con GNNExplainer y la medida sobre variables distintas de 0, dejan
+   de verse planas (por arquitectura 0,68 a 0,84; por pérdida 0,59 a 0,75).
+
+Esto explica de raíz por qué todo salió estable, que era la pregunta de Cristian, y a la vez
+obliga a decidir con qué medida se reportan los resultados.
+
 ## Decisiones que necesitan respuesta
 
 1. **Compuerta con umbral calibrado** para poder converger a pesos por clase (E.1).
@@ -423,9 +472,13 @@ que submuestreando no se va a romper.
    variante con negativos sobremuestreados o basta con declararla?
 3. **Deck de hipótesis.** Otra sesión publicó las versiones 6 y 7. Hay que confirmar que ya no
    se está editando antes de aplicar la sección D.
+4. **Medida de estabilidad** (sección G). ¿Se mantiene el Spearman sobre las 165 variables
+   declarando su piso, o se reportan también la medida sobre variables distintas de 0 y la
+   coincidencia de las 10 más importantes?
 
 ## Referencias
 
+- Adebayo, J. et al. (2018). Sanity checks for saliency maps. NeurIPS.
 - Agarwal, C. et al. (2023). Evaluating explainability for graph neural networks. Scientific Data, 10, 144.
 - Dal Pozzolo, A. et al. (2015). Calibrating probability with undersampling for unbalanced classification. IEEE Symposium Series on Computational Intelligence.
 - Du, J. et al. (2017). Topology adaptive graph convolutional networks. arXiv:1710.10370.

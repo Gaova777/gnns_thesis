@@ -307,21 +307,22 @@ rep(9, 'data-cue="1-10 · val"><p data-voz="J">', 'data-cue="1-10 · val"><p dat
 titulo(15, "H1: esperábamos que más desbalance volviera inestables las explicaciones; "
            "entre 1:10 y ≈1:40 no pasó")
 
-ag = esc[esc.arch.isin(APR) & (esc.explainer == "GNNExplainer")]
-ag_cw = ag[ag.balancing == CW].groupby("scenario").rho.mean()
-ag_ot = ag[ag.balancing != CW].groupby("scenario").rho.mean()
-rf = sem[sem.arch.isin(APR) & (sem.explainer == "GNNExplainer")]
-ref_cw = rf[rf.balancing == CW].rho.mean()
-ref_ot = rf[rf.balancing != CW].rho.mean()
+# Comparación justa: se cruza también la semilla, porque los modelos de la misma semilla
+# comparten inicialización e hiperparámetros y quedan casi iguales (coseno de pesos 0,90 a 1).
+rb = pd.read_csv(R7 / "robusta_semillas.csv")
+rb = rb[rb.arch.isin(APR) & (rb.explainer == "GNNExplainer") & rb.scenario.isin(MAIN)]
+gg = lambda tipo, cw: rb[(rb.tipo == tipo) & ((rb.balancing == CW) == cw)]
+AG = {(t, cw): gg(t, cw).sp_all.mean() for t in rb.tipo.unique() for cw in (True, False)}
+AGJ = {(t, cw): gg(t, cw).jac10.mean() for t in rb.tipo.unique() for cw in (True, False)}
+T_REF, T_CRUZ, T_MISMA = ("mismo escenario, otra semilla", "otro escenario, otra semilla",
+                          "otro escenario, misma semilla")
 XA = lambda v: 420 + (v - 0.80) / 0.20 * 560
-filas = [("Otro escenario, pesos por clase", "nativo frente a 1:10, 1:10 + SMOTE y 1:20",
-          ag_cw[MAIN[:3]].mean(), ag_cw[MAIN[:3]].min(), ag_cw[MAIN[:3]].max(), "barra"),
-         ("Otro escenario, otras pérdidas", "sin ajuste y focal loss",
-          ag_ot[MAIN[:3]].mean(), ag_ot[MAIN[:3]].min(), ag_ot[MAIN[:3]].max(), "barra-s"),
-         ("Mismo escenario, otra semilla", "la referencia: volver a entrenar el modelo",
-          rf.rho.mean(), min(ref_cw, ref_ot), max(ref_cw, ref_ot), "cat-n")]
+filas = [("Mismo escenario, otra semilla", "la referencia: volver a entrenar el modelo",
+          rb[rb.tipo == T_REF].sp_all.mean(), "cat-n"),
+         ("Otro escenario y otra semilla", "pesos por clase", AG[(T_CRUZ, True)], "barra"),
+         ("Otro escenario y otra semilla", "sin ajuste y focal loss", AG[(T_CRUZ, False)], "barra-s")]
 bars = []
-for k, (a, b, v, lo, hi, cls) in enumerate(filas):
+for k, (a, b, v, cls) in enumerate(filas):
     y = 40 + k * 104
     bars.append(
         f'<text class="t" x="0" y="{y + 26}" font-size="29">{a}</text>'
@@ -333,16 +334,15 @@ eje = '<path class="eje" d="M420 360L980 360"/>' + "".join(
     for t in (0.80, 0.85, 0.90, 0.95, 1.00))
 titulo(16, "H1: submuestrear negativos cambia la proporción de clases, no lo que el modelo "
            "aprende del fraude")
-cuerpo(16, f'''<p class="etiqueta" data-desde="1" style="left:80px;top:330px">5 · Por qué dio eso</p><svg class="fig" data-desde="1" viewBox="0 0 1080 440" style="left:80px;top:380px;width:1080px;height:440px" role="img" aria-label="Acuerdo entre las explicaciones del mismo nodo: otro escenario con pesos por clase {c(filas[0][2], 2)}, otro escenario con otras pérdidas {c(filas[1][2], 2)}, mismo escenario con otra semilla {c(filas[2][2], 2)}.">{"".join(bars)}{eje}<text class="t3 tc" x="700" y="432" font-size="23">¿señalan las mismas variables? (Spearman entre las dos explicaciones del mismo nodo)</text></svg><p class="llamada media" data-desde="2" style="left:80px;top:835px;width:1080px">Cambiar de escenario mueve la explicación tanto como volver a entrenar el mismo modelo con otra semilla, y con pesos por clase casi nada.</p><div class="ficha" data-desde="2" style="left:1220px;top:330px;width:620px;height:400px"><p class="etq">El mecanismo</p><p class="txt">Quitar negativos al azar cambia la proporción de clases, no cómo son las ilícitas. En el modelo eso solo desplaza el puntaje:</p><p class="txt" style="font-size:24px;color:var(--tinta);white-space:nowrap"><b>logit<sub>escenario</sub>(x) = logit<sub>nativo</sub>(x) + constante</b></p><p class="txt">Las variables que suben o bajan el puntaje son las mismas.</p></div><div class="veredicto" data-desde="3" style="left:1220px;top:750px;width:620px"><p class="etq">6 · En qué impacta</p><p class="txt">Con estos escenarios H1 <b>no podía fallar</b>. Para mover la explicación hay que cambiar lo que el modelo sabe del fraude.</p></div>''',
-       "Figura 12. GNNExplainer, GraphSAGE, GAT y TAGCN. Cada barra promedia 30 nodos, 3 semillas "
-       "y los escenarios indicados; las explicaciones se comparan con las del modelo nativo de "
-       "la misma semilla.")
+cuerpo(16, f'''<p class="etiqueta" data-desde="1" style="left:80px;top:330px">5 · Por qué dio eso</p><svg class="fig" data-desde="1" viewBox="0 0 1080 440" style="left:80px;top:380px;width:1080px;height:440px" role="img" aria-label="Acuerdo entre las explicaciones del mismo nodo: mismo escenario con otra semilla {c(filas[0][2], 2)}; otro escenario y otra semilla, con pesos por clase {c(filas[1][2], 2)} y con otras pérdidas {c(filas[2][2], 2)}.">{"".join(bars)}{eje}<text class="t3 tc" x="700" y="432" font-size="23">¿señalan las mismas variables? (Spearman entre las dos explicaciones del mismo nodo)</text></svg><p class="llamada media" data-desde="2" style="left:80px;top:835px;width:1080px">Cambiar además el escenario no mueve la explicación más de lo que ya la mueve cambiar la semilla.</p><div class="ficha" data-desde="2" style="left:1220px;top:330px;width:620px;height:400px"><p class="etq">El mecanismo</p><p class="txt">Quitar negativos al azar cambia la proporción de clases, no cómo son las ilícitas. Con pesos por clase la pérdida es la misma en los cuatro escenarios:</p><p class="txt" style="font-size:25px;color:var(--tinta);white-space:nowrap"><b>L = ½·media(ilícitas) + ½·media(negativos)</b></p><p class="txt">Con la misma semilla los modelos quedan casi iguales (acuerdo {c(AG[(T_MISMA, True)], 2)}).</p></div><div class="veredicto" data-desde="3" style="left:1220px;top:750px;width:620px"><p class="etq">6 · En qué impacta</p><p class="txt">Con estos escenarios H1 <b>no podía fallar</b>. Para mover la explicación hay que cambiar lo que el modelo sabe del fraude.</p></div>''',
+       "Figura 12. GNNExplainer, GraphSAGE, GAT y TAGCN, 30 nodos. Las explicaciones de 1:10, "
+       "1:10 + SMOTE y 1:20 se comparan con las del modelo nativo entrenado con otra semilla.")
 set_ref(16, REF["elkan"])
 set_notas(16, [
     ("H1 · por qué", "J", "¿Por qué no cambió? Esta vez lo medimos directamente."),
-    ("Clic 1 · acuerdo", "J", "Tomamos el mismo nodo y comparamos la explicación del modelo nativo con la del modelo entrenado en otro escenario: ¿señalan las mismas variables? Con pesos por clase el acuerdo es de 0,99. Con las otras pérdidas es de 0,92 a 0,93. Y la referencia: entrenar el mismo modelo, en el mismo escenario, con otra semilla, da 0,94."),
-    ("Clic 2 · mecanismo", "J", "O sea que cambiar el escenario mueve la explicación tanto como cambiar la semilla, y con pesos por clase casi nada. La razón es que quitar negativos al azar cambia cuántos hay de cada clase, pero no cómo son las ilícitas. En el clasificador eso equivale a sumar una constante al puntaje. Y con pesos por clase la función de pérdida es literalmente la misma en los cuatro escenarios: la mitad del peso para las ilícitas y la mitad para los negativos."),
-    ("Clic 3 · impacto", "J", "La consecuencia es fuerte: con estos escenarios H1 no podía fallar. No es que el desbalance no importe; es que submuestrear negativos no cambia lo que el modelo aprende del fraude. Para poner a prueba la hipótesis hay que tocar el fraude, y eso es la lámina siguiente."),
+    ("Clic 1 · acuerdo", "J", "Tomamos el mismo nodo y preguntamos si dos modelos señalan las mismas variables. La referencia, en gris, es entrenar el mismo modelo en el mismo escenario con otra semilla: 0,94. Si además de la semilla cambiamos el escenario, el acuerdo es el mismo: 0,94 con pesos por clase y 0,92 con las otras pérdidas."),
+    ("Clic 2 · mecanismo", "J", "O sea que el escenario no agrega nada a lo que ya mueve la semilla. La razón es que quitar negativos al azar cambia cuántos hay de cada clase, pero no cómo son las ilícitas. Con pesos por clase la función de pérdida es literalmente la misma en los cuatro escenarios: la mitad del peso para las ilícitas y la mitad para los negativos. De hecho, con la misma semilla los cuatro modelos terminan casi idénticos. Una advertencia honesta: la teoría dice que sin ajuste el submuestreo solo desplaza el puntaje en una constante, pero en nuestros modelos sin ajuste eso no se cumple, porque entrenan pocas épocas y no llegan al óptimo."),
+    ("Clic 3 · impacto", "J", "La consecuencia: con estos escenarios H1 no podía fallar. No es que el desbalance no importe; es que submuestrear negativos no cambia lo que el modelo aprende del fraude. Para poner a prueba la hipótesis hay que tocar el fraude, y eso es lo que hacen los escenarios 1:100 y 1:200."),
 ])
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -375,15 +375,15 @@ ECUACIONES = lamina(
     '<div class="veredicto" data-desde="3" style="left:80px;top:745px;width:1760px">'
     '<p class="etq">Lo que explica</p><p class="txt">En Elliptic la señal está en las variables '
     'del nodo y solo el 12 % de los vecinos de una ilícita es ilícito. Las tres capas que '
-    'conservan al nodo llegan al mismo techo y se apoyan en las mismas variables: por eso '
-    '<b>explican igual</b>. GCN lo mezcla con sus vecinos y pierde la señal.</p></div>',
+    'conservan al nodo llegan al mismo techo de rendimiento. GCN lo mezcla con sus vecinos y '
+    '<b>pierde la señal</b>: por eso es la única que no aprende.</p></div>',
     "Tabla 2. h: representación del nodo i; N(i): sus vecinos; d: grado; W: pesos que se "
     "aprenden. PR-AUC de validación con desbalance real y pesos por clase (azar 0,024).",
     REF["gnns"],
     [("H2 · ecuaciones", "A", "Nos pidieron el porqué con las ecuaciones. La diferencia entre las cuatro arquitecturas, para este problema, cabe en una pregunta: cuando la capa calcula la representación de un nodo, ¿ese nodo tiene un peso propio o se mezcla con sus vecinos?"),
      ("Clic 1 · GCN", "A", "GCN suma al nodo y a sus vecinos con la misma matriz W y normaliza por el grado. No puede tratar al nodo distinto de sus vecinos."),
      ("Clic 2 · las otras tres", "A", "GraphSAGE tiene una matriz solo para el nodo. GAT aprende cuánta atención darle al propio nodo. TAGCN tiene el término de cero saltos, que es el nodo con su propia matriz. Las tres pueden conservar lo que dice el nodo."),
-     ("Clic 3 · lectura", "A", "En Elliptic la señal del fraude está en las variables del propio nodo y los vecinos casi no ayudan. Las tres que conservan al nodo llegan al mismo techo y terminan apoyándose en las mismas variables, y por eso sus explicaciones son igual de estables. El experimento de control de la lámina anterior lo confirma: a GCN le agregamos un peso propio y sube de 0,21 a 0,46."),
+     ("Clic 3 · lectura", "A", "En Elliptic la señal del fraude está en las variables del propio nodo y los vecinos casi no ayudan. Las tres que conservan al nodo llegan al mismo techo de rendimiento. Ojo: eso no quiere decir que señalen las mismas variables; entre arquitecturas solo coinciden de 2 a 5 de las 10 variables más importantes. El experimento de control de la lámina anterior lo confirma: a GCN le agregamos un peso propio y sube de 0,21 a 0,46."),
      ])
 
 # ═════════════════════════════════════════════════════════════════════════════
