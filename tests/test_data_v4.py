@@ -19,8 +19,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.data.imbalance import (  # noqa: E402
-    V4_EXPECTED_TRAIN, V4_EXPECTED_TRAIN_BY_MODE, V4_MAIN_SCENARIOS, V4_SUBSAMPLE_SEED,
-    create_v4_scenario,
+    V4_EXPECTED_TRAIN, V4_EXPECTED_TRAIN_BY_MODE, V4_MAIN_SCENARIOS, V4_STRESS_SCENARIOS,
+    V4_SUBSAMPLE_SEED, create_v4_scenario,
 )
 from src.data.loader import (  # noqa: E402
     EXPECTED_COUNTS, EXPECTED_SPLIT_COUNTS, EXPECTED_SPLIT_COUNTS_BY_MODE, apply_label_mode,
@@ -114,12 +114,14 @@ def test_a3_label_modes():
 def test_b_v4_scenarios():
     """Main scenarios (mode C): every real illicit node is kept in every scenario."""
     d = _data_mode("licit_unknown")
-    assert V4_EXPECTED_TRAIN == V4_EXPECTED_TRAIN_BY_MODE["licit_unknown"] == {
+    assert V4_EXPECTED_TRAIN is V4_EXPECTED_TRAIN_BY_MODE["licit_unknown"]
+    protected = {k: v for k, v in V4_EXPECTED_TRAIN.items() if k not in V4_STRESS_SCENARIOS}
+    assert protected == {
         "native": (3462, 132803), "1:10": (3462, 34620), "1:1": (3462, 3462),
-        "1:10_os": (6924, 69240)}
+        "1:10_os": (6924, 69240), "1:20": (3462, 69240)}
     assert V4_MAIN_SCENARIOS == ["native", "1:10", "1:1", "1:10_os"]
     il_real = d.train_mask & (d.y == 1)
-    for name, (e_il, e_neg) in V4_EXPECTED_TRAIN.items():
+    for name, (e_il, e_neg) in protected.items():
         s, rep = create_v4_scenario(d, name, verbose=False)
         assert (rep["n_illicit"], rep["n_licit"]) == (e_il, e_neg), (name, rep)
         assert rep["expected_checked"] and rep["label_mode"] == "licit_unknown"
@@ -169,6 +171,26 @@ def test_b2_smote():
     # features inside the convex range of the illicit train features
     lo, hi = d.x[il].min(0).values, d.x[il].max(0).values
     assert bool(((s.x[syn] >= lo - 1e-5) & (s.x[syn] <= hi + 1e-5)).all())
+
+
+def test_b2b_stress_scenarios():
+    """Stress scenarios (7-oct): every negative is kept, illicit nodes are dropped."""
+    d = _data_mode("licit_unknown")
+    assert V4_STRESS_SCENARIOS == ["1:100_subil", "1:200_subil"]
+    exp = {"1:100_subil": (1328, 132803), "1:200_subil": (664, 132803)}
+    neg_real = d.train_mask & (d.y == 0)
+    for name in V4_STRESS_SCENARIOS:
+        s, rep = create_v4_scenario(d, name, verbose=False)
+        assert (rep["n_illicit"], rep["n_licit"]) == exp[name] == V4_EXPECTED_TRAIN[name]
+        assert rep["expected_checked"] and rep["n_synthetic_illicit"] == 0
+        assert s.num_nodes == d.num_nodes and torch.equal(s.edge_index, d.edge_index)
+        # no negative is dropped, only illicit; val/test and features untouched
+        assert bool((s.train_mask | ~neg_real).all()), name
+        assert bool((s.train_mask & ~d.train_mask).sum() == 0)
+        assert torch.equal(s.val_mask, d.val_mask) and torch.equal(s.test_mask, d.test_mask)
+        assert torch.equal(s.x, d.x) and torch.equal(s.y, d.y)
+        s2, rep2 = create_v4_scenario(d, name, verbose=False)
+        assert rep["train_idx_sha1"] == rep2["train_idx_sha1"]
 
 
 def test_b3_other_label_modes():
@@ -222,7 +244,8 @@ def test_c_train_matrix_smoke():
 
 if __name__ == "__main__":
     tests = [test_a_labels_and_splits, test_a2_old_v3_mapping_is_rejected, test_a3_label_modes,
-             test_b_v4_scenarios, test_b2_smote, test_b3_other_label_modes]
+             test_b_v4_scenarios, test_b2_smote, test_b2b_stress_scenarios,
+             test_b3_other_label_modes]
     if "--no-train" not in sys.argv:
         tests.append(test_c_train_matrix_smoke)
     for t in tests:

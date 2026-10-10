@@ -220,8 +220,16 @@ def verify_scenario_integrity(data: Data, scenario_name: str = "") -> bool:
 # coincide (class weighting gives weight 1 and focal loss reduces to plain cross entropy),
 # so it cannot compare balancing strategies. 1:20 replaces it in the main analysis, between
 # 1:10 and the native ratio.
+# Stress scenarios (7-oct meeting with Cristian): the main scenarios only cover 1:10 to
+# 1:38.4 and explanation stability did not move in that range, so the imbalance has to be
+# forced beyond the native ratio. In label mode C the native train split already uses every
+# negative node, so the only way to get there WITHOUT synthetic data is to drop illicit
+# nodes. These two scenarios deliberately break the "protect the fraud signal" rule and are
+# reported apart from the main ones (fewer fraud examples AND a lower ratio, confounded):
+#   1:100_subil  all negatives, illicit undersampled                1,328 / 132,803
+#   1:200_subil  all negatives, illicit undersampled                  664 / 132,803
 # Legacy scenarios of the 23-sep design (drop illicit nodes; label mode B only; not run):
-#   1:10_subil, 1:50_subil, 1:100_subil, native_size_ctrl
+#   1:10_subil, 1:50_subil, native_size_ctrl (and 1:100_subil in label mode B)
 
 import hashlib
 import json
@@ -240,8 +248,10 @@ V4_SCENARIOS = {
     "1:10_subil": {"kind": "illicit_per_licit", "k": 10},
     "1:50_subil": {"kind": "illicit_per_licit", "k": 50},
     "1:100_subil": {"kind": "illicit_per_licit", "k": 100},
+    "1:200_subil": {"kind": "illicit_per_licit", "k": 200},
 }
 V4_MAIN_SCENARIOS = ["native", "1:10", "1:1", "1:10_os"]
+V4_STRESS_SCENARIOS = ["1:100_subil", "1:200_subil"]  # 7-oct: drop illicit, label mode C
 
 # Expected (n_illicit, n_negative) in the train mask, per label mode, default temporal split.
 V4_BASE_TRAIN_BY_MODE = {
@@ -256,6 +266,8 @@ V4_EXPECTED_TRAIN_BY_MODE = {
         "1:1": (3462, 3462),
         "1:10_os": (6924, 69240),
         "1:20": (3462, 69240),
+        "1:100_subil": (1328, 132803),
+        "1:200_subil": (664, 132803),
     },
     "licit": {
         "native": (3462, 26432),

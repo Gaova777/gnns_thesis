@@ -39,9 +39,13 @@ scenarios:
   #   1:10_os   6.924 (3.462 + 3.462 SMOTE) / 69.240
   #   1:20      3.462 / 69.240          (añadido el 5-oct; reemplaza al 1:1 en el análisis
   #                                      principal, que pasa a anexo: reunión del 4-oct)
+  #   1:100_subil  1.328 / 132.803      (añadidos el 10-oct; reunión del 7-oct: forzar el
+  #   1:200_subil    664 / 132.803       desbalance más allá del nativo para ver si la
+  #                                      estabilidad cae. En modo C el nativo ya usa todos los
+  #                                      negativos, así que se quitan ilícitas. Van aparte.)
   # Los negativos se submuestrean estratificados: ~19,9 % lícitas y ~80,1 % sin etiqueta,
   # la misma mezcla que el nativo.
-  names: ["native", "1:10", "1:1", "1:10_os", "1:20"]
+  names: ["native", "1:10", "1:1", "1:10_os", "1:20", "1:100_subil", "1:200_subil"]
 
 models:
   architectures:
