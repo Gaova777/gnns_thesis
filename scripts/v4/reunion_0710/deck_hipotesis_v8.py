@@ -638,6 +638,85 @@ if len(STRESS) == 2:
          ], cls="lc")
 
 # ═════════════════════════════════════════════════════════════════════════════
+# Láminas de la reunión del 7-oct que faltaban a la vista (auditoría del 10-oct):
+# cómo se construyó el caso extremo, sus curvas y por qué pesos por clase gana a focal loss
+# ═════════════════════════════════════════════════════════════════════════════
+EXTRA_ESTRES, PERDIDAS = [], None
+if ESTRES:
+    nn = cfg.groupby("scenario")[["n_train_illicit", "n_train_neg"]].first()
+    COMO = {"1:10": "se quitan negativos", "1:20": "se quitan negativos",
+            "native": "todos los datos", "1:100_subil": "se quita fraude",
+            "1:200_subil": "se quita fraude"}
+    filas_d = "".join(
+        f'<tr data-desde="{2 if sc in STRESS else 1}"><td class="h">{ESC_NOM[sc]}</td>'
+        f'<td class="{"r" if sc in STRESS else ""}" style="text-align:right">{miles(nn.loc[sc, "n_train_illicit"])}</td>'
+        f'<td style="text-align:right">{miles(nn.loc[sc, "n_train_neg"])}</td><td>{COMO[sc]}</td></tr>'
+        for sc in ["1:10", "1:20", "native", "1:100_subil", "1:200_subil"])
+    EXTRA_ESTRES.append(lamina(
+        "<b>Resultados:</b> H1, desbalance",
+        "Hipótesis 1, caso extremo: cómo se llega a 1 fraude por cada 100 y por cada 200",
+        '<table class="tabla" style="left:80px;top:340px;width:980px"><thead><tr><th>Nivel</th>'
+        '<th style="text-align:right">Fraude para entrenar</th><th style="text-align:right">No fraude</th>'
+        f'<th>Cómo se obtiene</th></tr></thead><tbody>{filas_d}</tbody></table>'
+        '<div class="ficha" data-desde="3" style="left:1120px;top:340px;width:720px;height:330px">'
+        '<p class="etq">Por qué quitando fraude</p><p class="txt">El nivel real ya usa <b>todos</b> los '
+        'negativos: quitar más solo acerca las clases.</p><p class="txt">La otra vía, crear negativos '
+        'sintéticos, triplica el grafo y no cabe en la memoria disponible.</p></div>'
+        '<div class="veredicto" data-desde="4" style="left:1120px;top:700px;width:720px"><p class="etq">'
+        'Qué tener presente</p><p class="txt">Cambian a la vez la proporción y la <b>cantidad de fraude</b>. '
+        'Por eso van aparte de los niveles principales.</p></div>',
+        "Tabla 2. Transacciones de entrenamiento por nivel de desbalance. La validación y la prueba final "
+        "no se tocan en ningún nivel.",
+        REF["weber"],
+        [("Diseño del caso extremo", "A", "En la reunión nos pidieron forzar el desbalance hasta 1 por cada 100 y 1 por cada 200, para ver si la estabilidad se rompía. Aquí está cómo se construyó."),
+         ("Clic 1 · niveles principales", "A", "En los niveles principales el fraude nunca se toca: son siempre las 3.462 transacciones ilícitas. Lo que cambia es cuántas no ilícitas se dejan."),
+         ("Clic 2 · caso extremo", "A", "El nivel real ya usa todos los negativos. Para llegar a 1 por cada 100 dejamos 1.328 fraudes, el 38 por ciento; para 1 por cada 200, 664, el 19 por ciento. Se escogen al azar con una semilla fija."),
+         ("Clic 3 · por qué así", "A", "La alternativa era fabricar negativos sintéticos hasta completar la proporción. Eso triplica el tamaño del grafo y no cabe en la memoria de la tarjeta gráfica. Lo dejamos declarado."),
+         ("Clic 4 · advertencia", "A", "Hay que leerlo con cuidado: en estos dos niveles no solo cambia la proporción, también hay menos fraude del cual aprender. Por eso no los mezclamos con los niveles principales en las pruebas."),
+         ]))
+    for sc, nom in (("1:100_subil", "1 fraude por cada 100"), ("1:200_subil", "1 fraude por cada 200")):
+        fn = f"curvas_{sc.replace(':', '-')}_val.png"
+        _im = Image.open(FIG / fn)
+        _h = round(1760 * _im.height / _im.width)
+        g = cfg[(cfg.scenario == sc) & (cfg.arch == "GraphSAGE")].set_index("balancing").val_pr_auc
+        EXTRA_ESTRES.append(lamina(
+            "<b>Resultados:</b> H1, desbalance",
+            f"Caso extremo, {nom}, validación",
+            f'<img class="fig" src="{uri(fn, 1300)}" alt="Curvas ROC y PR en validación con {nom}, por arquitectura y forma de compensar el desbalance." style="left:80px;top:316px;height:{_h}px;width:1760px">'
+            f'<p class="pie junto" style="left:80px;top:{316 + _h + 4}px;width:1760px">Figura 0. Curvas ROC (arriba) y PR (abajo) con {nom}, en validación. Línea: media de 3 semillas; sombra: mínimo y máximo; puntos: umbral de cada semilla.</p>',
+            "", REF["saito"],
+            [(f"Curvas · {nom}", "A", f"Estas son las curvas con {nom}. Miren la curva azul, sin ajuste: en GraphSAGE y TAGCN queda pegada al azar, el modelo ya no aprende. Con pesos por clase, la naranja, GraphSAGE todavía llega a {c(g['class_weighting'], 2)}; con focal loss queda en {c(g['focal_loss'], 2)}. Con tan poco fraude, compensar el desbalance deja de ser opcional.")]))
+    gs = cfg[cfg.arch == "GraphSAGE"].set_index(["scenario", "balancing"]).val_pr_auc
+    PL = [("Sin ajuste", "none", "L = media de la pérdida de <b>todas</b> las transacciones", "1 a 1"),
+          ("Pesos por clase", CW, "L = ½ · media(fraude) + ½ · media(no fraude)", "38 a 1"),
+          ("Focal loss", "focal_loss", "L = media de α · (1 − p)<sup>γ</sup> · pérdida, con α = 0,75 y γ = 2", "3 a 1")]
+    PERDIDAS = lamina(
+        "<b>Resultados:</b> H3, balanceo",
+        "Hipótesis 3, por qué pesos por clase detecta mejor: es la única que compensa todo el desbalance",
+        '<table class="tabla" style="top:340px"><thead><tr><th style="width:260px">Forma de compensar</th>'
+        '<th>Qué minimiza el entrenamiento</th><th style="width:300px;text-align:right">Peso de un fraude frente a un no fraude</th>'
+        '<th style="width:170px;text-align:right">Nivel real</th><th style="width:170px;text-align:right">1 por cada 100</th>'
+        '</tr></thead><tbody>'
+        + "".join(f'<tr data-desde="{k + 1}"><td class="h">{n_}</td><td style="font-size:28px;color:var(--tinta)">{eq}</td>'
+                  f'<td class="r" style="text-align:right">{w}</td>'
+                  f'<td style="text-align:right">{c(gs[("native", b)], 2)}</td>'
+                  f'<td style="text-align:right">{c(gs[("1:100_subil", b)], 2)}</td></tr>'
+                  for k, (n_, b, eq, w) in enumerate(PL))
+        + '</tbody></table>'
+        '<div class="veredicto" data-desde="4" style="left:80px;top:700px;width:1760px"><p class="etq">Lo que explica</p>'
+        '<p class="txt">El desbalance real es de 38 a 1. Pesos por clase lo compensa completo; focal loss, como se configuró, '
+        'solo 3 a 1. <b>Cuanto menos fraude hay, más se nota.</b></p></div>',
+        "Tabla 4. Las dos últimas columnas son el PR-AUC de validación de GraphSAGE (azar: 0,024). "
+        "Limitación: α y γ de focal loss quedaron fijos y no se buscaron.",
+        REF["focal"],
+        [("Por qué gana pesos por clase", "J", "En la reunión nos dijeron que no era lo esperado que pesos por clase le ganara a focal loss, y que para discutirlo había que mirar la matemática. Aquí está."),
+         ("Clic 1 · sin ajuste", "J", "Sin ajuste, todas las transacciones pesan igual. Como el fraude es el 2,5 por ciento, casi toda la señal de entrenamiento viene de lo que no es fraude."),
+         ("Clic 2 · pesos por clase", "J", "Pesos por clase le da a cada clase la mitad del peso total. Eso equivale a que un fraude pese 38 veces lo que pesa una transacción normal: exactamente el desbalance."),
+         ("Clic 3 · focal loss", "J", "Focal loss tiene dos piezas. Alfa le da al fraude tres veces el peso de lo demás, no 38. La otra pieza baja el peso de los casos fáciles, pero no distingue entre clases."),
+         ("Clic 4 · lectura", "J", f"Por eso con el desbalance real pesos por clase llega a {c(gs[('native', CW)], 2)} y focal loss a {c(gs[('native', 'focal_loss')], 2)}. Y con 1 fraude por cada 100 la distancia se abre: {c(gs[('1:100_subil', CW)], 2)} frente a {c(gs[('1:100_subil', 'focal_loss')], 2)}. Una limitación que declaramos: los dos parámetros de focal loss quedaron fijos."),
+         ])
+
+# ═════════════════════════════════════════════════════════════════════════════
 # Resumen y plan
 # ═════════════════════════════════════════════════════════════════════════════
 rep(23, "<td>Mismo fraude, modelo que rinde parecido</td><td>Se pueden submuestrear negativos</td>",
@@ -661,9 +740,10 @@ rep(24, "<p>H1, H2 y H3 con las seis preguntas</p>",
 # Ensamblar, renumerar láminas, figuras y tablas
 # ═════════════════════════════════════════════════════════════════════════════
 orden_final = [S[i] for i in range(1, 7)] + [COMPUERTA] + [S[i] for i in range(7, 17)]
+orden_final += EXTRA_ESTRES
 if ESTRES:
     orden_final.append("@@ESTRES@@")
-orden_final += [S[17], S[18], ECUACIONES, S[19], S[20], EXPLICADORES]
+orden_final += [S[17], S[18], ECUACIONES, S[19]] + ([PERDIDAS] if PERDIDAS else []) + [S[20], EXPLICADORES]
 if VALIDEZ:
     orden_final.append(VALIDEZ)
 orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]]
@@ -690,11 +770,15 @@ TITULARES = [
     "Con 1 fraude por cada 20, prueba final: se repite la caída al nivel del azar",
     "Hipótesis 1, desbalance: esperábamos explicaciones menos estables con menos fraude; entre 1:10 y 1:40 no cambió",
     "Hipótesis 1, por qué: quitar transacciones lícitas cambia la proporción, no lo que el modelo aprende del fraude",
+    "Hipótesis 1, caso extremo: cómo se llega a 1 fraude por cada 100 y por cada 200",
+    "Caso extremo, 1 fraude por cada 100, validación: sin compensar el desbalance el modelo ya no aprende",
+    "Caso extremo, 1 fraude por cada 200, validación: pesos por clase es la que mejor resiste",
     "Hipótesis 1, caso extremo (1:100 y 1:200): el modelo detecta peor y se fija en otras variables, pero la estabilidad no cambia",
     "Hipótesis 2, tipo de red: esperábamos diferencias de estabilidad; las tres redes que aprenden dan casi la misma",
     "Hipótesis 2, por qué GCN no aprende: mezcla cada transacción con sus vecinas, y la señal del fraude está en la propia transacción",
     "Hipótesis 2, la ecuación: lo que distingue a las redes es si cada transacción tiene un peso propio",
     "Hipótesis 3, forma de compensar el desbalance: no cambia la estabilidad cuando se explican variables",
+    "Hipótesis 3, por qué pesos por clase detecta mejor: es la única que compensa todo el desbalance",
     "Hipótesis 3, la excepción: PGExplainer da cerca de 0 por la forma en que mide, no por el modelo",
     "Comparación de métodos de explicación: los cuatro son estables, pero no señalan las mismas variables",
     "Límite de la medida: una red sin entrenar da la misma estabilidad, así que la cifra no dice si el modelo aprendió",

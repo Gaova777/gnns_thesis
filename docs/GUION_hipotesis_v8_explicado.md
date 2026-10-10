@@ -1,6 +1,6 @@
 # Guion explicado del deck de hipótesis, versión 8
 
-Acompaña el deck «Hipótesis v4», versión 8 (32 láminas), que se genera con
+Acompaña el deck «Hipótesis v4», versión 8 (36 láminas), que se genera con
 `scripts/v4/reunion_0710/deck_hipotesis_v8.py`. Reemplaza, para este deck, la segunda mitad de
 `docs/GUION_presentacion_v4_explicado.md`, que describe la versión de 26 láminas.
 
@@ -69,7 +69,7 @@ de las 165 variables, promediada sobre los pares de ejecuciones y sobre 30 trans
 **Si preguntan.**
 - *¿Por qué importa?* Porque una razón que cambia cada vez que se pide no se puede presentar a
   un auditor.
-- *¿Estable quiere decir correcta?* No. Es el tema de las láminas 25 a 27.
+- *¿Estable quiere decir correcta?* No. Es el tema de las láminas 29 a 31.
 
 ---
 
@@ -208,8 +208,11 @@ clase arriba.
 hipótesis.
 
 **Si preguntan (para las ocho).**
-- *¿Por qué mostrar la prueba final si es mala?* Porque es el resultado honesto. Ocultarla
-  sería reportar solo lo que salió bien.
+- *¿Por qué seguir con una prueba final que no es representativa?* Tres razones. Entrenar con
+  el pasado y probar con el futuro es lo honesto en datos de transacciones. La estabilidad se
+  mide en validación, que es anterior al cierre del mercado ilegal. Y la caída es lo que le
+  habría pasado a un modelo en producción: funcionaba, el mercado cambió y dejó de servir.
+  Queda pendiente repetir el estudio cortando los datos antes del cierre.
 - *¿Qué es la sombra?* El mínimo y el máximo de las 3 semillas. Sombra ancha: los tres
   entrenamientos no coinciden.
 
@@ -226,7 +229,7 @@ encontramos diferencia», sino «la diferencia, si existe, es menor que 0,05» (
 
 **Si preguntan.**
 - *¿No es raro esperar una cosa y obtener otra?* Es el resultado. La lámina siguiente explica
-  por qué, y la 18 lo pone a prueba con un caso extremo.
+  por qué, y la 21 lo pone a prueba con un caso extremo.
 
 ---
 
@@ -244,13 +247,63 @@ Acuerdo entre explicaciones: mismo nivel y otra semilla 0,940; otro nivel y otra
 
 **Si preguntan.**
 - *¿Entonces la hipótesis no podía fallar?* En ese rango y con pesos por clase, no. Por eso se
-  hizo el caso extremo de la lámina 18.
+  hizo el caso extremo de la lámina 21.
 - *¿No dice la teoría que submuestrear solo desplaza el puntaje?* Es la expectativa teórica
   (Elkan 2001), pero en nuestros modelos sin ajuste no se observó. No lo afirmamos.
 
 ---
 
-## Lámina 18. Hipótesis 1, caso extremo: 1 por cada 100 y 1 por cada 200
+## Lámina 18. Hipótesis 1, caso extremo: cómo se construyó
+
+**Qué decir.** En la reunión del 7 de octubre nos pidieron forzar el desbalance hasta 1 por
+cada 100 y 1 por cada 200, para ver si la estabilidad se rompía. En los niveles principales
+el fraude nunca se toca: siempre son 3.462 transacciones ilícitas. Pero el nivel real ya usa
+todos los negativos, así que para ir más allá hay que quitar fraude: dejamos 1.328 y 664.
+
+**Qué hay detrás.**
+
+| Nivel | Fraude para entrenar | No fraude | Cómo se obtiene |
+|---|---|---|---|
+| 1:10 | 3.462 | 34.620 | se quitan negativos |
+| 1:20 | 3.462 | 69.240 | se quitan negativos |
+| Real (1:38) | 3.462 | 132.803 | todos los datos |
+| 1:100 | 1.328 | 132.803 | se quita fraude |
+| 1:200 | 664 | 132.803 | se quita fraude |
+
+El fraude que se conserva se escoge al azar con una semilla fija, igual para todos los
+modelos. Validación y prueba final no cambian. Se entrenaron 72 modelos: 2 niveles, 4 redes,
+3 formas de compensar y 3 semillas.
+
+**Si preguntan.**
+- *¿Por qué no crear negativos sintéticos, como se sugirió primero?* El grafo pasaría de 203
+  mil a 417 mil y 763 mil transacciones, más de la mitad inventadas, y no cabe en los 8 GB de
+  la tarjeta gráfica. Se corrió primero la vía que no necesita datos sintéticos.
+- *¿Qué se confunde?* Cambian a la vez la proporción y la cantidad de fraude (queda el 38 % y
+  el 19 %). Por eso estos dos niveles van aparte y no entran en las pruebas de los cuatro
+  principales.
+
+---
+
+## Láminas 19 y 20. Caso extremo: las curvas de rendimiento
+
+**Qué decir.** Estas son las curvas con 1 fraude por cada 100 y por cada 200. Miren la curva
+azul, sin ajuste: en GraphSAGE y en TAGCN queda pegada al azar; el modelo ya no aprende. Con
+pesos por clase, la naranja, GraphSAGE todavía llega a 0,37 y 0,36. Con tan poco fraude,
+compensar el desbalance deja de ser opcional.
+
+**Qué hay detrás.** PR-AUC de validación de GraphSAGE (azar 0,024):
+
+| Forma de compensar | Nivel real | 1:100 | 1:200 |
+|---|---|---|---|
+| Pesos por clase | 0,46 | 0,37 | 0,36 |
+| Focal loss | 0,30 | 0,11 | 0,02 |
+| Sin ajuste | 0,18 | 0,02 | 0,03 |
+
+GAT resiste mejor que las demás sin pesos por clase (0,24 y 0,20 con focal loss).
+
+---
+
+## Lámina 21. Hipótesis 1, caso extremo: 1 por cada 100 y 1 por cada 200
 
 **Qué decir.** Nos pidieron forzar el desbalance. Como ya usábamos todos los negativos, la
 única forma era quitar fraude: nos quedamos con 1.328 y con 664 casos de 3.462. El modelo
@@ -271,7 +324,7 @@ detecta peor y se fija en otras variables. Pero la estabilidad entre repeticione
 
 ---
 
-## Lámina 19. Hipótesis 2, tipo de red: qué esperábamos y qué resultó
+## Lámina 22. Hipótesis 2, tipo de red: qué esperábamos y qué resultó
 
 **Qué decir.** Esperábamos que el tipo de red cambiara la estabilidad, porque cada una combina
 de forma distinta la transacción con sus vecinas. Entre las tres que aprenden, la estabilidad
@@ -280,12 +333,12 @@ es casi la misma. GCN no aprende, así que no se explica.
 **Qué hay detrás.** GraphSAGE 0,94, GAT 0,93 y TAGCN 0,92, equivalentes con margen de 0,05.
 
 **Si preguntan.**
-- *¿Es definitivo?* No del todo. Con una medida más exigente (lámina 25) GraphSAGE queda por
+- *¿Es definitivo?* No del todo. Con una medida más exigente (lámina 29) GraphSAGE queda por
   encima: 0,84 frente a 0,73 y 0,68. Falta la prueba estadística.
 
 ---
 
-## Lámina 20. Hipótesis 2: por qué GCN no aprende
+## Lámina 23. Hipótesis 2: por qué GCN no aprende
 
 **Qué decir.** En estos datos la señal del fraude está en la propia transacción, no en sus
 vecinas: solo el 12 % de las vecinas de un fraude es fraude. GCN mezcla la transacción con sus
@@ -298,7 +351,7 @@ y si a GCN le damos un peso propio para la transacción, sube de 0,21 a 0,46.
 
 ---
 
-## Lámina 21. Hipótesis 2: la ecuación de cada red
+## Lámina 24. Hipótesis 2: la ecuación de cada red
 
 **Qué decir.** La diferencia está en una sola pieza: si la transacción tiene un peso propio o
 se promedia con sus vecinas. GCN no lo tiene. Las otras tres sí, cada una a su manera.
@@ -314,7 +367,7 @@ se promedia con sus vecinas. GCN no lo tiene. Las otras tres sí, cada una a su 
 
 ---
 
-## Lámina 22. Hipótesis 3, forma de compensar el desbalance
+## Lámina 25. Hipótesis 3, forma de compensar el desbalance
 
 **Qué decir.** Esperábamos que no cambiara la estabilidad, y así fue en los explicadores que
 ordenan variables. El único que cambia es PGExplainer, que ordena conexiones y no variables.
@@ -330,7 +383,30 @@ Shapley: 0,99 en las tres.
 
 ---
 
-## Lámina 23. Hipótesis 3: la excepción de PGExplainer
+## Lámina 26. Hipótesis 3: por qué pesos por clase detecta mejor
+
+**Qué decir.** Nos dijeron que no era lo esperado que pesos por clase le ganara a focal loss,
+y que había que mirar la matemática. Sin ajuste, todas las transacciones pesan igual, y como
+el fraude es el 2,5 %, casi toda la señal viene de lo que no es fraude. Pesos por clase le da
+a cada clase la mitad del peso: un fraude pesa 38 veces lo que una transacción normal, justo
+el desbalance. Focal loss, como la configuramos, le da 3 veces, no 38.
+
+**Qué hay detrás.**
+- Sin ajuste: L = media de la pérdida de todas las transacciones.
+- Pesos por clase: L = ½ · media(fraude) + ½ · media(no fraude).
+- Focal loss: L = media de α · (1 − p)^γ · pérdida, con α = 0,75 y γ = 2. El factor
+  (1 − p)^γ baja el peso de los casos que el modelo ya resuelve bien, pero no distingue
+  clases (Lin et al. 2017).
+- Con 1 fraude por cada 10 la diferencia es 10 a 1 contra 3 a 1, y por eso las curvas de la
+  lámina 10 se acercan. Con 1 por cada 100 se abre: 0,37 frente a 0,11.
+
+**Si preguntan.**
+- *¿Focal loss quedó mal configurada?* Quedó con valores fijos, sin búsqueda. Es una
+  limitación que se declara: con otros valores podría acercarse.
+
+---
+
+## Lámina 27. Hipótesis 3: la excepción de PGExplainer
 
 **Qué decir.** PGExplainer da cerca de cero, pero no por el modelo sino por cómo mide. Ordena
 conexiones, y el 83 % de nuestras transacciones tiene una o dos. Con dos elementos, el orden
@@ -339,7 +415,7 @@ solo puede coincidir del todo o invertirse. El mismo modelo, explicado dos veces
 
 ---
 
-## Lámina 24. Comparación de métodos de explicación
+## Lámina 28. Comparación de métodos de explicación
 
 **Qué decir.** Como PGExplainer no sirve aquí, agregamos otro explicador, de una familia
 distinta: gradientes. Los cuatro son estables consigo mismos. Pero no señalan las mismas
@@ -355,7 +431,7 @@ entre explicadores va de 0,42 a 0,84.
 
 ---
 
-## Lámina 25. Límite de la medida: la red sin entrenar
+## Lámina 29. Límite de la medida: la red sin entrenar
 
 **Qué decir.** Nos preguntaron por qué todo salía estable. Hicimos una prueba: explicar la
 misma red con los pesos entrenados y con pesos al azar, sin entrenar. Si la estabilidad
@@ -378,7 +454,7 @@ las variables de una transacción vale cero, y los explicadores siempre las deja
 
 ---
 
-## Lámina 26. ¿La explicación más estable es la más correcta?
+## Lámina 30. ¿La explicación más estable es la más correcta?
 
 **Qué decir.** Esperábamos que sí. Para comprobarlo usamos un grafo sintético donde sí
 conocemos la respuesta. El explicador más estable acierta al nivel del azar, y el que más
@@ -389,7 +465,7 @@ plausibilidad es la fracción de las variables o conexiones señaladas que perte
 
 ---
 
-## Lámina 27. Estable no significa correcto
+## Lámina 31. Estable no significa correcto
 
 **Qué decir.** Shapley promedia cientos de combinaciones: su ruido es bajo por construcción,
 encuentre o no el patrón. Y GCN, que casi no aprende, tiene explicaciones tan estables como
@@ -398,7 +474,7 @@ rendimiento, la plausibilidad y la fidelidad.
 
 ---
 
-## Lámina 28. El mejor modelo, con búsqueda completa de parámetros
+## Lámina 32. El mejor modelo, con búsqueda completa de parámetros
 
 **Qué decir.** La matriz de experimentos sirvió para escoger un candidato: GraphSAGE con pesos
 por clase. A ese le hicimos una búsqueda de parámetros 19 veces más larga. Sube de 0,46 a 0,50
@@ -410,7 +486,7 @@ estables.
 
 ---
 
-## Lámina 29. Resumen
+## Lámina 33. Resumen
 
 **Qué decir.** Tres de las cuatro preguntas no salieron como esperábamos, y para cada una
 tenemos una causa medida. El desbalance no cambia la estabilidad ni en el caso extremo. El
@@ -419,7 +495,7 @@ Y la más importante: estable no es correcto.
 
 ---
 
-## Lámina 30. Plan
+## Lámina 34. Plan
 
 **Qué decir.** Así quedan ordenados la presentación y el documento. Ya están hechos el
 candidato afinado, el explicador de gradientes y los casos 1 por cada 100 y 1 por cada 200.
@@ -427,7 +503,7 @@ Queda pendiente repetir el estudio cortando los datos antes del cierre del merca
 
 ---
 
-## Láminas 31 y 32. Anexo: 1 fraude por cada lícita
+## Láminas 35 y 36. Anexo: 1 fraude por cada lícita
 
 **Qué decir.** Solo si preguntan. Con igual cantidad de fraude y de no fraude, ningún modelo
 pasa el filtro de calidad, y en la prueba final se repite la caída.
@@ -452,5 +528,6 @@ pasa el filtro de calidad, y en la prueba final se repite la caída.
 - Elkan, C. (2001). The foundations of cost-sensitive learning. IJCAI.
 - Krishna, S. et al. (2022). The disagreement problem in explainable machine learning: a practitioner's perspective. arXiv:2202.01602.
 - Lakens, D. (2017). Equivalence tests: a practical primer. Social Psychological and Personality Science, 8(4), 355-362.
+- Lin, T.-Y. et al. (2017). Focal loss for dense object detection. ICCV.
 - Saito, T. y Rehmsmeier, M. (2015). The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets. PLoS ONE.
 - Weber, M. et al. (2019). Anti-money laundering in Bitcoin: experimenting with graph convolutional networks for financial forensics. arXiv:1908.02591.
