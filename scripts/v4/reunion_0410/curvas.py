@@ -48,7 +48,8 @@ FIGS = OUT / "figuras"
 MODELS = REPO / "results_models_v4"
 CONFIG = REPO / "configs" / "experiment_v4.yaml"
 
-SCENARIOS = ["native", "1:10", "1:10_os", "1:20", "1:1"]
+# 1:100_subil y 1:200_subil: escenarios de estrés (reunión del 7-oct, THE-39).
+SCENARIOS = ["native", "1:10", "1:10_os", "1:20", "1:1", "1:100_subil", "1:200_subil"]
 MAIN_SCENARIOS = ["native", "1:10", "1:10_os", "1:20"]  # 1:20 reemplaza al 1:1 (7-oct)
 ARCHS = ["GCN", "GraphSAGE", "GAT", "TAGCN"]
 LOSSES = ["none", "class_weighting", "focal_loss"]
@@ -57,9 +58,11 @@ SPLITS = ["val", "test"]
 
 SCEN_LABEL = {"native": "nativo (1:38,4)", "1:10": "1:10 (submuestreo)",
               "1:10_os": "1:10 con SMOTE", "1:20": "1:20 (submuestreo)",
-              "1:1": "1:1 (submuestreo)"}
+              "1:1": "1:1 (submuestreo)",
+              "1:100_subil": "1:100 (se quitan ilícitas)",
+              "1:200_subil": "1:200 (se quitan ilícitas)"}
 SPLIT_LABEL = {"val": "validación", "test": "test"}
-LOSS_LABEL = {"none": "sin balanceo", "class_weighting": "pesos por clase",
+LOSS_LABEL = {"none": "sin ajuste de la pérdida", "class_weighting": "pesos por clase",
               "focal_loss": "focal loss"}
 # Paleta categorica de referencia (skill dataviz, slots 1-4) + estilo de linea como
 # codificacion secundaria.
@@ -474,9 +477,11 @@ def stage_figures():
 
     # a) por escenario: 2 filas (ROC, PR) x 4 columnas (arquitecturas), color = perdida
     for scen in SCENARIOS:
+        if not any(k[0] == scen for k in C):
+            continue
         for split in SPLITS:
             logy = split == "test"
-            fig, axes = plt.subplots(2, 4, figsize=(18, 9.2))
+            fig, axes = plt.subplots(2, 4, figsize=(18, 9.6 if DECK else 9.2))
             for j, arch in enumerate(ARCHS):
                 for i, kind in enumerate(("roc", "pr")):
                     ax = axes[i, j]
@@ -503,15 +508,24 @@ def stage_figures():
                         ax.text(0.97, yy, f"{lab} {t}", transform=ax.transAxes, ha="right",
                                 va=va, fontsize=13 if DECK else 9.5, color="#0b0b0b",
                                 bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=col, lw=1.5))
-            fig.legend(handles=_legend_handles(
-                plt, [(LOSS_LABEL[l], LOSS_COLOR[l], LOSS_LS[l]) for l in LOSSES]),
-                loc="lower center", ncol=6, frameon=False, bbox_to_anchor=(0.5, -0.035))
+            # En las láminas la leyenda va arriba y grande: es lo primero que hay que leer
+            # (Cristian, 7-oct: "en la slide no está la información más importante").
+            handles = _legend_handles(
+                plt, [(LOSS_LABEL[l], LOSS_COLOR[l], LOSS_LS[l]) for l in LOSSES])
+            if DECK:
+                fig.legend(handles=handles[:3], loc="upper center", ncol=3, frameon=False,
+                           bbox_to_anchor=(0.5, 1.0), fontsize=21, handlelength=3)
+                fig.legend(handles=handles[3:], loc="lower center", ncol=3, frameon=False,
+                           bbox_to_anchor=(0.5, -0.03))
+            else:
+                fig.legend(handles=handles, loc="lower center", ncol=6, frameon=False,
+                           bbox_to_anchor=(0.5, -0.035))
             extra = " (anexo)" if scen == "1:1" else ""
             if not DECK:
                 fig.suptitle(f"Curvas ROC y PR en {SPLIT_LABEL[split]} · escenario "
                              f"{SCEN_LABEL[scen]}{extra} · media de 3 semillas · prevalencia "
                              f"{prev[split] * 100:.2f} %".replace(".", ","), fontsize=13.5)
-            fig.tight_layout(rect=(0, 0.03 if DECK else 0.02, 1, 1 if DECK else 0.97))
+            fig.tight_layout(rect=(0, 0.03 if DECK else 0.02, 1, 0.94 if DECK else 0.97))
             pref = "anexo_" if scen == "1:1" else ""
             _save(fig, f"{pref}curvas_{scen.replace(':', '-')}_{split}")
             plt.close(fig)
@@ -544,6 +558,32 @@ def stage_figures():
                      "calibrado de cada semilla", fontsize=13)
     fig.tight_layout(rect=(0, 0, 1, 1 if DECK else 0.95))
     _save(fig, "resumen_native_mejor_por_arquitectura")
+    plt.close(fig)
+
+    # c) resumen con la misma pérdida en las cuatro arquitecturas (pesos por clase), como
+    # pidió Cristian el 7-oct: así la comparación entre arquitecturas no mezcla pérdidas.
+    cw = "class_weighting"
+    fig, axes = plt.subplots(2, 2, figsize=(12.5, 11))
+    for j, split in enumerate(SPLITS):
+        for i, kind in enumerate(("roc", "pr")):
+            ax = axes[i, j]
+            logy = kind == "pr" and split == "test"
+            for arch in ARCHS:
+                c = C[("native", arch, cw, split)]
+                t = auc_txt("native", arch, cw, split, kind)
+                _draw(ax, kind, c[kind], c["pts"], ARCH_COLOR[arch], ARCH_LS[arch],
+                      f"{arch} ({'ROC' if kind == 'roc' else 'PR'}-AUC {t})", logy=logy)
+            _axes_setup(ax, kind, split, prev[split], logy)
+            ax.set_title(f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]} "
+                         f"(prevalencia {prev[split] * 100:.2f} %)".replace(".", ","))
+            ax.legend(loc="lower right" if kind == "roc" else "upper right",
+                      fontsize=13 if DECK else 9.5, frameon=True, framealpha=0.9)
+    if not DECK:
+        fig.suptitle("Escenario nativo, pesos por clase en las cuatro arquitecturas\n"
+                     "media de 3 semillas, banda mín.-máx., puntos = umbral calibrado de "
+                     "cada semilla", fontsize=13)
+    fig.tight_layout(rect=(0, 0, 1, 1 if DECK else 0.95))
+    _save(fig, "resumen_native_pesos_por_clase")
     plt.close(fig)
     print(f"Figuras en {FIGS}")
 
