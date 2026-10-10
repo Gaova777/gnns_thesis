@@ -668,6 +668,44 @@ if VALIDEZ:
     orden_final.append(VALIDEZ)
 orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]]
 ESTRES_SLOT = orden_final.index("@@ESTRES@@") if ESTRES else None
+
+# Titulares para un público que no conoce la tesis (pedido del 10-oct): primero el tema de la
+# lámina en palabras llanas, después el resultado. Sin jerga: «filtro de calidad» en vez de
+# «compuerta», «prueba final» en vez de «test», «1 fraude por cada 10» en vez de «1:10».
+TITULARES = [
+    "Las hipótesis de la tesis, una por una: qué esperábamos, qué resultó y por qué",
+    "Qué medimos: una explicación es estable si, al repetirla sobre la misma transacción, señala las mismas variables",
+    "Cómo se evalúa cada hipótesis: seis preguntas, respondidas solo con los modelos que sí aprendieron",
+    "Cómo leer las gráficas de rendimiento: cuánto fraude detecta el modelo y cuántas falsas alarmas cuesta",
+    "Rendimiento de las cuatro redes: tres detectan fraude en validación y GCN no; en la prueba final ninguna supera al azar",
+    "Las cuatro métricas de rendimiento dicen lo mismo: tres redes aprenden, GCN no, y todas fallan en la prueba final",
+    "Por qué el filtro de calidad de los modelos usa validación: escoger con la prueba final premiaría la suerte",
+    "Desbalance real (1 fraude por cada 40), validación: entrenar sin compensar el desbalance da el peor rendimiento",
+    "Desbalance real (1 fraude por cada 40), prueba final: ningún modelo detecta fraude mejor que el azar",
+    "Con 1 fraude por cada 10, validación: compensar el desbalance ya casi no hace diferencia",
+    "Con 1 fraude por cada 10, prueba final: el rendimiento vuelve a caer al nivel del azar",
+    "Con fraude sintético añadido (SMOTE), validación: el rendimiento es casi el mismo que con 1 fraude por cada 10",
+    "Con fraude sintético añadido (SMOTE), prueba final: tampoco se evita la caída al nivel del azar",
+    "Con 1 fraude por cada 20, validación: se repite el resultado del desbalance real",
+    "Con 1 fraude por cada 20, prueba final: se repite la caída al nivel del azar",
+    "Hipótesis 1, desbalance: esperábamos explicaciones menos estables con menos fraude; entre 1:10 y 1:40 no cambió",
+    "Hipótesis 1, por qué: quitar transacciones lícitas cambia la proporción, no lo que el modelo aprende del fraude",
+    "Hipótesis 1, caso extremo (1:100 y 1:200): el modelo detecta peor y se fija en otras variables, pero la estabilidad no cambia",
+    "Hipótesis 2, tipo de red: esperábamos diferencias de estabilidad; las tres redes que aprenden dan casi la misma",
+    "Hipótesis 2, por qué GCN no aprende: mezcla cada transacción con sus vecinas, y la señal del fraude está en la propia transacción",
+    "Hipótesis 2, la ecuación: lo que distingue a las redes es si cada transacción tiene un peso propio",
+    "Hipótesis 3, forma de compensar el desbalance: no cambia la estabilidad cuando se explican variables",
+    "Hipótesis 3, la excepción: PGExplainer da cerca de 0 por la forma en que mide, no por el modelo",
+    "Comparación de métodos de explicación: los cuatro son estables, pero no señalan las mismas variables",
+    "Límite de la medida: una red sin entrenar da la misma estabilidad, así que la cifra no dice si el modelo aprendió",
+    "¿La explicación más estable es la más correcta? Esperábamos que sí, y no lo es",
+    "Estable no significa correcto: una explicación puede repetirse siempre igual y no decir nada útil",
+    "El mejor modelo, con búsqueda completa de parámetros: sube de 0,46 a 0,50 y sus explicaciones siguen igual de estables",
+    "Resumen: tres de las cuatro preguntas no salieron como esperábamos, y cada resultado tiene una causa medida",
+    "Plan: cómo quedan ordenados la presentación y el documento con los cambios acordados",
+    "Anexo, 1 fraude por cada lícita (1:1), validación: ningún modelo pasa el filtro de calidad",
+    "Anexo, 1 fraude por cada lícita (1:1), prueba final: se repite la caída al nivel del azar",
+]
 if __name__ == "__main__":
     if ESTRES:
         orden_final[ESTRES_SLOT] = ESTRES
@@ -675,6 +713,10 @@ if __name__ == "__main__":
     out = []
     for k, s in enumerate(orden_final, 1):
         s = re.sub(r'aria-label="Lámina \d+"', f'aria-label="Lámina {k}"', s, count=1)
+        if len(orden_final) == len(TITULARES):
+            s, nt = re.subn(r'(<h1[^>]*>|<h2 class="titular">).*?(</h[12]>)',
+                            lambda mm: mm.group(1) + TITULARES[k - 1] + mm.group(2), s, count=1, flags=re.S)
+            assert nt == 1, k
         s = re.sub(r'<div class="num">\d+</div>', f'<div class="num">{k}</div>', s, count=1)
 
         def renum(mm):
@@ -693,6 +735,7 @@ if __name__ == "__main__":
             return mm.group(0)
         s = re.sub(r'(<p class="pie[^"]*"[^>]*>)(.*?)(?=</p>)', renum, s, flags=re.S)
         out.append(s)
+    PRE = PRE.replace("</style>", ".lamina .titular { font-size: 50px; }\n</style>", 1)
     html = PRE + "\n\n  ".join(out) + POST.replace("textContent = '—'", "textContent = ''")
     assert "—" not in "".join(orden_final[1:]) and "–" not in "".join(orden_final[1:])
     (OUT / "hipotesis.html").write_text(html, encoding="utf8")
