@@ -1,0 +1,107 @@
+216 modelos, 72 configuraciones, escenarios: ['1:10', '1:10_os', '1:20', 'native', '1:100_subil', '1:200_subil']
+
+== Compuerta: configuraciones que pasan por escenario ==
+             gate_05  gate_cal
+scenario                      
+1:10               7         9
+1:10_os            8         9
+1:20               8         9
+native             5         6
+1:100_subil        2         4
+1:200_subil        2         3
+
+== Rendimiento, pesos por clase (val PR-AUC media ± sd) ==
+scenario    1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+arch                                                          
+GCN        0,162   0,162  0,166  0,097       0,145       0,146
+GraphSAGE  0,455   0,438  0,457  0,462       0,374       0,361
+GAT        0,323   0,345  0,320  0,320       0,337       0,320
+TAGCN      0,294   0,292  0,295  0,299       0,275       0,283
+
+== Estabilidad entre réplicas por escenario · pesos_por_clase_3arq ==
+scenario              1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+explainer                                                               
+GNNExplainer         0,946   0,947  0,946  0,947       0,940       0,938
+PGExplainer          0,186   0,201  0,227  0,238       0,256       0,401
+ShapleyFeatures      0,993   0,992  0,992  0,992       0,991       0,992
+IntegratedGradients  1,000   1,000  1,000  1,000       1,000       1,000
+ExpectedGradients    0,926   0,922  0,925  0,923       0,927       0,922
+n: 3 3 3 3 3 3
+-- entre semillas · pesos_por_clase_3arq --
+scenario              1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+explainer                                                               
+GNNExplainer         0,941   0,944  0,941  0,940       0,936       0,934
+PGExplainer          0,290   0,225  0,374  0,294       0,133       0,358
+ShapleyFeatures      0,945   0,946  0,945  0,945       0,942       0,941
+IntegratedGradients  0,970   0,972  0,970  0,970       0,969       0,968
+ExpectedGradients    0,771   0,770  0,771  0,771       0,749       0,737
+
+== Estabilidad entre réplicas por escenario · compuerta_calibrada ==
+scenario              1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+explainer                                                               
+GNNExplainer         0,930   0,930  0,930  0,933       0,935       0,938
+PGExplainer          0,336   0,355  0,367  0,302       0,374       0,401
+ShapleyFeatures      0,995   0,994  0,994  0,994       0,991       0,992
+IntegratedGradients  1,000   1,000  1,000  1,000       1,000       1,000
+ExpectedGradients    0,931   0,930  0,935  0,929       0,926       0,922
+n: 9 9 9 6 4 3
+-- entre semillas · compuerta_calibrada --
+scenario              1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+explainer                                                               
+GNNExplainer         0,936   0,942  0,938  0,932       0,931       0,934
+PGExplainer          0,428   0,427  0,438  0,364       0,143       0,358
+ShapleyFeatures      0,946   0,947  0,945  0,940       0,944       0,941
+IntegratedGradients  0,971   0,972  0,970  0,968       0,970       0,968
+ExpectedGradients    0,779   0,796  0,788  0,762       0,763       0,737
+
+== Estabilidad entre réplicas por escenario · compuerta_0.5 ==
+scenario              1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+explainer                                                               
+GNNExplainer         0,928   0,928  0,929  0,931       0,938       0,936
+PGExplainer          0,239   0,333  0,343  0,234       0,130       0,253
+ShapleyFeatures      0,995   0,993  0,994  0,994       0,989       0,990
+IntegratedGradients  1,000   1,000  1,000  1,000       1,000       1,000
+ExpectedGradients    0,930   0,931  0,936  0,928       0,924       0,920
+n: 7 8 8 5 2 2
+-- entre semillas · compuerta_0.5 --
+scenario              1:10 1:10_os   1:20 native 1:100_subil 1:200_subil
+explainer                                                               
+GNNExplainer         0,940   0,942  0,939  0,932       0,931       0,933
+PGExplainer          0,397   0,481  0,461  0,410       0,195       0,381
+ShapleyFeatures      0,947   0,946  0,944  0,939       0,937       0,936
+IntegratedGradients  0,972   0,972  0,970  0,967       0,968       0,966
+ExpectedGradients    0,788   0,800  0,792  0,764       0,736       0,725
+
+== Acuerdo con el nativo (misma semilla), pesos por clase, 3 arquitecturas ==
+scenario              1:10 1:10_os   1:20 1:100_subil 1:200_subil
+explainer                                                        
+GNNExplainer         0,990   0,977  0,992       0,958       0,959
+ShapleyFeatures      0,990   0,978  0,993       0,962       0,959
+IntegratedGradients  0,994   0,988  0,996       0,979       0,977
+ExpectedGradients    0,969   0,921  0,980       0,840       0,820
+-- referencia: nativo contra nativo con otra semilla --
+explainer
+GNNExplainer           0,940
+ShapleyFeatures        0,945
+IntegratedGradients    0,970
+ExpectedGradients      0,771
+
+== Acuerdo entre explicadores (mismo modelo), escenarios principales, 3 arquitecturas ==
+                                          mean    std  count
+expl_a              expl_b                                  
+GNNExplainer        ExpectedGradients    0.501  0.038    108
+                    IntegratedGradients  0.842  0.026    108
+                    ShapleyFeatures      0.578  0.054    108
+IntegratedGradients ExpectedGradients    0.523  0.042    108
+ShapleyFeatures     ExpectedGradients    0.416  0.032    108
+                    IntegratedGradients  0.468  0.011    108
+
+== Acuerdo entre arquitecturas (mismo escenario, pérdida y semilla), pesos por clase, escenarios principales ==
+explainer           GNNExplainer ShapleyFeatures IntegratedGradients ExpectedGradients
+arch_a    arch_b                                                                      
+GAT       TAGCN            0,866           0,896               0,962             0,712
+GCN       GAT              0,897           0,911               0,960             0,708
+          GraphSAGE        0,910           0,913               0,963             0,706
+          TAGCN            0,835           0,902               0,960             0,705
+GraphSAGE GAT              0,930           0,943               0,968             0,731
+          TAGCN            0,869           0,902               0,967             0,741

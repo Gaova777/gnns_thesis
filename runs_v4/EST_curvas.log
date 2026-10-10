@@ -1,0 +1,89 @@
+GPU libre: 6.48 GiB
+Dispositivo: cuda
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Modo de etiqueta: licit_unknown
+val: 37820 nodos (914 ilicitos) | test: 29684 nodos (169 ilicitos)
+  1-100_subil_GCN_none                       cuda   0.2s
+  1-100_subil_GCN_none_s43                   cuda   0.0s
+  1-100_subil_GCN_none_s44                   cuda   0.0s
+  1-100_subil_GCN_class_weighting            cuda   0.0s
+  1-100_subil_GCN_class_weighting_s43        cuda   0.0s
+  1-100_subil_GCN_class_weighting_s44        cuda   0.0s
+  1-100_subil_GCN_focal_loss                 cuda   0.0s
+  1-100_subil_GCN_focal_loss_s43             cuda   0.0s
+  1-100_subil_GCN_focal_loss_s44             cuda   0.0s
+  1-100_subil_GraphSAGE_none                 cuda   0.0s
+  1-100_subil_GraphSAGE_none_s43             cuda   0.1s
+  1-100_subil_GraphSAGE_none_s44             cuda   0.1s
+  1-100_subil_GraphSAGE_class_weighting      cuda   0.0s
+  1-100_subil_GraphSAGE_class_weighting_s43  cuda   0.0s
+  1-100_subil_GraphSAGE_class_weighting_s44  cuda   0.0s
+  1-100_subil_GraphSAGE_focal_loss           cuda   0.1s
+  1-100_subil_GraphSAGE_focal_loss_s43       cuda   0.1s
+  1-100_subil_GraphSAGE_focal_loss_s44       cuda   0.1s
+  1-100_subil_GAT_none                       cuda   0.1s
+  1-100_subil_GAT_none_s43                   cuda   0.1s
+  1-100_subil_GAT_none_s44                   cuda   0.1s
+  1-100_subil_GAT_class_weighting            cuda   0.1s
+  1-100_subil_GAT_class_weighting_s43        cuda   0.1s
+  1-100_subil_GAT_class_weighting_s44        cuda   0.1s
+  1-100_subil_GAT_focal_loss                 cuda   0.1s
+  1-100_subil_GAT_focal_loss_s43             cuda   0.1s
+  1-100_subil_GAT_focal_loss_s44             cuda   0.1s
+  1-100_subil_TAGCN_none                     cuda   0.1s
+  1-100_subil_TAGCN_none_s43                 cuda   0.1s
+  1-100_subil_TAGCN_none_s44                 cuda   0.1s
+  1-100_subil_TAGCN_class_weighting          cuda   0.1s
+  1-100_subil_TAGCN_class_weighting_s43      cuda   0.1s
+  1-100_subil_TAGCN_class_weighting_s44      cuda   0.1s
+  1-100_subil_TAGCN_focal_loss               cuda   0.1s
+  1-100_subil_TAGCN_focal_loss_s43           cuda   0.1s
+  1-100_subil_TAGCN_focal_loss_s44           cuda   0.1s
+  1-200_subil_GCN_none                       cuda   0.0s
+  1-200_subil_GCN_none_s43                   cuda   0.0s
+  1-200_subil_GCN_none_s44                   cuda   0.0s
+  1-200_subil_GCN_class_weighting            cuda   0.0s
+  1-200_subil_GCN_class_weighting_s43        cuda   0.0s
+  1-200_subil_GCN_class_weighting_s44        cuda   0.0s
+  1-200_subil_GCN_focal_loss                 cuda   0.0s
+  1-200_subil_GCN_focal_loss_s43             cuda   0.0s
+  1-200_subil_GCN_focal_loss_s44             cuda   0.0s
+  1-200_subil_GraphSAGE_none                 cuda   0.0s
+  1-200_subil_GraphSAGE_none_s43             cuda   0.0s
+  1-200_subil_GraphSAGE_none_s44             cuda   0.0s
+  1-200_subil_GraphSAGE_class_weighting      cuda   0.0s
+  1-200_subil_GraphSAGE_class_weighting_s43  cuda   0.0s
+  1-200_subil_GraphSAGE_class_weighting_s44  cuda   0.0s
+  1-200_subil_GraphSAGE_focal_loss           cuda   0.1s
+  1-200_subil_GraphSAGE_focal_loss_s43       cuda   0.1s
+  1-200_subil_GraphSAGE_focal_loss_s44       cuda   0.0s
+  1-200_subil_GAT_none                       cuda   0.1s
+  1-200_subil_GAT_none_s43                   cuda   0.1s
+  1-200_subil_GAT_none_s44                   cuda   0.1s
+  1-200_subil_GAT_class_weighting            cuda   0.1s
+  1-200_subil_GAT_class_weighting_s43        cuda   0.1s
+  1-200_subil_GAT_class_weighting_s44        cuda   0.1s
+  1-200_subil_GAT_focal_loss                 cuda   0.1s
+  1-200_subil_GAT_focal_loss_s43             cuda   0.1s
+  1-200_subil_GAT_focal_loss_s44             cuda   0.1s
+  1-200_subil_TAGCN_none                     cuda   0.1s
+  1-200_subil_TAGCN_none_s43                 cuda   0.1s
+  1-200_subil_TAGCN_none_s44                 cuda   0.1s
+  1-200_subil_TAGCN_class_weighting          cuda   0.1s
+  1-200_subil_TAGCN_class_weighting_s43      cuda   0.1s
+  1-200_subil_TAGCN_class_weighting_s44      cuda   0.1s
+  1-200_subil_TAGCN_focal_loss               cuda   0.1s
+  1-200_subil_TAGCN_focal_loss_s43           cuda   0.1s
+  1-200_subil_TAGCN_focal_loss_s44           cuda   0.1s
+Modelos faltantes: 0
+252 modelos | max |PR-AUC - meta| = 8.01e-08 | max |F1 - meta| = 0.00e+00
+Figuras en /home/juan/Escritorio/gnn_thesis/gnns_thesis/results_v4/reunion_0410/curvas/figuras
+Figuras en /home/juan/Escritorio/gnn_thesis/gnns_thesis/results_v4/reunion_0410/curvas/figuras

@@ -1,0 +1,51 @@
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:245: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+Device: cuda | torch threads: 2
+Label mode: licit_unknown
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+Common node set: 30 illicit val nodes (seed 1234, pool 914) -> results_v4/explain_nodes_v4.json
+3 checkpoints | 9 units to explain (0 already complete) | 0 checkpoints gated out
+  1:200_subil_GraphSAGE_class_weighting_s43__GNNExplainer: primary=0.953 full=0.953 edges=0.144 jac=0.571 (n=30, tp=19) 26.6s
+  PGExplainer training complete (loss=0.4148)
+  PGExplainer training complete (loss=1.3917)
+  PGExplainer training complete (loss=1.4914)
+  PGExplainer training complete (loss=0.9214)
+  PGExplainer training complete (loss=1.5440)
+  1:200_subil_GraphSAGE_class_weighting_s43__PGExplainer: primary=0.017 full=nan edges=0.017 jac=0.454 (n=16, tp=19) 70.6s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:245: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:200_subil_GraphSAGE_class_weighting_s43__ShapleyFeatures: primary=0.995 full=0.995 edges=nan jac=nan (n=27, tp=19) 22.7s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:245: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:200_subil_GraphSAGE_focal_loss_s43__GNNExplainer: primary=0.905 full=0.905 edges=0.181 jac=0.587 (n=30, tp=0) 31.2s
+  PGExplainer training complete (loss=0.3047)
+  PGExplainer training complete (loss=0.5932)
+  PGExplainer training complete (loss=0.2850)
+  PGExplainer training complete (loss=0.2898)
+  PGExplainer training complete (loss=0.2599)
+  1:200_subil_GraphSAGE_focal_loss_s43__PGExplainer: primary=-0.019 full=nan edges=-0.019 jac=0.738 (n=5, tp=0) 85.2s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:245: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:200_subil_GraphSAGE_focal_loss_s43__ShapleyFeatures: primary=0.995 full=0.995 edges=nan jac=nan (n=27, tp=0) 23.8s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:245: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:200_subil_GraphSAGE_none_s43__GNNExplainer: primary=0.892 full=0.892 edges=0.094 jac=0.546 (n=30, tp=0) 28.2s
+  PGExplainer training complete (loss=0.2048)
+  PGExplainer training complete (loss=0.1672)
+  PGExplainer training complete (loss=0.0668)
+  PGExplainer training complete (loss=0.0766)
+  PGExplainer training complete (loss=0.0580)
+  1:200_subil_GraphSAGE_none_s43__PGExplainer: primary=1.000 full=nan edges=1.000 jac=0.812 (n=9, tp=0) 71.7s
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/explain_matrix.py:245: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  new = pd.concat([old, new], ignore_index=True) if len(old) else new
+  1:200_subil_GraphSAGE_none_s43__ShapleyFeatures: primary=0.997 full=0.997 edges=nan jac=nan (n=27, tp=0) 23.1s
+
+Done: 9 ok, 0 failed, 6.5 min. CSV: results_v4/elliptic_v4_stability.csv

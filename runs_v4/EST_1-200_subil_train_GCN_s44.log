@@ -1,0 +1,91 @@
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 6ce9fd4dc4e8)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.1s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 3 configs (1 seed(s): 44)
+Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:02<?]                                            Train matrix:   0%|          | 0/3 [00:03<?]                                            Train matrix:   0%|          | 0/3 [00:03<?]                                            Train matrix:   0%|          | 0/3 [00:03<?]Train matrix:  33%|███▎      | 1/3 [00:03<00:06]Train matrix:  33%|███▎      | 1/3 [00:03<00:06]                                                Train matrix:  33%|███▎      | 1/3 [00:03<00:06]                                                Train matrix:  33%|███▎      | 1/3 [00:03<00:06]                                                Train matrix:  33%|███▎      | 1/3 [00:05<00:06]                                                Train matrix:  33%|███▎      | 1/3 [00:05<00:06]                                                Train matrix:  33%|███▎      | 1/3 [00:05<00:06]                                                Train matrix:  33%|███▎      | 1/3 [00:05<00:06]Train matrix:  67%|██████▋   | 2/3 [00:05<00:02]Train matrix:  67%|██████▋   | 2/3 [00:05<00:02]                                                Train matrix:  67%|██████▋   | 2/3 [00:05<00:02]                                                Train matrix:  67%|██████▋   | 2/3 [00:05<00:02]                                                Train matrix:  67%|██████▋   | 2/3 [00:09<00:02]                                                Train matrix:  67%|██████▋   | 2/3 [00:09<00:02]                                                Train matrix:  67%|██████▋   | 2/3 [00:09<00:02]                                                Train matrix:  67%|██████▋   | 2/3 [00:09<00:02]Train matrix: 100%|██████████| 3/3 [00:09<00:00]Train matrix: 100%|██████████| 3/3 [00:09<00:00]
+
+======================================================================
+CONFIG: 1:200_subil_GCN_none_s44
+======================================================================
+  [v4 scenario 1:200_subil | licit_unknown] illicit=664 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:200.0 (subsample_seed=2026, idx sha1=9c5d7e599a)
+  Hyperparams: reused from seed 42 (1-200_subil_GCN_none_meta.json): {'hidden_dim': 64, 'num_layers': 3, 'dropout': 0.27606099749584057, 'lr': 0.00017541893487450815, 'weight_decay': 9.7803370166594e-05}
+  Epoch  10 | Train Loss: 1.0330 | Val Loss: 0.5180 | Val F1: 0.0179 | Val MCC: -0.0459 | Val PR-AUC: 0.0186
+  Epoch  20 | Train Loss: 0.4652 | Val Loss: 0.2309 | Val F1: 0.0097 | Val MCC: -0.0150 | Val PR-AUC: 0.0222
+  Early stopping at epoch 21 (best: 1)
+  Val (argmax): F1=0.0288 MCC=-0.0555 PR-AUC=0.0174 | Test PR-AUC=0.0043
+  Calibrated on val (t=0.06): val F1=0.0478 | test F1=0.0110 MCC=-0.0081
+  Cross-label test PR-AUC: vs licit=0.0190 vs unknown=0.0056 vs all=0.0043 | unknown flagged=94.056%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-200_subil_GCN_none_s44_meta.json (3s)
+
+======================================================================
+CONFIG: 1:200_subil_GCN_class_weighting_s44
+======================================================================
+  [v4 scenario 1:200_subil | licit_unknown] illicit=664 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:200.0 (subsample_seed=2026, idx sha1=9c5d7e599a)
+  Hyperparams: reused from seed 42 (1-200_subil_GCN_class_weighting_meta.json): {'hidden_dim': 64, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05}
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Epoch  10 | Train Loss: 0.6850 | Val Loss: 0.5146 | Val F1: 0.0649 | Val MCC: 0.0856 | Val PR-AUC: 0.0725
+  Epoch  20 | Train Loss: 0.4421 | Val Loss: 0.4339 | Val F1: 0.0748 | Val MCC: 0.1063 | Val PR-AUC: 0.1037
+  Early stopping at epoch 21 (best: 1)
+  Val (argmax): F1=0.0798 MCC=0.0810 PR-AUC=0.0423 | Test PR-AUC=0.0062
+  Calibrated on val (t=0.72): val F1=0.0954 | test F1=0.0076 MCC=-0.0079
+  Cross-label test PR-AUC: vs licit=0.0388 vs unknown=0.0074 vs all=0.0062 | unknown flagged=11.836%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-200_subil_GCN_class_weighting_s44_meta.json (2s)
+
+======================================================================
+CONFIG: 1:200_subil_GCN_focal_loss_s44
+======================================================================
+  [v4 scenario 1:200_subil | licit_unknown] illicit=664 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:200.0 (subsample_seed=2026, idx sha1=9c5d7e599a)
+  Hyperparams: reused from seed 42 (1-200_subil_GCN_focal_loss_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0188 | Val Loss: 0.0546 | Val F1: 0.1018 | Val MCC: 0.0770 | Val PR-AUC: 0.0578
+  Epoch  20 | Train Loss: 0.0069 | Val Loss: 0.0349 | Val F1: 0.0065 | Val MCC: 0.0262 | Val PR-AUC: 0.0461
+  Early stopping at epoch 26 (best: 6)
+  Val (argmax): F1=0.1218 MCC=0.0995 PR-AUC=0.0917 | Test PR-AUC=0.0079
+  Calibrated on val (t=0.62): val F1=0.1327 | test F1=0.0092 MCC=-0.0005
+  Cross-label test PR-AUC: vs licit=0.0542 vs unknown=0.0093 vs all=0.0079 | unknown flagged=3.596%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-200_subil_GCN_focal_loss_s44_meta.json (3s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        3
+    - 1:200_subil_GCN_none_s44
+    - 1:200_subil_GCN_class_weighting_s44
+    - 1:200_subil_GCN_focal_loss_s44
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl

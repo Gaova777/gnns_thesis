@@ -1,0 +1,181 @@
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 6ce9fd4dc4e8)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 3 configs (1 seed(s): 42)
+Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?][I 2026-10-10 12:37:53,776] A new study created in memory with name: GAT_none_pr_auc
+[I 2026-10-10 12:38:08,932] Trial 0 finished with value: 0.0647230583965977 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.0647230583965977.
+[I 2026-10-10 12:38:15,837] Trial 1 finished with value: 0.03264154660485473 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.3394633936788146, 'lr': 0.0002051338263087451, 'weight_decay': 2.0511104188433963e-05, 'heads': 4}. Best is trial 0 with value: 0.0647230583965977.
+[I 2026-10-10 12:38:18,883] Trial 2 finished with value: 0.034993073849237485 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05, 'heads': 4}. Best is trial 0 with value: 0.0647230583965977.
+[I 2026-10-10 12:38:31,845] Trial 3 finished with value: 0.0697104563267231 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.21649165607921678, 'lr': 0.0016738085788752138, 'weight_decay': 1.9010245319870364e-05, 'heads': 4}. Best is trial 3 with value: 0.0697104563267231.
+[I 2026-10-10 12:38:39,778] Trial 4 finished with value: 0.03985570909851218 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.3056937753654446, 'lr': 0.0015304852121831463, 'weight_decay': 1.2385137298860926e-05, 'heads': 2}. Best is trial 3 with value: 0.0697104563267231.
+[I 2026-10-10 12:38:48,405] Trial 5 finished with value: 0.032591891256814845 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4233589392465845, 'lr': 0.0004066563313514797, 'weight_decay': 1.5679933916722995e-05, 'heads': 2}. Best is trial 3 with value: 0.0697104563267231.
+[I 2026-10-10 12:38:51,630] Trial 6 finished with value: 0.041729641325760444 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.4637281608315128, 'lr': 0.00032927591344236165, 'weight_decay': 0.00021137059440645722, 'heads': 4}. Best is trial 3 with value: 0.0697104563267231.
+[I 2026-10-10 12:38:59,162] Trial 7 finished with value: 0.15938364568980257 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4100531293444458, 'lr': 0.007568292060167618, 'weight_decay': 0.0006161049539380963, 'heads': 4}. Best is trial 7 with value: 0.15938364568980257.
+                                            Train matrix:   0%|          | 0/3 [01:05<?]                                            Train matrix:   0%|          | 0/3 [01:17<?]                                            Train matrix:   0%|          | 0/3 [01:17<?]                                            Train matrix:   0%|          | 0/3 [01:17<?]                                            Train matrix:   0%|          | 0/3 [01:17<?]Train matrix:  33%|███▎      | 1/3 [01:17<02:35]Train matrix:  33%|███▎      | 1/3 [01:17<02:35]                                                Train matrix:  33%|███▎      | 1/3 [01:17<02:35]                                                Train matrix:  33%|███▎      | 1/3 [01:17<02:35][I 2026-10-10 12:39:11,351] A new study created in memory with name: GAT_class_weighting_pr_auc
+[I 2026-10-10 12:39:19,193] Trial 0 finished with value: 0.35266046455828937 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.35266046455828937.
+[I 2026-10-10 12:39:31,437] Trial 1 finished with value: 0.31745846807245337 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.3394633936788146, 'lr': 0.0002051338263087451, 'weight_decay': 2.0511104188433963e-05, 'heads': 4}. Best is trial 0 with value: 0.35266046455828937.
+[I 2026-10-10 12:39:39,128] Trial 2 finished with value: 0.19905678701406782 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05, 'heads': 4}. Best is trial 0 with value: 0.35266046455828937.
+[I 2026-10-10 12:39:46,087] Trial 3 finished with value: 0.3547468089066529 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.21649165607921678, 'lr': 0.0016738085788752138, 'weight_decay': 1.9010245319870364e-05, 'heads': 4}. Best is trial 3 with value: 0.3547468089066529.
+[I 2026-10-10 12:39:50,454] Trial 4 finished with value: 0.20662699011221916 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.3056937753654446, 'lr': 0.0015304852121831463, 'weight_decay': 1.2385137298860926e-05, 'heads': 2}. Best is trial 3 with value: 0.3547468089066529.
+[I 2026-10-10 12:39:57,343] Trial 5 finished with value: 0.33870064049957993 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4233589392465845, 'lr': 0.0004066563313514797, 'weight_decay': 1.5679933916722995e-05, 'heads': 2}. Best is trial 3 with value: 0.3547468089066529.
+[I 2026-10-10 12:40:09,325] Trial 6 finished with value: 0.2313980598118513 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.4637281608315128, 'lr': 0.00032927591344236165, 'weight_decay': 0.00021137059440645722, 'heads': 4}. Best is trial 3 with value: 0.3547468089066529.
+[I 2026-10-10 12:40:13,618] Trial 7 finished with value: 0.32105503801394125 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4100531293444458, 'lr': 0.007568292060167618, 'weight_decay': 0.0006161049539380963, 'heads': 4}. Best is trial 3 with value: 0.3547468089066529.
+                                                Train matrix:  33%|███▎      | 1/3 [02:19<02:35]                                                Train matrix:  33%|███▎      | 1/3 [03:01<02:35]                                                Train matrix:  33%|███▎      | 1/3 [03:01<02:35]                                                Train matrix:  33%|███▎      | 1/3 [03:01<02:35]                                                Train matrix:  33%|███▎      | 1/3 [03:01<02:35]Train matrix:  67%|██████▋   | 2/3 [03:01<01:33]Train matrix:  67%|██████▋   | 2/3 [03:01<01:33]                                                Train matrix:  67%|██████▋   | 2/3 [03:01<01:33]                                                Train matrix:  67%|██████▋   | 2/3 [03:01<01:33][I 2026-10-10 12:40:55,307] A new study created in memory with name: GAT_focal_loss_pr_auc
+[I 2026-10-10 12:41:04,989] Trial 0 finished with value: 0.14372103744992837 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}. Best is trial 0 with value: 0.14372103744992837.
+[I 2026-10-10 12:41:17,143] Trial 1 finished with value: 0.04264532574177407 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.3394633936788146, 'lr': 0.0002051338263087451, 'weight_decay': 2.0511104188433963e-05, 'heads': 4}. Best is trial 0 with value: 0.14372103744992837.
+[I 2026-10-10 12:41:24,542] Trial 2 finished with value: 0.09061839724680293 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.4879639408647978, 'lr': 0.004622589001020831, 'weight_decay': 2.6587543983272695e-05, 'heads': 4}. Best is trial 0 with value: 0.14372103744992837.
+[I 2026-10-10 12:41:34,533] Trial 3 finished with value: 0.1925440234208278 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.21649165607921678, 'lr': 0.0016738085788752138, 'weight_decay': 1.9010245319870364e-05, 'heads': 4}. Best is trial 3 with value: 0.1925440234208278.
+[I 2026-10-10 12:41:41,857] Trial 4 finished with value: 0.1032730531003925 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.3056937753654446, 'lr': 0.0015304852121831463, 'weight_decay': 1.2385137298860926e-05, 'heads': 2}. Best is trial 3 with value: 0.1925440234208278.
+[I 2026-10-10 12:41:49,923] Trial 5 finished with value: 0.045111520483124515 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4233589392465845, 'lr': 0.0004066563313514797, 'weight_decay': 1.5679933916722995e-05, 'heads': 2}. Best is trial 3 with value: 0.1925440234208278.
+[I 2026-10-10 12:41:53,006] Trial 6 finished with value: 0.0417487945624281 and parameters: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.4637281608315128, 'lr': 0.00032927591344236165, 'weight_decay': 0.00021137059440645722, 'heads': 4}. Best is trial 3 with value: 0.1925440234208278.
+[I 2026-10-10 12:41:59,177] Trial 7 finished with value: 0.3375571245998136 and parameters: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4100531293444458, 'lr': 0.007568292060167618, 'weight_decay': 0.0006161049539380963, 'heads': 4}. Best is trial 7 with value: 0.3375571245998136.
+                                                Train matrix:  67%|██████▋   | 2/3 [04:05<01:33]                                                Train matrix:  67%|██████▋   | 2/3 [04:24<01:33]                                                Train matrix:  67%|██████▋   | 2/3 [04:24<01:33]                                                Train matrix:  67%|██████▋   | 2/3 [04:24<01:33]                                                Train matrix:  67%|██████▋   | 2/3 [04:24<01:33]Train matrix: 100%|██████████| 3/3 [04:24<00:00]Train matrix: 100%|██████████| 3/3 [04:24<00:00]
+
+======================================================================
+CONFIG: 1:200_subil_GAT_none
+======================================================================
+  [v4 scenario 1:200_subil | licit_unknown] illicit=664 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:200.0 (subsample_seed=2026, idx sha1=9c5d7e599a)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+
+  Best trial (val pr_auc=0.1594):
+    hidden_dim: 148
+    num_layers: 2
+    dropout: 0.4100531293444458
+    lr: 0.007568292060167618
+    weight_decay: 0.0006161049539380963
+    heads: 4
+  Best Optuna val pr_auc=0.1594: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4100531293444458, 'lr': 0.007568292060167618, 'weight_decay': 0.0006161049539380963, 'heads': 4}
+  Epoch  10 | Train Loss: 0.3871 | Val Loss: 0.7979 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0393
+  Epoch  20 | Train Loss: 0.2361 | Val Loss: 0.2936 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0484
+  Epoch  30 | Train Loss: 0.1967 | Val Loss: 0.2608 | Val F1: 0.0000 | Val MCC: -0.0011 | Val PR-AUC: 0.0722
+  Early stopping at epoch 37 (best: 17)
+  Val (argmax): F1=0.1623 MCC=0.1414 PR-AUC=0.1130 | Test PR-AUC=0.0045
+  Calibrated on val (t=0.42): val F1=0.1708 | test F1=0.0000 MCC=-0.0124
+  Cross-label test PR-AUC: vs licit=0.0259 vs unknown=0.0055 vs all=0.0045 | unknown flagged=2.987%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-200_subil_GAT_none_meta.json (77s)
+
+======================================================================
+CONFIG: 1:200_subil_GAT_class_weighting
+======================================================================
+  [v4 scenario 1:200_subil | licit_unknown] illicit=664 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:200.0 (subsample_seed=2026, idx sha1=9c5d7e599a)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Class weights: [0.5024999380111694, 100.50225830078125]
+
+  Best trial (val pr_auc=0.3547):
+    hidden_dim: 128
+    num_layers: 2
+    dropout: 0.21649165607921678
+    lr: 0.0016738085788752138
+    weight_decay: 1.9010245319870364e-05
+    heads: 4
+  Best Optuna val pr_auc=0.3547: {'hidden_dim': 128, 'num_layers': 2, 'dropout': 0.21649165607921678, 'lr': 0.0016738085788752138, 'weight_decay': 1.9010245319870364e-05, 'heads': 4}
+  Class weights: [0.5024999380111694, 100.50225830078125]
+  Epoch  10 | Train Loss: 0.5500 | Val Loss: 0.4744 | Val F1: 0.0600 | Val MCC: 0.0786 | Val PR-AUC: 0.1120
+  Epoch  20 | Train Loss: 0.4261 | Val Loss: 0.4685 | Val F1: 0.1043 | Val MCC: 0.1544 | Val PR-AUC: 0.1911
+  Epoch  30 | Train Loss: 0.3706 | Val Loss: 0.4904 | Val F1: 0.1290 | Val MCC: 0.1855 | Val PR-AUC: 0.2876
+  Epoch  40 | Train Loss: 0.3399 | Val Loss: 0.4239 | Val F1: 0.1298 | Val MCC: 0.1937 | Val PR-AUC: 0.3171
+  Epoch  50 | Train Loss: 0.3301 | Val Loss: 0.4229 | Val F1: 0.1440 | Val MCC: 0.2118 | Val PR-AUC: 0.3536
+  Epoch  60 | Train Loss: 0.2966 | Val Loss: 0.4116 | Val F1: 0.1482 | Val MCC: 0.2179 | Val PR-AUC: 0.3575
+  Epoch  70 | Train Loss: 0.2998 | Val Loss: 0.4677 | Val F1: 0.1806 | Val MCC: 0.2503 | Val PR-AUC: 0.3616
+  Epoch  80 | Train Loss: 0.2804 | Val Loss: 0.4886 | Val F1: 0.1822 | Val MCC: 0.2505 | Val PR-AUC: 0.3764
+  Epoch  90 | Train Loss: 0.2599 | Val Loss: 0.5134 | Val F1: 0.1956 | Val MCC: 0.2627 | Val PR-AUC: 0.3652
+  Epoch 100 | Train Loss: 0.2571 | Val Loss: 0.5550 | Val F1: 0.2142 | Val MCC: 0.2779 | Val PR-AUC: 0.3706
+  Epoch 110 | Train Loss: 0.2488 | Val Loss: 0.5742 | Val F1: 0.2139 | Val MCC: 0.2782 | Val PR-AUC: 0.3596
+  Epoch 120 | Train Loss: 0.2574 | Val Loss: 0.6212 | Val F1: 0.2097 | Val MCC: 0.2717 | Val PR-AUC: 0.3610
+  Epoch 130 | Train Loss: 0.2426 | Val Loss: 0.6629 | Val F1: 0.2326 | Val MCC: 0.2929 | Val PR-AUC: 0.3784
+  Epoch 140 | Train Loss: 0.2319 | Val Loss: 0.7548 | Val F1: 0.2512 | Val MCC: 0.3042 | Val PR-AUC: 0.3693
+  Epoch 150 | Train Loss: 0.2273 | Val Loss: 0.7381 | Val F1: 0.2349 | Val MCC: 0.2927 | Val PR-AUC: 0.3633
+  Val (argmax): F1=0.2521 MCC=0.3050 PR-AUC=0.3652 | Test PR-AUC=0.0091
+  Calibrated on val (t=0.89): val F1=0.4241 | test F1=0.0044 MCC=-0.0029
+  Cross-label test PR-AUC: vs licit=0.0502 vs unknown=0.0111 vs all=0.0091 | unknown flagged=0.913%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-200_subil_GAT_class_weighting_meta.json (104s)
+
+======================================================================
+CONFIG: 1:200_subil_GAT_focal_loss
+======================================================================
+  [v4 scenario 1:200_subil | licit_unknown] illicit=664 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:200.0 (subsample_seed=2026, idx sha1=9c5d7e599a)
+  Optuna: 8 trials x <= 50 epochs, metric=pr_auc, warm_start=True
+  Warm-start trial enqueued for GAT: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.2522, 'lr': 0.0006999, 'weight_decay': 0.0005, 'heads': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+  Focal Loss: gamma=2.0, alpha=0.75
+
+  Best trial (val pr_auc=0.3376):
+    hidden_dim: 148
+    num_layers: 2
+    dropout: 0.4100531293444458
+    lr: 0.007568292060167618
+    weight_decay: 0.0006161049539380963
+    heads: 4
+  Best Optuna val pr_auc=0.3376: {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.4100531293444458, 'lr': 0.007568292060167618, 'weight_decay': 0.0006161049539380963, 'heads': 4}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0643 | Val Loss: 0.1116 | Val F1: 0.1709 | Val MCC: 0.2194 | Val PR-AUC: 0.2093
+  Epoch  20 | Train Loss: 0.0444 | Val Loss: 0.1586 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0423
+  Epoch  30 | Train Loss: 0.0216 | Val Loss: 0.0430 | Val F1: 0.2153 | Val MCC: 0.1978 | Val PR-AUC: 0.1750
+  Epoch  40 | Train Loss: 0.0133 | Val Loss: 0.0168 | Val F1: 0.2568 | Val MCC: 0.2711 | Val PR-AUC: 0.2498
+  Epoch  50 | Train Loss: 0.0097 | Val Loss: 0.0193 | Val F1: 0.1073 | Val MCC: 0.1665 | Val PR-AUC: 0.2612
+  Epoch  60 | Train Loss: 0.0078 | Val Loss: 0.0133 | Val F1: 0.1254 | Val MCC: 0.2137 | Val PR-AUC: 0.3069
+  Early stopping at epoch 61 (best: 41)
+  Val (argmax): F1=0.3135 MCC=0.3033 PR-AUC=0.2633 | Test PR-AUC=0.0058
+  Calibrated on val (t=0.47): val F1=0.3284 | test F1=0.0030 MCC=-0.0064
+  Cross-label test PR-AUC: vs licit=0.0289 vs unknown=0.0071 vs all=0.0058 | unknown flagged=1.422%
+  Quality gate (val F1>=0.3, val MCC>=0.15): PASSED
+  Saved metadata: results_models_v4/1-200_subil_GAT_focal_loss_meta.json (83s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 1
+    + 1:200_subil_GAT_focal_loss
+  Failed quality gate:                        2
+    - 1:200_subil_GAT_none
+    - 1:200_subil_GAT_class_weighting
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.07 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl

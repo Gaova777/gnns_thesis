@@ -1,0 +1,15 @@
+[2026-10-10 08:35:02] cola en espera · driver=58289 · control=259578
+[2026-10-10 11:25:33] cola en espera · driver=759531 · control=
+[2026-10-10 14:30:04] corrida de estrés terminada
+[2026-10-10 14:53:59] control de pesos al azar rc=0
+[2026-10-10 14:53:59] control de pesos al azar terminado (48 filas)
+[2026-10-10 14:55:12] gradientes 1:100_subil rc=0
+[2026-10-10 14:56:22] gradientes 1:200_subil rc=0
+[2026-10-10 14:56:31] cross_seed gradientes rc=0
+[2026-10-10 14:56:58] analisis.py rc=0
+[2026-10-10 15:00:27] metrica_robusta.py rc=0
+[2026-10-10 15:00:38] curvas scores rc=0
+[2026-10-10 15:00:56] curvas metrics rc=0
+[2026-10-10 15:01:17] curvas figures rc=0
+[2026-10-10 15:01:33] curvas figures (deck) rc=0
+[2026-10-10 15:01:33] fin cola

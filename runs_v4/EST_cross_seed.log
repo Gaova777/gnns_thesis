@@ -1,0 +1,25 @@
+252 configurations, 756 seed pairs -> results_v4/elliptic_v4_cross_seed.csv
+explainer        arch     
+GNNExplainer     GAT          0.929
+                 GCN          0.915
+                 GraphSAGE    0.943
+                 TAGCN        0.939
+PGExplainer      GAT          0.434
+                 GCN          0.271
+                 GraphSAGE    0.569
+                 TAGCN        0.259
+ShapleyFeatures  GAT          0.946
+                 GCN          0.931
+                 GraphSAGE    0.950
+                 TAGCN        0.928
+111 configurations, 225 seed pairs -> results_v4/elliptic_v4_cross_seed.csv
+explainer        arch     
+GNNExplainer     GAT          0.927
+                 GraphSAGE    0.947
+                 TAGCN        0.956
+PGExplainer      GAT          0.560
+                 GraphSAGE    0.598
+                 TAGCN        0.318
+ShapleyFeatures  GAT          0.944
+                 GraphSAGE    0.956
+                 TAGCN        0.942

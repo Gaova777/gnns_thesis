@@ -1,0 +1,140 @@
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 6ce9fd4dc4e8)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.1s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 3 configs (1 seed(s): 44)
+Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:03<?]                                            Train matrix:   0%|          | 0/3 [00:03<?]                                            Train matrix:   0%|          | 0/3 [00:04<?]                                            Train matrix:   0%|          | 0/3 [00:04<?]Train matrix:  33%|███▎      | 1/3 [00:04<00:08]Train matrix:  33%|███▎      | 1/3 [00:04<00:08]                                                Train matrix:  33%|███▎      | 1/3 [00:04<00:08]                                                Train matrix:  33%|███▎      | 1/3 [00:04<00:08]                                                Train matrix:  33%|███▎      | 1/3 [00:08<00:08]                                                Train matrix:  33%|███▎      | 1/3 [00:08<00:08]                                                Train matrix:  33%|███▎      | 1/3 [00:08<00:08]                                                Train matrix:  33%|███▎      | 1/3 [00:08<00:08]Train matrix:  67%|██████▋   | 2/3 [00:08<00:04]Train matrix:  67%|██████▋   | 2/3 [00:08<00:04]                                                Train matrix:  67%|██████▋   | 2/3 [00:08<00:04]                                                Train matrix:  67%|██████▋   | 2/3 [00:08<00:04]                                                Train matrix:  67%|██████▋   | 2/3 [00:12<00:04]                                                Train matrix:  67%|██████▋   | 2/3 [00:12<00:04]                                                Train matrix:  67%|██████▋   | 2/3 [00:12<00:04]                                                Train matrix:  67%|██████▋   | 2/3 [00:12<00:04]Train matrix: 100%|██████████| 3/3 [00:12<00:00]Train matrix: 100%|██████████| 3/3 [00:12<00:00]
+
+======================================================================
+CONFIG: 1:100_subil_GraphSAGE_none_s44
+======================================================================
+  [v4 scenario 1:100_subil | licit_unknown] illicit=1,328 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:100.0 (subsample_seed=2026, idx sha1=2469211f42)
+  Hyperparams: reused from seed 42 (1-100_subil_GraphSAGE_none_meta.json): {'hidden_dim': 128, 'num_layers': 3, 'dropout': 0.2246844304357644, 'lr': 0.001096821720752952, 'weight_decay': 0.00012399967836846095}
+  Epoch  10 | Train Loss: 0.1361 | Val Loss: 0.2557 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0246
+  Epoch  20 | Train Loss: 0.1098 | Val Loss: 0.2360 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0271
+  Early stopping at epoch 21 (best: 1)
+  Val (argmax): F1=0.0088 MCC=-0.0210 PR-AUC=0.0232 | Test PR-AUC=0.0088
+  Calibrated on val (t=0.06): val F1=0.0549 | test F1=0.0141 MCC=0.0375
+  Cross-label test PR-AUC: vs licit=0.0448 vs unknown=0.0108 vs all=0.0088 | unknown flagged=80.902%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-100_subil_GraphSAGE_none_s44_meta.json (4s)
+
+======================================================================
+CONFIG: 1:100_subil_GraphSAGE_class_weighting_s44
+======================================================================
+  [v4 scenario 1:100_subil | licit_unknown] illicit=1,328 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:100.0 (subsample_seed=2026, idx sha1=2469211f42)
+  Hyperparams: reused from seed 42 (1-100_subil_GraphSAGE_class_weighting_meta.json): {'hidden_dim': 148, 'num_layers': 2, 'dropout': 0.12602063719411183, 'lr': 0.007902619549708232, 'weight_decay': 0.0008536189862866829}
+  Class weights: [0.5049998760223389, 50.501129150390625]
+  Epoch  10 | Train Loss: 0.4162 | Val Loss: 0.6856 | Val F1: 0.2417 | Val MCC: 0.2577 | Val PR-AUC: 0.2330
+  Epoch  20 | Train Loss: 0.2940 | Val Loss: 0.3612 | Val F1: 0.1473 | Val MCC: 0.2185 | Val PR-AUC: 0.4334
+  Epoch  30 | Train Loss: 0.2327 | Val Loss: 0.4035 | Val F1: 0.1994 | Val MCC: 0.2721 | Val PR-AUC: 0.4087
+  Early stopping at epoch 30 (best: 10)
+  Val (argmax): F1=0.2417 MCC=0.2577 PR-AUC=0.2330 | Test PR-AUC=0.0064
+  Calibrated on val (t=0.72): val F1=0.3565 | test F1=0.0000 MCC=-0.0083
+  Cross-label test PR-AUC: vs licit=0.0395 vs unknown=0.0077 vs all=0.0064 | unknown flagged=1.478%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-100_subil_GraphSAGE_class_weighting_s44_meta.json (4s)
+
+======================================================================
+CONFIG: 1:100_subil_GraphSAGE_focal_loss_s44
+======================================================================
+  [v4 scenario 1:100_subil | licit_unknown] illicit=1,328 negatives=132,803 {'licit': 26432, 'unknown': 106371} ratio=1:100.0 (subsample_seed=2026, idx sha1=2469211f42)
+  Hyperparams: reused from seed 42 (1-100_subil_GraphSAGE_focal_loss_meta.json): {'hidden_dim': 148, 'num_layers': 3, 'dropout': 0.2727780074568463, 'lr': 0.0003823475224675188, 'weight_decay': 0.00016738085788752134}
+  Focal Loss: gamma=2.0, alpha=0.75
+  Epoch  10 | Train Loss: 0.0208 | Val Loss: 0.0407 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0259
+  Epoch  20 | Train Loss: 0.0157 | Val Loss: 0.0323 | Val F1: 0.0000 | Val MCC: 0.0000 | Val PR-AUC: 0.0303
+  Early stopping at epoch 21 (best: 1)
+  Val (argmax): F1=0.0478 MCC=0.0059 PR-AUC=0.0234 | Test PR-AUC=0.0095
+  Calibrated on val (t=0.28): val F1=0.0538 | test F1=0.0136 MCC=0.0342
+  Cross-label test PR-AUC: vs licit=0.0339 vs unknown=0.0132 vs all=0.0095 | unknown flagged=83.354%
+  Quality gate (val F1>=0.3, val MCC>=0.15): FAILED
+  Saved metadata: results_models_v4/1-100_subil_GraphSAGE_focal_loss_s44_meta.json (4s)
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        3
+    - 1:100_subil_GraphSAGE_none_s44
+    - 1:100_subil_GraphSAGE_class_weighting_s44
+    - 1:100_subil_GraphSAGE_focal_loss_s44
+  Errors (OOM / timeout / exception):         0
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl
+Device: cuda | config configs/experiment_v4.yaml (version v4, sha256 6ce9fd4dc4e8)
+  MLflow experiment: xai-gnn-stability-v4
+  Tracking URI: sqlite:///mlruns.db
+
+======================================================================
+LOADING ELLIPTIC DATASET
+======================================================================
+============================================================
+Elliptic Bitcoin Dataset Statistics
+============================================================
+Total nodes:      203,769
+Total edges:      234,355
+Node features:    165
+Labeled nodes:    46,564
+  Licit (0):      42,019
+  Illicit (1):    4,545
+  Unknown (-1):   157,205
+Illicit ratio:    0.0976
+============================================================
+  Label mode: licit_unknown (negatives = licit + unknown)
+Preprocessing Elliptic dataset...
+Creating time-based splits:
+  Train: 136,265 nodes (3,462 illicit, 132,803 licit, ratio 1:38.4)
+  Val  : 37,820 nodes (914 illicit, 36,906 licit, ratio 1:40.4)
+  Test : 29,684 nodes (169 illicit, 29,515 licit, ratio 1:174.6)
+  Split counts validated against the official Elliptic release.
+Normalizing features (fit on every node of the train timesteps):
+  Features normalized (RobustScaler + clip[-10,10]): mean~0.7023, std~2.3916, clipped=4.69% of values
+Preprocessing complete.
+  Data loaded + validated in 2.2s: {'train': {'illicit': 3462, 'licit': 132803}, 'val': {'illicit': 914, 'licit': 36906}, 'test': {'illicit': 169, 'licit': 29515}}
+
+Training matrix: 3 configs (1 seed(s): 44)
+Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]Train matrix:   0%|          | 0/3 [00:00<?]                                            Train matrix:   0%|          | 0/3 [00:00<?]Train matrix: 100%|██████████| 3/3 [00:00<00:00]
+  SKIP (resume — 1-100_subil_GraphSAGE_none_s44_meta.json exists): 1:100_subil_GraphSAGE_none_s44
+  SKIP (resume — 1-100_subil_GraphSAGE_class_weighting_s44_meta.json exists): 1:100_subil_GraphSAGE_class_weighting_s44
+  SKIP (resume — 1-100_subil_GraphSAGE_focal_loss_s44_meta.json exists): 1:100_subil_GraphSAGE_focal_loss_s44
+
+======================================================================
+TRAIN MATRIX SUMMARY
+======================================================================
+  Passed (val F1>=0.3, MCC>=0.15): 0
+  Failed quality gate:                        0
+  Errors (OOM / timeout / exception):         0
+  Skipped (resume):                           3
+
+  Total time: 0.00 h
+  Checkpoints + metadata in: results_models_v4
+  Progress log: runs_v4/progress.jsonl
