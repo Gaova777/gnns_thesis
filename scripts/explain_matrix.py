@@ -95,8 +95,13 @@ from src.training.trainer import build_model
 warnings.filterwarnings("ignore", category=UserWarning)
 
 EXPLAINERS = ["GNNExplainer", "PGExplainer", "ShapleyFeatures"]
-HAS_FEAT = {"GNNExplainer": True, "PGExplainer": False, "ShapleyFeatures": True}
-HAS_EDGE = {"GNNExplainer": True, "PGExplainer": True, "ShapleyFeatures": False}
+# Gradient explainers added after the 7-oct meeting (src/explainability/gradients.py). They
+# only run when asked for with --explainer, so the default matrix stays the same.
+EXTRA_EXPLAINERS = ["IntegratedGradients", "ExpectedGradients"]
+HAS_FEAT = {"GNNExplainer": True, "PGExplainer": False, "ShapleyFeatures": True,
+            "IntegratedGradients": True, "ExpectedGradients": True}
+HAS_EDGE = {"GNNExplainer": True, "PGExplainer": True, "ShapleyFeatures": False,
+            "IntegratedGradients": False, "ExpectedGradients": False}
 
 COLUMNS = [
     "run_id", "seed", "scenario", "arch", "balancing", "explainer", "gate_passed",
@@ -138,7 +143,8 @@ def parse_args(argv=None):
     p.add_argument("--scenario", default=None)
     p.add_argument("--balancing", default=None)
     p.add_argument("--explainer", default=None,
-                   help="GNNExplainer | PGExplainer | ShapleyFeatures (alias GNNShap)")
+                   help="GNNExplainer | PGExplainer | ShapleyFeatures (alias GNNShap) | "
+                        "IntegratedGradients | ExpectedGradients; several separated by commas")
     p.add_argument("--include-gated", "--force", dest="include_gated", action="store_true",
                    help="also explain models that FAIL the gate (rows keep gate_passed=False)")
     p.add_argument("--resume", action="store_true",
@@ -181,6 +187,8 @@ def load_settings(config: dict, args) -> dict:
         "pg_train_min_illicit": int(pg.get("train_min_illicit", 25)),
         "pg_nan_abort": int(pg.get("nan_abort_threshold", 2)),
         "shap_samples": int(sh.get("num_samples", 50)),
+        "ig_steps": int((ex.get("gradients") or {}).get("steps", 100)),
+        "eg_samples": int((ex.get("gradients") or {}).get("num_samples", 200)),
         "results_dir": results_dir,
         "models_dir": Path(args.models_dir or tr.get("models_dir", "./results_models_v4")),
         "logs_dir": Path(args.logs_dir or tr.get("logs_dir", "./runs_v4")),
@@ -408,10 +416,13 @@ def main(argv=None):
         torch.set_num_threads(args.threads)
     print(f"Device: {device} | torch threads: {torch.get_num_threads()}")
 
-    only_ex = canonical_explainer(args.explainer) if args.explainer else None
-    explainers = [e for e in EXPLAINERS if only_ex is None or e == only_ex]
-    if not explainers:
-        sys.exit(f"Unknown explainer {args.explainer!r}; choose from {EXPLAINERS}")
+    asked = [canonical_explainer(e.strip()) for e in args.explainer.split(",")] \
+        if args.explainer else None
+    explainers = [e for e in EXPLAINERS + EXTRA_EXPLAINERS if e in asked] if asked \
+        else list(EXPLAINERS)
+    if not explainers or (asked and len(explainers) != len(set(asked))):
+        sys.exit(f"Unknown explainer in {args.explainer!r}; choose from "
+                 f"{EXPLAINERS + EXTRA_EXPLAINERS}")
 
     res_dir, rk_dir = s["results_dir"], s["results_dir"] / "rankings"
     csv_path = res_dir / "elliptic_v4_stability.csv"
@@ -484,6 +495,7 @@ def main(argv=None):
 
     # ── run ──────────────────────────────────────────────────────────────────
     n_ok = n_fail = 0
+    eg_refs = None  # reference pool of ExpectedGradients, built once
     by_meta: dict = {}
     for m, ex, gate in todo:
         by_meta.setdefault(m["run_id"], (m, gate, []))[2].append(ex)
@@ -541,6 +553,18 @@ def main(argv=None):
                                                        full_logits, s["replicas"],
                                                        s["shap_samples"], device,
                                                        on_node=beat)
+                        elif ex in EXTRA_EXPLAINERS:
+                            from src.explainability import gradients as gr
+                            if ex == "IntegratedGradients":
+                                res, extra = gr.run_integrated_gradients(
+                                    model, data, nodes, base_k, full_logits, s["replicas"],
+                                    s["ig_steps"], device, on_node=beat)
+                            else:
+                                if eg_refs is None:
+                                    eg_refs = gr.reference_pool(data)
+                                res, extra = gr.run_expected_gradients(
+                                    model, data, nodes, base_k, full_logits, s["replicas"],
+                                    s["eg_samples"], eg_refs, device, on_node=beat)
                         else:
                             res, extra = run_pgexplainer(
                                 model, data, nodes, base_k, full_logits, s["replicas"],
@@ -560,6 +584,7 @@ def main(argv=None):
                                finished_at=time.strftime("%Y-%m-%dT%H:%M:%S"))
                     kf = s["top_k_features"]
                     rec["metrics"] = {
+                        **{k: v for k, v in extra.items() if k.startswith("ig_")},
                         "spearman_full": agg["spearman_full"],
                         f"spearman_top{kf}": agg["spearman_topk"],
                         "spearman_edges": agg["spearman_edges"],

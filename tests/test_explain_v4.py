@@ -150,6 +150,45 @@ def test_shapley_batched_matches_legacy():
     assert np.allclose(legacy, new, atol=1e-6), (legacy, new)
 
 
+def test_gradient_explainers():
+    """IntegratedGradients satisfies completeness on the node's own features and is
+    deterministic; ExpectedGradients depends only on its seed."""
+    from src.explainability.gradients import (
+        expected_gradients_subgraph, integrated_gradients_subgraph, reference_pool)
+    from src.training.trainer import build_model
+    from torch_geometric.utils import k_hop_subgraph
+    d = _toy_graph()
+    for arch in ("GCN", "GraphSAGE"):
+        torch.manual_seed(0)
+        model = build_model(arch, in_channels=6, hidden_channels=8, num_layers=2).eval()
+        node = 3
+        subset, sei, mapping, _ = k_hop_subgraph(node, 2, d.edge_index, relabel_nodes=True,
+                                                 num_nodes=d.num_nodes)
+        x, t = d.x[subset], int(mapping[0])
+        phi, err = integrated_gradients_subgraph(model, x, sei, t, steps=200)
+        phi2, _ = integrated_gradients_subgraph(model, x, sei, t, steps=200)
+        with torch.no_grad():
+            xb = x.clone()
+            f1 = model(xb, sei)[t]
+            xb[t] = 0.0
+            f0 = model(xb, sei)[t]
+        delta = float((f1[1] - f1[0]) - (f0[1] - f0[0]))
+        assert abs(phi.sum() - delta) < 1e-2 and err < 1e-2, (arch, phi.sum(), delta, err)
+        assert np.array_equal(phi, phi2)
+        # chunked passes give the same gradients as one pass
+        from src.explainability import gradients as G
+        st = torch.randn(7, 6)
+        m1, g1 = G._margin_and_grad(model, x, sei, t, st)
+        m2, g2 = G._margin_and_grad(model, x, sei, t, st, max_nodes_per_pass=x.shape[0])
+        assert torch.allclose(m1, m2, atol=1e-5) and torch.allclose(g1, g2, atol=1e-5)
+        refs = reference_pool(d)
+        assert refs.shape == (int((d.train_mask & (d.y == 0)).sum()), 6)
+        a = expected_gradients_subgraph(model, x, sei, t, refs, num_samples=20, seed=5)
+        b = expected_gradients_subgraph(model, x, sei, t, refs, num_samples=20, seed=5)
+        c = expected_gradients_subgraph(model, x, sei, t, refs, num_samples=20, seed=6)
+        assert np.array_equal(a, b) and not np.array_equal(a, c)
+
+
 def test_common_nodes_persist_and_verify():
     from src.explainability.v4_explain import select_common_explain_nodes
     d = _toy_graph(200)
