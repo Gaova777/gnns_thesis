@@ -481,7 +481,8 @@ def stage_figures():
             continue
         for split in SPLITS:
             logy = split == "test"
-            fig, axes = plt.subplots(2, 4, figsize=(18, 9.6 if DECK else 9.2))
+            # En las láminas la figura ocupa casi toda la lámina (1760 x 640 px): paneles apaisados.
+            fig, axes = plt.subplots(2, 4, figsize=(18, 6.3 if DECK else 9.2))
             for j, arch in enumerate(ARCHS):
                 for i, kind in enumerate(("roc", "pr")):
                     ax = axes[i, j]
@@ -503,8 +504,9 @@ def stage_figures():
                     y0 = 0.05 if kind == "roc" else 0.95
                     va = "bottom" if kind == "roc" else "top"
                     for k, (t, col) in enumerate(txt):
-                        yy = (y0 + (len(txt) - 1 - k) * 0.075) if kind == "roc" \
-                            else y0 - k * 0.075
+                        dy = 0.135 if DECK else 0.075      # paneles apaisados en las láminas
+                        yy = (y0 + (len(txt) - 1 - k) * dy) if kind == "roc" \
+                            else y0 - k * dy
                         ax.text(0.97, yy, f"{lab} {t}", transform=ax.transAxes, ha="right",
                                 va=va, fontsize=13 if DECK else 9.5, color="#0b0b0b",
                                 bbox=dict(boxstyle="round,pad=0.2", fc="white", ec=col, lw=1.5))
@@ -514,7 +516,7 @@ def stage_figures():
                 plt, [(LOSS_LABEL[l], LOSS_COLOR[l], LOSS_LS[l]) for l in LOSSES])
             if DECK:
                 fig.legend(handles=handles[:3], loc="upper center", ncol=3, frameon=False,
-                           bbox_to_anchor=(0.5, 1.0), fontsize=21, handlelength=3)
+                           bbox_to_anchor=(0.5, 1.01), fontsize=19, handlelength=3)
                 fig.legend(handles=handles[3:], loc="lower center", ncol=3, frameon=False,
                            bbox_to_anchor=(0.5, -0.03))
             else:
@@ -525,7 +527,7 @@ def stage_figures():
                 fig.suptitle(f"Curvas ROC y PR en {SPLIT_LABEL[split]} · escenario "
                              f"{SCEN_LABEL[scen]}{extra} · media de 3 semillas · prevalencia "
                              f"{prev[split] * 100:.2f} %".replace(".", ","), fontsize=13.5)
-            fig.tight_layout(rect=(0, 0.03 if DECK else 0.02, 1, 0.94 if DECK else 0.97))
+            fig.tight_layout(rect=(0, 0.035 if DECK else 0.02, 1, 0.93 if DECK else 0.97))
             pref = "anexo_" if scen == "1:1" else ""
             _save(fig, f"{pref}curvas_{scen.replace(':', '-')}_{split}")
             plt.close(fig)
@@ -535,10 +537,11 @@ def stage_figures():
     best = {a: nat[nat.arch == a].sort_values("pr_auc_mean", ascending=False).balancing.iloc[0]
             for a in ARCHS}
     (OUT / "mejor_perdida_native.json").write_text(json.dumps(best, indent=2), encoding="utf-8")
-    fig, axes = plt.subplots(2, 2, figsize=(12.5, 11))
+    # En las láminas los cuatro paneles van en una fila, a todo el ancho.
+    fig, axes = plt.subplots(1, 4, figsize=(18, 5.6)) if DECK else plt.subplots(2, 2, figsize=(12.5, 11))
     for j, split in enumerate(SPLITS):
         for i, kind in enumerate(("roc", "pr")):
-            ax = axes[i, j]
+            ax = axes[2 * j + i] if DECK else axes[i, j]
             logy = kind == "pr" and split == "test"
             for arch in ARCHS:
                 c = C[("native", arch, best[arch], split)]
@@ -547,8 +550,9 @@ def stage_figures():
                       f"{arch} · {LOSS_LABEL[best[arch]]} ({'ROC' if kind == 'roc' else 'PR'}"
                       f"-AUC {t})", logy=logy)
             _axes_setup(ax, kind, split, prev[split], logy)
-            ax.set_title(f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]} "
-                         f"(prevalencia {prev[split] * 100:.2f} %)".replace(".", ","))
+            ax.set_title((f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]}" if DECK else
+                          f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]} "
+                          f"(prevalencia {prev[split] * 100:.2f} %)").replace(".", ","))
             ax.legend(loc="lower right" if kind == "roc" else "upper right",
                       fontsize=12 if DECK else 9.5,
                       frameon=True, framealpha=0.9)
@@ -563,10 +567,11 @@ def stage_figures():
     # c) resumen con la misma pérdida en las cuatro arquitecturas (pesos por clase), como
     # pidió Cristian el 7-oct: así la comparación entre arquitecturas no mezcla pérdidas.
     cw = "class_weighting"
-    fig, axes = plt.subplots(2, 2, figsize=(12.5, 11))
+    # En las láminas los cuatro paneles van en una fila, a todo el ancho.
+    fig, axes = plt.subplots(1, 4, figsize=(18, 5.6)) if DECK else plt.subplots(2, 2, figsize=(12.5, 11))
     for j, split in enumerate(SPLITS):
         for i, kind in enumerate(("roc", "pr")):
-            ax = axes[i, j]
+            ax = axes[2 * j + i] if DECK else axes[i, j]
             logy = kind == "pr" and split == "test"
             for arch in ARCHS:
                 c = C[("native", arch, cw, split)]
@@ -574,8 +579,9 @@ def stage_figures():
                 _draw(ax, kind, c[kind], c["pts"], ARCH_COLOR[arch], ARCH_LS[arch],
                       f"{arch} ({'ROC' if kind == 'roc' else 'PR'}-AUC {t})", logy=logy)
             _axes_setup(ax, kind, split, prev[split], logy)
-            ax.set_title(f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]} "
-                         f"(prevalencia {prev[split] * 100:.2f} %)".replace(".", ","))
+            ax.set_title((f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]}" if DECK else
+                          f"{'ROC' if kind == 'roc' else 'PR'} · {SPLIT_LABEL[split]} "
+                          f"(prevalencia {prev[split] * 100:.2f} %)").replace(".", ","))
             ax.legend(loc="lower right" if kind == "roc" else "upper right",
                       fontsize=13 if DECK else 9.5, frameon=True, framealpha=0.9)
     if not DECK:

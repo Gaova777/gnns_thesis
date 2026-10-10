@@ -122,6 +122,19 @@ def cuerpo(n, nuevo, pie=None):
     S[n] = S[n][:a] + "\n" + nuevo + pie_html + "\n    " + S[n][b:]
 
 
+def solo_figura(n):
+    """La figura ocupa casi toda la lámina: las llamadas pasan a las notas, en un solo paso."""
+    S[n] = re.sub(r'\s*<p class="llamada[^"]*"[^>]*>.*?</p>', "", S[n], flags=re.S)
+    S[n] = re.sub(r'\s*data-desde="\d+"', "", S[n])
+    ps = re.findall(r'<p data-voz="[^"]*">.*?</p>', re.search(
+        r'<aside class="notas" hidden>(.*?)</aside>', S[n], flags=re.S).group(1), flags=re.S)
+    cue = re.search(r'data-cue="([^"]*)"', S[n]).group(1)
+    S[n] = re.sub(r'<aside class="notas" hidden>.*?</aside>',
+                  lambda _: f'<aside class="notas" hidden><div data-paso="0" data-cue="{cue}">'
+                            + "".join(ps) + "</div></aside>", S[n], flags=re.S)
+    S[n] = re.sub(r'data-pasos="\d+"', 'data-pasos="0"', S[n], count=1)
+
+
 def imagen(n, name, h_px, estilo):
     S[n], k = re.subn(r'(<img class="fig" src=")data:image/jpeg;base64,[^"]+(" alt="[^"]*" style=")[^"]*(")',
                       lambda mm: mm.group(1) + uri(name, h_px) + mm.group(2) + estilo + mm.group(3),
@@ -178,17 +191,24 @@ pv = {a: met(a, "val", "pr_auc")[0] for a in ARQ}
 rt = {a: met(a, "test", "roc_auc")[0] for a in ARQ}
 titulo(5, "Con la misma pérdida en las cuatro, GCN es la única que no aprende en validación; "
           "en test ninguna se separa del azar")
-cuerpo(5, f'''<img class="fig" src="{uri("resumen_native_pesos_por_clase.png", 1080)}" alt="Desbalance real, pesos por clase en las cuatro arquitecturas. Arriba ROC, abajo PR; izquierda validación, derecha test." style="left:1224px;top:330px;height:540px;width:616px">
+cuerpo(5, f'''<img class="fig" src="{uri("resumen_native_pesos_por_clase.png", 1070)}" alt="Desbalance real, pesos por clase en las cuatro arquitecturas. De izquierda a derecha: ROC y PR en validación, ROC y PR en test." style="left:1224px;top:330px;height:540px;width:616px">
 <p class="llamada media" data-desde="1" style="left:80px;top:330px;width:1094px">Validación: GraphSAGE va arriba en todo el recall. GCN queda sola abajo: PR-AUC {c(pv["GCN"], 2)} frente a {c(min(pv[a] for a in APR), 2)} a {c(max(pv[a] for a in APR), 2)} de las otras tres.</p>
 <p class="llamada media" data-desde="2" style="left:80px;top:530px;width:1094px">Test: las cuatro curvas PR quedan pegadas a la línea de azar y las ROC se juntan entre {c(min(rt.values()), 2)} y {c(max(rt.values()), 2)}.</p>
 <p class="llamada fuerte" data-desde="3" style="left:80px;top:730px;width:1094px">El orden de validación no se conserva en test: por eso la estabilidad se mide en validación.</p>
-<p class="pie junto" style="left:1224px;top:882px;width:616px">Figura 2. Desbalance real (≈1:40), pesos por clase. Línea: media de 3 semillas. Sombra: mínimo y máximo. Puntos: umbral elegido en cada semilla.</p>''')
+<p class="pie junto" style="left:1224px;top:882px;width:616px">Figura 2. Desbalance real (≈1:40), pesos por clase; prevalencia de ilícitas 2,42 % en validación y 0,57 % en test. Línea: media de 3 semillas. Sombra: mínimo y máximo. Puntos: umbral elegido en cada semilla.</p>''')
 set_notas(5, [
     ("Resumen", "J", "Primero el resumen: el escenario con el desbalance real y la misma pérdida, pesos por clase, en las cuatro arquitecturas. Así comparamos arquitecturas sin mezclar pérdidas. La línea es la media de tres semillas, la sombra va del mínimo al máximo y cada punto es el umbral con el que se reporta el F1."),
     ("Clic 1", "J", "En validación GraphSAGE está arriba en todo el recall y su sombra es angosta: las tres semillas coinciden. GCN queda sola abajo."),
     ("Clic 2", "J", "En test todo se aplasta contra el azar y las cuatro curvas ROC quedan juntas. Aquí GCN ya no se distingue de las demás, y es lo que explicamos en dos láminas."),
     ("Clic 3", "J", "Como el orden no se conserva en test, medimos la estabilidad en validación, donde el modelo sí aprendió."),
 ])
+solo_figura(5)
+S[5] = re.sub(r'(<img class="fig"[^>]*style=")[^"]*(")',
+              r'\g<1>left:80px;top:320px;height:528px;width:1760px\g<2>', S[5], count=1)
+S[5] = S[5].replace('<p class="pie junto" style="left:1224px;top:882px;width:616px">',
+                    '<p class="llamada fuerte" style="left:80px;top:862px;width:1760px">El orden de '
+                    'validación no se conserva en test: por eso la estabilidad se mide en validación.</p>\n'
+                    '<p class="pie junto" style="left:80px;top:950px;width:1760px">')
 
 # ═════════════════════════════════════════════════════════════════════════════
 # Lámina 6: tabla con pesos por clase, GCN al final y marcada
@@ -285,11 +305,11 @@ CURVAS = {7: "curvas_native_val.png", 8: "curvas_native_test.png", 9: "curvas_1-
           13: "curvas_1-20_val.png", 14: "curvas_1-20_test.png",
           25: "anexo_curvas_1-1_val.png", 26: "anexo_curvas_1-1_test.png"}
 for n, name in CURVAS.items():
-    imagen(n, name, 1140, "left:812px;top:322px;height:570px;width:1028px")
-    S[n] = re.sub(r'(<p class="llamada[^"]*"[^>]*style="left:80px;top:\d+px;width:)574px',
-                  r'\g<1>682px', S[n])
+    _im = Image.open(FIG / name)
+    _h = round(1760 * _im.height / _im.width)
+    imagen(n, name, 1300, f"left:80px;top:316px;height:{_h}px;width:1760px")
     S[n], k = re.subn(r'<p class="pie junto" style="[^"]*">',
-                      '<p class="pie junto" style="left:812px;top:900px;width:1028px">', S[n])
+                      f'<p class="pie junto" style="left:80px;top:{316 + _h + 4}px;width:1760px">', S[n])
     assert k == 1, n
     S[n] = S[n].replace(" Color: forma de compensar el desbalance.", "")
     S[n] = S[n].replace(" Línea: media de 3 semillas. Sombra: mínimo y máximo de las 3. Puntos: umbral elegido en cada semilla.", " Línea: media de 3 semillas; sombra: mínimo y máximo; puntos: umbral de cada semilla.")
@@ -302,6 +322,8 @@ rep(9, 'data-cue="1-10 · val"><p data-voz="J">', 'data-cue="1-10 · val"><p dat
     "Ojo con el nombre: aquí «sin ajuste» no quiere decir sin balancear, porque el submuestreo "
     "ya es una forma de balanceo. Por eso las tres curvas se acercan: con 10 negativos por "
     "ilícita queda menos desbalance que compensar. ")
+for n in CURVAS:      # pedido del 10-oct: la figura ocupa casi toda la lámina
+    solo_figura(n)
 
 # ═════════════════════════════════════════════════════════════════════════════
 # H1
