@@ -367,7 +367,8 @@ Las tres que conservan al nodo llegan al mismo techo de rendimiento. La arquitec
 
 **Lo que no se puede afirmar** (validación del 10-oct): que las tres «se apoyan en las mismas
 variables». Entre arquitecturas, con el mismo escenario, la misma pérdida y la misma semilla,
-solo coinciden de 2 a 5 de las 10 variables más importantes (Jaccard de 0,20 a 0,50). El
+el Jaccard de las 10 variables más importantes es de 0,20 a 0,50 (comparten de 3 a 7 de las
+10; corregido el 10-oct, antes decía «de 2 a 5»). El
 Spearman sobre las 165 variables da 0,84 a 0,97, pero ese valor está inflado por la razón que
 se explica en la sección G. Tampoco es cierto que «expliquen igual» con una medida que no se
 infle: en GNNExplainer la estabilidad sobre las variables distintas de 0 es 0,84 en GraphSAGE,

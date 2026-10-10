@@ -9,9 +9,9 @@ que la respalda. Solo usa afirmaciones que pasaron la validación del 10-oct
 (`docs/REUNION_2026-10-07_CRISTIAN.md`, sección G). Lo que no pasó está al final, en «Lo que
 no se puede afirmar».
 
-**Estado:** falta la sección 2.4 (escenarios 1:100 y 1:200), que se llena cuando termine la
-corrida de estrés, y las cifras finales del control de pesos al azar (hoy con 37 de 48 filas).
-Las cifras de la sección 1 marcadas como parciales pueden moverse en el segundo decimal.
+**Estado (10-oct, 15:00):** completo con la corrida de 1:100 y 1:200 y con el control de pesos
+al azar terminado (48 de 48). Las diferencias de H2 y H3 con las medidas nuevas siguen sin
+prueba estadística.
 
 Alcance de las cifras: 3 semillas del modelo (42, 43, 44) en todo lo que se afirma. Donde se
 usa otra cosa se dice.
@@ -60,14 +60,19 @@ Es la prueba de aleatorización de parámetros de Adebayo et al. (2018): se expl
 arquitectura con los pesos entrenados y con pesos al azar, sobre los mismos 30 nodos. Si la
 medida dependiera de lo que el modelo aprendió, debería caer con pesos al azar.
 
-Escenario nativo, pesos por clase. *Cifras parciales (37 de 48 filas; se actualizan).*
+Escenario nativo, pesos por clase, 4 arquitecturas, 3 semillas (48 combinaciones).
 
 | Explicador | Estabilidad, modelo entrenado | Estabilidad, red sin entrenar | Acuerdo entre ambas |
 |---|---|---|---|
-| GNNExplainer | 0,95 | 0,94 | 0,89 |
-| Shapley | 0,98 | 0,98 | 0,91 |
-| Expected Gradients | 0,94 | 0,93 | 0,70 |
+| GNNExplainer | 0,95 | 0,93 | 0,90 |
+| Shapley | 0,97 | 0,96 | 0,91 |
+| Expected Gradients | 0,93 | 0,93 | 0,69 |
 | Integrated Gradients | 1 (determinista) | 1 | 0,96 |
+
+Con la coincidencia de las 10 más importantes pasa lo mismo: GNNExplainer 0,66 entrenado y
+0,63 sin entrenar; Expected Gradients 0,77 y 0,77; Shapley 0,82 y 0,90. En cambio, las 10 más
+importantes del modelo entrenado y de la red al azar coinciden poco (0,20 a 0,40): la red
+entrenada sí señala otras variables, pero la estabilidad entre réplicas no lo registra.
 
 La estabilidad entre réplicas es casi la misma con y sin entrenamiento. **La medida describe
 al explicador y a los datos de entrada, no al modelo.**
@@ -77,7 +82,8 @@ al explicador y a los datos de entrada, no al modelo.**
 - **Spearman sobre las variables distintas de 0** del nodo (ρ_nz): la misma correlación,
   calculada solo sobre las variables que el explicador sí puede ordenar.
 - **Coincidencia de las 10 más importantes** (J₁₀): Jaccard entre los conjuntos de las 10
-  variables con mayor importancia, |A ∩ B| / |A ∪ B|.
+  variables con mayor importancia, |A ∩ B| / |A ∪ B|. Si comparten k variables, J₁₀ = k / (20 − k):
+  compartir 5 da 0,33, compartir 7 da 0,54 y compartir 9 da 0,82.
 
 GNNExplainer, pesos por clase, GraphSAGE, GAT y TAGCN, escenarios principales:
 
@@ -145,21 +151,62 @@ semilla es comparar cosas distintas.
 
 ### 2.4 Qué pasa cuando sí se toca el fraude: 1:100 y 1:200
 
-> **Pendiente.** Se llena con la corrida de estrés (THE-39). En modo C el nativo ya usa todos
-> los negativos, así que 1:100 y 1:200 se alcanzan quitando ilícitas: 1.328 y 664 de 3.462.
-> Aquí el primer término de la ecuación de 2.2 sí cambia: el promedio de las ilícitas se
-> estima con el 38 % y el 19 % de los casos. La predicción que se deriva de 2.2 es que el
-> **rendimiento** caiga (ya se ve en el entrenamiento de 1:100: PR-AUC en validación de 0,37
-> en GraphSAGE con pesos por clase frente a 0,45 en el nativo, y azar sin ajuste) y que la
-> estabilidad entre réplicas se mueva poco, porque depende del explicador y de la entrada
-> (sección 1.3). Lo que sí debería moverse es el acuerdo con el modelo nativo.
+En modo C el nativo ya usa todos los negativos, así que 1:100 y 1:200 se alcanzan quitando
+ilícitas: quedan 1.328 y 664 de 3.462. Aquí el primer término de la ecuación de 2.2 sí
+cambia: el promedio de las ilícitas se estima con el 38 % y el 19 % de los casos.
+
+**El rendimiento cae.** PR-AUC en validación, media de 3 semillas:
+
+| Configuración | Nativo | 1:100 | 1:200 |
+|---|---|---|---|
+| GraphSAGE, pesos por clase | 0,46 | 0,37 | 0,36 |
+| TAGCN, pesos por clase | 0,30 | 0,28 | 0,28 |
+| GAT, pesos por clase | 0,32 | 0,34 | 0,32 |
+| GraphSAGE, focal loss | 0,31 | 0,11 | 0,02 |
+| GraphSAGE, sin ajuste | 0,18 | 0,02 | 0,03 |
+
+El azar es 0,024. Sin ajuste, GraphSAGE y TAGCN no aprenden nada desde 1:100; con focal loss
+dejan de aprender en 1:200. Solo pesos por clase resiste.
+
+**La estabilidad entre réplicas no cae.** GNNExplainer, pesos por clase, GraphSAGE, GAT y TAGCN:
+
+| Medida | 1:10 | 1:20 | Nativo | 1:100 | 1:200 |
+|---|---|---|---|---|---|
+| Spearman, 165 variables | 0,946 | 0,946 | 0,947 | 0,940 | 0,938 |
+| Spearman, variables distintas de 0 | 0,749 | 0,751 | 0,753 | 0,717 | 0,708 |
+| Coincidencia de las 10 más importantes | 0,62 | 0,63 | 0,62 | 0,61 | 0,62 |
+
+Prueba de Friedman sobre los seis escenarios (9 modelos: 3 arquitecturas por 3 semillas):
+p = 0,84 con la medida de la tesis y p = 0,35 sobre las variables distintas de 0. La baja de
+0,75 a 0,71 viene casi toda de un modelo (GraphSAGE, semilla 44: de 0,86 a 0,59) y no es
+significativa (Wilcoxon contra el nativo: p = 0,43 en 1:100 y p = 0,07 en 1:200). Incluso los
+modelos que quedaron al nivel del azar dan 0,90 a 0,93 con la medida de la tesis.
+
+**Lo que sí cambia es qué variables señala el modelo.** Acuerdo con el modelo nativo de la
+misma semilla (GNNExplainer, pesos por clase):
+
+| Comparación con el nativo, misma semilla | 1:10 | 1:20 | 1:100 | 1:200 |
+|---|---|---|---|---|
+| Spearman, variables distintas de 0 | 0,96 | 0,97 | 0,83 | 0,82 |
+| Coincidencia de las 10 más importantes | 0,78 | 0,81 | 0,52 | 0,51 |
+
+Submuestrear negativos deja al modelo casi igual (un Jaccard de 0,80 equivale a compartir 9
+de las 10 variables principales); quitar ilícitas lo cambia (0,52 equivale a compartir 7). El mismo patrón aparece en
+Shapley (0,86 a 0,88 frente a 0,62 a 0,63), Integrated Gradients (0,84 a 0,89 frente a 0,60 a
+0,66) y Expected Gradients (0,82 a 0,86 frente a 0,52 a 0,55).
+
+Para poner ese cambio en escala: volver a entrenar el nativo con otra semilla da 0,38, que
+equivale a compartir entre 5 y 6 de las 10. Quitar el 60 % o el 80 % de las ilícitas cambia la explicación, pero menos de
+lo que la cambia la semilla.
 
 ### 2.5 Cómo decirlo
 
-H1 no se rechaza, y con pesos por clase no podía rechazarse en el rango 1:10 a 1:38,4: los
-escenarios principales cambian una cantidad que no entra en la función de pérdida. Lo que el
-resultado respalda es la decisión de diseño de no tocar las ilícitas. No dice nada sobre un
-desbalance más severo; eso lo responde 2.4.
+H1 no se rechaza. En el rango 1:10 a 1:38,4, con pesos por clase, no podía rechazarse: los
+escenarios cambian una cantidad que no entra en la función de pérdida, y el resultado respalda
+la decisión de diseño de no tocar las ilícitas. En 1:100 y 1:200 tampoco se rechaza con la
+estabilidad entre réplicas, pero esa medida no distingue un modelo que aprendió de uno que no
+(sección 1.3). Lo que sí registra el desbalance severo es el rendimiento y el acuerdo con el
+modelo nativo: el modelo aprende menos y señala otras variables.
 
 ---
 
@@ -319,7 +366,7 @@ explicación sea correcta, ni siquiera que sea la misma si se reentrena el model
 |---|---|
 | «El submuestreo solo desplaza el logit en log(1/β)» (Elkan 2001; Dal Pozzolo et al. 2015), como mecanismo observado | En los modelos sin ajuste el desplazamiento mediano entre nativo y 1:10 es de −0,4 a 0,2 (la teoría predice +1,34) y la correlación de puntajes es de 0,40 a 0,80. Vale como expectativa teórica para el clasificador óptimo, no como lo que pasó. |
 | «Entre escenarios el acuerdo es 0,99, más que entre semillas» | Compara modelos de la misma semilla, que son casi idénticos, contra una referencia de otra semilla. Ver 2.3. |
-| «Las tres arquitecturas se apoyan en las mismas variables» | Entre arquitecturas solo coinciden de 2 a 5 de las 10 variables más importantes (Jaccard de 0,20 a 0,50). |
+| «Las tres arquitecturas se apoyan en las mismas variables» | Entre arquitecturas el Jaccard de las 10 variables más importantes es de 0,20 a 0,50: comparten de 3 a 7 de las 10. |
 | «La estabilidad de 0,93 a 0,99 muestra que el modelo aprendió algo consistente» | Una red sin entrenar da casi la misma cifra. Ver 1.3. |
 
 ---

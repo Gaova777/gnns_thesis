@@ -385,7 +385,7 @@ ECUACIONES = lamina(
     [("H2 · ecuaciones", "A", "Nos pidieron el porqué con las ecuaciones. La diferencia entre las cuatro arquitecturas, para este problema, cabe en una pregunta: cuando la capa calcula la representación de un nodo, ¿ese nodo tiene un peso propio o se mezcla con sus vecinos?"),
      ("Clic 1 · GCN", "A", "GCN suma al nodo y a sus vecinos con la misma matriz W y normaliza por el grado. No puede tratar al nodo distinto de sus vecinos."),
      ("Clic 2 · las otras tres", "A", "GraphSAGE tiene una matriz solo para el nodo. GAT aprende cuánta atención darle al propio nodo. TAGCN tiene el término de cero saltos, que es el nodo con su propia matriz. Las tres pueden conservar lo que dice el nodo."),
-     ("Clic 3 · lectura", "A", "En Elliptic la señal del fraude está en las variables del propio nodo y los vecinos casi no ayudan. Las tres que conservan al nodo llegan al mismo techo de rendimiento. Ojo: eso no quiere decir que señalen las mismas variables; entre arquitecturas solo coinciden de 2 a 5 de las 10 variables más importantes. El experimento de control de la lámina anterior lo confirma: a GCN le agregamos un peso propio y sube de 0,21 a 0,46."),
+     ("Clic 3 · lectura", "A", "En Elliptic la señal del fraude está en las variables del propio nodo y los vecinos casi no ayudan. Las tres que conservan al nodo llegan al mismo techo de rendimiento. Ojo: eso no quiere decir que señalen las mismas variables; entre arquitecturas comparten de 3 a 7 de las 10 variables más importantes. El experimento de control de la lámina anterior lo confirma: a GCN le agregamos un peso propio y sube de 0,21 a 0,46."),
      ])
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -511,11 +511,11 @@ if _fc.exists() and _fr.exists() and len(pd.read_csv(_fc)) == 48:
         '<p class="llamada media" data-desde="3" style="left:80px;top:700px;width:900px">Con medidas que no '
         f'se inflan, GNNExplainer baja de {c(rg.sp_all, 2)} a <b>{c(rg.sp_nz, 2)}</b> (solo variables '
         f'distintas de 0) y a <b>{c(rg.jac10, 2)}</b> (coincidencia de las 10 más importantes).</p>'
-        '<div class="ficha" data-desde="2" style="left:1040px;top:340px;width:800px;height:320px">'
+        '<div class="ficha" data-desde="2" style="left:1040px;top:340px;width:800px;height:260px">'
         '<p class="etq">Por qué</p><p class="txt">El <b>46 %</b> de las variables de un nodo vale 0 '
         'después del escalado. Los cuatro explicadores las dejan al fondo del orden, con cualquier '
         'modelo.</p><p class="txt">Solo ese bloque ya da un Spearman de 0,74 a 0,82.</p></div>'
-        '<div class="veredicto" data-desde="4" style="left:1040px;top:690px;width:800px"><p class="etq">'
+        '<div class="veredicto" data-desde="4" style="left:1040px;top:640px;width:800px"><p class="etq">'
         'Qué cambia</p><p class="txt"><b>H1 se sostiene</b> con las tres medidas. H2 y H3 hay que '
         'volver a probarlas con las medidas nuevas.</p></div>',
         "Tabla 4. Escenario con el desbalance real, pesos por clase, 4 arquitecturas, 3 semillas. "
@@ -576,44 +576,56 @@ if len(STRESS) == 2:
     SEIS = MAIN + STRESS
     tr = cfg[cfg.arch.isin(APR) & (cfg.balancing == CW)]
     prs = tr.groupby("scenario").val_pr_auc.mean()
-    prsd = tr.groupby("scenario").val_pr_auc_sd.mean()
     nil = tr.groupby("scenario").n_train_illicit.first()
     st3 = stab[stab.arch.isin(APR) & (stab.balancing == CW)]
     gr = st3[st3.explainer == "GNNExplainer"].groupby("scenario").y.mean()
-    eg = st3[st3.explainer == "ExpectedGradients"].groupby("scenario").y.mean()
-    gcs = st3[st3.explainer == "GNNExplainer"].groupby("scenario").cs.mean()
-    ecs = st3[st3.explainer == "ExpectedGradients"].groupby("scenario").cs.mean()
-    acs = esc[esc.arch.isin(APR) & (esc.balancing == CW) & (esc.explainer == "GNNExplainer")].groupby("scenario").rho.mean()
+    rs = pd.read_csv(R7 / "robusta_semillas.csv")
+    rs = rs[rs.arch.isin(APR) & (rs.balancing == CW) & (rs.explainer == "GNNExplainer")]
+    acs = rs[rs.tipo == "otro escenario, misma semilla"].groupby("scenario").jac10.mean()
+    ref_sem = rs[(rs.tipo == "mismo escenario, otra semilla") & (rs.scenario == "native")].jac10.mean()
     cols = "".join(f'<th style="text-align:right">{ESC_NOM[s]}</th>' for s in SEIS)
+
     def fila_e(nom, sub_, ser, d=2, fmt=None, desde=1):
         cel = "".join(f'<td class="{"r" if s in STRESS else ""}" style="text-align:right">'
-                      f'{(fmt(ser[s]) if fmt else c(ser[s], d)) if s in ser.index else "ref."}</td>' for s in SEIS)
+                      f'{(fmt(ser[s]) if fmt else c(ser[s], d)) if s in ser.index else "referencia"}</td>' for s in SEIS)
         return (f'<tr data-desde="{desde}"><td class="h">{nom}<br><span style="font-weight:400;font-size:21px">{sub_}</span></td>{cel}</tr>')
     miles = lambda v: f"{int(v):,}".replace(",", ".")
     cuerpo_e = ('<table class="tabla met" style="top:330px"><thead><tr><th>Pesos por clase, 3 arquitecturas</th>'
                 + cols + '</tr></thead><tbody>'
                 + fila_e("Ilícitas para entrenar", "de 3.462", nil, fmt=miles, desde=1)
                 + fila_e("PR-AUC de validación", "¿aprende?", prs, desde=1)
-                + fila_e("Desviación entre semillas", "del PR-AUC", prsd, desde=1)
-                + fila_e("GNNExplainer", "entre repeticiones", gr, 3, desde=2)
-                + fila_e("Expected Gradients", "entre repeticiones", eg, 3, desde=2)
-                + fila_e("GNNExplainer", "entre semillas del modelo", gcs, 3, desde=3)
-                + fila_e("Expected Gradients", "entre semillas del modelo", ecs, 3, desde=3)
-                + fila_e("Acuerdo con el nativo", "mismas variables, GNNExplainer", acs, 3, desde=3)
-                + '</tbody></table>')
-    ESTRES = dict(cuerpo=cuerpo_e, prs=prs, prsd=prsd, gr=gr, eg=eg, gcs=gcs, ecs=ecs, acs=acs)
+                + fila_e("Estabilidad de GNNExplainer", "entre repeticiones", gr, 3, desde=2)
+                + fila_e("Mismas 10 variables que el nativo", "misma semilla del modelo", acs, desde=3)
+                + '</tbody></table>'
+                '<div class="veredicto" data-desde="4" style="left:80px;top:765px;width:1760px"><p class="etq">Lo que muestra</p>'
+                '<p class="txt">Con menos fraude el modelo <b>aprende menos y señala otras variables</b>. '
+                'La estabilidad entre repeticiones no lo registra.</p></div>')
+    ESTRES = lamina(
+        "<b>Resultados:</b> H1, desbalance",
+        "Al quitar fraude hasta 1:100 y 1:200 cae el rendimiento y cambian las variables "
+        "señaladas, pero la estabilidad entre repeticiones no se mueve",
+        cuerpo_e,
+        "Tabla 3. Media de 3 semillas; GraphSAGE, GAT y TAGCN. Estabilidad: Spearman sobre las 165 "
+        f"variables. Última fila: Jaccard de las 10 variables más importantes; reentrenar el nativo con otra semilla da {c(ref_sem, 2)}.",
+        REF["weber"],
+        [("Estrés", "A", "Nos pidió forzar el desbalance hasta 1:100 y 1:200 para ver si la estabilidad se rompía. El escenario con el desbalance real ya usa todos los negativos, así que para llegar ahí quitamos fraude: nos quedamos con 1.328 y con 664 transacciones ilícitas de las 3.462."),
+         ("Clic 1 · rendimiento", "A", f"El modelo aprende menos: el PR-AUC de validación baja de {c(prs['native'], 2)} a {c(prs['1:100_subil'], 2)} y {c(prs['1:200_subil'], 2)}. Y eso es con pesos por clase; sin ajustar la pérdida, GraphSAGE y TAGCN quedan al nivel del azar."),
+         ("Clic 2 · estabilidad", "A", f"La estabilidad entre repeticiones casi no se mueve: {c(gr['native'], 3)} en el real, {c(gr['1:100_subil'], 3)} y {c(gr['1:200_subil'], 3)} en los dos extremos. La prueba de Friedman sobre los seis escenarios no encuentra diferencia."),
+         ("Clic 3 · qué variables", "A", f"Lo que sí cambia es qué variables señala el modelo. Comparamos cada modelo con el del desbalance real entrenado con la misma semilla. Cuando solo submuestreamos negativos, las diez variables principales casi no cambian: {c(acs['1:10'], 2)} y {c(acs['1:20'], 2)}. Cuando quitamos fraude baja a {c(acs['1:100_subil'], 2)} y {c(acs['1:200_subil'], 2)}."),
+         ("Clic 4 · lectura", "A", "Entonces el desbalance severo sí tiene efecto, pero no donde lo buscábamos: cambia cuánto aprende el modelo y en qué se fija, y la estabilidad entre repeticiones no lo ve. Es la misma conclusión de la prueba con la red sin entrenar."),
+         ], cls="lc")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # Resumen y plan
 # ═════════════════════════════════════════════════════════════════════════════
 rep(23, "<td>Mismo fraude, modelo que rinde parecido</td><td>Se pueden submuestrear negativos</td>",
-    "<td>Submuestrear negativos solo desplaza el puntaje; las variables son las mismas</td>"
-    "<td>Para probar H1 hay que cambiar lo que el modelo sabe del fraude</td>")
-rep(23, '<td class="r">Igual (0,93 en los cuatro)</td>', '<td class="r">Igual entre 1:10 y ≈1:40 (0,93)</td>')
+    "<td>Con pesos por clase la proporción de clases no entra en la pérdida, y la medida casi no depende del modelo</td>"
+    "<td>Con menos fraude cambian el rendimiento y las variables señaladas, no la estabilidad</td>")
+rep(23, '<td class="r">Igual (0,93 en los cuatro)</td>', '<td class="r">Igual de 1:10 a 1:200 (0,94 a 0,95)</td>')
 rep(23, "<td>La señal está en el nodo; GCN la diluye</td>",
     "<td>La señal está en el nodo; GCN no tiene peso propio para él</td>")
 rep(23, '<td class="r">Como esperábamos en GNNExplainer y Shapley; PGExplainer ≈ 0</td><td>PGExplainer satura en nodos de 2 aristas</td><td>PGExplainer como limitación</td>',
-    '<td class="r">Sin efecto en los explicadores de variables; PGExplainer ≈ 0</td><td>La pérdida mueve el umbral, no las variables; PGExplainer ordena 2 aristas</td><td>PGExplainer como limitación; un explicador de gradientes lo reemplaza</td>')
+    '<td class="r">Sin efecto en los explicadores de variables; PGExplainer ≈ 0</td><td>En variables la diferencia es de centésimas; PGExplainer ordena 2 aristas</td><td>PGExplainer como limitación; un explicador de gradientes lo reemplaza</td>')
 rep(24, '<span class="estado">Optimización completa cuando salga el candidato</span>',
     '<span class="estado ok">✓ Candidato con optimización completa</span>'
     '<span class="estado ok">✓ Explicador de gradientes</span>'
@@ -635,15 +647,8 @@ if VALIDEZ:
 orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]]
 ESTRES_SLOT = orden_final.index("@@ESTRES@@") if ESTRES else None
 if __name__ == "__main__":
-    extra = {}
-    hook = OUT / "estres_lamina.py"      # la lámina de estrés se redacta al ver los datos
-    if ESTRES and hook.exists():
-        exec(hook.read_text(encoding="utf8"), {"ESTRES": ESTRES, "lamina": lamina, "REF": REF,
-                                                 "c": c, "extra": extra})
     if ESTRES:
-        orden_final[ESTRES_SLOT] = extra.get("lamina") or lamina(
-            "<b>Resultados:</b> H1, desbalance", "H1: escenarios 1:100 y 1:200",
-            ESTRES["cuerpo"], "", REF["weber"], [("Estrés", "J", "")] * 4)
+        orden_final[ESTRES_SLOT] = ESTRES
     nfig = ntab = 0
     out = []
     for k, s in enumerate(orden_final, 1):
