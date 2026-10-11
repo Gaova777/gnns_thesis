@@ -19,6 +19,12 @@ de `results_phase1_v4/` y del código en `src/` y `configs/experiment_v4.yaml`.
 
 ---
 
+> **Actualización del 10-oct.** Después de la reunión del 7 de octubre se agregaron dos niveles
+> extremos de desbalance (1:100 y 1:200), dos explicadores de gradientes y una prueba sobre la
+> propia medida de estabilidad. Las láminas 10, 11 y 12 de la Parte 1 traen abajo un bloque
+> «Actualización» con lo que hay que añadir al discurso. La **Parte 2 quedó reemplazada** por
+> `docs/GUION_hipotesis_v8_explicado.md`, que sigue el deck de hipótesis de 36 láminas.
+
 ## La historia completa en un minuto
 
 Si solo se entiende esto, se entiende la tesis:
@@ -460,6 +466,25 @@ Además ningún modelo 1:1 pasó la compuerta. Lo pidió Cristian.
 
 ---
 
+**Actualización del 10-oct: el caso extremo**
+
+Añadir al discurso, después de la regla de no quitar ilícitas:
+
+> Esa regla tiene una excepción que hicimos a propósito. Nos pidieron forzar el desbalance
+> hasta 1 por cada 100 y 1 por cada 200. Como el nivel real ya usa todos los negativos, la
+> única forma de ir más allá sin inventar datos es quitar fraude: dejamos 1.328 y 664 de las
+> 3.462 ilícitas. Son dos niveles de estrés, y los reportamos aparte.
+
+- **Conteos de entrenamiento:** 1:10 = 3.462 ilícitas y 34.620 negativos; 1:20 = 3.462 y
+  69.240; real = 3.462 y 132.803; 1:100 = 1.328 y 132.803; 1:200 = 664 y 132.803.
+- **Por qué aparte:** cambian a la vez la proporción y la cantidad de fraude (queda el 38 % y
+  el 19 %). No entran en las pruebas estadísticas de los cuatro niveles principales.
+- **Si preguntan por qué no crear negativos sintéticos:** el grafo pasaría de 203 mil a 417
+  mil y 763 mil transacciones, más de la mitad inventadas, y no cabe en los 8 GB de la tarjeta
+  gráfica.
+
+---
+
 ## Lámina 11. La matriz experimental
 
 **Qué decir**
@@ -530,6 +555,17 @@ Son los mismos umbrales de la versión anterior, fijados antes de ver estos resu
 
 ---
 
+**Actualización del 10-oct: la matriz creció**
+
+- A los cuatro niveles principales se suman los dos de estrés: 72 modelos más (2 niveles, 4
+  arquitecturas, 3 pérdidas, 3 semillas).
+- Con pesos por clase, GAT solo pasa el filtro de calidad si se evalúa con el umbral ajustado
+  (0 de 12 modelos con el umbral 0,5; 12 de 12 con el ajustado). Es una decisión pendiente.
+- El candidato que salió de la matriz, GraphSAGE con pesos por clase, se volvió a entrenar con
+  una búsqueda de parámetros 19 veces más larga: sube de 0,46 a 0,50 en validación.
+
+---
+
 ## Lámina 12. Cómo se mide la estabilidad
 
 **Qué decir**
@@ -563,6 +599,42 @@ Son los mismos umbrales de la versión anterior, fijados antes de ver estos resu
   cuando en realidad no mide eso.
 
 ---
+
+**Actualización del 10-oct: dos explicadores más y un límite de la medida**
+
+Añadir al discurso:
+
+> Como PGExplainer no sirve en este grafo, agregamos un explicador de otra familia, la de
+> gradientes, en dos versiones. Y una advertencia sobre la medida: casi la mitad de las
+> variables de una transacción vale cero, y los explicadores siempre las dejan al fondo del
+> orden. Eso sube la correlación sin que el modelo tenga nada que ver. Por eso reportamos
+> también dos medidas que no se inflan.
+
+- **Integrated Gradients** (Sundararajan et al. 2017): reparte la decisión entre las variables
+  siguiendo el gradiente desde una transacción de referencia. Es determinista: repetirlo da lo
+  mismo, y su estabilidad entre repeticiones vale 1 por construcción.
+- **Expected Gradients** (Erion et al. 2021): lo mismo, con la referencia tomada al azar de
+  transacciones no ilícitas. Tiene ruido, así que las cinco repeticiones sí miden algo.
+- **El límite de la medida.** El 46 % de las variables de las 30 transacciones vale 0 después
+  del escalado. Solo ese bloque común ya da un Spearman de 0,74 a 0,82. Y una red sin entrenar
+  da casi la misma estabilidad que la entrenada: GNNExplainer 0,95 y 0,93; Shapley 0,97 y 0,96
+  (prueba de Adebayo et al. 2018).
+- **Las dos medidas que no se inflan:** el Spearman solo sobre las variables distintas de 0, y
+  la coincidencia de las 10 variables más importantes (índice de Jaccard). Con ellas
+  GNNExplainer baja de 0,95 a 0,75 y a 0,63.
+- **Si preguntan si eso invalida el estudio:** no. La conclusión sobre el desbalance se
+  sostiene con las tres medidas. Lo que cambia es cuánto se puede concluir de una estabilidad
+  alta, que es la tesis de fondo: estable no es lo mismo que correcto.
+
+Referencias de esta actualización: Adebayo, J. et al. (2018). Sanity checks for saliency maps.
+NeurIPS. Erion, G. et al. (2021). Improving performance of deep learning models with axiomatic
+attribution priors and expected gradients. Nature Machine Intelligence, 3, 620-631.
+Sundararajan, M. et al. (2017). Axiomatic attribution for deep networks. ICML.
+
+---
+
+> **Esta parte describe la versión de 26 láminas y quedó reemplazada** por
+> `docs/GUION_hipotesis_v8_explicado.md`. Se conserva como registro.
 
 # Parte 2. Deck de hipótesis
 

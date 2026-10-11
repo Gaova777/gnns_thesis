@@ -749,6 +749,21 @@ if VALIDEZ:
 orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]]
 ESTRES_SLOT = orden_final.index("@@ESTRES@@") if ESTRES else None
 
+def llano(t):
+    """Notas del orador en el mismo lenguaje de los titulares (pedido del 11-oct)."""
+    def ini(mm, txt):      # mayúscula si abre la frase
+        prev = t[max(0, mm.start() - 2):mm.start()]
+        return txt[0].upper() + txt[1:] if (mm.start() == 0 or prev.endswith((">", ". ", "? ", ": "))) else txt
+    t = t.replace("deja test intacto", "deja intacta la prueba final")
+    t = re.sub(r"\b([Ee]n|[Dd]e|[Cc]on) test\b", r"\1 la prueba final", t)
+    t = re.sub(r"\b[Tt]est\b", lambda mm: ini(mm, "la prueba final"), t)
+    t = t.replace("la compuerta", "el filtro de calidad").replace("La compuerta", "El filtro de calidad")
+    t = re.sub(r"\bH(\d) y H(\d)\b", lambda mm: ini(mm, f"las hipótesis {mm.group(1)} y {mm.group(2)}"), t)
+    t = re.sub(r"\bH(\d) a H(\d)\b", lambda mm: ini(mm, f"las hipótesis {mm.group(1)} a {mm.group(2)}"), t)
+    t = re.sub(r"\bH(\d)\b", lambda mm: ini(mm, f"la hipótesis {mm.group(1)}"), t)
+    return t
+
+
 # Titulares para un público que no conoce la tesis (pedido del 10-oct): primero el tema de la
 # lámina en palabras llanas, después el resultado. Sin jerga: «filtro de calidad» en vez de
 # «compuerta», «prueba final» en vez de «test», «1 fraude por cada 10» en vez de «1:10».
@@ -797,6 +812,8 @@ if __name__ == "__main__":
     out = []
     for k, s in enumerate(orden_final, 1):
         s = re.sub(r'aria-label="Lámina \d+"', f'aria-label="Lámina {k}"', s, count=1)
+        s = re.sub(r'(<aside class="notas" hidden>)(.*?)(</aside>)',
+                   lambda mm: mm.group(1) + llano(mm.group(2)) + mm.group(3), s, flags=re.S)
         if len(orden_final) == len(TITULARES):
             s, nt = re.subn(r'(<h1[^>]*>|<h2 class="titular">).*?(</h[12]>)',
                             lambda mm: mm.group(1) + TITULARES[k - 1] + mm.group(2), s, count=1, flags=re.S)
