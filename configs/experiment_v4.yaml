@@ -103,6 +103,12 @@ explainability:
     train_min_illicit: 25              # de ellos, al menos 25 ilícitos
   shapley:
     num_samples: 50                    # v3-C usaba 25 para GAT; común: 50
+  # Explicadores por gradiente (7-oct). No entran en la matriz por defecto: se piden con
+  # --explainer IntegratedGradients,ExpectedGradients y se guardan en results_v4_grad/.
+  # Son los valores con que se corrieron los 252 modelos (antes eran el default del código).
+  gradients:
+    steps: 100                         # Integrated Gradients: pasos de la suma de Riemann
+    num_samples: 200                   # Expected Gradients: pares (referencia, alfa) por réplica
   # Lista legada (formato v3) con los mismos valores, por si algún lector aún la usa.
   # Fuente de verdad: los bloques gnnexplainer / pgexplainer / shapley de arriba.
   methods:
