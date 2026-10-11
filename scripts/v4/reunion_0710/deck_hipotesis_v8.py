@@ -444,7 +444,7 @@ set_ref(19, REF["focal"])
 set_notas(19, [
     ("H3", "J", "Tercera hipótesis: la función de pérdida con la que se compensa el desbalance."),
     ("Clic 1 · qué esperábamos", "J", "Esperábamos que no moviera la estabilidad."),
-    ("Clic 2 · por qué", "J", "Porque la pérdida solo cambia cuánto pesa cada error durante el entrenamiento. Eso desplaza el umbral del modelo, pero no cambia qué variables llevan la señal."),
+    ("Clic 2 · por qué", "J", "La pérdida cambia cuánto pesa cada error durante el entrenamiento, y con eso cambia cuánto fraude detecta el modelo, como se ve en la lámina siguiente. Lo que medimos aquí es otra cosa: si al repetir la explicación sale lo mismo. Y eso casi no depende de lo que el modelo aprendió; lo mostramos más adelante con una red sin entrenar."),
     ("Clic 3 · qué dio", "J", "Aquí hay que leer con cuidado, porque la vez pasada se entendió al revés. Los tres primeros grupos son explicadores que ordenan las 165 variables del nodo: GNNExplainer, Shapley y el nuevo, Expected Gradients. En los tres, las tres barras quedan a la misma altura: la pérdida no mueve nada. El cuarto grupo es PGExplainer, que no ordena variables sino aristas. Ahí sí hay una caída grande con pesos por clase."),
     ("Clic 4 · veredicto", "J", "Entonces: en los explicadores de variables salió lo esperado. Lo de PGExplainer no es un efecto de la pérdida sobre la explicación; es un problema del instrumento, y lo mostramos en la siguiente."),
 ])
