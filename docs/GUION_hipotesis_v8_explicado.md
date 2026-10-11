@@ -1,6 +1,6 @@
 # Guion explicado del deck de hipótesis, versión 8
 
-Acompaña el deck «Hipótesis v4», versión 8 (36 láminas), que se genera con
+Acompaña el deck «Hipótesis v4», versión 8 (38 láminas), que se genera con
 `scripts/v4/reunion_0710/deck_hipotesis_v8.py`. Reemplaza, para este deck, la segunda mitad de
 `docs/GUION_presentacion_v4_explicado.md`, que describe la versión de 26 láminas.
 
@@ -327,14 +327,15 @@ detecta peor y se fija en otras variables. Pero la estabilidad entre repeticione
 ## Lámina 22. Hipótesis 2, tipo de red: qué esperábamos y qué resultó
 
 **Qué decir.** Esperábamos que el tipo de red cambiara la estabilidad, porque cada una combina
-de forma distinta la transacción con sus vecinas. Entre las tres que aprenden, la estabilidad
-es casi la misma. GCN no aprende, así que no se explica.
+de forma distinta la transacción con sus vecinas. Entre las tres que aprenden, las diferencias
+son de centésimas. GCN no aprende, así que no se explica.
 
 **Qué hay detrás.** GraphSAGE 0,94, GAT 0,93 y TAGCN 0,92, equivalentes con margen de 0,05.
 
 **Si preguntan.**
-- *¿Es definitivo?* No del todo. Con una medida más exigente (lámina 29) GraphSAGE queda por
-  encima: 0,84 frente a 0,73 y 0,68. Falta la prueba estadística.
+- *¿Hay una red más estable?* No se puede afirmar. Con GNNExplainer, GraphSAGE queda primera
+  en las tres semillas (0,96 frente a 0,94 y 0,94); con Shapley la primera es GAT. El orden
+  depende del explicador y las diferencias son de centésimas, dentro del margen de 0,05.
 
 ---
 
@@ -369,8 +370,10 @@ se promedia con sus vecinas. GCN no lo tiene. Las otras tres sí, cada una a su 
 
 ## Lámina 25. Hipótesis 3, forma de compensar el desbalance
 
-**Qué decir.** Esperábamos que no cambiara la estabilidad, y así fue en los explicadores que
-ordenan variables. El único que cambia es PGExplainer, que ordena conexiones y no variables.
+**Qué decir.** Esperábamos que no cambiara la estabilidad. En los explicadores que ordenan
+variables cambia unas centésimas, y no siempre en el mismo sentido. El único donde cambia
+mucho es PGExplainer, que ordena conexiones y no variables, y ahí el problema es del
+instrumento.
 
 **Qué hay detrás.** GNNExplainer: pesos por clase 0,95, sin ajuste 0,93, focal loss 0,91.
 Shapley: 0,99 en las tres.
@@ -378,8 +381,11 @@ Shapley: 0,99 en las tres.
 **Si preguntan.**
 - *¿Por qué pesos por clase rinde mejor que focal loss?* Pesos por clase compensa 38 a 1, el
   desbalance completo. Focal loss, como se configuró, solo 3 a 1.
-- *¿Es definitivo?* Con la medida más exigente la diferencia crece: 0,75, 0,65 y 0,59. Falta
-  la prueba estadística.
+- *¿De verdad no hay efecto?* Hay un efecto pequeño y depende del explicador. Con
+  GNNExplainer, pesos por clase es más estable que focal loss en los 9 modelos (0,95 frente a
+  0,91; con la medida exigente, 0,75 frente a 0,59). Con Shapley es al revés (0,992 frente a
+  0,995). Por eso el titular dice «unas centésimas, y en sentido distinto según el
+  explicador».
 
 ---
 
@@ -495,9 +501,10 @@ las variables de una transacción vale cero, y los explicadores siempre las deja
 - Es la prueba de Adebayo et al. (2018).
 
 **Si preguntan.**
-- *¿Entonces la tesis está mal?* No. La hipótesis 1 se sostiene con las tres medidas. Lo que
-  cambia es qué tanto se puede concluir de una estabilidad alta, que es justo la tesis de
-  fondo.
+- *¿Entonces la tesis está mal?* No. La hipótesis 1 se sostiene con las tres medidas. En las
+  hipótesis 2 y 3 las diferencias crecen con la medida exigente y su sentido depende del
+  explicador. Lo que cambia es qué tanto se puede concluir de una estabilidad alta, que es
+  justo la tesis de fondo.
 - *¿Las variables principales sí cambian al entrenar?* Sí: coinciden solo 0,20 a 0,40 con las
   de la red sin entrenar. La estabilidad no lo registra.
 
@@ -559,6 +566,16 @@ pasa el filtro de calidad, y en la prueba final se repite la caída.
 
 ---
 
+## Láminas 37 y 38. Anexo: el caso extremo en la prueba final
+
+**Qué decir.** Solo si preguntan. Con 1 fraude por cada 100 y por cada 200, en la prueba final
+pasa lo mismo que en los demás niveles: ninguna curva se separa del azar.
+
+**Qué hay detrás.** PR-AUC de GraphSAGE con pesos por clase en la prueba final: 0,007 en los
+dos niveles, frente a 0,010 con todo el fraude. El azar es 0,006.
+
+---
+
 ## Lo que no se debe decir
 
 | Frase | Por qué no |
@@ -567,7 +584,9 @@ pasa el filtro de calidad, y en la prueba final se repite la caída.
 | «Entre escenarios las explicaciones coinciden en 0,99» | Compara modelos de la misma semilla, que son casi idénticos. |
 | «Las redes se apoyan en las mismas variables» | Comparten de 3 a 7 de las 10 principales. |
 | «La estabilidad alta muestra que el modelo aprendió» | Una red sin entrenar da casi lo mismo. |
-| «GAT es la más estable» o cualquier orden entre redes | Las diferencias no tienen prueba estadística con las medidas nuevas. |
+| «GAT es la más estable» o cualquier orden entre redes | El orden cambia con el explicador: GraphSAGE con GNNExplainer, GAT con Shapley. |
+| «La forma de compensar el desbalance no afecta la estabilidad» | Afecta unas centésimas, y en sentido contrario en GNNExplainer y en Shapley. |
+| «Friedman da p = 0,0001 entre arquitecturas» | Ese valor trata como independientes modelos casi idénticos. Solo hay 3 semillas independientes. |
 
 ## Referencias
 

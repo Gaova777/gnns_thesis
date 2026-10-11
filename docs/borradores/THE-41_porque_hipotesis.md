@@ -9,9 +9,9 @@ que la respalda. Solo usa afirmaciones que pasaron la validación del 10-oct
 (`docs/REUNION_2026-10-07_CRISTIAN.md`, sección G). Lo que no pasó está al final, en «Lo que
 no se puede afirmar».
 
-**Estado (10-oct, 15:00):** completo con la corrida de 1:100 y 1:200 y con el control de pesos
-al azar terminado (48 de 48). Las diferencias de H2 y H3 con las medidas nuevas siguen sin
-prueba estadística.
+**Estado (11-oct):** completo con la corrida de 1:100 y 1:200, el control de pesos al azar
+(48 de 48) y las pruebas de H2 y H3 con las tres medidas
+(`results_v4/reunion_0710/VALIDACION.md`, sección 3).
 
 Alcance de las cifras: 3 semillas del modelo (42, 43, 44) en todo lo que se afirma. Donde se
 usa otra cosa se dice.
@@ -261,15 +261,22 @@ separación en una de las dos:
 | TAGCN | 0,68 | 0,62 |
 
 Sobre las variables distintas de 0, GraphSAGE queda por encima; en las 10 más importantes las
-cuatro son indistinguibles. **A estas diferencias todavía no se les ha hecho prueba
-estadística**: no se puede afirmar una separación hasta rehacer el contraste de H2 con estas
-medidas.
+cuatro son indistinguibles.
+
+GraphSAGE queda primera en las tres semillas con GNNExplainer (0,964 frente a 0,939 y 0,937
+con la medida de la tesis; 0,84 frente a 0,73 y 0,68 sobre las variables distintas de 0). Con
+Shapley la primera es GAT, también en las tres semillas. Con solo 3 semillas independientes
+no hay prueba formal posible, y con la medida de la tesis las diferencias (hasta 0,03) quedan
+dentro del margen de equivalencia de 0,05. No se debe citar la prueba de Friedman con 12
+bloques: los modelos de una misma semilla en distintos escenarios son casi idénticos y no son
+réplicas independientes.
 
 ### 3.5 Cómo decirlo
 
 La arquitectura decide **si el modelo aprende**: la que no tiene un camino propio para el nodo
-no aprende en un grafo donde los vecinos no se parecen al nodo. Entre las que aprenden, la
-conclusión sobre la estabilidad depende de la medida y queda abierta hasta rehacer la prueba.
+no aprende en un grafo donde los vecinos no se parecen al nodo. Entre las que aprenden, las
+diferencias de estabilidad son de centésimas con la medida de la tesis y su orden depende del
+explicador: no hay una arquitectura «más estable».
 
 ---
 
@@ -320,7 +327,13 @@ GraphSAGE, GAT y TAGCN, escenarios principales, GNNExplainer:
 
 El orden es el mismo con las tres medidas: pesos por clase, sin ajuste, focal loss. Con la
 medida de la tesis la diferencia es de cuatro centésimas; sobre las variables distintas de 0,
-de dieciséis. **Tampoco tiene todavía prueba estadística con las medidas nuevas.**
+de dieciséis. Pesos por clase supera a focal loss en los 9 modelos (3 arquitecturas por 3
+semillas) con las dos correlaciones (prueba de signos, p = 0,004) y en 7 de 9 con las 10 más
+importantes (p = 0,18).
+
+**En Shapley el sentido se invierte:** pesos por clase da 0,992 frente a 0,995 de focal loss,
+y 0,81 frente a 0,89 en las 10 más importantes (menor en 8 de 9 modelos). La pérdida sí tiene
+efecto sobre la estabilidad, pero su sentido depende del explicador.
 
 Una lectura coherente con 4.1, que hay que presentar como hipótesis y no como resultado: la
 estabilidad de GNNExplainer depende de qué tan nítido es el gradiente del modelo respecto a

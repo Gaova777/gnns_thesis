@@ -66,7 +66,46 @@ variables distintas de 0; jac10: Jaccard de las 10 más importantes.
 | H3, 3 arquitecturas: pesos por clase · sin ajuste · focal loss | 0,947 · 0,925 · 0,914 | 0,751 · 0,650 · 0,589 | 0,63 · 0,59 · 0,57 |
 
 - H1: Friedman sobre los seis escenarios (9 modelos), p = 0,84 (sp_all) y p = 0,35 (sp_nz).
-- H2 y H3: sin prueba estadística todavía con sp_nz y jac10.
+- H2 y H3: ver la subsección siguiente.
+
+### Pruebas de H2 y H3 con las tres medidas (11-oct)
+
+`pruebas_h2_h3_robustas.csv`. Escenarios principales; GraphSAGE, GAT y TAGCN.
+
+**Advertencia de método.** Los modelos de una misma semilla en distintos escenarios son casi
+idénticos (sección «Veredicto»), así que no son réplicas independientes. La unidad
+independiente es el modelo promediado sobre los cuatro escenarios: 3 semillas por arquitectura
+(9 modelos). Una prueba de Friedman con 12 bloques (4 escenarios por 3 semillas) da p = 0,0001
+para H2, pero ese valor está inflado por la repetición y **no debe citarse**.
+
+**H2, arquitectura** (pesos por clase, media por semilla):
+
+| Explicador y medida | GraphSAGE | GAT | TAGCN | ¿Mismo orden en las 3 semillas? |
+|---|---|---|---|---|
+| GNNExplainer, sp_all | 0,964 | 0,939 | 0,937 | GraphSAGE primera en las 3 |
+| GNNExplainer, sp_nz | 0,844 | 0,734 | 0,677 | GraphSAGE primera en las 3 |
+| GNNExplainer, jac10 | 0,635 | 0,623 | 0,624 | No: cambia en cada semilla |
+| Shapley, sp_all | 0,993 | 0,996 | 0,987 | GAT primera en las 3 |
+| Shapley, jac10 | 0,802 | 0,861 | 0,772 | GAT primera en las 3 |
+
+Con 3 semillas no hay prueba formal posible. Lo que se puede decir: con la medida de la tesis
+las diferencias son de hasta 0,03, dentro del margen de equivalencia de 0,05; el orden depende
+del explicador (GraphSAGE con GNNExplainer, GAT con Shapley) y desaparece en las 10 variables
+principales de GNNExplainer. TAGCN semilla 44 es un caso atípico (sp_nz 0,46).
+
+**H3, pérdida** (9 modelos: 3 arquitecturas por 3 semillas):
+
+| Explicador y medida | Pesos por clase | Sin ajuste | Focal loss | Pesos por clase mayor que focal loss |
+|---|---|---|---|---|
+| GNNExplainer, sp_all | 0,947 | 0,925 | 0,914 | 9 de 9 (prueba de signos, p = 0,004) |
+| GNNExplainer, sp_nz | 0,751 | 0,650 | 0,589 | 9 de 9 (p = 0,004) |
+| GNNExplainer, jac10 | 0,627 | 0,588 | 0,573 | 7 de 9 (p = 0,18) |
+| Shapley, sp_all | 0,992 | 0,994 | 0,995 | 2 de 9 |
+| Shapley, jac10 | 0,812 | 0,876 | 0,894 | 1 de 9 (p = 0,04, en sentido contrario) |
+
+La pérdida sí tiene efecto, y su sentido depende del explicador: con GNNExplainer, pesos por
+clase da las explicaciones más estables; con Shapley, las menos estables. Con la medida de la
+tesis el tamaño es de centésimas (0,03 y 0,003).
 
 ## 4. Escenarios de estrés 1:100 y 1:200
 

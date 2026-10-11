@@ -41,15 +41,15 @@ Estado: ✅ hecho · 🔄 en curso · ⏳ pendiente · ❓ requiere decisión
 
 | # | Qué pidió (minuto) | Qué hacemos | Estado | Linear |
 |---|---|---|---|---|
-| C1 | Forzar el desbalance a **1:100 o 1:200** para ver caer la estabilidad. «Va a ser obligatorio» (min. 76 y 91). | Dos escenarios de estrés con el mismo protocolo de la matriz. Ver A.1. | 🔄 corriendo desde el 10-oct 07:41 | THE-39 |
-| C2 | **Un explicador extra** que compense a PGExplainer (min. 86 a 91). | Integrated Gradients, con la variante de línea base aleatoria para el protocolo de 5 réplicas. Ver A.2. | ⏳ | THE-40 |
-| C3 | **El porqué** de H1, H2 y H3 con ecuaciones, arquitectura, puntos fuertes y débiles (min. 82). | Sección C de este documento y redacción para la tesis. | 🔄 | THE-41 |
+| C1 | Forzar el desbalance a **1:100 o 1:200** para ver caer la estabilidad. «Va a ser obligatorio» (min. 76 y 91). | Dos escenarios de estrés con el mismo protocolo de la matriz. Ver A.1. | ✅ 72 modelos; la estabilidad no cae (Friedman p = 0,84) | THE-39 |
+| C2 | **Un explicador extra** que compense a PGExplainer (min. 86 a 91). | Integrated Gradients, con la variante de línea base aleatoria para el protocolo de 5 réplicas. Ver A.2. | ✅ sobre los 252 modelos | THE-40 |
+| C3 | **El porqué** de H1, H2 y H3 con ecuaciones, arquitectura, puntos fuertes y débiles (min. 82). | Sección C de este documento y redacción para la tesis. | ✅ borrador en `docs/borradores/THE-41_porque_hipotesis.md` | THE-41 |
 | C4 | **Pesos por clase para todas** las arquitecturas, «sin ajuste» como referencia, nativo como escenario de referencia (min. 46 a 53). | Rehacer las láminas de rendimiento. Antes hay que resolver la compuerta de GAT (sección E.1). | ❓ | THE-42 |
 | C5 | Respuesta a «¿por qué seguir con un test que no es representativo?» y, más adelante, **correr también solo hasta antes del cierre** (min. 0 a 4). | Respuesta en B.12. La corrida con la partición alterna queda para después del envío. | ⏳ posterior | THE-44 |
-| C6 | **Coherencia de GCN**: si no pasa la compuerta no puede aparecer como la mejor en test sin explicación (min. 6 a 44). | Lámina explícita y orden «tabla completa, filtro, candidatos». Respuestas en B.1 a B.3. | ⏳ | THE-43 |
-| C7 | Láminas: leyenda de colores, qué es la banda, qué son los puntos, redacción de H1, H2 y H3, Shapley mal graficado (min. 14, 45, 77 a 85). | Lista de verificación en la sección D. | ⏳ | THE-43 |
+| C6 | **Coherencia de GCN**: si no pasa la compuerta no puede aparecer como la mejor en test sin explicación (min. 6 a 44). | Lámina explícita y orden «tabla completa, filtro, candidatos». Respuestas en B.1 a B.3. | ✅ láminas 6 y 7 del deck | THE-43 |
+| C7 | Láminas: leyenda de colores, qué es la banda, qué son los puntos, redacción de H1, H2 y H3, Shapley mal graficado (min. 14, 45, 77 a 85). | Lista de verificación en la sección D. | ✅ deck de 38 láminas | THE-43 |
 | C8 | Las hipótesis «así están un poco raras»; hay que ver cómo se plantean (min. 79). | Sigue abierta la tarea de pasar a una sola hipótesis. | ⏳ | THE-16 |
-| C9 | Saber argumentar cada decisión. «No debería suceder que sea: ni se me ocurrió» (min. 3). | Banco de respuestas de la sección B. | 🔄 | THE-45 |
+| C9 | Saber argumentar cada decisión. «No debería suceder que sea: ni se me ocurrió» (min. 3). | Banco de respuestas de la sección B. | ✅ acta y guion; falta el ensayo | THE-45 |
 
 ### A.1 Escenarios 1:100 y 1:200 (C1)
 
@@ -465,6 +465,32 @@ Detalle completo en `results_v4/reunion_0710/VALIDACION.md`.
 
 Esto explica de raíz por qué todo salió estable, que era la pregunta de Cristian, y a la vez
 obliga a decidir con qué medida se reportan los resultados.
+
+## H. Cierre del 11-oct
+
+Todo lo que se podía hacer sin una decisión de los autores o de Cristian quedó hecho.
+
+**Resultado de 1:100 y 1:200.** El rendimiento cae (GraphSAGE con pesos por clase: 0,46, 0,37 y
+0,36), cambian las variables que señala el modelo (Jaccard de las 10 principales contra el
+nativo de la misma semilla: 0,78 a 0,81 al quitar negativos; 0,52 y 0,51 al quitar fraude) y la
+estabilidad entre réplicas no cambia (0,947, 0,940 y 0,938; Friedman p = 0,84).
+
+**Pruebas de H2 y H3 con las tres medidas** (`results_v4/reunion_0710/VALIDACION.md`, sección
+3). Las respuestas B.10 y B.11 se leen ahora así:
+
+- **Arquitectura.** Con GNNExplainer, GraphSAGE queda primera en las tres semillas (0,964
+  frente a 0,939 y 0,937); con Shapley la primera es GAT. Las diferencias son de centésimas con
+  la medida de la tesis y el orden depende del explicador. Solo hay 3 semillas independientes:
+  no se debe citar una prueba con 12 bloques, porque los modelos de una misma semilla en
+  distintos escenarios son casi idénticos.
+- **Pérdida.** Con GNNExplainer, pesos por clase es más estable que focal loss en los 9 modelos
+  (prueba de signos, p = 0,004); con Shapley es al revés. La pérdida sí tiene efecto, pequeño,
+  y su sentido depende del explicador. La frase «la pérdida mueve el umbral, no las variables»
+  no está medida y se retiró de las láminas.
+
+**Entregables.** Deck de hipótesis de 38 láminas (borrador privado), guion explicado
+(`docs/GUION_hipotesis_v8_explicado.md`), guion del deck principal actualizado, informe de
+validación y borrador del porqué.
 
 ## Decisiones que necesitan respuesta
 

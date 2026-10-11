@@ -437,7 +437,7 @@ ley = "".join(f'<rect class="{cls}" x="{130 + k * 250}" y="456" width="26" heigh
               for k, (cls, t) in enumerate((("cat-n", "sin ajuste"), ("cat-c", "pesos por clase"), ("cat-f", "focal loss"))))
 titulo(19, "H3: la pérdida no mueve la estabilidad cuando se explican variables; solo cambia "
            "PGExplainer, que ordena aristas")
-cuerpo(19, f'''<div class="ficha" data-desde="1" style="left:80px;top:330px;width:660px;height:300px"><p class="etq">1 · Qué esperábamos</p><p class="afirma">Que la pérdida no moviera la estabilidad</p><svg width="560" height="120" viewBox="0 0 560 120"><path class="eje" d="M10 6L10 104L540 104"/><rect class="cat-n creceY" x="120" y="30" width="80" height="74"/><rect class="cat-c creceY" x="240" y="30" width="80" height="74" style="--d:.1s"/><rect class="cat-f creceY" x="360" y="30" width="80" height="74" style="--d:.2s"/></svg></div><div class="ficha" data-desde="2" style="left:80px;top:650px;width:660px;height:280px"><p class="etq">2 · Por qué</p><p class="txt">La pérdida cambia cuánto pesa cada error al entrenar. Mueve el umbral del modelo, no las variables que usa para decidir.</p></div><p class="etiqueta" data-desde="3" style="left:800px;top:330px">3 · Qué dio</p><svg class="fig" data-desde="3" viewBox="0 0 1040 490" style="left:820px;top:360px;width:998px;height:470px" role="img" aria-label="Estabilidad por pérdida. GNNExplainer {c(h3[("GNNExplainer", "none")], 2)}, {c(h3[("GNNExplainer", CW)], 2)}, {c(h3[("GNNExplainer", "focal_loss")], 2)}. PGExplainer {c(h3[("PGExplainer", "none")], 2)}, {c(h3[("PGExplainer", CW)], 2)}, {c(h3[("PGExplainer", "focal_loss")], 2)}.">{guia}<path class="eje" d="M100 20L100 370L1030 370"/><text class="t3 te" x="88" y="378" font-size="22">0,00</text><g class="aparece" style="--d:.2s">{"".join(gb)}</g>{ley}</svg><div class="veredicto" data-desde="4" style="left:800px;top:838px;width:1040px;padding:12px 28px"><p class="txt" style="font-size:29px"><b>Sí</b> era lo esperado en los tres que explican variables. <b>No</b> en PGExplainer, y es el instrumento.</p></div>''',
+cuerpo(19, f'''<div class="ficha" data-desde="1" style="left:80px;top:330px;width:660px;height:300px"><p class="etq">1 · Qué esperábamos</p><p class="afirma">Que la pérdida no moviera la estabilidad</p><svg width="560" height="120" viewBox="0 0 560 120"><path class="eje" d="M10 6L10 104L540 104"/><rect class="cat-n creceY" x="120" y="30" width="80" height="74"/><rect class="cat-c creceY" x="240" y="30" width="80" height="74" style="--d:.1s"/><rect class="cat-f creceY" x="360" y="30" width="80" height="74" style="--d:.2s"/></svg></div><div class="ficha" data-desde="2" style="left:80px;top:650px;width:660px;height:280px"><p class="etq">2 · Por qué</p><p class="txt">La pérdida cambia cuánto pesa cada error al entrenar. No esperábamos que eso cambiara cuánto se repite una explicación.</p></div><p class="etiqueta" data-desde="3" style="left:800px;top:330px">3 · Qué dio</p><svg class="fig" data-desde="3" viewBox="0 0 1040 490" style="left:820px;top:360px;width:998px;height:470px" role="img" aria-label="Estabilidad por pérdida. GNNExplainer {c(h3[("GNNExplainer", "none")], 2)}, {c(h3[("GNNExplainer", CW)], 2)}, {c(h3[("GNNExplainer", "focal_loss")], 2)}. PGExplainer {c(h3[("PGExplainer", "none")], 2)}, {c(h3[("PGExplainer", CW)], 2)}, {c(h3[("PGExplainer", "focal_loss")], 2)}.">{guia}<path class="eje" d="M100 20L100 370L1030 370"/><text class="t3 te" x="88" y="378" font-size="22">0,00</text><g class="aparece" style="--d:.2s">{"".join(gb)}</g>{ley}</svg><div class="veredicto" data-desde="4" style="left:800px;top:838px;width:1040px;padding:12px 28px"><p class="txt" style="font-size:29px"><b>Casi</b>: en los que explican variables el efecto es de centésimas. <b>No</b> en PGExplainer, y es el instrumento.</p></div>''',
        "Figura 15. Media de las configuraciones que aprenden, sin el 1:1. Bajo cada explicador, lo "
        "que ordena. Integrated Gradients es determinista: su estabilidad vale 1 por construcción.")
 set_ref(19, REF["focal"])
@@ -538,8 +538,8 @@ if _fc.exists() and _fr.exists() and len(pd.read_csv(_fc)) == 48:
         'después del escalado. Los cuatro explicadores las dejan al fondo del orden, con cualquier '
         'modelo.</p><p class="txt">Solo ese bloque ya da un Spearman de 0,74 a 0,82.</p></div>'
         '<div class="veredicto" data-desde="4" style="left:1040px;top:640px;width:800px"><p class="etq">'
-        'Qué cambia</p><p class="txt"><b>H1 se sostiene</b> con las tres medidas. H2 y H3 hay que '
-        'volver a probarlas con las medidas nuevas.</p></div>',
+        'Qué cambia</p><p class="txt"><b>H1 se sostiene</b> con las tres medidas. En H2 y H3 las '
+        'diferencias crecen con la medida exigente y dependen del explicador.</p></div>',
         "Tabla 4. Escenario con el desbalance real, pesos por clase, 4 arquitecturas, 3 semillas. "
         "Estabilidad entre repeticiones y acuerdo: Spearman sobre las 165 variables, 30 nodos.",
         REF["adebayo"],
@@ -547,7 +547,7 @@ if _fc.exists() and _fr.exists() and len(pd.read_csv(_fc)) == 48:
          ("Clic 1 · el control", "J", "Si la estabilidad dependiera de lo que el modelo aprendió, con pesos al azar debería caer. No cae: la red sin entrenar da prácticamente la misma cifra. Y la explicación del modelo entrenado se parece mucho a la de la red al azar."),
          ("Clic 2 · la causa", "J", "La causa está en los datos. Después del escalado, casi la mitad de las variables de un nodo vale exactamente cero, porque son iguales a su mediana. Por la forma en que se calcula cada explicador, una variable en cero recibe importancia cero. Entonces casi media lista queda siempre al fondo, y solo eso ya da una correlación de 0,74 a 0,82."),
          ("Clic 3 · medidas que no se inflan", "J", "Por eso calculamos dos medidas más: la misma correlación solo sobre las variables distintas de cero, y cuántas de las diez variables más importantes coinciden. Con ellas el nivel baja de forma apreciable."),
-         ("Clic 4 · qué cambia", "J", "Qué cambia en las hipótesis. H1 se sostiene con las tres medidas: el escenario no agrega nada a lo que ya mueve la semilla. En H2 y H3 las diferencias dejan de verse planas con las medidas nuevas, y hay que repetir las pruebas antes de afirmar algo."),
+         ("Clic 4 · qué cambia", "J", "Qué cambia en las hipótesis. H1 se sostiene con las tres medidas: el escenario no agrega nada a lo que ya mueve la semilla. En H2 y H3 las diferencias dejan de verse planas con las medidas nuevas, y las repetimos. Con GNNExplainer, pesos por clase es más estable que focal loss en los nueve modelos; con Shapley el orden se invierte. Y GraphSAGE queda por encima de las otras dos redes con GNNExplainer, pero no con Shapley. O sea que el efecto existe, es pequeño y depende del explicador."),
          ])
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -580,7 +580,7 @@ CANDIDATO = lamina(
     f'''<svg class="fig" data-desde="1" viewBox="0 0 1000 430" style="left:80px;top:350px;width:1000px;height:430px" role="img" aria-label="PR-AUC de validación de GraphSAGE con pesos por clase: fase de selección frente a optimización completa, en los cuatro escenarios."><path class="eje" d="M90 20L90 330L990 330"/>{"".join(f'<path class="guia" d="M90 {YB(t):.0f}L990 {YB(t):.0f}"/><text class="t3 te" x="78" y="{YB(t) + 8:.0f}" font-size="22">{c(t, 1)}</text>' for t in (0.2, 0.4, 0.6))}<g class="aparece">{"".join(cb)}</g><rect class="cat-n" x="200" y="392" width="26" height="26" rx="4"/><text class="t" x="236" y="414" font-size="23">fase de selección</text><rect class="cat-c" x="500" y="392" width="26" height="26" rx="4"/><text class="t" x="536" y="414" font-size="23">optimización completa</text></svg>
 <p class="llamada media" data-desde="1" style="left:80px;top:800px;width:1000px">GraphSAGE con pesos por clase, PR-AUC de validación. Las tres semillas coinciden (desviación ≤ 0,02).</p>
 <div class="ficha" data-desde="2" style="left:1160px;top:340px;width:680px;height:400px"><p class="etq">Lo que no cambia</p><p class="txt"><b>Test:</b> PR-AUC 0,011 a 0,012, igual que antes. La caída no depende de cuánto se optimice.</p><p class="txt"><b>Estabilidad:</b> GNNExplainer 0,95 frente a 0,96 de la fase de selección; Shapley 0,99 en las dos.</p></div>
-<div class="veredicto" data-desde="3" style="left:1160px;top:760px;width:680px"><p class="etq">Lo que se concluye</p><p class="txt">La matriz selecciona y el candidato optimizado confirma: <b>H1 a H3 se sostienen</b> con el mejor modelo.</p></div>''',
+<div class="veredicto" data-desde="3" style="left:1160px;top:760px;width:680px"><p class="etq">Lo que se concluye</p><p class="txt">La matriz selecciona y el candidato optimizado confirma: las conclusiones <b>no dependían de modelos poco afinados</b>.</p></div>''',
     "Figura 20. Media de 3 semillas. La optimización completa usa una búsqueda 19 veces más "
     "larga de hiperparámetros; azar 0,024.",
     REF["bergstra"],
@@ -641,7 +641,7 @@ if len(STRESS) == 2:
 # Láminas de la reunión del 7-oct que faltaban a la vista (auditoría del 10-oct):
 # cómo se construyó el caso extremo, sus curvas y por qué pesos por clase gana a focal loss
 # ═════════════════════════════════════════════════════════════════════════════
-EXTRA_ESTRES, PERDIDAS = [], None
+EXTRA_ESTRES, PERDIDAS, ANEXO_ESTRES = [], None, []
 if ESTRES:
     nn = cfg.groupby("scenario")[["n_train_illicit", "n_train_neg"]].first()
     COMO = {"1:10": "se quitan negativos", "1:20": "se quitan negativos",
@@ -686,6 +686,18 @@ if ESTRES:
             f'<p class="pie junto" style="left:80px;top:{316 + _h + 4}px;width:1760px">Figura 0. Curvas ROC (arriba) y PR (abajo) con {nom}, en validación. Línea: media de 3 semillas; sombra: mínimo y máximo; puntos: umbral de cada semilla.</p>',
             "", REF["saito"],
             [(f"Curvas · {nom}", "A", f"Estas son las curvas con {nom}. Miren la curva azul, sin ajuste: en GraphSAGE y TAGCN queda pegada al azar, el modelo ya no aprende. Con pesos por clase, la naranja, GraphSAGE todavía llega a {c(g['class_weighting'], 2)}; con focal loss queda en {c(g['focal_loss'], 2)}. Con tan poco fraude, compensar el desbalance deja de ser opcional.")]))
+    ANEXO_ESTRES = []
+    for sc, nom in (("1:100_subil", "1 fraude por cada 100"), ("1:200_subil", "1 fraude por cada 200")):
+        fn = f"curvas_{sc.replace(':', '-')}_test.png"
+        _im = Image.open(FIG / fn)
+        _h = round(1760 * _im.height / _im.width)
+        ANEXO_ESTRES.append(lamina(
+            "<b>Anexo:</b> caso extremo en la prueba final",
+            f"Anexo, {nom}, prueba final",
+            f'<img class="fig" src="{uri(fn, 1300)}" alt="Curvas ROC y PR en la prueba final con {nom}." style="left:80px;top:316px;height:{_h}px;width:1760px">'
+            f'<p class="pie junto" style="left:80px;top:{316 + _h + 4}px;width:1760px">Figura 0. Curvas ROC (arriba) y PR (abajo) con {nom}, en la prueba final. Línea: media de 3 semillas; sombra: mínimo y máximo. La precisión va en escala logarítmica.</p>',
+            "", REF["weber"],
+            [(f"Anexo · {nom}", "A", f"Solo si preguntan. Con {nom}, en la prueba final pasa lo mismo que en todos los demás niveles: ninguna curva se separa del azar.")]))
     gs = cfg[cfg.arch == "GraphSAGE"].set_index(["scenario", "balancing"]).val_pr_auc
     PL = [("Sin ajuste", "none", "L = media de la pérdida de <b>todas</b> las transacciones", "1 a 1"),
           ("Pesos por clase", CW, "L = ½ · media(fraude) + ½ · media(no fraude)", "38 a 1"),
@@ -726,7 +738,7 @@ rep(23, '<td class="r">Igual (0,93 en los cuatro)</td>', '<td class="r">Igual de
 rep(23, "<td>La señal está en el nodo; GCN la diluye</td>",
     "<td>La señal está en el nodo; GCN no tiene peso propio para él</td>")
 rep(23, '<td class="r">Como esperábamos en GNNExplainer y Shapley; PGExplainer ≈ 0</td><td>PGExplainer satura en nodos de 2 aristas</td><td>PGExplainer como limitación</td>',
-    '<td class="r">Sin efecto en los explicadores de variables; PGExplainer ≈ 0</td><td>En variables la diferencia es de centésimas; PGExplainer ordena 2 aristas</td><td>PGExplainer como limitación; un explicador de gradientes lo reemplaza</td>')
+    '<td class="r">Efecto de centésimas, distinto según el explicador; PGExplainer ≈ 0</td><td>Con GNNExplainer, pesos por clase es la más estable; con Shapley, al revés</td><td>PGExplainer como limitación; un explicador de gradientes lo reemplaza</td>')
 rep(24, '<span class="estado">Optimización completa cuando salga el candidato</span>',
     '<span class="estado ok">✓ Candidato con optimización completa</span>'
     '<span class="estado ok">✓ Explicador de gradientes</span>'
@@ -735,6 +747,11 @@ rep(24, '<span class="estado">Optimización completa cuando salga el candidato</
     + '<span class="estado">Partición antes del cierre del mercado</span>')
 rep(24, "<p>H1, H2 y H3 con las seis preguntas</p>",
     "<p>H1, H2 y H3 con las seis preguntas y su porqué</p><p>El efecto del explicador</p>")
+
+_n23 = S[23].count("Iguales las tres que aprenden; GCN no aprende")
+assert _n23 == 1, _n23
+S[23] = S[23].replace("Iguales las tres que aprenden; GCN no aprende",
+                      "Diferencias de centésimas entre las tres que aprenden; GCN no aprende")
 
 # ═════════════════════════════════════════════════════════════════════════════
 # Ensamblar, renumerar láminas, figuras y tablas
@@ -746,7 +763,7 @@ if ESTRES:
 orden_final += [S[17], S[18], ECUACIONES, S[19]] + ([PERDIDAS] if PERDIDAS else []) + [S[20], EXPLICADORES]
 if VALIDEZ:
     orden_final.append(VALIDEZ)
-orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]]
+orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]] + ANEXO_ESTRES
 ESTRES_SLOT = orden_final.index("@@ESTRES@@") if ESTRES else None
 
 def llano(t):
@@ -789,10 +806,10 @@ TITULARES = [
     "Caso extremo, 1 fraude por cada 100, validación: sin compensar el desbalance el modelo ya no aprende",
     "Caso extremo, 1 fraude por cada 200, validación: pesos por clase es la que mejor resiste",
     "Hipótesis 1, caso extremo (1:100 y 1:200): el modelo detecta peor y se fija en otras variables, pero la estabilidad no cambia",
-    "Hipótesis 2, tipo de red: esperábamos diferencias de estabilidad; las tres redes que aprenden dan casi la misma",
+    "Hipótesis 2, tipo de red: esperábamos diferencias de estabilidad; entre las tres redes que aprenden son de centésimas",
     "Hipótesis 2, por qué GCN no aprende: mezcla cada transacción con sus vecinas, y la señal del fraude está en la propia transacción",
     "Hipótesis 2, la ecuación: lo que distingue a las redes es si cada transacción tiene un peso propio",
-    "Hipótesis 3, forma de compensar el desbalance: no cambia la estabilidad cuando se explican variables",
+    "Hipótesis 3, forma de compensar el desbalance: mueve la estabilidad unas centésimas, y en sentido distinto según el explicador",
     "Hipótesis 3, por qué pesos por clase detecta mejor: es la única que compensa todo el desbalance",
     "Hipótesis 3, la excepción: PGExplainer da cerca de 0 por la forma en que mide, no por el modelo",
     "Comparación de métodos de explicación: los cuatro son estables, pero no señalan las mismas variables",
@@ -804,6 +821,8 @@ TITULARES = [
     "Plan: cómo quedan ordenados la presentación y el documento con los cambios acordados",
     "Anexo, 1 fraude por cada lícita (1:1), validación: ningún modelo pasa el filtro de calidad",
     "Anexo, 1 fraude por cada lícita (1:1), prueba final: se repite la caída al nivel del azar",
+    "Anexo, caso extremo (1 fraude por cada 100), prueba final: tampoco se separa del azar",
+    "Anexo, caso extremo (1 fraude por cada 200), prueba final: tampoco se separa del azar",
 ]
 if __name__ == "__main__":
     if ESTRES:
