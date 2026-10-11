@@ -45,7 +45,7 @@ scenarios:
   #                                      negativos, así que se quitan ilícitas. Van aparte.)
   # Los negativos se submuestrean estratificados: ~19,9 % lícitas y ~80,1 % sin etiqueta,
   # la misma mezcla que el nativo.
-  names: ["native", "1:10", "1:10_os", "1:20"]
+  names: ["native", "1:10", "1:10_os", "1:20", "1:100_subil", "1:200_subil"]
 
 models:
   architectures:
