@@ -418,14 +418,63 @@ solo puede coincidir del todo o invertirse. El mismo modelo, explicado dos veces
 ## Lámina 28. Comparación de métodos de explicación
 
 **Qué decir.** Como PGExplainer no sirve aquí, agregamos otro explicador, de una familia
-distinta: gradientes. Los cuatro son estables consigo mismos. Pero no señalan las mismas
-variables: cada uno responde una pregunta distinta. Por eso hay que decir con cuál se explicó.
+distinta: gradientes. Son dos versiones, y ninguna se entrena: se calculan directamente sobre
+el modelo ya entrenado. Los cuatro explicadores son estables consigo mismos. Pero no señalan
+las mismas variables: cada uno responde una pregunta distinta. Por eso hay que decir con cuál
+se explicó.
 
-**Qué hay detrás.** Integrated Gradients es determinista: repetirlo da siempre lo mismo, y su
-estabilidad vale 1 por construcción. Expected Gradients es su versión con azar. El acuerdo
-entre explicadores va de 0,42 a 0,84.
+**Qué hay detrás.**
+
+*Por qué se agregaron.* En la reunión del 7 de octubre nos dijeron que, si un explicador
+resultó inapropiado, debía haber otro que lo compensara. PGExplainer ordena conexiones, y el
+83 % de las transacciones explicadas tiene una o dos. Faltaba la familia de gradientes: las
+otras ya estaban (GNNExplainer optimiza una máscara, Shapley prueba combinaciones de
+variables).
+
+*Cómo funcionan.* Los dos responden la misma pregunta: de la sospecha que el modelo le asigna
+a una transacción, cuánto se debe a cada una de sus 165 variables.
+
+- **Integrated Gradients** (Sundararajan et al. 2017). Parte de una transacción de referencia
+  neutra, con todas las variables en su valor mediano, y avanza en 100 pasos hasta la
+  transacción real. En cada paso mira cuánto cambia la sospecha al mover cada variable, y suma
+  esos cambios. Es determinista: repetirlo da exactamente lo mismo, así que su estabilidad
+  entre repeticiones vale 1 por construcción y no informa nada.
+- **Expected Gradients** (Erion et al. 2021). Es lo mismo, pero en vez de una sola referencia
+  fija usa 200 transacciones no ilícitas reales tomadas al azar. Como hay azar, las cinco
+  repeticiones sí miden algo. Por eso se usan los dos: uno limpio y otro comparable con los
+  demás.
+
+*Cuál se entrena y cuál no.*
+
+| Explicador | ¿Requiere entrenamiento? |
+|---|---|
+| PGExplainer | Sí: entrena una red pequeña en cada repetición |
+| GNNExplainer | Ajusta una máscara por cada transacción (optimización, no entrenamiento de un modelo) |
+| Shapley | No: prueba combinaciones al azar |
+| Integrated Gradients y Expected Gradients | No: solo usan los gradientes del modelo |
+
+*Qué dieron.* Se calcularon sobre los 252 modelos (los seis niveles de desbalance), en las
+mismas 30 transacciones.
+
+| Explicador | Entre repeticiones | Entre semillas del modelo |
+|---|---|---|
+| Integrated Gradients | 1 (por construcción) | 0,97 |
+| Expected Gradients | 0,92 | 0,77 |
+
+- **No coinciden con los otros explicadores.** Integrated Gradients se parece a GNNExplainer
+  (0,84), pero Shapley coincide con ellos apenas 0,47 a 0,58.
+- **Integrated Gradients sigue de cerca el tamaño de cada variable** (correlación de 0,98):
+  con referencia cero, una variable grande recibe importancia grande casi sin importar el
+  modelo. Es una de las razones por las que la estabilidad no dice si el modelo aprendió
+  (lámina 29).
+- El código está en `src/explainability/gradients.py`. Se verificó que da el resultado exacto
+  en un modelo lineal y que sus gradientes coinciden con el cálculo numérico.
 
 **Si preguntan.**
+- *¿Los explicadores nuevos se entrenaron?* No. Solo PGExplainer se entrena. Los de gradientes
+  se calculan sobre el modelo ya entrenado.
+- *¿Por qué dos versiones?* La de referencia fija siempre da lo mismo, así que no sirve para
+  medir estabilidad entre repeticiones. La de referencia al azar sí.
 - *¿Cuál es el correcto?* En datos reales no se puede saber, porque nadie conoce la respuesta
   verdadera. Es un problema abierto (Krishna et al. 2022).
 
@@ -526,8 +575,10 @@ pasa el filtro de calidad, y en la prueba final se repite la caída.
 - Cawley, G. y Talbot, N. (2010). On over-fitting in model selection and subsequent selection bias in performance evaluation. JMLR, 11, 2079-2107.
 - Chawla, N. et al. (2002). SMOTE: synthetic minority over-sampling technique. JAIR, 16, 321-357.
 - Elkan, C. (2001). The foundations of cost-sensitive learning. IJCAI.
+- Erion, G. et al. (2021). Improving performance of deep learning models with axiomatic attribution priors and expected gradients. Nature Machine Intelligence, 3, 620-631.
 - Krishna, S. et al. (2022). The disagreement problem in explainable machine learning: a practitioner's perspective. arXiv:2202.01602.
 - Lakens, D. (2017). Equivalence tests: a practical primer. Social Psychological and Personality Science, 8(4), 355-362.
 - Lin, T.-Y. et al. (2017). Focal loss for dense object detection. ICCV.
 - Saito, T. y Rehmsmeier, M. (2015). The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets. PLoS ONE.
+- Sundararajan, M. et al. (2017). Axiomatic attribution for deep networks. ICML.
 - Weber, M. et al. (2019). Anti-money laundering in Bitcoin: experimenting with graph convolutional networks for financial forensics. arXiv:1908.02591.
