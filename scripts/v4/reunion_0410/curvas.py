@@ -601,9 +601,20 @@ def main():
     ap.add_argument("--force", action="store_true", help="recalcular scores ya guardados")
     ap.add_argument("--deck", action="store_true",
                     help="figuras para láminas: sin título interno y letra grande (figuras/deck/)")
+    ap.add_argument("--variante", default="original", choices=["original", "precierre"],
+                    help="precierre: partición antes del cierre del mercado (THE-44), con "
+                         "sus propios modelos, configuración y carpeta de salida")
     a = ap.parse_args()
-    global DECK
+    global DECK, OUT, SCORES, FIGS, MODELS, CONFIG
     DECK = a.deck
+    if a.variante == "precierre":
+        OUT = REPO / "results_v4_precierre" / "curvas"
+        SCORES, FIGS = OUT / "scores", OUT / "figuras"
+        MODELS = REPO / "results_models_v4_precierre"
+        CONFIG = REPO / "configs" / "experiment_v4_precierre.yaml"
+        SCEN_LABEL["native"] = "nativo (1:41,1)"
+        SPLIT_LABEL["test"] = ("prueba final" if DECK else
+                               "prueba (t = 36 a 42, antes del cierre)")
     OUT.mkdir(parents=True, exist_ok=True)
     if a.stage in ("all", "scores"):
         stage_scores(a.device, a.force)

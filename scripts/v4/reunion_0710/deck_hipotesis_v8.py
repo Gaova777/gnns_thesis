@@ -55,8 +55,8 @@ def c(x, d=3):
     return f"{x:.{d}f}".replace(".", ",")
 
 
-def uri(name, h):
-    im = Image.open(FIG / name).convert("RGB")
+def uri(name, h, base=None):
+    im = Image.open((base or FIG) / name).convert("RGB")
     w = round(im.width * h / im.height)
     b = io.BytesIO()
     im.resize((w, h), Image.LANCZOS).save(b, "JPEG", quality=86, optimize=True)
@@ -719,7 +719,7 @@ if ESTRES:
         '<p class="txt">El desbalance real es de 38 a 1. Pesos por clase lo compensa completo; focal loss, como se configuró, '
         'solo 3 a 1. <b>Cuanto menos fraude hay, más se nota.</b></p></div>',
         "Tabla 4. Las dos últimas columnas son el PR-AUC de validación de GraphSAGE (azar: 0,024). "
-        "Limitación: α y γ de focal loss quedaron fijos y no se buscaron.",
+        "Limitación: α y γ de focal loss quedaron fijos. Sin el periodo del cierre, focal loss iguala a pesos por clase en el nivel real.",
         REF["focal"],
         [("Por qué gana pesos por clase", "J", "En la reunión nos dijeron que no era lo esperado que pesos por clase le ganara a focal loss, y que para discutirlo había que mirar la matemática. Aquí está."),
          ("Clic 1 · sin ajuste", "J", "Sin ajuste, todas las transacciones pesan igual. Como el fraude es el 2,5 por ciento, casi toda la señal de entrenamiento viene de lo que no es fraude."),
@@ -727,6 +727,160 @@ if ESTRES:
          ("Clic 3 · focal loss", "J", "Focal loss tiene dos piezas. Alfa le da al fraude tres veces el peso de lo demás, no 38. La otra pieza baja el peso de los casos fáciles, pero no distingue entre clases."),
          ("Clic 4 · lectura", "J", f"Por eso con el desbalance real pesos por clase llega a {c(gs[('native', CW)], 2)} y focal loss a {c(gs[('native', 'focal_loss')], 2)}. Y con 1 fraude por cada 100 la distancia se abre: {c(gs[('1:100_subil', CW)], 2)} frente a {c(gs[('1:100_subil', 'focal_loss')], 2)}. Una limitación que declaramos: los dos parámetros de focal loss quedaron fijos."),
          ])
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Sin el periodo del cierre del mercado (THE-44): misma matriz con t = 1 a 42
+# ═════════════════════════════════════════════════════════════════════════════
+PRECIERRE = []
+RP = REPO / "results_v4_precierre"
+if (RP / "curvas/curvas_metricas_por_config.csv").exists():
+    FIGP = RP / "curvas/figuras/deck"
+    pc = pd.read_csv(RP / "curvas/curvas_metricas_por_config.csv")
+    ps = pd.concat([pd.read_csv(RP / "elliptic_v4_stability.csv"),
+                    pd.read_csv(REPO / "results_v4_precierre_grad/elliptic_v4_stability.csv")])
+    SECP = "<b>Resultados:</b> sin el periodo del cierre"
+
+    def pm(D, scen, arch, bal, split, col):
+        r = D[(D.scenario == scen) & (D.arch == arch) & (D.balancing == bal) & (D.split == split)]
+        return float(r[col + "_mean"].iloc[0])
+
+    def mejor(D, arch):      # pérdida elegida por PR-AUC de validación, desbalance real
+        v = D[(D.scenario == "native") & (D.arch == arch) & (D.split == "val")]
+        return v.sort_values("pr_auc_mean", ascending=False).balancing.iloc[0]
+
+    def figura(fn, alt, pie, callout=None):
+        im = Image.open(FIGP / fn)
+        hh = round(1760 * im.height / im.width)
+        extra = (f'<p class="llamada fuerte" style="left:80px;top:{316 + hh + 10}px;width:1760px">{callout}</p>'
+                 if callout else "")
+        top_pie = 316 + hh + (70 if callout else 4)
+        return (f'<img class="fig" src="{uri(fn, 1300 if hh > 560 else 1070, FIGP)}" alt="{alt}" style="left:80px;top:316px;height:{hh}px;width:1760px">'
+                f'{extra}<p class="pie junto" style="left:80px;top:{top_pie}px;width:1760px">{pie}</p>')
+
+    # 1. cómo se repartieron los datos
+    PRECIERRE.append(lamina(
+        SECP, "",
+        '<table class="tabla" style="left:80px;top:340px;width:1000px"><thead><tr><th>Parte</th>'
+        '<th>Pasos de tiempo</th><th style="text-align:right">Fraude</th><th style="text-align:right">No fraude</th>'
+        '<th style="text-align:right">Proporción</th></tr></thead><tbody>'
+        '<tr data-desde="1"><td class="h">Entrenamiento</td><td>1 a 29</td><td style="text-align:right">2.871</td><td style="text-align:right">117.933</td><td style="text-align:right">1 por cada 41</td></tr>'
+        '<tr data-desde="1"><td class="h">Validación</td><td>30 a 35</td><td style="text-align:right">773</td><td style="text-align:right">20.195</td><td style="text-align:right">1 por cada 26</td></tr>'
+        '<tr data-desde="1"><td class="h">Prueba final</td><td>36 a 42</td><td style="text-align:right">732</td><td style="text-align:right">31.581</td><td style="text-align:right">1 por cada 43</td></tr>'
+        '<tr data-desde="2"><td class="h" style="color:var(--tinta-3)">Periodo del cierre</td><td>43 a 49</td><td class="r" colspan="3" style="text-align:right">no se usa</td></tr>'
+        '</tbody></table>'
+        '<div class="ficha" data-desde="3" style="left:1140px;top:340px;width:700px;height:300px"><p class="etq">Por qué</p>'
+        '<p class="txt">En el paso 43 cierra un mercado ilegal y el fraude que queda es distinto. Con ese '
+        'periodo como prueba, ningún modelo supera al azar.</p><p class="txt">Aquí la prueba final se parece al '
+        'entrenamiento.</p></div>'
+        '<div class="veredicto" data-desde="4" style="left:1140px;top:670px;width:700px"><p class="etq">Qué tener presente</p>'
+        '<p class="txt">Hay <b>591 fraudes menos</b> para entrenar que en la corrida original. Las cifras de validación de '
+        'una y otra no se comparan directamente.</p></div>',
+        "Tabla 0. Misma matriz y mismo protocolo: 216 modelos (6 niveles de desbalance, 4 redes, 3 formas de compensar, 3 semillas).",
+        REF["weber"],
+        [("Sin el cierre", "J", "El conjunto de datos tiene una limitación conocida: en el paso 43 cierra un mercado ilegal y el fraude cambia. Por eso repetimos todo el estudio usando solo los datos anteriores al cierre."),
+         ("Clic 1 · la partición", "J", "Entrenamos con los pasos 1 a 29, validamos con 30 a 35 y probamos con 36 a 42. El fraude queda repartido en 66, 18 y 17 por ciento."),
+         ("Clic 2 · lo que se omite", "J", "Los pasos 43 a 49, que eran la prueba final de la corrida original, no se usan para nada."),
+         ("Clic 3 · por qué", "J", "Así la prueba final es un periodo que el modelo nunca vio pero que se parece al de entrenamiento. Es la forma de saber si el modelo generaliza cuando el mercado no cambia."),
+         ("Clic 4 · advertencia", "J", "Una cautela: al mover el corte quedan 591 fraudes menos para entrenar. Por eso no comparamos directamente las cifras de validación de las dos corridas; comparamos el comportamiento."),
+         ]))
+
+    # 2. resumen con pesos por clase
+    rtp = [pm(pc, "native", a, CW, "test", "roc_auc") for a in ARQ]
+    PRECIERRE.append(lamina(
+        SECP, "",
+        figura("resumen_native_pesos_por_clase.png",
+               "Sin el periodo del cierre, desbalance real, pesos por clase en las cuatro redes. De izquierda a derecha: ROC y PR en validación, ROC y PR en la prueba final.",
+               "Figura 0. Sin el periodo del cierre; desbalance real, pesos por clase; prevalencia de fraude 3,7 % en validación y 2,3 % en la prueba final. Línea: media de 3 semillas; sombra: mínimo y máximo.",
+               f"En la prueba final las curvas ROC ya no se pegan a la diagonal: ROC-AUC de {c(min(rtp), 2)} a {c(max(rtp), 2)}."),
+        "", REF["saito"],
+        [("Resumen sin el cierre", "J", f"Este es el mismo resumen de antes, con pesos por clase en las cuatro redes, pero sin el periodo del cierre. Miren los dos paneles de la derecha, la prueba final: las curvas ROC se separan de la diagonal, con valores de {c(min(rtp), 2)} a {c(max(rtp), 2)}, y las curvas PR quedan por encima de la línea del azar. Los modelos sí generalizan cuando el mercado no cambia.")]))
+
+    # 3. tabla con y sin el cierre
+    filas_p = ""
+    for a in ["GraphSAGE", "TAGCN", "GAT", "GCN"]:
+        bo, bp = mejor(cur, a), mejor(pc, a)
+        filas_p += (f'<tr data-desde="1"><td class="h">{a}</td>'
+                    f'<td style="text-align:right">{c(pm(cur, "native", a, bo, "test", "pr_auc"), 3)}</td>'
+                    f'<td class="r" style="text-align:right">{c(pm(pc, "native", a, bp, "test", "pr_auc"), 2)}</td>'
+                    f'<td style="text-align:right">{c(pm(cur, "native", a, bo, "test", "roc_auc"), 2)}</td>'
+                    f'<td class="r" style="text-align:right">{c(pm(pc, "native", a, bp, "test", "roc_auc"), 2)}</td></tr>')
+    PRECIERRE.append(lamina(
+        SECP, "",
+        '<table class="tabla" style="top:340px"><thead><tr><th>Red</th>'
+        '<th style="text-align:right">PR-AUC con el cierre</th><th style="text-align:right">PR-AUC sin el cierre</th>'
+        '<th style="text-align:right">ROC-AUC con el cierre</th><th style="text-align:right">ROC-AUC sin el cierre</th>'
+        f'</tr></thead><tbody>{filas_p}'
+        '<tr data-desde="1"><td class="h" style="color:var(--tinta-3)">Azar</td><td style="text-align:right">0,006</td>'
+        '<td style="text-align:right">0,023</td><td style="text-align:right">0,50</td><td style="text-align:right">0,50</td></tr>'
+        '</tbody></table>'
+        '<div class="veredicto" data-desde="2" style="left:80px;top:740px;width:1760px"><p class="etq">Lo que muestra</p>'
+        '<p class="txt">La caída de la corrida original era <b>del cierre del mercado, no de los modelos</b>. GCN sigue siendo la más débil.</p></div>',
+        "Tabla 0. Prueba final, desbalance real, media de 3 semillas. Para cada red, la forma de compensar elegida en validación.",
+        REF["weber"],
+        [("Con y sin el cierre", "J", "Aquí está la comparación directa en la prueba final, red por red. A la izquierda de cada par, la corrida original; a la derecha, sin el cierre."),
+         ("Clic 1 · las cifras", "J", "Con el cierre, el PR-AUC de todas estaba en el nivel del azar y varias curvas ROC quedaban cerca de 0,5 o por debajo. Sin el cierre, las tres redes que aprenden quedan entre siete y doce veces por encima del azar, con ROC-AUC de 0,85 a 0,88."),
+         ("Clic 2 · lectura", "J", "Entonces la caída que mostramos antes no era un defecto de los modelos: era el cambio del mercado. Y el orden se mantiene en lo esencial: GCN sigue siendo la más débil."),
+         ]))
+
+    # 4 y 5. curvas del desbalance real
+    for sp, nom in (("val", "validación"), ("test", "la prueba final")):
+        PRECIERRE.append(lamina(
+            SECP, "",
+            figura(f"curvas_native_{sp}.png",
+                   f"Curvas ROC y PR sin el periodo del cierre, desbalance real, en {nom}.",
+                   f"Figura 0. Sin el periodo del cierre. Curvas ROC (arriba) y PR (abajo) con el desbalance real (1 por cada 41), en {nom}. Línea: media de 3 semillas; sombra: mínimo y máximo; puntos: umbral de cada semilla."),
+            "", REF["saito"],
+            [(f"Curvas sin el cierre · {nom}", "J",
+              "En validación, con el desbalance real, focal loss, la curva verde, iguala o supera a pesos por clase en GraphSAGE y en TAGCN. En la corrida original era al revés." if sp == "val" else
+              "Y esta es la prueba final sin el cierre. A diferencia de la corrida original, las curvas se separan del azar en las tres redes que aprenden. GraphSAGE sin ajuste, la azul, sí queda en el azar: esa configuración no aprendió.")]))
+
+    # 6. caso extremo y estabilidad
+    SEISP = ["1:10", "1:20", "native", "1:100_subil", "1:200_subil"]
+    NOMP = {"1:10": "1:10", "1:20": "1:20", "native": "Real (1:41)", "1:100_subil": "1:100", "1:200_subil": "1:200"}
+    st = ps[(ps.explainer == "GNNExplainer") & ps.arch.isin(APR) & (ps.balancing == CW)].groupby("scenario").spearman_full.mean()
+    sh = ps[(ps.explainer == "ShapleyFeatures") & ps.arch.isin(APR) & (ps.balancing == CW)].groupby("scenario").spearman_full.mean()
+
+    def fp(nom, sub_, f, desde):
+        return (f'<tr data-desde="{desde}"><td class="h">{nom}<br><span style="font-weight:400;font-size:21px">{sub_}</span></td>'
+                + "".join(f'<td class="{"r" if sc in STRESS else ""}" style="text-align:right">{f(sc)}</td>' for sc in SEISP) + '</tr>')
+    PRECIERRE.append(lamina(
+        SECP, "",
+        '<table class="tabla met" style="top:330px"><thead><tr><th>GraphSAGE, validación</th>'
+        + "".join(f'<th style="text-align:right">{NOMP[sc]}</th>' for sc in SEISP) + '</tr></thead><tbody>'
+        + fp("Pesos por clase", "PR-AUC", lambda sc: c(pm(pc, sc, "GraphSAGE", CW, "val", "pr_auc"), 2), 1)
+        + fp("Focal loss", "PR-AUC", lambda sc: c(pm(pc, sc, "GraphSAGE", "focal_loss", "val", "pr_auc"), 2), 1)
+        + fp("Sin ajuste", "PR-AUC", lambda sc: c(pm(pc, sc, "GraphSAGE", "none", "val", "pr_auc"), 2), 1)
+        + fp("Estabilidad de GNNExplainer", "pesos por clase, 3 redes", lambda sc: c(st[sc], 3), 2)
+        + '</tbody></table>'
+        '<div class="veredicto" data-desde="3" style="left:80px;top:760px;width:1760px;padding:14px 28px"><p class="txt">'
+        'Se repite lo de la corrida original: con poco fraude <b>solo pesos por clase resiste</b>, y la estabilidad no cambia.</p></div>',
+        "Tabla 0. Sin el periodo del cierre; azar 0,037. Shapley: 0,99 en todos los niveles. En 1:100 y 1:200 se quita fraude: quedan 1.179 y 590 de 2.871. Friedman sobre los seis niveles: p = 0,27.",
+        REF["weber"],
+        [("Caso extremo sin el cierre", "A", "También repetimos el caso extremo, 1 por cada 100 y 1 por cada 200, sin el periodo del cierre."),
+         ("Clic 1 · rendimiento", "A", "Pesos por clase se mantiene entre 0,33 y 0,46 en los cinco niveles. Focal loss se cae en los extremos, y sin ajuste el modelo queda en el azar en varios niveles. Es lo mismo que vimos antes: con poco fraude, compensar todo el desbalance es lo que sostiene al modelo."),
+         ("Clic 2 · estabilidad", "A", "La estabilidad de las explicaciones no cambia: GNNExplainer entre 0,92 y 0,94, Shapley en 0,99. La prueba estadística sobre los seis niveles no encuentra diferencia."),
+         ("Clic 3 · lectura", "A", "Entonces las dos conclusiones sobre el desbalance se repiten con otra partición de los datos: afecta al rendimiento, no a la estabilidad de la explicación."),
+         ]))
+
+    # 7. qué se mantiene y qué cambia
+    PRECIERRE.append(lamina(
+        SECP, "",
+        '<div class="ficha" data-desde="1" style="left:80px;top:340px;width:850px;height:430px"><p class="etq">Lo que se mantiene</p>'
+        '<p class="txt">GCN es la red más débil.</p>'
+        '<p class="txt">La estabilidad no depende del desbalance: GNNExplainer 0,92 a 0,94; Shapley 0,99.</p>'
+        '<p class="txt">Con poco fraude, solo pesos por clase resiste.</p>'
+        '<p class="txt">No hay una red con explicaciones más estables.</p></div>'
+        '<div class="ficha" data-desde="2" style="left:990px;top:340px;width:850px;height:430px"><p class="etq">Lo que cambia</p>'
+        '<p class="txt"><b>La prueba final deja de caer al azar</b>: PR-AUC hasta 0,31 y ROC-AUC hasta 0,90.</p>'
+        '<p class="txt"><b>Ya no hay una forma de compensar que gane siempre</b>: con el desbalance real focal loss iguala a pesos por clase; con 1:10, sin ajuste es la mejor en validación.</p></div>'
+        '<div class="veredicto" data-desde="3" style="left:80px;top:800px;width:1760px;padding:14px 28px"><p class="txt">'
+        'Las conclusiones sobre la <b>estabilidad</b> no dependen de la partición. La de «pesos por clase detecta mejor» <b>sí</b>.</p></div>',
+        "", REF["weber"],
+        [("Qué se mantiene y qué cambia", "A", "Para cerrar esta parte: qué conclusiones aguantan cuando se cambia la partición de los datos y cuáles no."),
+         ("Clic 1 · se mantiene", "A", "Aguantan todas las de estabilidad: no depende del desbalance, no hay una red más estable, y con poco fraude solo pesos por clase sostiene al modelo. Y GCN sigue siendo la más débil."),
+         ("Clic 2 · cambia", "A", "Cambian dos cosas. La primera es la buena noticia: la prueba final ya no cae al azar. La segunda nos obliga a corregir una afirmación: pesos por clase no es siempre la que mejor detecta. Con el desbalance real, focal loss la iguala; con 1 por cada 10, entrenar sin ajuste da la mejor validación."),
+         ("Clic 3 · lectura", "A", "La lectura honesta es esta: lo que la tesis afirma sobre la estabilidad no depende de cómo se partan los datos. Lo que afirmaba sobre cuál forma de compensar detecta mejor, sí depende, y lo decimos así."),
+         ]))
 
 # ═════════════════════════════════════════════════════════════════════════════
 # Resumen y plan
@@ -763,7 +917,7 @@ if ESTRES:
 orden_final += [S[17], S[18], ECUACIONES, S[19]] + ([PERDIDAS] if PERDIDAS else []) + [S[20], EXPLICADORES]
 if VALIDEZ:
     orden_final.append(VALIDEZ)
-orden_final += [S[21], S[22], CANDIDATO, S[23], S[24], S[25], S[26]] + ANEXO_ESTRES
+orden_final += [S[21], S[22], CANDIDATO] + PRECIERRE + [S[23], S[24], S[25], S[26]] + ANEXO_ESTRES
 ESTRES_SLOT = orden_final.index("@@ESTRES@@") if ESTRES else None
 
 def llano(t):
@@ -810,13 +964,20 @@ TITULARES = [
     "Hipótesis 2, por qué GCN no aprende: mezcla cada transacción con sus vecinas, y la señal del fraude está en la propia transacción",
     "Hipótesis 2, la ecuación: lo que distingue a las redes es si cada transacción tiene un peso propio",
     "Hipótesis 3, forma de compensar el desbalance: mueve la estabilidad unas centésimas, y en sentido distinto según el explicador",
-    "Hipótesis 3, por qué pesos por clase detecta mejor: es la única que compensa todo el desbalance",
+    "Hipótesis 3, por qué pesos por clase resiste con poco fraude: es la única que compensa todo el desbalance",
     "Hipótesis 3, la excepción: PGExplainer da cerca de 0 por la forma en que mide, no por el modelo",
     "Comparación de métodos de explicación: los cuatro son estables, pero no señalan las mismas variables",
     "Límite de la medida: una red sin entrenar da la misma estabilidad, así que la cifra no dice si el modelo aprendió",
     "¿La explicación más estable es la más correcta? Esperábamos que sí, y no lo es",
     "Estable no significa correcto: una explicación puede repetirse siempre igual y no decir nada útil",
     "El mejor modelo, con búsqueda completa de parámetros: sube de 0,46 a 0,50 y sus explicaciones siguen igual de estables",
+    "Sin el periodo del cierre: cómo se repartieron los datos que sí sirven",
+    "Sin el periodo del cierre, rendimiento de las cuatro redes: la prueba final ya no cae al azar",
+    "Con y sin el periodo del cierre: en la prueba final los modelos pasan del azar a detectar fraude",
+    "Sin el periodo del cierre, desbalance real, validación: focal loss iguala o supera a pesos por clase",
+    "Sin el periodo del cierre, desbalance real, prueba final: las curvas se separan del azar",
+    "Sin el periodo del cierre, caso extremo: con poco fraude solo pesos por clase resiste, y la estabilidad no cambia",
+    "Sin el periodo del cierre: qué conclusiones se mantienen y cuáles cambian",
     "Resumen: tres de las cuatro preguntas no salieron como esperábamos, y cada resultado tiene una causa medida",
     "Plan: cómo quedan ordenados la presentación y el documento con los cambios acordados",
     "Anexo, 1 fraude por cada lícita (1:1), validación: ningún modelo pasa el filtro de calidad",

@@ -1,0 +1,10 @@
+[2026-10-11 17:01:47] cola en espera · driver=788591
+[2026-10-12 01:51:20] estrés 1:100 y 1:200 rc=0
+[2026-10-12 01:52:23] gradientes native rc=0
+[2026-10-12 01:53:25] gradientes 1:10 rc=0
+[2026-10-12 01:54:31] gradientes 1:20 rc=0
+[2026-10-12 01:55:35] gradientes 1:10_os rc=0
+[2026-10-12 01:56:41] gradientes 1:100_subil rc=0
+[2026-10-12 01:57:49] gradientes 1:200_subil rc=0
+[2026-10-12 01:57:57] cross_seed gradientes rc=0
+[2026-10-12 01:57:57] fin cola precierre

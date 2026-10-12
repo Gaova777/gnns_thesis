@@ -1,0 +1,6 @@
+{
+  "GCN": "focal_loss",
+  "GraphSAGE": "focal_loss",
+  "GAT": "none",
+  "TAGCN": "focal_loss"
+}

@@ -1,6 +1,6 @@
 # Guion explicado del deck de hipótesis, versión 8
 
-Acompaña el deck «Hipótesis v4», versión 8 (38 láminas), que se genera con
+Acompaña el deck «Hipótesis v4», versión 8 (45 láminas), que se genera con
 `scripts/v4/reunion_0710/deck_hipotesis_v8.py`. Reemplaza, para este deck, la segunda mitad de
 `docs/GUION_presentacion_v4_explicado.md`, que describe la versión de 26 láminas.
 
@@ -542,7 +542,118 @@ estables.
 
 ---
 
-## Lámina 33. Resumen
+## Láminas 33 a 39. El estudio repetido sin el periodo del cierre
+
+El conjunto de datos tiene una limitación conocida: en el paso de tiempo 43 cierra un mercado
+ilegal y el fraude que queda es distinto del anterior. Con ese periodo como prueba final,
+ningún modelo supera al azar. Estas siete láminas repiten el estudio completo usando solo los
+datos anteriores al cierre.
+
+### Lámina 33. Cómo se repartieron los datos que sí sirven
+
+**Qué decir.** Usamos solo los pasos de tiempo 1 a 42. Entrenamos con 1 a 29, validamos con 30
+a 35 y probamos con 36 a 42. Los pasos 43 a 49, que eran la prueba final original, no se usan
+para nada. Así la prueba final es un periodo que el modelo nunca vio pero que se parece al de
+entrenamiento.
+
+**Qué hay detrás.**
+
+| Parte | Pasos | Fraude | No fraude | Proporción |
+|---|---|---|---|---|
+| Entrenamiento | 1 a 29 | 2.871 | 117.933 | 1 por cada 41 |
+| Validación | 30 a 35 | 773 | 20.195 | 1 por cada 26 |
+| Prueba final | 36 a 42 | 732 | 31.581 | 1 por cada 43 |
+
+Mismo protocolo: 216 modelos (6 niveles de desbalance, 4 redes, 3 formas de compensar, 3
+semillas) y los cinco explicadores.
+
+**Si preguntan.**
+- *¿Por qué ese corte?* Reparte el fraude anterior al cierre en 66 %, 18 % y 17 %, lo más
+  parecido a la partición original. Es una elección nuestra.
+- *¿Se pueden comparar las cifras de validación con las de antes?* No directamente: aquí hay
+  591 fraudes menos para entrenar. Se compara el comportamiento, no el número.
+
+### Lámina 34. Rendimiento de las cuatro redes sin el cierre
+
+**Qué decir.** El mismo resumen de la lámina 5, con pesos por clase en las cuatro redes. Miren
+los dos paneles de la derecha: en la prueba final las curvas ROC se separan de la diagonal y
+las PR quedan por encima del azar. Los modelos sí generalizan cuando el mercado no cambia.
+
+**Qué hay detrás.** ROC-AUC en la prueba final con pesos por clase: GraphSAGE 0,85, GCN 0,77,
+GAT 0,77 y TAGCN 0,75. En la corrida original iban de 0,61 a 0,71.
+
+### Lámina 35. Con y sin el periodo del cierre
+
+**Qué decir.** La comparación directa en la prueba final. Con el cierre, todas las redes
+quedaban en el nivel del azar. Sin el cierre, las tres que aprenden quedan entre siete y doce
+veces por encima. La caída no era de los modelos: era del cambio del mercado.
+
+**Qué hay detrás.** Para cada red, la forma de compensar elegida en validación:
+
+| Red | PR-AUC con el cierre | PR-AUC sin el cierre | ROC-AUC con el cierre | ROC-AUC sin el cierre |
+|---|---|---|---|---|
+| GraphSAGE | 0,010 | 0,27 | 0,71 | 0,88 |
+| TAGCN | 0,008 | 0,24 | 0,67 | 0,87 |
+| GAT | 0,005 | 0,17 | 0,48 | 0,85 |
+| GCN | 0,012 | 0,09 | 0,60 | 0,73 |
+| Azar | 0,006 | 0,023 | 0,50 | 0,50 |
+
+### Láminas 36 y 37. Las curvas con el desbalance real, sin el cierre
+
+**Qué decir.** En validación, focal loss (la curva verde) iguala o supera a pesos por clase en
+GraphSAGE y en TAGCN; en la corrida original era al revés. En la prueba final las curvas de
+las tres redes que aprenden se separan del azar. GraphSAGE sin ajuste, la azul, queda en el
+azar: esa configuración no aprendió.
+
+**Qué hay detrás.** PR-AUC de validación con el desbalance real: GraphSAGE 0,48 con focal loss
+y 0,33 con pesos por clase; TAGCN 0,53 y 0,21.
+
+### Lámina 38. El caso extremo sin el cierre
+
+**Qué decir.** También repetimos 1 por cada 100 y 1 por cada 200. Pesos por clase se mantiene
+entre 0,33 y 0,46 en todos los niveles. Focal loss se cae en los extremos, y sin ajuste el
+modelo queda en el azar en varios niveles. La estabilidad de las explicaciones no cambia.
+
+**Qué hay detrás.**
+
+| GraphSAGE, PR-AUC de validación | 1:10 | 1:20 | Real | 1:100 | 1:200 |
+|---|---|---|---|---|---|
+| Pesos por clase | 0,41 | 0,46 | 0,33 | 0,45 | 0,42 |
+| Focal loss | 0,32 | 0,46 | 0,48 | 0,19 | 0,05 |
+| Sin ajuste | 0,55 | 0,03 | 0,03 | 0,03 | 0,04 |
+
+Estabilidad con pesos por clase: GNNExplainer 0,92 a 0,94; Shapley 0,99; Expected Gradients
+0,92 a 0,93. Prueba de Friedman sobre los seis niveles: p = 0,27. En 1:100 y 1:200 quedan
+1.179 y 590 fraudes de 2.871.
+
+**Si preguntan.**
+- *¿Por qué «sin ajuste» da 0,55 en 1:10 y 0,03 en 1:20?* Con 1 por cada 10 el propio
+  submuestreo ya balancea lo suficiente. Con más desbalance y sin compensar, el modelo deja de
+  aprender. Es una configuración frágil, y por eso no la recomendamos.
+
+### Lámina 39. Qué se mantiene y qué cambia
+
+**Qué decir.** Lo que la tesis afirma sobre la estabilidad no depende de cómo se partan los
+datos: no depende del desbalance, no hay una red más estable, y con poco fraude solo pesos por
+clase sostiene al modelo. Cambian dos cosas. La buena: la prueba final ya no cae al azar. Y una
+corrección: pesos por clase no es siempre la que mejor detecta.
+
+**Qué hay detrás.**
+- Se mantiene: GCN es la más débil; estabilidad de GNNExplainer 0,92 a 0,94 y de Shapley 0,99
+  en todos los niveles; con poco fraude solo resiste pesos por clase.
+- Cambia: en la prueba final, PR-AUC hasta 0,31 y ROC-AUC hasta 0,90; con el desbalance real
+  focal loss iguala a pesos por clase; con 1 por cada 10, sin ajuste da la mejor validación.
+- Con esta partición GraphSAGE ya no es la más estable con GNNExplainer (GCN 0,94, GraphSAGE
+  0,93, TAGCN 0,93, GAT 0,92): confirma que no hay un orden entre redes.
+
+**Si preguntan.**
+- *¿Cuál de las dos corridas es «la» de la tesis?* Las dos se reportan. La original muestra lo
+  que le pasa a un modelo cuando el mercado cambia. La segunda muestra que, sin ese cambio, el
+  modelo generaliza, y que las conclusiones de estabilidad se repiten.
+
+---
+
+## Lámina 40. Resumen
 
 **Qué decir.** Tres de las cuatro preguntas no salieron como esperábamos, y para cada una
 tenemos una causa medida. El desbalance no cambia la estabilidad ni en el caso extremo. El
@@ -551,7 +662,7 @@ Y la más importante: estable no es correcto.
 
 ---
 
-## Lámina 34. Plan
+## Lámina 41. Plan
 
 **Qué decir.** Así quedan ordenados la presentación y el documento. Ya están hechos el
 candidato afinado, el explicador de gradientes y los casos 1 por cada 100 y 1 por cada 200.
@@ -559,14 +670,14 @@ Queda pendiente repetir el estudio cortando los datos antes del cierre del merca
 
 ---
 
-## Láminas 35 y 36. Anexo: 1 fraude por cada lícita
+## Láminas 42 y 43. Anexo: 1 fraude por cada lícita
 
 **Qué decir.** Solo si preguntan. Con igual cantidad de fraude y de no fraude, ningún modelo
 pasa el filtro de calidad, y en la prueba final se repite la caída.
 
 ---
 
-## Láminas 37 y 38. Anexo: el caso extremo en la prueba final
+## Láminas 44 y 45. Anexo: el caso extremo en la prueba final
 
 **Qué decir.** Solo si preguntan. Con 1 fraude por cada 100 y por cada 200, en la prueba final
 pasa lo mismo que en los demás niveles: ninguna curva se separa del azar.
@@ -583,6 +694,7 @@ dos niveles, frente a 0,010 con todo el fraude. El azar es 0,006.
 | «El submuestreo solo desplaza el puntaje del modelo» | Es teoría; en nuestros modelos no se observó. |
 | «Entre escenarios las explicaciones coinciden en 0,99» | Compara modelos de la misma semilla, que son casi idénticos. |
 | «Las redes se apoyan en las mismas variables» | Comparten de 3 a 7 de las 10 principales. |
+| «Pesos por clase es la que mejor detecta» | Solo en la corrida original. Sin el periodo del cierre, focal loss la iguala con el desbalance real. Lo que sí se repite: es la única que resiste con poco fraude. |
 | «La estabilidad alta muestra que el modelo aprendió» | Una red sin entrenar da casi lo mismo. |
 | «GAT es la más estable» o cualquier orden entre redes | El orden cambia con el explicador: GraphSAGE con GNNExplainer, GAT con Shapley. |
 | «La forma de compensar el desbalance no afecta la estabilidad» | Afecta unas centésimas, y en sentido contrario en GNNExplainer y en Shapley. |
