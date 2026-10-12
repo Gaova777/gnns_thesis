@@ -757,31 +757,48 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
         return (f'<img class="fig" src="{uri(fn, 1300 if hh > 560 else 1070, FIGP)}" alt="{alt}" style="left:80px;top:316px;height:{hh}px;width:1760px">'
                 f'{extra}<p class="pie junto" style="left:80px;top:{top_pie}px;width:1760px">{pie}</p>')
 
-    # 1. cómo se repartieron los datos
+    # 1. cómo se repartieron los datos: línea de tiempo de las dos particiones
+    X0, PW = 330, 28.0                       # x del paso 1 y ancho de cada paso de tiempo
+    xx = lambda t: X0 + (t - 1) * PW
+
+    def tramo(y, a, b, cls, txt, sub_, op=1.0):
+        w = (b - a + 1) * PW - 4
+        return (f'<rect class="{cls}" x="{xx(a):.0f}" y="{y}" width="{w:.0f}" height="64" rx="6" style="opacity:{op}"/>'
+                f'<text class="tw tb tc" x="{xx(a) + w / 2:.0f}" y="{y + 30}" font-size="23">{txt}</text>'
+                f'<text class="tw tc" x="{xx(a) + w / 2:.0f}" y="{y + 54}" font-size="19">{sub_}</text>')
+    linea = (
+        '<text class="t tb te" x="310" y="92" font-size="24">Corrida original</text>'
+        + tramo(52, 1, 34, "cat-n", "Entrenamiento", "pasos 1 a 34")
+        + tramo(52, 35, 42, "cat-c", "Validación", "35 a 42")
+        + tramo(52, 43, 49, "cat-f", "Prueba final", "43 a 49")
+        + '<text class="t tb te" x="310" y="202" font-size="24">Sin el cierre</text>'
+        + tramo(162, 1, 29, "cat-n", "Entrenamiento", "pasos 1 a 29")
+        + tramo(162, 30, 35, "cat-c", "Validación", "30 a 35")
+        + tramo(162, 36, 42, "cat-f", "Prueba final", "36 a 42")
+        + f'<rect x="{xx(43):.0f}" y="162" width="{7 * PW - 4:.0f}" height="64" rx="6" fill="none" stroke="var(--tinta-3)" stroke-width="2" stroke-dasharray="7 6"/>'
+        + f'<text class="t3 tb tc" x="{xx(43) + (7 * PW - 4) / 2:.0f}" y="202" font-size="22">no se usa</text>'
+        + f'<path d="M{xx(43) - 2:.0f} 28L{xx(43) - 2:.0f} 246" stroke="var(--tinta)" stroke-width="3" stroke-dasharray="4 5"/>'
+        + f'<text class="t tb tc" x="{xx(43) - 2:.0f}" y="20" font-size="22">cierre del mercado ilegal (paso 43)</text>'
+        + "".join(f'<text class="t3 tc" x="{xx(t) + PW / 2 - 2:.0f}" y="270" font-size="19">{t}</text>' for t in (1, 10, 20, 29, 35, 42, 49))
+        + f'<text class="t3 te" x="310" y="270" font-size="19">paso de tiempo</text>')
     PRECIERRE.append(lamina(
         SECP, "",
-        '<table class="tabla" style="left:80px;top:340px;width:1000px"><thead><tr><th>Parte</th>'
-        '<th>Pasos de tiempo</th><th style="text-align:right">Fraude</th><th style="text-align:right">No fraude</th>'
+        f'<svg class="fig" data-desde="1" viewBox="0 0 1760 280" style="left:80px;top:330px;width:1760px;height:280px" role="img" aria-label="Línea de tiempo de las dos particiones. Original: entrenamiento pasos 1 a 34, validación 35 a 42, prueba final 43 a 49. Sin el cierre: entrenamiento 1 a 29, validación 30 a 35, prueba final 36 a 42; los pasos 43 a 49 no se usan. El mercado ilegal cierra en el paso 43.">{linea}</svg>'
+        '<table class="tabla" data-desde="2" style="left:80px;top:640px;width:1000px"><thead><tr><th>Sin el cierre</th>'
+        '<th>Pasos</th><th style="text-align:right">Fraude</th><th style="text-align:right">No fraude</th>'
         '<th style="text-align:right">Proporción</th></tr></thead><tbody>'
-        '<tr data-desde="1"><td class="h">Entrenamiento</td><td>1 a 29</td><td style="text-align:right">2.871</td><td style="text-align:right">117.933</td><td style="text-align:right">1 por cada 41</td></tr>'
-        '<tr data-desde="1"><td class="h">Validación</td><td>30 a 35</td><td style="text-align:right">773</td><td style="text-align:right">20.195</td><td style="text-align:right">1 por cada 26</td></tr>'
-        '<tr data-desde="1"><td class="h">Prueba final</td><td>36 a 42</td><td style="text-align:right">732</td><td style="text-align:right">31.581</td><td style="text-align:right">1 por cada 43</td></tr>'
-        '<tr data-desde="2"><td class="h" style="color:var(--tinta-3)">Periodo del cierre</td><td>43 a 49</td><td class="r" colspan="3" style="text-align:right">no se usa</td></tr>'
+        '<tr><td class="h">Entrenamiento</td><td>1 a 29</td><td style="text-align:right">2.871</td><td style="text-align:right">117.933</td><td style="text-align:right">1 por cada 41</td></tr>'
+        '<tr><td class="h">Validación</td><td>30 a 35</td><td style="text-align:right">773</td><td style="text-align:right">20.195</td><td style="text-align:right">1 por cada 26</td></tr>'
+        '<tr><td class="h">Prueba final</td><td>36 a 42</td><td style="text-align:right">732</td><td style="text-align:right">31.581</td><td style="text-align:right">1 por cada 43</td></tr>'
         '</tbody></table>'
-        '<div class="ficha" data-desde="3" style="left:1140px;top:340px;width:700px;height:300px"><p class="etq">Por qué</p>'
-        '<p class="txt">En el paso 43 cierra un mercado ilegal y el fraude que queda es distinto. Con ese '
-        'periodo como prueba, ningún modelo supera al azar.</p><p class="txt">Aquí la prueba final se parece al '
-        'entrenamiento.</p></div>'
-        '<div class="veredicto" data-desde="4" style="left:1140px;top:670px;width:700px"><p class="etq">Qué tener presente</p>'
-        '<p class="txt">Hay <b>591 fraudes menos</b> para entrenar que en la corrida original. Las cifras de validación de '
-        'una y otra no se comparan directamente.</p></div>',
-        "Tabla 0. Misma matriz y mismo protocolo: 216 modelos (6 niveles de desbalance, 4 redes, 3 formas de compensar, 3 semillas).",
+        '<div class="veredicto" data-desde="3" style="left:1140px;top:650px;width:700px"><p class="etq">Qué tener presente</p>'
+        '<p class="txt">Ahora la prueba final se parece al entrenamiento. Hay <b>591 fraudes menos</b> para entrenar que en la corrida original.</p></div>',
+        "Tabla 0 y Figura 0. Los pasos de tiempo están separados unas dos semanas entre sí. Mismo protocolo: 216 modelos (6 niveles de desbalance, 4 redes, 3 formas de compensar, 3 semillas).",
         REF["weber"],
-        [("Sin el cierre", "J", "El conjunto de datos tiene una limitación conocida: en el paso 43 cierra un mercado ilegal y el fraude cambia. Por eso repetimos todo el estudio usando solo los datos anteriores al cierre."),
-         ("Clic 1 · la partición", "J", "Entrenamos con los pasos 1 a 29, validamos con 30 a 35 y probamos con 36 a 42. El fraude queda repartido en 66, 18 y 17 por ciento."),
-         ("Clic 2 · lo que se omite", "J", "Los pasos 43 a 49, que eran la prueba final de la corrida original, no se usan para nada."),
-         ("Clic 3 · por qué", "J", "Así la prueba final es un periodo que el modelo nunca vio pero que se parece al de entrenamiento. Es la forma de saber si el modelo generaliza cuando el mercado no cambia."),
-         ("Clic 4 · advertencia", "J", "Una cautela: al mover el corte quedan 591 fraudes menos para entrenar. Por eso no comparamos directamente las cifras de validación de las dos corridas; comparamos el comportamiento."),
+        [("Sin el cierre", "J", "El conjunto de datos tiene una limitación conocida: en el paso de tiempo 43 cierra un mercado ilegal y el fraude cambia. Por eso repetimos todo el estudio usando solo los datos anteriores al cierre."),
+         ("Clic 1 · las dos particiones", "J", "Arriba está la corrida original: entrenábamos con los pasos 1 a 34, validábamos con 35 a 42 y la prueba final eran los pasos 43 a 49, justo después del cierre. Abajo, la nueva: entrenamos con 1 a 29, validamos con 30 a 35 y probamos con 36 a 42. Los pasos 43 a 49 no se usan para nada."),
+         ("Clic 2 · cuánto hay en cada parte", "J", "El fraude anterior al cierre queda repartido en 66, 18 y 17 por ciento: 2.871 casos para entrenar, 773 para validar y 732 para la prueba final."),
+         ("Clic 3 · advertencia", "J", "Así la prueba final es un periodo que el modelo nunca vio pero que se parece al de entrenamiento. Una cautela: al mover el corte quedan 591 fraudes menos para entrenar, así que no comparamos directamente las cifras de validación de las dos corridas; comparamos el comportamiento."),
          ]))
 
     # 2. resumen con pesos por clase

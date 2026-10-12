@@ -551,8 +551,10 @@ datos anteriores al cierre.
 
 ### Lámina 33. Cómo se repartieron los datos que sí sirven
 
-**Qué decir.** Usamos solo los pasos de tiempo 1 a 42. Entrenamos con 1 a 29, validamos con 30
-a 35 y probamos con 36 a 42. Los pasos 43 a 49, que eran la prueba final original, no se usan
+**Qué decir.** La lámina muestra las dos particiones como una línea de tiempo. Arriba, la
+corrida original: entrenábamos con los pasos 1 a 34, validábamos con 35 a 42 y la prueba final
+eran los pasos 43 a 49, justo después del cierre. Abajo, la nueva: usamos solo los pasos 1 a
+42. Entrenamos con 1 a 29, validamos con 30 a 35 y probamos con 36 a 42. Los pasos 43 a 49, que eran la prueba final original, no se usan
 para nada. Así la prueba final es un periodo que el modelo nunca vio pero que se parece al de
 entrenamiento.
 
