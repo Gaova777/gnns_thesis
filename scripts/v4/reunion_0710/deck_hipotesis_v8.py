@@ -601,6 +601,8 @@ if len(STRESS) == 2:
     nil = tr.groupby("scenario").n_train_illicit.first()
     st3 = stab[stab.arch.isin(APR) & (stab.balancing == CW)]
     gr = st3[st3.explainer == "GNNExplainer"].groupby("scenario").y.mean()
+    st3n = stab[stab.arch.isin(APR) & (stab.balancing == "none")]
+    grn = st3n[st3n.explainer == "GNNExplainer"].groupby("scenario").y.mean()
     rs = pd.read_csv(R7 / "robusta_semillas.csv")
     rs = rs[rs.arch.isin(APR) & (rs.balancing == CW) & (rs.explainer == "GNNExplainer")]
     acs = rs[rs.tipo == "otro escenario, misma semilla"].groupby("scenario").jac10.mean()
@@ -612,29 +614,32 @@ if len(STRESS) == 2:
                       f'{(fmt(ser[s]) if fmt else c(ser[s], d)) if s in ser.index else "referencia"}</td>' for s in SEIS)
         return (f'<tr data-desde="{desde}"><td class="h">{nom}<br><span style="font-weight:400;font-size:21px">{sub_}</span></td>{cel}</tr>')
     miles = lambda v: f"{int(v):,}".replace(",", ".")
-    cuerpo_e = ('<table class="tabla met" style="top:330px"><thead><tr><th>Pesos por clase, 3 arquitecturas</th>'
+    cuerpo_e = ('<style>#tex21 td{padding-top:4px!important;padding-bottom:4px!important}</style>'
+                '<table id="tex21" class="tabla met" style="top:320px"><thead><tr><th>Pesos por clase, 3 arquitecturas</th>'
                 + cols + '</tr></thead><tbody>'
                 + fila_e("Ilícitas para entrenar", "de 3.462", nil, fmt=miles, desde=1)
                 + fila_e("PR-AUC de validación", "¿aprende?", prs, desde=1)
-                + fila_e("Estabilidad de GNNExplainer", "entre repeticiones", gr, 3, desde=2)
+                + fila_e("Estabilidad de GNNExplainer", "pesos por clase", gr, 3, desde=2)
+                + fila_e("Estabilidad de GNNExplainer", "sin ajuste", grn, 3, desde=2)
                 + fila_e("Mismas 10 variables que el nativo", "misma semilla del modelo", acs, desde=3)
                 + '</tbody></table>'
-                '<div class="veredicto" data-desde="4" style="left:80px;top:765px;width:1760px"><p class="etq">Lo que muestra</p>'
+                '<div class="veredicto" data-desde="4" style="left:80px;top:770px;width:1760px"><p class="etq">Lo que muestra</p>'
                 '<p class="txt">Con menos fraude el modelo <b>aprende menos y señala otras variables</b>. '
-                'La estabilidad entre repeticiones no lo registra.</p></div>')
+                'Con pesos por clase la estabilidad no lo registra; <b>sin ajuste, la de GNNExplainer sí baja</b>.</p></div>')
     ESTRES = lamina(
         "<b>Resultados:</b> H1, desbalance",
         "Al quitar fraude hasta 1:100 y 1:200 cae el rendimiento y cambian las variables "
         "señaladas, pero la estabilidad entre repeticiones no se mueve",
         cuerpo_e,
-        "Tabla 3. Media de 3 semillas; GraphSAGE, GAT y TAGCN. Estabilidad: Spearman sobre las 165 "
-        f"variables. Última fila: Jaccard de las 10 variables más importantes; reentrenar el nativo con otra semilla da {c(ref_sem, 2)}.",
+        "Tabla 3. Media de 3 semillas; GraphSAGE, GAT y TAGCN; pesos por clase salvo la fila «sin ajuste». "
+        "Estabilidad: Spearman (165 variables); Friedman: sin ajuste p < 0,001, pesos por clase p = 0,84. "
+        f"Última fila: Jaccard top-10; otra semilla da {c(ref_sem, 2)}.",
         REF["weber"],
         [("Estrés", "A", "Nos pidió forzar el desbalance hasta 1:100 y 1:200 para ver si la estabilidad se rompía. El escenario con el desbalance real ya usa todos los negativos, así que para llegar ahí quitamos fraude: nos quedamos con 1.328 y con 664 transacciones ilícitas de las 3.462."),
          ("Clic 1 · rendimiento", "A", f"El modelo aprende menos: el PR-AUC de validación baja de {c(prs['native'], 2)} a {c(prs['1:100_subil'], 2)} y {c(prs['1:200_subil'], 2)}. Y eso es con pesos por clase; sin ajustar la pérdida, GraphSAGE y TAGCN quedan al nivel del azar."),
-         ("Clic 2 · estabilidad", "A", f"La estabilidad entre repeticiones casi no se mueve: {c(gr['native'], 3)} en el real, {c(gr['1:100_subil'], 3)} y {c(gr['1:200_subil'], 3)} en los dos extremos. La prueba de Friedman sobre los seis escenarios no encuentra diferencia."),
+         ("Clic 2 · estabilidad", "A", f"La estabilidad entre repeticiones casi no se mueve con pesos por clase: {c(gr['native'], 3)} en el real, {c(gr['1:100_subil'], 3)} y {c(gr['1:200_subil'], 3)} en los dos extremos. Pero miren la fila de abajo: sin ajustar la pérdida, la estabilidad de GNNExplainer baja de {c(grn['1:10'], 3)} a {c(grn['1:200_subil'], 3)}, y esa caída sí es significativa. Sin compensar el desbalance, el modelo se degrada y su explicación también."),
          ("Clic 3 · qué variables", "A", f"Lo que sí cambia es qué variables señala el modelo. Comparamos cada modelo con el del desbalance real entrenado con la misma semilla. Cuando solo submuestreamos negativos, las diez variables principales casi no cambian: {c(acs['1:10'], 2)} y {c(acs['1:20'], 2)}. Cuando quitamos fraude baja a {c(acs['1:100_subil'], 2)} y {c(acs['1:200_subil'], 2)}."),
-         ("Clic 4 · lectura", "A", "Entonces el desbalance severo sí tiene efecto, pero no donde lo buscábamos: cambia cuánto aprende el modelo y en qué se fija, y la estabilidad entre repeticiones no lo ve. Es la misma conclusión de la prueba con la red sin entrenar."),
+         ("Clic 4 · lectura", "A", "Entonces el desbalance severo sí tiene efecto. Con pesos por clase cambia cuánto aprende el modelo y en qué se fija, pero no la estabilidad. Sin ajuste también baja la estabilidad de GNNExplainer. El desbalance llega a la explicación a través de cuánto se degrada el modelo, y compensarlo por completo corta ese camino."),
          ], cls="lc")
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -855,6 +860,7 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
     SEISP = ["1:10", "1:20", "native", "1:100_subil", "1:200_subil"]
     NOMP = {"1:10": "1:10", "1:20": "1:20", "native": "Real (1:41)", "1:100_subil": "1:100", "1:200_subil": "1:200"}
     st = ps[(ps.explainer == "GNNExplainer") & ps.arch.isin(APR) & (ps.balancing == CW)].groupby("scenario").spearman_full.mean()
+    stn = ps[(ps.explainer == "GNNExplainer") & ps.arch.isin(APR) & (ps.balancing == "none")].groupby("scenario").spearman_full.mean()
     sh = ps[(ps.explainer == "ShapleyFeatures") & ps.arch.isin(APR) & (ps.balancing == CW)].groupby("scenario").spearman_full.mean()
 
     def fp(nom, sub_, f, desde):
@@ -862,21 +868,23 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
                 + "".join(f'<td class="{"r" if sc in STRESS else ""}" style="text-align:right">{f(sc)}</td>' for sc in SEISP) + '</tr>')
     PRECIERRE.append(lamina(
         SECP, "",
-        '<table class="tabla met" style="top:330px"><thead><tr><th>GraphSAGE, validación</th>'
+        '<style>#tex38 td{padding-top:4px!important;padding-bottom:4px!important}</style>'
+        '<table id="tex38" class="tabla met" style="top:320px"><thead><tr><th>GraphSAGE, validación</th>'
         + "".join(f'<th style="text-align:right">{NOMP[sc]}</th>' for sc in SEISP) + '</tr></thead><tbody>'
         + fp("Pesos por clase", "PR-AUC", lambda sc: c(pm(pc, sc, "GraphSAGE", CW, "val", "pr_auc"), 2), 1)
         + fp("Focal loss", "PR-AUC", lambda sc: c(pm(pc, sc, "GraphSAGE", "focal_loss", "val", "pr_auc"), 2), 1)
         + fp("Sin ajuste", "PR-AUC", lambda sc: c(pm(pc, sc, "GraphSAGE", "none", "val", "pr_auc"), 2), 1)
         + fp("Estabilidad de GNNExplainer", "pesos por clase, 3 redes", lambda sc: c(st[sc], 3), 2)
+        + fp("Estabilidad de GNNExplainer", "sin ajuste, 3 redes", lambda sc: c(stn[sc], 3), 2)
         + '</tbody></table>'
-        '<div class="veredicto" data-desde="3" style="left:80px;top:760px;width:1760px;padding:14px 28px"><p class="txt">'
-        'Se repite lo de la corrida original: con poco fraude <b>solo pesos por clase resiste</b>, y la estabilidad no cambia.</p></div>',
-        "Tabla 0. Sin el periodo del cierre; azar 0,037. Shapley: 0,99 en todos los niveles. En 1:100 y 1:200 se quita fraude: quedan 1.179 y 590 de 2.871. Friedman sobre los seis niveles: p = 0,27.",
+        '<div class="veredicto" data-desde="3" style="left:80px;top:810px;width:1760px;padding:14px 28px"><p class="txt">'
+        'Se repite lo de la corrida original: con poco fraude <b>solo pesos por clase resiste</b>, y con ella la estabilidad no cambia; <b>sin ajuste, la de GNNExplainer baja</b>.</p></div>',
+        "Tabla 0. Sin el periodo del cierre; azar 0,037. Shapley: 0,99 en todos los niveles. En 1:100 y 1:200 se quita fraude: quedan 1.179 y 589 de 2.871. Friedman sobre los seis niveles: pesos por clase p = 0,27; sin ajuste p < 0,001; focal loss p = 0,010.",
         REF["weber"],
         [("Caso extremo sin el cierre", "A", "También repetimos el caso extremo, 1 por cada 100 y 1 por cada 200, sin el periodo del cierre."),
          ("Clic 1 · rendimiento", "A", "Pesos por clase se mantiene entre 0,33 y 0,46 en los cinco niveles. Focal loss se cae en los extremos, y sin ajuste el modelo queda en el azar en varios niveles. Es lo mismo que vimos antes: con poco fraude, compensar todo el desbalance es lo que sostiene al modelo."),
-         ("Clic 2 · estabilidad", "A", "La estabilidad de las explicaciones no cambia: GNNExplainer entre 0,92 y 0,94, Shapley en 0,99. La prueba estadística sobre los seis niveles no encuentra diferencia."),
-         ("Clic 3 · lectura", "A", "Entonces las dos conclusiones sobre el desbalance se repiten con otra partición de los datos: afecta al rendimiento, no a la estabilidad de la explicación."),
+         ("Clic 2 · estabilidad", "A", "Con pesos por clase la estabilidad de las explicaciones no cambia: GNNExplainer entre 0,92 y 0,94, Shapley en 0,99, y la prueba estadística no encuentra diferencia. Sin ajuste, en cambio, la de GNNExplainer baja hacia 1 por cada 200, y esa caída sí es significativa. Con focal loss también baja, aunque menos, y en la corrida original no bajaba."),
+         ("Clic 3 · lectura", "A", "Entonces lo que se repite con otra partición de los datos es esto: el desbalance afecta al rendimiento, y a la estabilidad de la explicación solo cuando no se compensa. Con pesos por clase, la estabilidad no cambia."),
          ]))
 
     # 7. qué se mantiene y qué cambia
@@ -884,7 +892,7 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
         SECP, "",
         '<div class="ficha" data-desde="1" style="left:80px;top:340px;width:850px;height:430px"><p class="etq">Lo que se mantiene</p>'
         '<p class="txt">GCN es la red más débil.</p>'
-        '<p class="txt">La estabilidad no depende del desbalance: GNNExplainer 0,92 a 0,94; Shapley 0,99.</p>'
+        '<p class="txt">Con pesos por clase, la estabilidad no depende del desbalance (GNNExplainer 0,92 a 0,94; Shapley 0,99); sin ajuste, la de GNNExplainer baja.</p>'
         '<p class="txt">Con poco fraude, solo pesos por clase resiste.</p>'
         '<p class="txt">No hay una red con explicaciones más estables.</p></div>'
         '<div class="ficha" data-desde="2" style="left:990px;top:340px;width:850px;height:430px"><p class="etq">Lo que cambia</p>'
@@ -894,7 +902,7 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
         'Las conclusiones sobre la <b>estabilidad</b> no dependen de la partición. La de «pesos por clase detecta mejor» <b>sí</b>.</p></div>',
         "", REF["weber"],
         [("Qué se mantiene y qué cambia", "A", "Para cerrar esta parte: qué conclusiones aguantan cuando se cambia la partición de los datos y cuáles no."),
-         ("Clic 1 · se mantiene", "A", "Aguantan todas las de estabilidad: no depende del desbalance, no hay una red más estable, y con poco fraude solo pesos por clase sostiene al modelo. Y GCN sigue siendo la más débil."),
+         ("Clic 1 · se mantiene", "A", "Aguantan todas las de estabilidad: con pesos por clase no depende del desbalance y sin ajuste la de GNNExplainer baja, no hay una red más estable, y con poco fraude solo pesos por clase sostiene al modelo. Y GCN sigue siendo la más débil."),
          ("Clic 2 · cambia", "A", "Cambian dos cosas. La primera es la buena noticia: la prueba final ya no cae al azar. La segunda nos obliga a corregir una afirmación: pesos por clase no es siempre la que mejor detecta. Con el desbalance real, focal loss la iguala; con 1 por cada 10, entrenar sin ajuste da la mejor validación."),
          ("Clic 3 · lectura", "A", "La lectura honesta es esta: lo que la tesis afirma sobre la estabilidad no depende de cómo se partan los datos. Lo que afirmaba sobre cuál forma de compensar detecta mejor, sí depende, y lo decimos así."),
          ]))
@@ -904,8 +912,8 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
 # ═════════════════════════════════════════════════════════════════════════════
 rep(23, "<td>Mismo fraude, modelo que rinde parecido</td><td>Se pueden submuestrear negativos</td>",
     "<td>Con pesos por clase la proporción de clases no entra en la pérdida, y la medida casi no depende del modelo</td>"
-    "<td>Con menos fraude cambian el rendimiento y las variables señaladas, no la estabilidad</td>")
-rep(23, '<td class="r">Igual (0,93 en los cuatro)</td>', '<td class="r">Igual de 1:10 a 1:200 (0,94 a 0,95)</td>')
+    "<td>Con pesos por clase cambian el rendimiento y las variables señaladas, no la estabilidad; sin compensar, también baja la estabilidad</td>")
+rep(23, '<td class="r">Igual (0,93 en los cuatro)</td>', '<td class="r">Con pesos por clase, igual de 1:10 a 1:200 (0,94 a 0,95); sin ajuste, GNNExplainer baja</td>')
 rep(23, "<td>La señal está en el nodo; GCN la diluye</td>",
     "<td>La señal está en el nodo; GCN no tiene peso propio para él</td>")
 rep(23, '<td class="r">Como esperábamos en GNNExplainer y Shapley; PGExplainer ≈ 0</td><td>PGExplainer satura en nodos de 2 aristas</td><td>PGExplainer como limitación</td>',
@@ -971,12 +979,12 @@ TITULARES = [
     "Con fraude sintético añadido (SMOTE), prueba final: tampoco se evita la caída al nivel del azar",
     "Con 1 fraude por cada 20, validación: se repite el resultado del desbalance real",
     "Con 1 fraude por cada 20, prueba final: se repite la caída al nivel del azar",
-    "Hipótesis 1, desbalance: esperábamos explicaciones menos estables con menos fraude; entre 1:10 y 1:40 no cambió",
+    "Hipótesis 1, desbalance: esperábamos explicaciones menos estables con menos fraude; con pesos por clase, entre 1:10 y 1:40 no cambió",
     "Hipótesis 1, por qué: quitar transacciones lícitas cambia la proporción, no lo que el modelo aprende del fraude",
     "Hipótesis 1, caso extremo: cómo se llega a 1 fraude por cada 100 y por cada 200",
     "Caso extremo, 1 fraude por cada 100, validación: sin compensar el desbalance el modelo ya no aprende",
     "Caso extremo, 1 fraude por cada 200, validación: pesos por clase es la que mejor resiste",
-    "Hipótesis 1, caso extremo (1:100 y 1:200): el modelo detecta peor y se fija en otras variables, pero la estabilidad no cambia",
+    "Hipótesis 1, caso extremo (1:100 y 1:200): con pesos por clase la estabilidad no cambia; sin compensar el desbalance, la de GNNExplainer baja",
     "Hipótesis 2, tipo de red: esperábamos diferencias de estabilidad; entre las tres redes que aprenden son de centésimas",
     "Hipótesis 2, por qué GCN no aprende: mezcla cada transacción con sus vecinas, y la señal del fraude está en la propia transacción",
     "Hipótesis 2, la ecuación: lo que distingue a las redes es si cada transacción tiene un peso propio",
@@ -993,9 +1001,9 @@ TITULARES = [
     "Con y sin el periodo del cierre: en la prueba final los modelos pasan del azar a detectar fraude",
     "Sin el periodo del cierre, desbalance real, validación: focal loss iguala o supera a pesos por clase",
     "Sin el periodo del cierre, desbalance real, prueba final: las curvas se separan del azar",
-    "Sin el periodo del cierre, caso extremo: con poco fraude solo pesos por clase resiste, y la estabilidad no cambia",
+    "Sin el periodo del cierre, caso extremo: solo pesos por clase resiste, y sin compensar el desbalance la estabilidad de GNNExplainer baja",
     "Sin el periodo del cierre: qué conclusiones se mantienen y cuáles cambian",
-    "Resumen: tres de las cuatro preguntas no salieron como esperábamos, y cada resultado tiene una causa medida",
+    "Resumen: el desbalance solo afecta la estabilidad cuando no se compensa, y cada resultado tiene una causa medida",
     "Plan: cómo quedan ordenados la presentación y el documento con los cambios acordados",
     "Anexo, 1 fraude por cada lícita (1:1), validación: ningún modelo pasa el filtro de calidad",
     "Anexo, 1 fraude por cada lícita (1:1), prueba final: se repite la caída al nivel del azar",

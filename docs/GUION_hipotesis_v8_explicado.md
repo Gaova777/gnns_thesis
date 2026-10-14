@@ -339,7 +339,10 @@ detecta peor y se fija en otras variables. Pero la estabilidad entre repeticione
 **Qué hay detrás.**
 - Rendimiento de GraphSAGE con pesos por clase: 0,46 con todo el fraude, 0,37 y 0,36 en los
   dos extremos. Sin ajuste, cae al azar.
-- Estabilidad: 0,947, 0,940 y 0,938. La prueba de Friedman no encuentra diferencia (p = 0,84).
+- Estabilidad con pesos por clase: 0,947, 0,940 y 0,938. La prueba de Friedman no encuentra
+  diferencia (p = 0,84).
+- Fila nueva (14-oct), estabilidad sin ajuste: 0,930 en 1:10, 0,912 en el real, 0,909 y 0,901 en
+  los extremos. Aquí sí hay diferencia (p < 0,001).
 - Coincidencia de las 10 variables principales con el modelo original: 0,78 a 0,81 cuando solo
   se quitan negativos; 0,52 y 0,51 cuando se quita fraude.
 
@@ -654,8 +657,10 @@ que el rendimiento (lámina 16).
 | Sin ajuste | 0,55 | 0,03 | 0,03 | 0,03 | 0,04 |
 
 Estabilidad con pesos por clase: GNNExplainer 0,92 a 0,94; Shapley 0,99; Expected Gradients
-0,92 a 0,93. Prueba de Friedman sobre los seis niveles: p = 0,27. En 1:100 y 1:200 quedan
-1.179 y 590 fraudes de 2.871.
+0,92 a 0,93. Prueba de Friedman sobre los seis niveles: p = 0,27. Fila nueva (14-oct),
+GNNExplainer sin ajuste: 0,942, 0,920, 0,915, 0,905 y 0,889 (p < 0,001); con focal loss también
+baja (p = 0,010). En 1:100 y 1:200 quedan
+1.179 y 589 fraudes de 2.871.
 
 **Si preguntan.**
 - *¿Por qué «sin ajuste» da 0,55 en 1:10 y 0,03 en 1:20?* Con 1 por cada 10 el propio

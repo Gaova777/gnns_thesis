@@ -2,6 +2,17 @@
 
 > ## ⚠️ Estado 02-oct-2026: corridas v4 del eje Elliptic terminadas. Lee `RUNBOOK_V4.md` y `runs_v4/DECISIONES.md` antes de hacer nada
 >
+> **Actualización 14-oct-2026: el manuscrito vigente es `tesis_v4/`** (97 páginas). Corrida
+> principal: partición sin el cierre del mercado (train 1-29, val 30-35, test 36-42; config
+> `configs/experiment_v4_precierre.yaml`, resultados `results_v4_precierre/`). La corrida
+> original va en anexo. Bibliografía generada solo desde Crossref
+> (`tesis_v4/scripts/verificar_referencias.py`): artículos de revista con DOI, más una lista
+> cerrada de excepciones en `tesis_v4/referencias/excepciones.bib`. Tablas y figuras con
+> `tesis_v4/scripts/analisis.py` y `figuras.py`. Hallazgos vigentes: H1 se sostiene en parte
+> (sin ajuste la estabilidad de GNNExplainer baja con el desbalance; con pesos por clase no), H2
+> no, H3 sí en la práctica; con Spearman global una red sin entrenar da casi la misma estabilidad.
+> `tesis_latex/` (v3) queda como registro histórico.
+>
 > **Corrida v4 completa (30-sep, máquina de Juan Diego):** 144 modelos (4 arquitecturas × semillas
 > 42/43/44 × 4 escenarios native/1:10/1:1/1:10_os × 3 balanceos), entrenados y explicados en modo C.
 > Resultados en `results_v4/analysis_v4_summary.txt` y `results_v4/tables/`. En corto: el desbalance

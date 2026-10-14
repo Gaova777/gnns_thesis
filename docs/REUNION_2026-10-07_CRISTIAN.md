@@ -492,6 +492,21 @@ estabilidad entre réplicas no cambia (0,947, 0,940 y 0,938; Friedman p = 0,84).
 (`docs/GUION_hipotesis_v8_explicado.md`), guion del deck principal actualizado, informe de
 validación y borrador del porqué.
 
+## I. Actualización del 14-oct
+
+- **Manuscrito v4 completo** en `tesis_v4/` (97 páginas, `tesis_v4/main.pdf`): la corrida sin el
+  cierre es la principal, la original va en el anexo A y el eje sintético en el anexo B. Las 81
+  referencias citadas son artículos de revista con DOI verificado en Crossref, salvo 10
+  excepciones (originales de los métodos y de Elliptic) verificadas en su fuente.
+- **Medidas robustas y control de pesos al azar** repetidos sobre la corrida sin el cierre
+  (`results_v4_precierre/robusta/`): mismas conclusiones que en la original. Piso del bloque de
+  ceros: Spearman 0,81 (`tesis_v4/scripts/piso_spearman.py`).
+- **H1 depende de la forma de compensar.** Con pesos por clase la estabilidad no cambia con el
+  desbalance en ninguna partición. Sin ajuste, la de GNNExplainer baja en las dos (Friedman
+  p < 0,001; sin el cierre de 0,942 en 1:10 a 0,889 en 1:200). Con focal loss solo baja sin el
+  cierre (p = 0,010). Veredicto: H1 se sostiene en parte. Actualizados el manuscrito, los guiones,
+  el deck borrador (láminas 16, 21, 38, 39 y 40) y Linear (THE-16, THE-27, THE-41, THE-44, THE-46).
+
 ## Decisiones que necesitan respuesta
 
 1. **Compuerta con umbral calibrado** para poder converger a pesos por clase (E.1).
