@@ -2,7 +2,13 @@
 
 Pedido de Cristian (28-sep y 4-oct): una técnica, con su porqué y un paper, sin listar siete. Hay que decir qué técnica de submuestreo se usó y por qué se eligió.
 
-Abajo van el párrafo listo para LaTeX y las entradas de bibliografía que faltan. Los datos del código salen de `src/data/imbalance.py`.
+Abajo van el párrafo listo para LaTeX y las entradas de bibliografía. Los datos del código salen de `src/data/imbalance.py`.
+
+> **Actualización 14-oct.** El párrafo sobre Alarab y Prakoonwit (2022) se corrigió tras leer su
+> texto completo: el remuestreo cambió la importancia de las variables solo con algunas técnicas,
+> no en general. Las claves de bibliografía se ajustaron al manuscrito vigente (`tesis_v4/`), donde
+> `Alarab2022Resampling`, `Chawla2002SMOTE` y `He2009Imbalanced` ya están verificadas en Crossref.
+> GraphSMOTE no está en la bibliografía v4 (ver la nota más abajo).
 
 ## Párrafo (LaTeX)
 
@@ -25,7 +31,7 @@ más cercano editado o los enlaces de Tomek, porque estas eliminan precisamente 
 cercanos a la frontera de decisión. Con ellas el escenario no solo cambiaría la proporción de
 clases, sino también qué tipo de negativos ve el modelo, y el efecto del desbalance quedaría
 confundido con una limpieza de los datos. Además, el submuestreo aleatorio no introduce
-información que no esté en el conjunto original \parencite{He2009LearningData}. Las
+información que no esté en el conjunto original \parencite{He2009Imbalanced}. Las
 transacciones descartadas no se eliminan del grafo: siguen enviando mensajes a sus vecinas y
 solo dejan de contar en la función de pérdida.
 
@@ -39,16 +45,27 @@ base con copia de aristas de GraphSMOTE \parencite{Zhao2021Graphsmote:Networks}.
 sintéticos viven solo en los pasos de tiempo de entrenamiento y nunca tocan validación ni
 prueba.
 
-Estas técnicas se usan en el mismo conjunto de datos: \textcite{Alarab2022Resampling} compararon
-métodos de sobremuestreo y submuestreo sobre Elliptic y mostraron que el remuestreo cambia la
-importancia que el modelo asigna a cada variable, es decir, su explicación. Ese hallazgo es el
-punto de partida de la primera hipótesis de esta tesis: si remuestrear cambia qué explica el
-modelo, cabe preguntar si también cambia qué tan estable es esa explicación.
+Estas técnicas se han aplicado al mismo conjunto de datos. \textcite{Alarab2022Resampling}
+compararon técnicas de sobremuestreo, submuestreo e híbridas sobre las transacciones etiquetadas
+de Elliptic, con un bosque aleatorio, y midieron la importancia de las variables por permutación
+antes y después de remuestrear. Con la prueba de Wilcoxon encontraron cambios significativos
+solo con algunas técnicas y conjuntos: en la prueba, con SMOTE-SF ($p = 0{,}001$); en el
+entrenamiento, con ninguna. Es decir, remuestrear puede cambiar qué variables considera
+importantes el modelo, aunque no siempre lo hace. Esta tesis da el paso siguiente: pregunta si
+el remuestreo cambia también qué tan estable es la explicación al repetirla, algo que ese
+trabajo no mide.
 ```
 
-## Entradas de bibliografía que faltan en `tesis_latex/bibliografia.bib`
+## Entradas de bibliografía
 
-`Zhao2021Graphsmote:Networks` ya está. Las tres siguientes son reales; Alarab y Prakoonwit (2022) se verificó en el PDF de la revista.
+Las tres siguientes ya están en `tesis_v4/bibliografia.bib`, generadas desde Crossref (allí He y
+Garcia tiene la clave `He2009Imbalanced`; las entradas de abajo quedan como registro). Alarab y
+Prakoonwit (2022) se leyó en texto completo el 14-oct.
+
+**GraphSMOTE** (Zhao et al. 2021) es un artículo de congreso (WSDM), fuera de la regla de
+«solo artículos de revista o revisiones» del manuscrito v4, y no está en su lista cerrada de
+excepciones. La Metodología v4 describe la copia de aristas sin citarlo. Si se quiere citar, hay
+que decidir con Cristian si se añade a las excepciones.
 
 ```bibtex
 @article{Chawla2002SMOTE,
@@ -61,7 +78,7 @@ modelo, cabe preguntar si también cambia qué tan estable es esa explicación.
     doi = {10.1613/jair.953}
 }
 
-@article{He2009LearningData,
+@article{He2009Imbalanced,
     title = {{Learning from imbalanced data}},
     year = {2009},
     journal = {IEEE Transactions on Knowledge and Data Engineering},
@@ -78,6 +95,7 @@ modelo, cabe preguntar si también cambia qué tan estable es esa explicación.
     journal = {Data Science and Management},
     author = {Alarab, I and Prakoonwit, S},
     volume = {5},
+    number = {2},
     pages = {66-76},
     doi = {10.1016/j.dsm.2022.04.003}
 }
@@ -87,4 +105,13 @@ modelo, cabe preguntar si también cambia qué tan estable es esa explicación.
 
 - **¿Por qué no submuestrear las ilícitas?** Porque son la señal más débil: quitarlas reduce lo que el modelo puede aprender del fraude y mezcla el efecto del desbalance con el de tener menos ejemplos. Las versiones que quitaban ilícitas (diseño del 23-sep) se descartaron por eso.
 - **¿Por qué el 1:1 va al anexo?** Con clases balanceadas los pesos por clase valen 1 y focal loss queda igual que la entropía cruzada, así que no sirve para comparar formas de balanceo. Además ninguna configuración 1:1 pasó la compuerta.
+- **¿Alarab y Prakoonwit no mostraron ya que el remuestreo cambia la explicación?** Solo con
+  algunas técnicas y en uno de los dos conjuntos, con un bosque aleatorio e importancia por
+  permutación. Y no miden la estabilidad. En nuestros modelos, con la misma semilla, GNNExplainer
+  conserva unas 6 de sus 10 variables principales entre escenarios, incluido el de SMOTE:
+  coincide en parte con ellos.
+- **Ellos encontraron que el vecino más cercano editado (ENN) da el mejor rendimiento; ¿por qué
+  no usarlo?** Porque elimina los negativos cercanos a la frontera: cambiaría qué negativos ve el
+  modelo, no solo cuántos, y el efecto del desbalance quedaría confundido con una limpieza de
+  los datos.
 - **¿Por qué no GraphSMOTE completo?** Su generador de aristas aprendido añade un modelo más que entrenar y explicar. La copia de aristas es la línea base que el mismo artículo de GraphSMOTE reporta.
