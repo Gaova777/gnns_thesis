@@ -13,13 +13,11 @@ la descripción del conjunto de datos Elliptic como representación de ese probl
 El lavado de dinero es el conjunto de operaciones con las que se oculta el origen ilícito de
 unos fondos para que puedan usarse como si fueran legítimos. Es el paso que permite a una
 actividad criminal convertir sus ganancias en patrimonio aprovechable, y por eso combatirlo es
-una forma de combatir los delitos que lo originan, desde el narcotráfico hasta la corrupción y
-el financiamiento del terrorismo \cite{Chen2018AMLReview, Kute2021AMLReview}.
+una forma de combatir los delitos que lo originan. Es un problema global desde hace décadas y una amenaza para la economía y la sociedad \cite{Kute2021AMLReview}.
 
 \subsection{Las tres etapas}
 
-La descripción más extendida del proceso distingue tres etapas
-\cite{Irwin2012Typologies, Chen2018AMLReview}:
+La descripción más extendida del proceso distingue tres etapas \cite{Irwin2012Typologies}:
 
 \begin{enumerate}
   \item \textbf{Colocación.} Los fondos de origen ilícito entran por primera vez al sistema
@@ -63,10 +61,7 @@ Las criptomonedas permiten transferir valor de persona a persona sin un intermed
 financiero, y la cadena de bloques asocia las transacciones a direcciones y no a identidades.
 Albrecht et al. señalan que esas dos propiedades las volvieron atractivas para los mercados de
 la red oscura y otras redes criminales, y analizan cómo se incorporan a cada etapa del lavado
-\cite{Albrecht2019Crypto}. Otros trabajos describen técnicas propias de este medio, como la
-mezcla de fondos de muchos usuarios para romper el rastro entre direcciones, el encadenamiento
-de transacciones y el paso por plataformas con controles débiles \cite{Almeida2025Techniques,
-Subashi2024Crypto}.
+\cite{Albrecht2019Crypto}. Almeida et al. analizan los métodos que se usan con criptomonedas, desde los intercambios entre particulares hasta los servicios de mezcla de fondos, en cada una de las tres etapas, y encuentran que las técnicas más sofisticadas dan más anonimato pero exigen más conocimiento técnico \cite{Almeida2025Techniques}. Subashi destaca que buena parte de estas transacciones ocurre fuera del sistema bancario convencional, lo que las hace difíciles de rastrear, y que la respuesta exige coordinación internacional \cite{Subashi2024Crypto}.
 
 El punto débil de quien lava con criptomonedas es la conversión a dinero tradicional, porque
 ahí reaparece un intermediario regulado. Dupuis y Gleason identificaron seis «puertas abiertas»
@@ -102,11 +97,7 @@ superarlo \cite{Oztas2024Monitoring}.
 
 \subsection{Monitoreo con aprendizaje automático}
 
-El aprendizaje automático se ha propuesto como complemento de las reglas para reducir las falsas
-alarmas \cite{Chen2018AMLReview, Hilal2022Anomaly}. Las revisiones distinguen enfoques
-supervisados, que aprenden de casos etiquetados y suelen detectar mejor pero necesitan muchas
-etiquetas, y no supervisados, que detectan patrones anómalos nuevos pero producen más falsas
-alarmas \cite{Hilal2022Anomaly}. Labanca et al. combinan ambos en un esquema de aprendizaje
+Los sistemas de monitoreo basados en aprendizaje automático han complementado a los de reglas para reducir las falsas alarmas y el esfuerzo de revisar manualmente todas las alertas \cite{Labanca2022Amaretto}. Las revisiones sobre detección de fraude financiero muestran que el aprendizaje supervisado ha sido el más estudiado, y que sus limitaciones han llevado a explorar enfoques semisupervisados y no supervisados \cite{Hilal2022Anomaly}. Los modelos supervisados suelen detectar mejor, pero necesitan muchas etiquetas; los no supervisados detectan patrones anómalos nuevos, pero producen más falsas alarmas. Labanca et al. combinan ambos en un esquema de aprendizaje
 activo en el que el modelo elige qué transacciones conviene que el analista revise, para
 aprovechar mejor su retroalimentación \cite{Labanca2022Amaretto}. En todos los casos la
 escasez de ejemplos positivos es una constante: los casos confirmados de lavado son muy pocos
@@ -138,9 +129,7 @@ buscados son la transparencia, la confianza de los interesados y el cumplimiento
 \cite{FinXAI2026Mapping}.
 
 Esta tesis parte de una observación que esa literatura suele dar por supuesta: para que una
-explicación sirva como evidencia ante un auditor, debe ser reproducible. Si el mismo método,
-aplicado a la misma transacción y al mismo modelo, produce explicaciones distintas, no puede
-sostener una decisión regulatoria \cite{Rudin2019Stop}. La estabilidad de las explicaciones es,
+explicación sirva como evidencia ante un auditor, debe ser reproducible. Si el mismo método, aplicado a la misma transacción y al mismo modelo, produce explicaciones distintas, difícilmente puede sostener una decisión regulatoria; Gawantka et al. plantean el mismo problema para los métodos de explicabilidad no deterministas \cite{Gawantka2024Explanations}. La estabilidad de las explicaciones es,
 por eso, una condición previa a su uso en un entorno regulado.
 
 \section{El conjunto de datos Elliptic}\label{sec:ctx_elliptic}

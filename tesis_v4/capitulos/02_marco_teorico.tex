@@ -186,9 +186,7 @@ tesis usa el PR-AUC como métrica principal y lo compara siempre con la prevalen
 La explicabilidad busca que las decisiones de un modelo puedan ser comprendidas por una persona
 \cite{Adadi2018Peeking, Guidotti2018Survey, Arrieta2020XAI}. Los métodos post hoc explican un
 modelo ya entrenado sin modificarlo, y los locales explican una predicción individual
-asignando una importancia a cada elemento de la entrada. En grafos, esos elementos pueden ser
-las variables de los nodos, las aristas o subgrafos completos \cite{Yuan2023Taxonomic,
-Dai2024Trustworthy}. Esta tesis estudia explicaciones de variables: para una transacción, cuál
+asignando una importancia a cada elemento de la entrada. En grafos, esos elementos pueden ser las variables de los nodos, las aristas o subgrafos completos \cite{Yuan2023Taxonomic}. Esta tesis estudia explicaciones de variables: para una transacción, cuál
 de sus 165 variables pesó más en la predicción.
 
 \textbf{GNNExplainer} \cite{Ying2019GNNExplainer}. Busca una máscara $\mathbf{M}$ sobre las
@@ -236,14 +234,11 @@ La esperanza se estima por muestreo, por lo que es estocástico.
 
 \section{Evaluación de las explicaciones}
 
-No existe una única medida de la calidad de una explicación. Las revisiones sistemáticas
-distinguen varias propiedades \cite{Nauta2023Anecdotal, Bodria2023Benchmarking}: la
+No existe una única medida de la calidad de una explicación. Nauta et al., al revisar más de 300 trabajos, identifican doce propiedades conceptuales que una evaluación completa debería medir, y encuentran que uno de cada tres trabajos evalúa sus explicaciones solo con ejemplos anecdóticos \cite{Nauta2023Anecdotal}. Bodria et al. comparan los explicadores más usados con un repertorio de métricas cuantitativas \cite{Bodria2023Benchmarking}. Tres de esas propiedades son las que importan en esta tesis: la
 \textbf{fidelidad}, si la explicación refleja lo que de verdad usa el modelo; la
 \textbf{plausibilidad}, si coincide con lo que un experto considera relevante; y la
 \textbf{estabilidad} o consistencia, si explicaciones de la misma predicción en condiciones
-equivalentes se parecen entre sí. En grafos, las evaluaciones sistemáticas han mostrado que
-los explicadores difieren mucho entre sí y que su desempeño depende del conjunto de datos y de
-la arquitectura \cite{Agarwal2023Evaluating, Longa2024Explaining}.
+equivalentes se parecen entre sí. En grafos, las evaluaciones sistemáticas han estudiado por qué unas arquitecturas resultan más explicables que otras y qué explicador conviene en cada caso \cite{Longa2024Explaining}, y han construido grafos sintéticos con explicaciones de referencia para poder medir la calidad de los explicadores \cite{Agarwal2023Evaluating}.
 
 Cuando se conoce la explicación correcta, como en un grafo sintético construido con ese fin, la
 plausibilidad puede medirse como la coincidencia entre lo que señala el explicador y lo que de
@@ -275,8 +270,7 @@ explicación no depende de lo aprendido.
 Para medir el acuerdo entre dos explicaciones se usan comparaciones de rangos o de conjuntos.
 La correlación de Spearman \cite{Spearman1904} compara los órdenes completos de importancia, y
 el índice de Jaccard \cite{Jaccard1912} compara los conjuntos de las $k$ variables más
-importantes. También se han propuesto métricas diseñadas específicamente para la estabilidad
-de las explicaciones \cite{Gawantka2024Explanations}.
+importantes. Gawantka et al. señalan que algunos métodos de explicabilidad no son deterministas y producen explicaciones distintas para la misma instancia y el mismo modelo, y proponen métricas para clasificar los algoritmos según su estabilidad \cite{Gawantka2024Explanations}. Esa es exactamente la noción de estabilidad que mide esta tesis.
 
 \section{Medidas de acuerdo entre explicaciones}\label{sec:acuerdo}
 

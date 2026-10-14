@@ -8,25 +8,18 @@ final se precisa el vacío que aborda el trabajo (Sección \ref{sec:ea_vacio}).
 
 \section{Detección de lavado de dinero con grafos}\label{sec:ea_aml}
 
-Las revisiones sobre aprendizaje automático para la prevención del lavado de dinero
-documentan el paso de sistemas basados en reglas a modelos supervisados y no supervisados
-\cite{Chen2018AMLReview}, y, más recientemente, a modelos de aprendizaje profundo
-\cite{Kute2021AMLReview}. Una revisión sistemática dedicada a la detección de fraude
-financiero con GNN muestra que esta familia de modelos se ha extendido a tarjetas de crédito,
-seguros, transferencias bancarias y criptomonedas \cite{Motie2024FraudGNN}.
+Las revisiones sobre aprendizaje automático para la prevención del lavado de dinero identifican técnicas de análisis de vínculos, modelado del comportamiento, puntuación de riesgo y detección de anomalías \cite{Chen2018AMLReview}. Kute et al. observan que el aprendizaje profundo se ha usado poco en este dominio, sobre todo por la falta de interpretabilidad de sus decisiones, y que faltan estudios que lo combinen con explicabilidad \cite{Kute2021AMLReview}. La detección de fraude financiero con GNN ya cuenta con una revisión sistemática dedicada \cite{Motie2024FraudGNN}.
 
 Elliptic se publicó junto con los primeros experimentos de GCN para este problema
 \cite{Weber2019Elliptic}. Sus autores compararon regresión logística, bosques aleatorios y GCN,
 y observaron que el desempeño en la prueba se desplomaba a partir del paso 43, tras el cierre
 de un mercado ilegal. Ese hallazgo es la base de la partición que usa esta tesis. Desde
 entonces el conjunto de datos se ha convertido en la referencia para la detección de
-transacciones ilícitas en Bitcoin. Sobre él se han propuesto modelos de \textit{gradient
-boosting} \cite{Vassallo2021Boosting}; modelos que combinan GCN con memorias de largo y corto
+transacciones ilícitas en Bitcoin. En criptomonedas se han propuesto modelos de \textit{gradient boosting} que superan a los bosques aleatorios y cuya adaptación reduce el efecto del cambio de concepto \cite{Vassallo2021Boosting}. Sobre Elliptic se han propuesto modelos que combinan GCN con memorias de largo y corto
 plazo para aprovechar el orden temporal, junto con esquemas de aprendizaje activo
 \cite{Alarab2023Graph}; representaciones de nodos aprendidas de forma autosupervisada
 \cite{Lo2023Inspection}; y arquitecturas temporales basadas en transformadores sobre grafos
-\cite{Lin2026Detecting}. Otras propuestas modelan el grafo de transacciones como una secuencia
-de instantáneas dinámicas \cite{Wan2024Memory, Wang2025CoSemiGNN}. Mohan et al. modelan la detección en Bitcoin como clasificación de
+\cite{Lin2026Detecting}. Otras propuestas modelan el grafo de transacciones de forma dinámica: Wan et al. construyen instantáneas del grafo en el tiempo y las combinan con memorias de largo y corto plazo, centrándose en la etapa de estratificación \cite{Wan2024Memory}, y Wang et al. proponen GNN dinámicas semisupervisadas para fraude en cadenas de bloques \cite{Wang2025CoSemiGNN}. Mohan et al. modelan la detección en Bitcoin como clasificación de
 nodos en redes dinámicas, combinando convoluciones de grafos que evolucionan en el tiempo con
 bosques de decisión neuronales \cite{DTA2022Evolving}, y Asiri et al. comparan regresión
 logística, máquinas de soporte vectorial, bosques aleatorios, redes LSTM y GCN sobre Elliptic
@@ -50,23 +43,18 @@ segunda es que el desbalance de clases se trata como un obstáculo para el rendi
 et al. examinan explícitamente las limitaciones de las GNN sobre Elliptic bajo ese
 desbalance, y muestran que un modelo puede lograr una exactitud alta en entrenamiento sin
 identificar de forma significativa las transacciones ilícitas, con y sin estrategias como los
-pesos por clase \cite{Lawal2025Dataset}. Ninguno de estos trabajos mide qué ocurre con las
+pesos por clase y la \textit{focal loss}, con un rendimiento que sigue siendo inestable; además muestran ejemplos de explicaciones con GNNExplainer \cite{Lawal2025Dataset}. Ninguno de estos trabajos mide qué ocurre con las
 explicaciones cuando cambia el desbalance.
 
 \section{Explicabilidad en la detección de lavado de dinero}\label{sec:ea_xai_aml}
 
-La necesidad de explicar las alertas de un sistema de detección se justifica tanto por la
-regulación como por la operación: el analista debe poder entender y documentar por qué revisa
-una transacción \cite{Rudin2019Stop, Kute2021AMLReview}. Una revisión reciente reúne los
+La falta de interpretabilidad es, según Kute et al., la razón principal por la que el aprendizaje profundo se ha usado poco en la detección de lavado \cite{Kute2021AMLReview}. Una revisión reciente reúne los
 trabajos sobre detección de lavado en criptomonedas que incorporan explicabilidad
-\cite{Unagar2025Survey}, y se han propuesto marcos de GNN explicables para detectar
-transacciones financieras ilícitas \cite{He2026Detection}. En la mayoría de estos trabajos la
+\cite{Unagar2025Survey}, y se han propuesto marcos de GNN explicables para detectar transacciones financieras ilícitas, como el de He et al., construido sobre TAGCN para integrar información de vecindarios de orden superior \cite{He2026Detection}. En la mayoría de estos trabajos la
 explicación se presenta como un resultado cualitativo, por ejemplo las variables o los vecinos
 más importantes para algunos casos, y no se evalúa si la explicación se mantiene al repetirla.
 
-En el campo general de la explicabilidad de GNN, las taxonomías clasifican los métodos según
-lo que explican (variables, aristas o subgrafos) y cómo lo obtienen (gradientes,
-perturbaciones, sustitutos o descomposición) \cite{Yuan2023Taxonomic, Dai2024Trustworthy}. Las
+En el campo general de la explicabilidad de GNN, las taxonomías clasifican los métodos según lo que explican (variables, aristas o subgrafos) y cómo lo obtienen (gradientes, perturbaciones, sustitutos o descomposición) \cite{Yuan2023Taxonomic}. Las
 evaluaciones comparativas han mostrado que los explicadores discrepan entre sí. Agarwal et al.
 construyeron un generador de grafos sintéticos con explicaciones de referencia, capaz de
 variar el tamaño, la distribución de grados y la homofilia del grafo, y una biblioteca para
@@ -87,8 +75,7 @@ el modelo aprendió \cite{Adebayo2018Sanity}.
 
 La relación entre desbalance de clases y explicaciones se ha estudiado en datos tabulares. Rai
 et al. diseñaron un marco comparativo para evaluar la confiabilidad y la consistencia de LIME,
-SHAP y gráficos de dependencia parcial en la predicción de riesgo de enfermedades con
-historias clínicas electrónicas, bajo distintos grados de desbalance \cite{Rai2025Evaluating}.
+SHAP y gráficos de dependencia parcial en la predicción del riesgo de cáncer de pulmón con historias clínicas electrónicas, comparando modelos entrenados con datos desbalanceados y balanceados \cite{Rai2025Evaluating}.
 Fujiwara et al. proponen combinar destilación de conocimiento y remuestreo para mejorar tanto
 el rendimiento como la estabilidad de las explicaciones en clasificación desbalanceada
 \cite{Fujiwara2024Stability}.

@@ -8,12 +8,9 @@ Kute2021AMLReview}. En el caso de las criptomonedas, las transacciones forman de
 un grafo, en el que cada transacción es un nodo y cada transferencia de fondos entre
 transacciones es una arista. Las redes neuronales de grafos (\textit{Graph Neural Networks},
 GNN) aprovechan esa estructura combinando los atributos de cada transacción con los de sus
-vecinas \cite{Scarselli2009GNN, Wu2021Survey}, y se han convertido en una de las familias de
-modelos más estudiadas para la detección de fraude financiero \cite{Motie2024FraudGNN}.
+vecinas \cite{Scarselli2009GNN, Wu2021Survey}, y su aplicación a la detección de fraude financiero ya cuenta con revisiones sistemáticas propias \cite{Motie2024FraudGNN}.
 
-En un entorno regulado no basta con que el modelo acierte. El analista que revisa una alerta
-necesita saber por qué la transacción fue marcada como sospechosa, y esa justificación debe
-poder sostenerse ante un auditor \cite{Rudin2019Stop, Arrieta2020XAI}. Las GNN son modelos
+En un entorno regulado no basta con que el modelo acierte. El analista que revisa una alerta necesita saber por qué la transacción fue marcada como sospechosa, y en decisiones de alto riesgo esa justificación debe poder sostenerse ante terceros \cite{Rudin2019Stop, Arrieta2020XAI}. Las revisiones sobre GNN confiables señalan precisamente que estas redes se usan en escenarios de alto riesgo, como el análisis financiero, y que su falta de interpretabilidad es uno de sus riesgos \cite{Dai2024Trustworthy}. Las GNN son modelos
 opacos, por lo que la justificación se obtiene con métodos de explicabilidad
 post hoc que asignan una importancia a cada variable o a cada arista que intervino en la
 predicción \cite{Yuan2023Taxonomic}. Esos métodos, sin embargo, son en su mayoría
@@ -31,10 +28,7 @@ más frágiles. Las técnicas que compensan el desbalance, como reponderar la fu
 pérdida o generar ejemplos sintéticos de la clase rara \cite{Chawla2002SMOTE, Lin2020Focal},
 modifican lo que el modelo aprende y podrían modificar también lo que el explicador reporta.
 
-La literatura ha evaluado la calidad de los explicadores de GNN principalmente en grafos
-sintéticos o en tareas de química y redes sociales \cite{Agarwal2023Evaluating,
-Longa2024Explaining}, y la evaluación de la estabilidad de las explicaciones se ha estudiado
-sobre todo fuera de los grafos \cite{Nauta2023Anecdotal, Bodria2023Benchmarking}. No se
+La literatura ha evaluado la calidad de los explicadores de GNN sobre todo con grafos sintéticos que tienen explicaciones de referencia y con conjuntos de datos de referencia de otros dominios \cite{Agarwal2023Evaluating, Longa2024Explaining}, y las revisiones sobre la evaluación cuantitativa de las explicaciones tratan la explicabilidad en general, no los grafos en particular \cite{Nauta2023Anecdotal, Bodria2023Benchmarking}. No se
 encontró un estudio que mida, con un diseño factorial y réplicas independientes, cómo cambian
 la estabilidad de las explicaciones de distintas GNN cuando se varían el nivel de desbalance y
 la técnica que lo compensa, en un problema real de lavado de dinero. Ese es el vacío que
@@ -132,9 +126,7 @@ explicadores de referencia, uno determinista y uno estocástico, que no requiere
 \textbf{Operativa.} Los sistemas de monitoreo basados en reglas producen una proporción muy alta
 de falsas alarmas, que en algunos reportes supera el 90~\% \cite{Ketenci2021TimeFrequency}, y los
 especialistas del sector identifican ese costo como uno de los problemas centrales del
-monitoreo actual \cite{Oztas2024Monitoring}. Los modelos de aprendizaje automático, y en
-particular los que aprovechan la estructura de las transacciones, son una vía para reducirlo
-\cite{Hilal2022Anomaly, Motie2024FraudGNN}. Pero cada alerta de un modelo tiene que ser
+monitoreo actual \cite{Oztas2024Monitoring}. Los sistemas basados en aprendizaje automático se han usado como complemento de las reglas para reducir esas falsas alarmas \cite{Labanca2022Amaretto}, y los mismos especialistas proponen el análisis de grafos como una de las vías para superar las limitaciones actuales \cite{Oztas2024Monitoring}. Pero cada alerta de un modelo tiene que ser
 revisada por una persona, y esa revisión es más rápida y más defendible si la alerta viene con
 una explicación en la que se pueda confiar.
 

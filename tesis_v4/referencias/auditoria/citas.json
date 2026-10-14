@@ -1,0 +1,902 @@
+[
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Chen2018AMLReview",
+  "frase": "La detección de lavado de dinero se apoya cada vez más en modelos de aprendizaje automático que examinan transacciones en busca de patrones anómalos \\cite{Chen2018AMLReview, Kute2021AMLReview}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Kute2021AMLReview",
+  "frase": "La detección de lavado de dinero se apoya cada vez más en modelos de aprendizaje automático que examinan transacciones en busca de patrones anómalos \\cite{Chen2018AMLReview, Kute2021AMLReview}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Scarselli2009GNN",
+  "frase": "Las redes neuronales de grafos (\\textit{Graph Neural Networks}, GNN) aprovechan esa estructura combinando los atributos de cada transacción con los de sus vecinas \\cite{Scarselli2009GNN, Wu2021Survey}, y se han convertido en una de las familias de modelos más estudiadas para la detección de fraude financiero \\cite{Motie2024FraudGNN}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Wu2021Survey",
+  "frase": "Las redes neuronales de grafos (\\textit{Graph Neural Networks}, GNN) aprovechan esa estructura combinando los atributos de cada transacción con los de sus vecinas \\cite{Scarselli2009GNN, Wu2021Survey}, y se han convertido en una de las familias de modelos más estudiadas para la detección de fraude financiero \\cite{Motie2024FraudGNN}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Motie2024FraudGNN",
+  "frase": "Las redes neuronales de grafos (\\textit{Graph Neural Networks}, GNN) aprovechan esa estructura combinando los atributos de cada transacción con los de sus vecinas \\cite{Scarselli2009GNN, Wu2021Survey}, y se han convertido en una de las familias de modelos más estudiadas para la detección de fraude financiero \\cite{Motie2024FraudGNN}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Rudin2019Stop",
+  "frase": "El analista que revisa una alerta necesita saber por qué la transacción fue marcada como sospechosa, y esa justificación debe poder sostenerse ante un auditor \\cite{Rudin2019Stop, Arrieta2020XAI}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Arrieta2020XAI",
+  "frase": "El analista que revisa una alerta necesita saber por qué la transacción fue marcada como sospechosa, y esa justificación debe poder sostenerse ante un auditor \\cite{Rudin2019Stop, Arrieta2020XAI}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Yuan2023Taxonomic",
+  "frase": "Las GNN son modelos opacos, por lo que la justificación se obtiene con métodos de explicabilidad post hoc que asignan una importancia a cada variable o a cada arista que intervino en la predicción \\cite{Yuan2023Taxonomic}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "En el conjunto de datos Elliptic, que es la referencia pública más usada para este problema \\cite{Weber2019Elliptic}, hay 4.545 transacciones etiquetadas como ilícitas frente a más de 199.000 lícitas o sin etiqueta."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "He2009Imbalanced",
+  "frase": "Bajo un desbalance así, los modelos aprenden la clase rara a partir de pocos ejemplos \\cite{He2009Imbalanced, Johnson2019Survey}, y es razonable esperar que sus explicaciones sobre esa clase también sean más frágiles."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Johnson2019Survey",
+  "frase": "Bajo un desbalance así, los modelos aprenden la clase rara a partir de pocos ejemplos \\cite{He2009Imbalanced, Johnson2019Survey}, y es razonable esperar que sus explicaciones sobre esa clase también sean más frágiles."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Chawla2002SMOTE",
+  "frase": "Las técnicas que compensan el desbalance, como reponderar la función de pérdida o generar ejemplos sintéticos de la clase rara \\cite{Chawla2002SMOTE, Lin2020Focal}, modifican lo que el modelo aprende y podrían modificar también lo que el explicador reporta."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Lin2020Focal",
+  "frase": "Las técnicas que compensan el desbalance, como reponderar la función de pérdida o generar ejemplos sintéticos de la clase rara \\cite{Chawla2002SMOTE, Lin2020Focal}, modifican lo que el modelo aprende y podrían modificar también lo que el explicador reporta."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Agarwal2023Evaluating",
+  "frase": "La literatura ha evaluado la calidad de los explicadores de GNN principalmente en grafos sintéticos o en tareas de química y redes sociales \\cite{Agarwal2023Evaluating, Longa2024Explaining}, y la evaluación de la estabilidad de las explicaciones se ha estudiado sobre todo fuera de los grafos \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Longa2024Explaining",
+  "frase": "La literatura ha evaluado la calidad de los explicadores de GNN principalmente en grafos sintéticos o en tareas de química y redes sociales \\cite{Agarwal2023Evaluating, Longa2024Explaining}, y la evaluación de la estabilidad de las explicaciones se ha estudiado sobre todo fuera de los grafos \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Nauta2023Anecdotal",
+  "frase": "La literatura ha evaluado la calidad de los explicadores de GNN principalmente en grafos sintéticos o en tareas de química y redes sociales \\cite{Agarwal2023Evaluating, Longa2024Explaining}, y la evaluación de la estabilidad de las explicaciones se ha estudiado sobre todo fuera de los grafos \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Bodria2023Benchmarking",
+  "frase": "La literatura ha evaluado la calidad de los explicadores de GNN principalmente en grafos sintéticos o en tareas de química y redes sociales \\cite{Agarwal2023Evaluating, Longa2024Explaining}, y la evaluación de la estabilidad de las explicaciones se ha estudiado sobre todo fuera de los grafos \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "En el paso 43 se cerró un mercado ilegal importante de la red, y los autores del conjunto de datos reportaron que, a partir de ese momento, ningún modelo era capaz de detectar las nuevas transacciones ilícitas \\cite{Weber2019Elliptic}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Strumbelj2014Explaining",
+  "frase": "GNNShap se reemplazó por valores de Shapley estimados por muestreo sobre las variables de la transacción \\cite{Strumbelj2014Explaining}, porque la pregunta de la tesis es qué variables pesan y GNNShap atribuye importancia a las aristas."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Chawla2002SMOTE",
+  "frase": "GraphSMOTE se reemplazó por SMOTE sobre los atributos \\cite{Chawla2002SMOTE}, porque la estructura del grafo de Elliptic no se modifica en ningún escenario."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Sundararajan2017IG",
+  "frase": "Integrated Gradients \\cite{Sundararajan2017IG} y Expected Gradients \\cite{Erion2021Expected} se añadieron como explicadores de referencia, uno determinista y uno estocástico, que no requieren entrenamiento."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Erion2021Expected",
+  "frase": "Integrated Gradients \\cite{Sundararajan2017IG} y Expected Gradients \\cite{Erion2021Expected} se añadieron como explicadores de referencia, uno determinista y uno estocástico, que no requieren entrenamiento."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Ketenci2021TimeFrequency",
+  "frase": "\\textbf{Operativa.} Los sistemas de monitoreo basados en reglas producen una proporción muy alta de falsas alarmas, que en algunos reportes supera el 90~\\% \\cite{Ketenci2021TimeFrequency}, y los especialistas del sector identifican ese costo como uno de los problemas centrales del monitoreo actual \\cite{Oztas2024Monitoring}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Oztas2024Monitoring",
+  "frase": "\\textbf{Operativa.} Los sistemas de monitoreo basados en reglas producen una proporción muy alta de falsas alarmas, que en algunos reportes supera el 90~\\% \\cite{Ketenci2021TimeFrequency}, y los especialistas del sector identifican ese costo como uno de los problemas centrales del monitoreo actual \\cite{Oztas2024Monitoring}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Hilal2022Anomaly",
+  "frase": "Los modelos de aprendizaje automático, y en particular los que aprovechan la estructura de las transacciones, son una vía para reducirlo \\cite{Hilal2022Anomaly, Motie2024FraudGNN}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Motie2024FraudGNN",
+  "frase": "Los modelos de aprendizaje automático, y en particular los que aprovechan la estructura de las transacciones, son una vía para reducirlo \\cite{Hilal2022Anomaly, Motie2024FraudGNN}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Bertrand2021Rights",
+  "frase": "\\textbf{Regulatoria.} La normativa exige a las entidades financieras un monitoreo continuo capaz de detectar transacciones sospechosas, y la introducción de modelos opacos en ese monitoreo plantea problemas de transparencia y de derechos que la regulación ha comenzado a abordar \\cite{Bertrand2021Rights}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Giudici2023Risk",
+  "frase": "Los marcos propuestos para medir el riesgo de la inteligencia artificial en finanzas incluyen la explicabilidad entre sus principios medibles \\cite{Giudici2023Risk}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Chen2023CreditImbalance",
+  "frase": "\\textbf{Científica.} Los estudios sobre el efecto del desbalance en las explicaciones se han hecho con datos tabulares y han encontrado que el desbalance las vuelve menos estables \\cite{Chen2023CreditImbalance}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Foley2019Bitcoin",
+  "frase": "\\textbf{Social.} Las criptomonedas se han usado para financiar actividades ilegales a gran escala \\cite{Foley2019Bitcoin, PaquetClouston2019Ransomware}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "PaquetClouston2019Ransomware",
+  "frase": "\\textbf{Social.} Las criptomonedas se han usado para financiar actividades ilegales a gran escala \\cite{Foley2019Bitcoin, PaquetClouston2019Ransomware}."
+ },
+ {
+  "archivo": "01_introduccion.tex",
+  "clave": "Adebayo2018Sanity",
+  "frase": "La tesis cuantifica ese efecto con dos medidas que no dependen de esas variables y con un control de pesos aleatorios \\cite{Adebayo2018Sanity}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Chen2018AMLReview",
+  "frase": "Es el paso que permite a una actividad criminal convertir sus ganancias en patrimonio aprovechable, y por eso combatirlo es una forma de combatir los delitos que lo originan, desde el narcotráfico hasta la corrupción y el financiamiento del terrorismo \\cite{Chen2018AMLReview, Kute2021AMLReview}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Kute2021AMLReview",
+  "frase": "Es el paso que permite a una actividad criminal convertir sus ganancias en patrimonio aprovechable, y por eso combatirlo es una forma de combatir los delitos que lo originan, desde el narcotráfico hasta la corrupción y el financiamiento del terrorismo \\cite{Chen2018AMLReview, Kute2021AMLReview}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Irwin2012Typologies",
+  "frase": "La descripción más extendida del proceso distingue tres etapas \\cite{Irwin2012Typologies, Chen2018AMLReview}:"
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Chen2018AMLReview",
+  "frase": "La descripción más extendida del proceso distingue tres etapas \\cite{Irwin2012Typologies, Chen2018AMLReview}:"
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Irwin2012Typologies",
+  "frase": "Irwin et al. analizaron 184 tipologías documentadas por organismos de prevención del lavado y del financiamiento del terrorismo, y encontraron que quienes lavan dinero y quienes financian el terrorismo prefieren técnicas algo distintas en cada etapa, y que cuantas más técnicas se combinan, más dinero se logra ocultar \\cite{Irwin2012Typologies}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Foley2019Bitcoin",
+  "frase": "Foley et al. estimaron, con técnicas de análisis de la cadena de bloques, que cerca de una cuarta parte de los usuarios de Bitcoin participaba en actividades ilegales, y que esas actividades movían unos 76.000 millones de dólares al año, el 46~\\% de las transacciones de Bitcoin, una cifra comparable a los mercados de drogas ilegales de Estados Unidos y Europa \\cite{Foley2019Bitcoin}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "PaquetClouston2019Ransomware",
+  "frase": "En otro frente, Paquet-Clouston et al. reconstruyeron los pagos de 35 familias de \\textit{ransomware} en Bitcoin y estimaron un mercado de al menos 12,7 millones de dólares entre 2013 y mediados de 2017, concentrado en unos pocos actores \\cite{PaquetClouston2019Ransomware}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Albrecht2019Crypto",
+  "frase": "Albrecht et al. señalan que esas dos propiedades las volvieron atractivas para los mercados de la red oscura y otras redes criminales, y analizan cómo se incorporan a cada etapa del lavado \\cite{Albrecht2019Crypto}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Almeida2025Techniques",
+  "frase": "Otros trabajos describen técnicas propias de este medio, como la mezcla de fondos de muchos usuarios para romper el rastro entre direcciones, el encadenamiento de transacciones y el paso por plataformas con controles débiles \\cite{Almeida2025Techniques, Subashi2024Crypto}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Subashi2024Crypto",
+  "frase": "Otros trabajos describen técnicas propias de este medio, como la mezcla de fondos de muchos usuarios para romper el rastro entre direcciones, el encadenamiento de transacciones y el paso por plataformas con controles débiles \\cite{Almeida2025Techniques, Subashi2024Crypto}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Dupuis2020OpenDoors",
+  "frase": "Dupuis y Gleason identificaron seis «puertas abiertas» para convertir criptomonedas en moneda tradicional que seguían disponibles para quien busca lavar fondos, y las analizaron con el paradigma de la dialéctica regulatoria: cada regulación cierra una puerta y los infractores buscan la siguiente \\cite{Dupuis2020OpenDoors}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Pocher2023Anomalous",
+  "frase": "Esta combinación de transparencia y seudonimato es la que hace posible el análisis forense de la cadena de bloques y, a la vez, la que lo limita \\cite{Pocher2023Anomalous}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "Por eso el problema se plantea de forma natural como el análisis de un grafo de transacciones, en el que lo que se observa son flujos y no identidades \\cite{Weber2019Elliptic}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Ketenci2021TimeFrequency",
+  "frase": "Ketenci et al. reportan que la mayoría de los sistemas en uso son basados en reglas y que más del 90~\\% de sus alertas son falsos positivos \\cite{Ketenci2021TimeFrequency}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Oztas2024Monitoring",
+  "frase": "Oztas et al. entrevistaron a especialistas en prevención del lavado, que identificaron esa tasa de falsos positivos, con sus costos e ineficiencias, como uno de los problemas centrales del monitoreo actual, y señalaron el aprendizaje automático, el análisis de grafos y la detección de anomalías como vías para superarlo \\cite{Oztas2024Monitoring}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Chen2018AMLReview",
+  "frase": "El aprendizaje automático se ha propuesto como complemento de las reglas para reducir las falsas alarmas \\cite{Chen2018AMLReview, Hilal2022Anomaly}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Hilal2022Anomaly",
+  "frase": "El aprendizaje automático se ha propuesto como complemento de las reglas para reducir las falsas alarmas \\cite{Chen2018AMLReview, Hilal2022Anomaly}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Hilal2022Anomaly",
+  "frase": "Las revisiones distinguen enfoques supervisados, que aprenden de casos etiquetados y suelen detectar mejor pero necesitan muchas etiquetas, y no supervisados, que detectan patrones anómalos nuevos pero producen más falsas alarmas \\cite{Hilal2022Anomaly}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Labanca2022Amaretto",
+  "frase": "Labanca et al. combinan ambos en un esquema de aprendizaje activo en el que el modelo elige qué transacciones conviene que el analista revise, para aprovechar mejor su retroalimentación \\cite{Labanca2022Amaretto}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Oztas2024Monitoring",
+  "frase": "Los entrevistados por Oztas et al. incluyeron la explicabilidad entre los requisitos para que un sistema de monitoreo basado en aprendizaje automático se adopte en la práctica \\cite{Oztas2024Monitoring}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Bertrand2021Rights",
+  "frase": "Bertrand et al. examinan si los sistemas de prevención del lavado basados en inteligencia artificial respetan los derechos fundamentales europeos, y recuerdan que la normativa de la Unión Europea obliga a las entidades financieras a un monitoreo continuo capaz de detectar transacciones inusuales o sospechosas; la introducción de algoritmos de aprendizaje automático más opacos en ese monitoreo plantea riesgos de protección de datos que solo se han estudiado en parte \\cite{Bertrand2021Rights}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Giudici2023Risk",
+  "frase": "En el sector financiero en general, Giudici et al. proponen un marco de indicadores para medir los riesgos de la inteligencia artificial, en el que traducen los requisitos regulatorios propuestos para la inteligencia artificial en cuatro principios medibles: sostenibilidad, exactitud, equidad y explicabilidad \\cite{Giudici2023Risk}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "FinXAI2026Mapping",
+  "frase": "Una revisión sistemática de 35 casos de uso de explicabilidad en finanzas encontró que la detección de fraude es una de las aplicaciones más frecuentes, que SHAP y LIME son los métodos más usados, y que los beneficios buscados son la transparencia, la confianza de los interesados y el cumplimiento regulatorio \\cite{FinXAI2026Mapping}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Rudin2019Stop",
+  "frase": "Si el mismo método, aplicado a la misma transacción y al mismo modelo, produce explicaciones distintas, no puede sostener una decisión regulatoria \\cite{Rudin2019Stop}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "Elliptic es una excepción: es un grafo de transacciones de Bitcoin publicado por la empresa del mismo nombre junto con investigadores del MIT e IBM, con una parte de las transacciones etiquetadas como lícitas o ilícitas según su asociación con entidades conocidas \\cite{Weber2019Elliptic}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Alarab2023Graph",
+  "frase": "Elliptic se ha convertido en la referencia pública para la detección de transacciones ilícitas en criptomonedas \\cite{Alarab2023Graph, DTA2022Evolving}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "DTA2022Evolving",
+  "frase": "Elliptic se ha convertido en la referencia pública para la detección de transacciones ilícitas en criptomonedas \\cite{Alarab2023Graph, DTA2022Evolving}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "La segunda es el cierre de un mercado ilegal en el paso de tiempo 43, que cambia la distribución de las transacciones ilícitas posteriores y que ningún modelo logra capturar con las variables originales \\cite{Weber2019Elliptic, Alarab2023Recurrent}."
+ },
+ {
+  "archivo": "02_marco_contextual.tex",
+  "clave": "Alarab2023Recurrent",
+  "frase": "La segunda es el cierre de un mercado ilegal en el paso de tiempo 43, que cambia la distribución de las transacciones ilícitas posteriores y que ningún modelo logra capturar con las variables originales \\cite{Weber2019Elliptic, Alarab2023Recurrent}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "LeCun2015DeepLearning",
+  "frase": "Las redes neuronales profundas componen muchas transformaciones no lineales con parámetros que se ajustan por descenso de gradiente, y aprenden representaciones intermedias de los datos en lugar de depender de variables diseñadas a mano \\cite{LeCun2015DeepLearning}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Bronstein2017Geometric",
+  "frase": "El aprendizaje profundo geométrico extiende las redes neuronales a dominios de este tipo, que no tienen la estructura regular de una imagen o una secuencia \\cite{Bronstein2017Geometric}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Scarselli2009GNN",
+  "frase": "Una red neuronal de grafos calcula en cada capa $\\ell$ una representación $\\mathbf{h}_v^{(\\ell)}$ de cada nodo combinando su propia representación con las de sus vecinos \\cite{Scarselli2009GNN, Wu2021Survey, Zhou2020Review}:"
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Wu2021Survey",
+  "frase": "Una red neuronal de grafos calcula en cada capa $\\ell$ una representación $\\mathbf{h}_v^{(\\ell)}$ de cada nodo combinando su propia representación con las de sus vecinos \\cite{Scarselli2009GNN, Wu2021Survey, Zhou2020Review}:"
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Zhou2020Review",
+  "frase": "Una red neuronal de grafos calcula en cada capa $\\ell$ una representación $\\mathbf{h}_v^{(\\ell)}$ de cada nodo combinando su propia representación con las de sus vecinos \\cite{Scarselli2009GNN, Wu2021Survey, Zhou2020Review}:"
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Kipf2017GCN",
+  "frase": "\\textbf{GCN} \\cite{Kipf2017GCN}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Hamilton2017GraphSAGE",
+  "frase": "\\textbf{GraphSAGE} \\cite{Hamilton2017GraphSAGE}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Velickovic2018GAT",
+  "frase": "\\textbf{GAT} \\cite{Velickovic2018GAT}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Du2017TAGCN",
+  "frase": "\\textbf{TAGCN} \\cite{Du2017TAGCN}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Zheng2026Heterophily",
+  "frase": "Cuando los nodos de clases distintas tienden a conectarse entre sí, situación llamada heterofilia, las GNN diseñadas bajo el supuesto contrario pierden rendimiento, porque promediar con las vecinas mezcla la señal del nodo con la de la otra clase \\cite{Zheng2026Heterophily}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Residual2025Oversmoothing",
+  "frase": "Al apilar muchas capas, las representaciones de nodos distintos se vuelven cada vez más parecidas y el rendimiento cae, un fenómeno llamado sobresuavizado \\cite{Residual2025Oversmoothing}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "He2009Imbalanced",
+  "frase": "Cuando una clase es mucho más frecuente que otra, la pérdida promedio está dominada por la clase mayoritaria y el modelo puede minimizarla prediciendo casi siempre esa clase \\cite{He2009Imbalanced, Johnson2019Survey}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Johnson2019Survey",
+  "frase": "Cuando una clase es mucho más frecuente que otra, la pérdida promedio está dominada por la clase mayoritaria y el modelo puede minimizarla prediciendo casi siempre esa clase \\cite{He2009Imbalanced, Johnson2019Survey}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Chawla2002SMOTE",
+  "frase": "SMOTE \\cite{Chawla2002SMOTE} genera ejemplos sintéticos de la clase minoritaria interpolando entre un ejemplo y uno de sus vecinos más cercanos de la misma clase: $\\tilde{\\mathbf{x}} = \\mathbf{x}_i + \\lambda(\\mathbf{x}_j - \\mathbf{x}_i)$, con $\\lambda \\sim \\mathcal{U}(0, 1)$."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "ERA2026Imbalanced",
+  "frase": "Las revisiones sobre clasificación de nodos desbalanceada agrupan los métodos en los que actúan sobre los datos, como el sobremuestreo y el submuestreo, y los que actúan sobre el algoritmo, como la reponderación de la pérdida \\cite{ERA2026Imbalanced}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Lin2020Focal",
+  "frase": "La \\textit{focal loss} \\cite{Lin2020Focal} reduce el peso de los ejemplos que el modelo ya clasifica bien:"
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Chicco2020MCC",
+  "frase": "\\end{equation} El MCC usa las cuatro celdas de la matriz de confusión y solo es alto si el clasificador acierta en las dos clases, por lo que es más informativo que el F1 y la exactitud bajo desbalance \\cite{Chicco2020MCC}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Saito2015PR",
+  "frase": "La diferencia importa bajo desbalance: como la TFP se divide por el número enorme de negativos, un modelo puede tener una TFP de 0,05 y un ROC-AUC alto mientras produce muchas más falsas alarmas que aciertos; la precisión sí refleja ese costo \\cite{Saito2015PR}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Adadi2018Peeking",
+  "frase": "La explicabilidad busca que las decisiones de un modelo puedan ser comprendidas por una persona \\cite{Adadi2018Peeking, Guidotti2018Survey, Arrieta2020XAI}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Guidotti2018Survey",
+  "frase": "La explicabilidad busca que las decisiones de un modelo puedan ser comprendidas por una persona \\cite{Adadi2018Peeking, Guidotti2018Survey, Arrieta2020XAI}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Arrieta2020XAI",
+  "frase": "La explicabilidad busca que las decisiones de un modelo puedan ser comprendidas por una persona \\cite{Adadi2018Peeking, Guidotti2018Survey, Arrieta2020XAI}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Yuan2023Taxonomic",
+  "frase": "En grafos, esos elementos pueden ser las variables de los nodos, las aristas o subgrafos completos \\cite{Yuan2023Taxonomic, Dai2024Trustworthy}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Dai2024Trustworthy",
+  "frase": "En grafos, esos elementos pueden ser las variables de los nodos, las aristas o subgrafos completos \\cite{Yuan2023Taxonomic, Dai2024Trustworthy}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Ying2019GNNExplainer",
+  "frase": "\\textbf{GNNExplainer} \\cite{Ying2019GNNExplainer}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Luo2020PGExplainer",
+  "frase": "\\textbf{PGExplainer} \\cite{Luo2020PGExplainer}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Lundberg2017SHAP",
+  "frase": "\\textbf{Valores de Shapley} \\cite{Lundberg2017SHAP, Strumbelj2014Explaining}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Strumbelj2014Explaining",
+  "frase": "\\textbf{Valores de Shapley} \\cite{Lundberg2017SHAP, Strumbelj2014Explaining}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Castro2009Polynomial",
+  "frase": "Como hay $d!$ órdenes, se estima con una muestra aleatoria de permutaciones \\cite{Castro2009Polynomial}, y por ello es estocástico."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Sundararajan2017IG",
+  "frase": "\\textbf{Integrated Gradients} \\cite{Sundararajan2017IG}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Erion2021Expected",
+  "frase": "\\textbf{Expected Gradients} \\cite{Erion2021Expected}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Nauta2023Anecdotal",
+  "frase": "Las revisiones sistemáticas distinguen varias propiedades \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}: la \\textbf{fidelidad}, si la explicación refleja lo que de verdad usa el modelo; la \\textbf{plausibilidad}, si coincide con lo que un experto considera relevante; y la \\textbf{estabilidad} o consistencia, si explicaciones de la misma predicción en condiciones equivalentes se parecen entre sí."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Bodria2023Benchmarking",
+  "frase": "Las revisiones sistemáticas distinguen varias propiedades \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}: la \\textbf{fidelidad}, si la explicación refleja lo que de verdad usa el modelo; la \\textbf{plausibilidad}, si coincide con lo que un experto considera relevante; y la \\textbf{estabilidad} o consistencia, si explicaciones de la misma predicción en condiciones equivalentes se parecen entre sí."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Agarwal2023Evaluating",
+  "frase": "En grafos, las evaluaciones sistemáticas han mostrado que los explicadores difieren mucho entre sí y que su desempeño depende del conjunto de datos y de la arquitectura \\cite{Agarwal2023Evaluating, Longa2024Explaining}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Longa2024Explaining",
+  "frase": "En grafos, las evaluaciones sistemáticas han mostrado que los explicadores difieren mucho entre sí y que su desempeño depende del conjunto de datos y de la arquitectura \\cite{Agarwal2023Evaluating, Longa2024Explaining}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Adebayo2018Sanity",
+  "frase": "\\cite{Adebayo2018Sanity} propusieron por eso comparar la explicación de un modelo entrenado con la de la misma arquitectura con pesos aleatorios: si se parecen, la explicación no depende de lo aprendido."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Spearman1904",
+  "frase": "La correlación de Spearman \\cite{Spearman1904} compara los órdenes completos de importancia, y el índice de Jaccard \\cite{Jaccard1912} compara los conjuntos de las $k$ variables más importantes."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Jaccard1912",
+  "frase": "La correlación de Spearman \\cite{Spearman1904} compara los órdenes completos de importancia, y el índice de Jaccard \\cite{Jaccard1912} compara los conjuntos de las $k$ variables más importantes."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Gawantka2024Explanations",
+  "frase": "También se han propuesto métricas diseñadas específicamente para la estabilidad de las explicaciones \\cite{Gawantka2024Explanations}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Spearman1904",
+  "frase": "\\textbf{Correlación de Spearman.} Es la correlación de Pearson entre los rangos \\cite{Spearman1904}:"
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Jaccard1912",
+  "frase": "El índice \\cite{Jaccard1912} \\begin{equation} J_k(\\mathbf{a}, \\mathbf{b}) = \\frac{|T_k(\\mathbf{a}) \\cap T_k(\\mathbf{b})|} {|T_k(\\mathbf{a}) \\cup T_k(\\mathbf{b})|} \\end{equation} vale 1 si las dos explicaciones señalan las mismas $k$ variables y 0 si no comparten ninguna."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Friedman1937",
+  "frase": "\\textbf{Prueba de Friedman.} Compara $k$ tratamientos medidos sobre los mismos $n$ bloques sin suponer normalidad \\cite{Friedman1937}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Wilcoxon1945",
+  "frase": "Es menos potente que la prueba de Wilcoxon \\cite{Wilcoxon1945}, pero no supone nada sobre la magnitud de las diferencias, lo que conviene con pocos pares."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Lakens2017TOST",
+  "frase": "Si ambas se rechazan, la diferencia está dentro del margen \\cite{Lakens2017TOST}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Efron1979Bootstrap",
+  "frase": "\\textbf{Intervalos \\textit{bootstrap}.} Remuestreando con reemplazo las unidades observadas y recalculando la media en cada remuestra se obtiene una aproximación a su distribución, de la que se toman los percentiles 2,5 y 97,5 como intervalo de confianza del 95~\\% \\cite{Efron1979Bootstrap}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Hurlbert1984",
+  "frase": "La pseudorreplicación consiste en tratar como independientes observaciones que no lo son, por ejemplo mediciones repetidas sobre el mismo sujeto, y conduce a contrastar el efecto con un término de error que no corresponde a la hipótesis \\cite{Hurlbert1984}."
+ },
+ {
+  "archivo": "02_marco_teorico.tex",
+  "clave": "Lazic2010",
+  "frase": "Su consecuencia es inflar la significancia, y es un error frecuente aun en revistas de alto impacto \\cite{Lazic2010}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Chen2018AMLReview",
+  "frase": "Las revisiones sobre aprendizaje automático para la prevención del lavado de dinero documentan el paso de sistemas basados en reglas a modelos supervisados y no supervisados \\cite{Chen2018AMLReview}, y, más recientemente, a modelos de aprendizaje profundo \\cite{Kute2021AMLReview}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Kute2021AMLReview",
+  "frase": "Las revisiones sobre aprendizaje automático para la prevención del lavado de dinero documentan el paso de sistemas basados en reglas a modelos supervisados y no supervisados \\cite{Chen2018AMLReview}, y, más recientemente, a modelos de aprendizaje profundo \\cite{Kute2021AMLReview}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Motie2024FraudGNN",
+  "frase": "Una revisión sistemática dedicada a la detección de fraude financiero con GNN muestra que esta familia de modelos se ha extendido a tarjetas de crédito, seguros, transferencias bancarias y criptomonedas \\cite{Motie2024FraudGNN}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "Elliptic se publicó junto con los primeros experimentos de GCN para este problema \\cite{Weber2019Elliptic}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Vassallo2021Boosting",
+  "frase": "Sobre él se han propuesto modelos de \\textit{gradient boosting} \\cite{Vassallo2021Boosting}; modelos que combinan GCN con memorias de largo y corto plazo para aprovechar el orden temporal, junto con esquemas de aprendizaje activo \\cite{Alarab2023Graph}; representaciones de nodos aprendidas de forma autosupervisada \\cite{Lo2023Inspection}; y arquitecturas temporales basadas en transformadores sobre grafos \\cite{Lin2026Detecting}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Alarab2023Graph",
+  "frase": "Sobre él se han propuesto modelos de \\textit{gradient boosting} \\cite{Vassallo2021Boosting}; modelos que combinan GCN con memorias de largo y corto plazo para aprovechar el orden temporal, junto con esquemas de aprendizaje activo \\cite{Alarab2023Graph}; representaciones de nodos aprendidas de forma autosupervisada \\cite{Lo2023Inspection}; y arquitecturas temporales basadas en transformadores sobre grafos \\cite{Lin2026Detecting}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Lo2023Inspection",
+  "frase": "Sobre él se han propuesto modelos de \\textit{gradient boosting} \\cite{Vassallo2021Boosting}; modelos que combinan GCN con memorias de largo y corto plazo para aprovechar el orden temporal, junto con esquemas de aprendizaje activo \\cite{Alarab2023Graph}; representaciones de nodos aprendidas de forma autosupervisada \\cite{Lo2023Inspection}; y arquitecturas temporales basadas en transformadores sobre grafos \\cite{Lin2026Detecting}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Lin2026Detecting",
+  "frase": "Sobre él se han propuesto modelos de \\textit{gradient boosting} \\cite{Vassallo2021Boosting}; modelos que combinan GCN con memorias de largo y corto plazo para aprovechar el orden temporal, junto con esquemas de aprendizaje activo \\cite{Alarab2023Graph}; representaciones de nodos aprendidas de forma autosupervisada \\cite{Lo2023Inspection}; y arquitecturas temporales basadas en transformadores sobre grafos \\cite{Lin2026Detecting}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Wan2024Memory",
+  "frase": "Otras propuestas modelan el grafo de transacciones como una secuencia de instantáneas dinámicas \\cite{Wan2024Memory, Wang2025CoSemiGNN}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Wang2025CoSemiGNN",
+  "frase": "Otras propuestas modelan el grafo de transacciones como una secuencia de instantáneas dinámicas \\cite{Wan2024Memory, Wang2025CoSemiGNN}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "DTA2022Evolving",
+  "frase": "Mohan et al. modelan la detección en Bitcoin como clasificación de nodos en redes dinámicas, combinando convoluciones de grafos que evolucionan en el tiempo con bosques de decisión neuronales \\cite{DTA2022Evolving}, y Asiri et al. comparan regresión logística, máquinas de soporte vectorial, bosques aleatorios, redes LSTM y GCN sobre Elliptic \\cite{SciRep2025GCN}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "SciRep2025GCN",
+  "frase": "Mohan et al. modelan la detección en Bitcoin como clasificación de nodos en redes dinámicas, combinando convoluciones de grafos que evolucionan en el tiempo con bosques de decisión neuronales \\cite{DTA2022Evolving}, y Asiri et al. comparan regresión logística, máquinas de soporte vectorial, bosques aleatorios, redes LSTM y GCN sobre Elliptic \\cite{SciRep2025GCN}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Alarab2023Recurrent",
+  "frase": "Alarab y Prakoonwit señalan que todos los algoritmos de aprendizaje han fallado en capturar ese evento con las variables originales de Elliptic, y proponen un modelo recurrente de grafos que hace predicciones secuenciales apoyándose en las transacciones etiquetadas más recientes \\cite{Alarab2023Recurrent}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Pocher2023Anomalous",
+  "frase": "En el ámbito forense, Pocher et al. analizan cómo los métodos de aprendizaje automático y de análisis del grafo de transacciones se aplican a la prevención del lavado en criptomonedas y qué implicaciones tiene su uso por autoridades y empresas \\cite{Pocher2023Anomalous}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Lawal2025Dataset",
+  "frase": "Lawal et al. examinan explícitamente las limitaciones de las GNN sobre Elliptic bajo ese desbalance, y muestran que un modelo puede lograr una exactitud alta en entrenamiento sin identificar de forma significativa las transacciones ilícitas, con y sin estrategias como los pesos por clase \\cite{Lawal2025Dataset}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Rudin2019Stop",
+  "frase": "La necesidad de explicar las alertas de un sistema de detección se justifica tanto por la regulación como por la operación: el analista debe poder entender y documentar por qué revisa una transacción \\cite{Rudin2019Stop, Kute2021AMLReview}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Kute2021AMLReview",
+  "frase": "La necesidad de explicar las alertas de un sistema de detección se justifica tanto por la regulación como por la operación: el analista debe poder entender y documentar por qué revisa una transacción \\cite{Rudin2019Stop, Kute2021AMLReview}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Unagar2025Survey",
+  "frase": "Una revisión reciente reúne los trabajos sobre detección de lavado en criptomonedas que incorporan explicabilidad \\cite{Unagar2025Survey}, y se han propuesto marcos de GNN explicables para detectar transacciones financieras ilícitas \\cite{He2026Detection}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "He2026Detection",
+  "frase": "Una revisión reciente reúne los trabajos sobre detección de lavado en criptomonedas que incorporan explicabilidad \\cite{Unagar2025Survey}, y se han propuesto marcos de GNN explicables para detectar transacciones financieras ilícitas \\cite{He2026Detection}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Yuan2023Taxonomic",
+  "frase": "En el campo general de la explicabilidad de GNN, las taxonomías clasifican los métodos según lo que explican (variables, aristas o subgrafos) y cómo lo obtienen (gradientes, perturbaciones, sustitutos o descomposición) \\cite{Yuan2023Taxonomic, Dai2024Trustworthy}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Dai2024Trustworthy",
+  "frase": "En el campo general de la explicabilidad de GNN, las taxonomías clasifican los métodos según lo que explican (variables, aristas o subgrafos) y cómo lo obtienen (gradientes, perturbaciones, sustitutos o descomposición) \\cite{Yuan2023Taxonomic, Dai2024Trustworthy}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Agarwal2023Evaluating",
+  "frase": "Agarwal et al. construyeron un generador de grafos sintéticos con explicaciones de referencia, capaz de variar el tamaño, la distribución de grados y la homofilia del grafo, y una biblioteca para evaluar explicadores sobre esos grafos y sobre grafos reales \\cite{Agarwal2023Evaluating}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Longa2024Explaining",
+  "frase": "Longa et al. probaron 12 explicadores sobre 8 arquitecturas de paso de mensajes y 6 conjuntos de datos, y analizaron por qué unas arquitecturas resultan más explicables que otras y qué explicador conviene en cada caso \\cite{Longa2024Explaining}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Nauta2023Anecdotal",
+  "frase": "Las revisiones sobre la evaluación cuantitativa de la explicabilidad incluyen la estabilidad, o consistencia, entre las propiedades que una explicación debe cumplir, junto a la fidelidad y la plausibilidad \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Bodria2023Benchmarking",
+  "frase": "Las revisiones sobre la evaluación cuantitativa de la explicabilidad incluyen la estabilidad, o consistencia, entre las propiedades que una explicación debe cumplir, junto a la fidelidad y la plausibilidad \\cite{Nauta2023Anecdotal, Bodria2023Benchmarking}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Gawantka2024Explanations",
+  "frase": "Se han propuesto métricas específicas para medirla \\cite{Gawantka2024Explanations}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Adebayo2018Sanity",
+  "frase": "Adebayo et al. mostraron que algunas explicaciones visualmente convincentes apenas cambian cuando se aleatorizan los pesos del modelo, y propusieron esa aleatorización como prueba de que una explicación depende de lo que el modelo aprendió \\cite{Adebayo2018Sanity}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Rai2025Evaluating",
+  "frase": "Rai et al. diseñaron un marco comparativo para evaluar la confiabilidad y la consistencia de LIME, SHAP y gráficos de dependencia parcial en la predicción de riesgo de enfermedades con historias clínicas electrónicas, bajo distintos grados de desbalance \\cite{Rai2025Evaluating}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Fujiwara2024Stability",
+  "frase": "Fujiwara et al. proponen combinar destilación de conocimiento y remuestreo para mejorar tanto el rendimiento como la estabilidad de las explicaciones en clasificación desbalanceada \\cite{Fujiwara2024Stability}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Chen2023CreditImbalance",
+  "frase": "Partiendo de que la investigación sobre desbalance se había concentrado en su efecto sobre la exactitud y no sobre la interpretabilidad, evaluaron la estabilidad de LIME y SHAP sobre conjuntos de datos hipotecarios con desbalance creciente, y encontraron que las explicaciones se vuelven menos estables a medida que aumenta el desbalance, resultado que repitieron en otros dos conjuntos de datos de crédito \\cite{Chen2023CreditImbalance}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "TEM2026Stability",
+  "frase": "Mammadov et al. propusieron un artefacto de diseño para evaluar de forma controlada el efecto del desbalance y del muestreo sobre la estabilidad de SHAP y LIME, con medidas de acuerdo de rangos y de variabilidad, sobre 1.600 simulaciones \\cite{TEM2026Stability}."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "\\cite{Weber2019Elliptic} & \\checkmark & -- & -- & -- \\\\ Alarab et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Alarab2023Graph",
+  "frase": "\\cite{Alarab2023Graph, Alarab2023Recurrent} & \\checkmark & \\checkmark & -- & -- \\\\ Lawal et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Alarab2023Recurrent",
+  "frase": "\\cite{Alarab2023Graph, Alarab2023Recurrent} & \\checkmark & \\checkmark & -- & -- \\\\ Lawal et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Lawal2025Dataset",
+  "frase": "\\cite{Lawal2025Dataset} & \\checkmark & \\checkmark & -- & -- \\\\ He et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "He2026Detection",
+  "frase": "\\cite{He2026Detection} & \\checkmark & \\checkmark & -- & -- \\\\ Agarwal et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Agarwal2023Evaluating",
+  "frase": "\\cite{Agarwal2023Evaluating} & \\checkmark & \\checkmark & -- & -- \\\\ Longa et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Longa2024Explaining",
+  "frase": "\\cite{Longa2024Explaining} & \\checkmark & \\checkmark & -- & -- \\\\ Chen et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Chen2023CreditImbalance",
+  "frase": "\\cite{Chen2023CreditImbalance} & -- & \\checkmark & \\checkmark & \\checkmark \\\\ Mammadov et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "TEM2026Stability",
+  "frase": "\\cite{TEM2026Stability} & -- & \\checkmark & \\checkmark & \\checkmark \\\\ Rai et al."
+ },
+ {
+  "archivo": "03_estado_arte.tex",
+  "clave": "Rai2025Evaluating",
+  "frase": "\\cite{Rai2025Evaluating} & -- & \\checkmark & \\checkmark & \\checkmark \\\\ Esta tesis & \\checkmark & \\checkmark & \\checkmark & \\checkmark \\\\ \\bottomrule \\end{tabularx} \\end{table}"
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "Se usa el conjunto de datos Elliptic \\cite{Weber2019Elliptic}, un grafo de 203.769 transacciones de Bitcoin unidas por 234.355 aristas dirigidas, que representan flujos de fondos entre transacciones."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "En el paso 43 se cerró un mercado ilegal importante, y los autores de Elliptic reportaron que desde ese momento ningún modelo detectaba las nuevas transacciones ilícitas \\cite{Weber2019Elliptic}."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Gama2014Drift",
+  "frase": "Es un cambio en la distribución de los datos a lo largo del tiempo \\cite{Gama2014Drift}: lo que el modelo aprendió de los mercados que existían deja de describir la actividad ilícita posterior."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Chawla2002SMOTE",
+  "frase": "Cada sintética interpola los atributos de una ilícita y de una de sus vecinas más cercanas en el espacio de atributos \\cite{Chawla2002SMOTE}, se añade al grafo en el mismo paso de tiempo y hereda las aristas de la ilícita de la que parte."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Kipf2017GCN",
+  "frase": "GCN \\cite{Kipf2017GCN}, GraphSAGE \\cite{Hamilton2017GraphSAGE}, GAT \\cite{Velickovic2018GAT} y TAGCN \\cite{Du2017TAGCN}, descritas en la Sección \\ref{sec:gnn}."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Hamilton2017GraphSAGE",
+  "frase": "GCN \\cite{Kipf2017GCN}, GraphSAGE \\cite{Hamilton2017GraphSAGE}, GAT \\cite{Velickovic2018GAT} y TAGCN \\cite{Du2017TAGCN}, descritas en la Sección \\ref{sec:gnn}."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Velickovic2018GAT",
+  "frase": "GCN \\cite{Kipf2017GCN}, GraphSAGE \\cite{Hamilton2017GraphSAGE}, GAT \\cite{Velickovic2018GAT} y TAGCN \\cite{Du2017TAGCN}, descritas en la Sección \\ref{sec:gnn}."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Du2017TAGCN",
+  "frase": "GCN \\cite{Kipf2017GCN}, GraphSAGE \\cite{Hamilton2017GraphSAGE}, GAT \\cite{Velickovic2018GAT} y TAGCN \\cite{Du2017TAGCN}, descritas en la Sección \\ref{sec:gnn}."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Lin2020Focal",
+  "frase": "\\textbf{Compensación del desbalance.} Se comparan tres funciones de pérdida (Sección \\ref{sec:desbalance}): entropía cruzada sin ajuste; entropía cruzada con pesos por clase inversamente proporcionales a su frecuencia en el entrenamiento, de modo que cada clase aporta la mitad de la pérdida total; y \\textit{focal loss} \\cite{Lin2020Focal} con $\\gamma = 2$ y $\\alpha = 0{,}75$ como peso de la clase ilícita."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Saito2015PR",
+  "frase": "\\textbf{Evaluación del rendimiento.} La métrica principal es el PR-AUC, el área bajo la curva de precisión y exhaustividad, porque bajo un desbalance fuerte el ROC-AUC puede ser alto aunque el modelo produzca muchas más falsas alarmas que aciertos \\cite{Saito2015PR}."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Chicco2020MCC",
+  "frase": "Por eso cada modelo se marca como aprobado si en validación, con umbral 0,5, alcanza un F1 de al menos 0,30 y un coeficiente de Matthews \\cite{Chicco2020MCC} de al menos 0,15."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Ying2019GNNExplainer",
+  "frase": "\\begin{itemize} \\item \\textbf{GNNExplainer} \\cite{Ying2019GNNExplainer}, que optimiza una máscara sobre las variables de los nodos del subgrafo durante 100 iteraciones con tasa de aprendizaje 0,01."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Luo2020PGExplainer",
+  "frase": "\\item \\textbf{PGExplainer} \\cite{Luo2020PGExplainer}, que entrena una red que asigna importancia a las aristas."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Strumbelj2014Explaining",
+  "frase": "\\item \\textbf{Shapley por muestreo} \\cite{Strumbelj2014Explaining, Castro2009Polynomial}, que estima la contribución de cada variable promediando 50 permutaciones aleatorias; una variable ausente toma el valor medio de esa variable en el subgrafo."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Castro2009Polynomial",
+  "frase": "\\item \\textbf{Shapley por muestreo} \\cite{Strumbelj2014Explaining, Castro2009Polynomial}, que estima la contribución de cada variable promediando 50 permutaciones aleatorias; una variable ausente toma el valor medio de esa variable en el subgrafo."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Sundararajan2017IG",
+  "frase": "\\item \\textbf{Integrated Gradients} \\cite{Sundararajan2017IG}, que integra el gradiente a lo largo del camino recto entre una referencia y la transacción, con 100 pasos."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Erion2021Expected",
+  "frase": "\\item \\textbf{Expected Gradients} \\cite{Erion2021Expected}, que promedia Integrated Gradients sobre 200 referencias tomadas al azar de 5.000 transacciones negativas del entrenamiento."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Spearman1904",
+  "frase": "\\begin{description} \\item[Spearman global (principal).] La correlación de rangos de Spearman \\cite{Spearman1904} entre los dos vectores completos de 165 importancias."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Jaccard1912",
+  "frase": "\\item[Jaccard top-10.] El índice de Jaccard \\cite{Jaccard1912} entre los conjuntos de las 10 variables más importantes de cada réplica, $|A \\cap B| / |A \\cup B|$."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Adebayo2018Sanity",
+  "frase": "\\cite{Adebayo2018Sanity}: para cada arquitectura y semilla, en el escenario nativo con pesos por clase (12 modelos), se explican las mismas 30 transacciones con el modelo entrenado y con dos redes de la misma arquitectura e hiperparámetros pero con pesos aleatorios, sin entrenar."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Friedman1937",
+  "frase": "\\begin{description} \\item[H1 (escenario).] Prueba de Friedman \\cite{Friedman1937} con 9 bloques (3 arquitecturas que aprenden por 3 semillas) y 6 tratamientos (los escenarios), con pesos por clase."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Lakens2017TOST",
+  "frase": "Se complementa con una prueba de equivalencia de dos pruebas unilaterales (TOST) \\cite{Lakens2017TOST} entre el nativo y 1:200 con margen de 0,05: rechazar ambas hipótesis nulas indica que la diferencia, si existe, es menor que el margen."
+ },
+ {
+  "archivo": "04_metodologia.tex",
+  "clave": "Efron1979Bootstrap",
+  "frase": "Los intervalos de confianza de las figuras se obtienen por \\textit{bootstrap} sobre los modelos \\cite{Efron1979Bootstrap}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Chen2023CreditImbalance",
+  "frase": "Chen et al. encontraron que las explicaciones de LIME y SHAP pierden estabilidad a medida que aumenta el desbalance en datos de crédito \\cite{Chen2023CreditImbalance}, y Rai et al. que el desbalance puede afectar de forma significativa la confiabilidad y la consistencia de LIME y SHAP en datos clínicos \\cite{Rai2025Evaluating}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Rai2025Evaluating",
+  "frase": "Chen et al. encontraron que las explicaciones de LIME y SHAP pierden estabilidad a medida que aumenta el desbalance en datos de crédito \\cite{Chen2023CreditImbalance}, y Rai et al. que el desbalance puede afectar de forma significativa la confiabilidad y la consistencia de LIME y SHAP en datos clínicos \\cite{Rai2025Evaluating}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Zheng2026Heterophily",
+  "frase": "Esta es una manifestación del problema de la heterofilia descrito en la literatura \\cite{Zheng2026Heterophily}, aunque aquí la mezcla de clases proviene en parte de contar como negativas las transacciones sin etiqueta."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Longa2024Explaining",
+  "frase": "Longa et al. encontraron que la explicabilidad depende de la arquitectura en sus experimentos \\cite{Longa2024Explaining}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Adebayo2018Sanity",
+  "frase": "Es la misma situación que Adebayo et al. describieron para mapas de saliencia de imágenes, en los que explicaciones visualmente convincentes apenas cambiaban al aleatorizar los pesos \\cite{Adebayo2018Sanity}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Alarab2023Recurrent",
+  "frase": "Alarab y Prakoonwit señalaron que ningún algoritmo había logrado capturar ese evento con las variables originales \\cite{Alarab2023Recurrent}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Hurlbert1984",
+  "frase": "Los modelos de una misma semilla en distintos escenarios resultaron casi idénticos, y con la unidad correcta esas diferencias desaparecieron \\cite{Hurlbert1984, Lazic2010}."
+ },
+ {
+  "archivo": "06_discusion.tex",
+  "clave": "Lazic2010",
+  "frase": "Los modelos de una misma semilla en distintos escenarios resultaron casi idénticos, y con la unidad correcta esas diferencias desaparecieron \\cite{Hurlbert1984, Lazic2010}."
+ },
+ {
+  "archivo": "A_corrida_original.tex",
+  "clave": "Weber2019Elliptic",
+  "frase": "Ningún modelo detecta las transacciones ilícitas posteriores al cierre, lo que reproduce lo reportado por los autores del conjunto de datos \\cite{Weber2019Elliptic}."
+ }
+]

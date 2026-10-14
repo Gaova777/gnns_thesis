@@ -152,6 +152,109 @@ control de pesos aleatorios. Sin el control, una estabilidad alta puede deberse 
 de los datos y no al modelo; sin una medida de las principales, el bloque de variables nulas
 puede ocultar desacuerdos en lo que importa.
 
+\section{Relación con los trabajos previos}\label{sec:dis_literatura}
+
+La Tabla \ref{tab:literatura} confronta cada resultado de la tesis con lo que reportan los
+trabajos más cercanos. Se distinguen tres casos: el resultado coincide, difiere, o no es
+comparable porque la tarea, los datos o las métricas son distintos.
+
+\begin{table}[ht]
+\centering
+\caption{Resultados de la tesis frente a la literatura. Lo que se atribuye a cada trabajo se
+limita a lo que declara su resumen.}
+\label{tab:literatura}
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{p{0.17\textwidth}XXp{0.11\textwidth}}
+\toprule
+Trabajo & Qué reporta & Qué encontró esta tesis & Relación \\
+\midrule
+Weber et al. \cite{Weber2019Elliptic}; Alarab y Prakoonwit \cite{Alarab2023Recurrent} &
+Ningún modelo capta el cierre del mercado del paso 43 con las variables originales. &
+Con la prueba después del cierre, las cuatro arquitecturas quedan en el azar (PR-AUC entre 0,005
+y 0,012). & Coincide \\
+Alarab y Prakoonwit \cite{Alarab2023Recurrent}; Lin et al. \cite{Lin2026Detecting} &
+Exactitud de 0,98 a 0,99 y F1 de 0,92 a 0,98 sobre Elliptic. &
+PR-AUC de prueba de hasta 0,31 y ROC-AUC de hasta 0,90 sin el cierre. & No comparable: métricas
+distintas, que bajo desbalance no son equivalentes, y posiblemente otra definición de la tarea \\
+Lawal et al. \cite{Lawal2025Dataset} &
+Bajo el desbalance de Elliptic un modelo puede lograr exactitud alta sin identificar el fraude;
+pesos por clase y \textit{focal loss} no lo estabilizan del todo. &
+La técnica de compensación cambia mucho el rendimiento, y la mejor depende del escenario. &
+Coincide \\
+Chen et al. \cite{Chen2023CreditImbalance}; Rai et al. \cite{Rai2025Evaluating}; Mammadov et
+al. \cite{TEM2026Stability} &
+En datos tabulares, el desbalance reduce la estabilidad de LIME y SHAP. &
+Con GNNExplainer la estabilidad baja con el desbalance sin ajuste y con \textit{focal loss}; con
+pesos por clase no cambia; Shapley casi no responde. & Coincide en parte \\
+Fujiwara et al. \cite{Fujiwara2024Stability} &
+El remuestreo puede reducir la estabilidad de las explicaciones; la destilación la mejora. &
+Submuestrear negativas o añadir ilícitas con SMOTE no redujo la estabilidad con pesos por clase.
+& Difiere \\
+Gawantka et al. \cite{Gawantka2024Explanations} &
+Los métodos no deterministas dan explicaciones distintas para la misma entrada y modelo. &
+GNNExplainer, Shapley y Expected Gradients varían entre réplicas; Integrated Gradients no. &
+Coincide \\
+Adebayo et al. \cite{Adebayo2018Sanity} &
+Algunas explicaciones de imágenes apenas cambian al aleatorizar los pesos. &
+Con Spearman global, la explicación de la red entrenada y la de una sin entrenar coinciden casi
+como dos réplicas; con el Jaccard top-10, no. & Coincide, con un matiz de medida \\
+Longa et al. \cite{Longa2024Explaining} &
+La explicabilidad depende de la arquitectura y del explicador. &
+La estabilidad no depende de la arquitectura entre las que aprenden; el explicador sí cambia
+qué variables se señalan. & Coincide en el explicador; difiere en la arquitectura \\
+Zheng et al. \cite{Zheng2026Heterophily} &
+La heterofilia limita a las GNN que suponen homofilia. &
+Una ilícita tiene en su mayoría vecinas negativas; GCN, que no da peso propio al nodo, no
+aprende. & Coincide \\
+He et al. \cite{He2026Detection} &
+Marco explicable basado en TAGCN para transacciones ilícitas. &
+TAGCN rinde entre las mejores, pero sus explicaciones no son más estables. & Complementa \\
+Agarwal et al. \cite{Agarwal2023Evaluating} &
+Grafos sintéticos con explicación de referencia para medir la calidad de los explicadores. &
+En el eje sintético, el explicador más estable no es el más plausible. & Complementa \\
+Vassallo et al. \cite{Vassallo2021Boosting} &
+Una adaptación de XGBoost reduce el impacto del cambio de concepto. &
+La tesis evita el cambio con la partición en lugar de adaptarse a él. & Enfoque distinto \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Tres de estas comparaciones merecen comentario.
+
+\textbf{El rendimiento no es comparable con las cifras publicadas sobre Elliptic.} Varios
+trabajos reportan exactitudes cercanas a 0,99 y F1 superiores a 0,90
+\cite{Alarab2023Recurrent, Lin2026Detecting}. Las cifras de esta tesis son mucho menores, pero
+pueden medir otra cosa. Esta tesis trata las 157.205 transacciones sin etiqueta como negativas,
+lo que da una razón de 41 a 1, mientras que en el trabajo original sobre Elliptic se clasifican
+solo las transacciones etiquetadas, con una razón cercana a 9 a 1 \cite{Weber2019Elliptic}; los
+resúmenes de los trabajos citados no precisan qué definición usan. Además, bajo un desbalance fuerte la
+exactitud y el F1 pueden ser engañosos \cite{Chicco2020MCC, Saito2015PR}, y Lawal et al. muestran
+que en Elliptic un modelo puede tener una exactitud alta sin identificar de forma significativa
+el fraude \cite{Lawal2025Dataset}. Por eso esta tesis no afirma que sus modelos sean peores ni
+mejores que los publicados: afirma que, en la tarea más cercana a la operación real, las tres
+arquitecturas que aprenden detectan el fraude entre 7 y 12 veces mejor que el azar en un periodo
+posterior al de entrenamiento.
+
+\textbf{El efecto del desbalance coincide en dirección con los estudios tabulares, pero no en
+alcance.} Chen et al. encontraron que las explicaciones de LIME y SHAP pierden estabilidad con
+más desbalance \cite{Chen2023CreditImbalance}. Esta tesis encuentra lo mismo con GNNExplainer
+cuando la pérdida no compensa el desbalance, pero no con Shapley ni con pesos por clase. La
+diferencia más probable es de diseño, y se discutió en la Sección \ref{sec:dis_h1}: qué fuente de
+variación entra en la medida. Una consecuencia práctica, que esos trabajos no examinan, es que la
+forma de compensar el desbalance decide si el efecto aparece.
+
+\textbf{La objeción de Rudin.} Rudin sostiene que, para decisiones de alto riesgo, explicar
+modelos de caja negra puede perpetuar malas prácticas, y que el camino es usar modelos
+interpretables desde el principio \cite{Rudin2019Stop}. Los resultados de esta tesis dan
+argumentos a esa posición: con la medida más usada, una explicación estable puede no depender
+del modelo, y modelos que solo difieren en la semilla señalan variables distintas. Pero no la
+resuelven, porque esta tesis no compara las GNN con un modelo interpretable de rendimiento
+similar. Lo que sí aporta es un procedimiento para decidir cuándo una explicación post hoc es
+digna de confianza: que sea estable, que dependa del modelo según un control de pesos
+aleatorios, y que sus variables principales se mantengan entre modelos entrenados con semillas
+distintas.
+
 \section{Implicaciones para la auditoría}\label{sec:dis_auditoria}
 
 Los resultados tienen tres consecuencias para el uso de explicaciones en un sistema de

@@ -1,0 +1,578 @@
+{
+ "Wu2021Survey": {
+  "doi": "10.1109/TNNLS.2020.2978386",
+  "titulo": "A Comprehensive Survey on Graph Neural Networks",
+  "revista": "IEEE Transactions on Neural Networks and Learning Systems",
+  "anio": "2021",
+  "resumen": "Deep learning has revolutionized many machine learning tasks in recent years, ranging from image classification and video processing to speech recognition and natural language understanding. The data in these tasks are typically represented in the Euclidean space. However, there is an increasing number of applications, where data are generated from non-Euclidean domains and are represented as graphs with complex relationships and interdependency between objects. The complexity of graph data has imposed significant challenges on the existing machine learning algorithms. Recently, many studies on extending deep learning approaches for graph data have emerged. In this article, we provide a comprehensive overview of graph neural networks (GNNs) in data mining and machine learning fields. We propose a new taxonomy to divide the state-of-the-art GNNs into four categories, namely, recurrent GNNs, convolutional GNNs, graph autoencoders, and spatial-temporal GNNs. We further discuss the applications of GNNs across various domains and summarize the open-source codes, benchmark data sets, and model evaluation of GNNs. Finally, we propose potential research directions in this rapidly growing field.",
+  "fuente": "openalex"
+ },
+ "Zhou2020Review": {
+  "doi": "10.1016/j.aiopen.2021.01.001",
+  "titulo": "Graph neural networks: A review of methods and applications",
+  "revista": "AI Open",
+  "anio": "2020",
+  "resumen": "Lots of learning tasks require dealing with graph data which contains rich relation information among elements. Modeling physics systems, learning molecular fingerprints, predicting protein interface, and classifying diseases demand a model to learn from graph inputs. In other domains such as learning from non-structural data like texts and images, reasoning on extracted structures (like the dependency trees of sentences and the scene graphs of images) is an important research topic which also needs graph reasoning models. Graph neural networks (GNNs) are neural models that capture the dependence of graphs via message passing between the nodes of graphs. In recent years, variants of GNNs such as graph convolutional network (GCN), graph attention network (GAT), graph recurrent network (GRN) have demonstrated ground-breaking performances on many deep learning tasks. In this survey, we propose a general design pipeline for GNN models and discuss the variants of each component, systematically categorize the applications, and propose four open problems for future research.",
+  "fuente": "openalex"
+ },
+ "Scarselli2009GNN": {
+  "doi": "10.1109/TNN.2008.2005605",
+  "titulo": "The Graph Neural Network Model",
+  "revista": "IEEE Transactions on Neural Networks",
+  "anio": "2009",
+  "resumen": "Many underlying relationships among data in several areas of science and engineering, e.g., computer vision, molecular chemistry, molecular biology, pattern recognition, and data mining, can be represented in terms of graphs. In this paper, we propose a new neural network model, called graph neural network (GNN) model, that extends existing neural network methods for processing the data represented in graph domains. This GNN model, which can directly process most of the practically useful types of graphs, e.g., acyclic, cyclic, directed, and undirected, implements a function tau(G,n) is an element of IR(m) that maps a graph G and one of its nodes n into an m-dimensional Euclidean space. A supervised learning algorithm is derived to estimate the parameters of the proposed GNN model. The computational cost of the proposed algorithm is also considered. Some experimental results are shown to validate the proposed learning algorithm, and to demonstrate its generalization capabilities.",
+  "fuente": "openalex"
+ },
+ "Yuan2023Taxonomic": {
+  "doi": "10.1109/TPAMI.2022.3204236",
+  "titulo": "Explainability in Graph Neural Networks: A Taxonomic Survey",
+  "revista": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+  "anio": "2022",
+  "resumen": "Deep learning methods are achieving ever-increasing performance on many artificial intelligence tasks. A major limitation of deep models is that they are not amenable to interpretability. This limitation can be circumvented by developing post hoc techniques to explain predictions, giving rise to the area of explainability. Recently, explainability of deep models on images and texts has achieved significant progress. In the area of graph data, graph neural networks (GNNs) and their explainability are experiencing rapid developments. However, there is neither a unified treatment of GNN explainability methods, nor a standard benchmark and testbed for evaluations. In this survey, we provide a unified and taxonomic view of current GNN explainability methods. Our unified and taxonomic treatments of this subject shed lights on the commonalities and differences of existing methods and set the stage for further methodological developments. To facilitate evaluations, we provide a testbed for GNN explainability, including datasets, common algorithms and evaluation metrics. Furthermore, we conduct comprehensive experiments to compare and analyze the performance of many techniques. Altogether, this work provides a unified methodological treatment of GNN explainability and a standardized testbed for evaluations.",
+  "fuente": "openalex"
+ },
+ "Agarwal2023Evaluating": {
+  "doi": "10.1038/s41597-023-01974-x",
+  "titulo": "Evaluating explainability for graph neural networks",
+  "revista": "Scientific Data",
+  "anio": "2023",
+  "resumen": "As explanations are increasingly used to understand the behavior of graph neural networks (GNNs), evaluating the quality and reliability of GNN explanations is crucial. However, assessing the quality of GNN explanations is challenging as existing graph datasets have no or unreliable ground-truth explanations. Here, we introduce a synthetic graph data generator, SHAPEGGEN, which can generate a variety of benchmark datasets (e.g., varying graph sizes, degree distributions, homophilic vs. heterophilic graphs) accompanied by ground-truth explanations. The flexibility to generate diverse synthetic datasets and corresponding ground-truth explanations allows SHAPEGGEN to mimic the data in various real-world areas. We include SHAPEGGEN and several real-world graph datasets in a graph explainability library, GRAPHXAI. In addition to synthetic and real-world graph datasets with ground-truth explanations, GRAPHXAI provides data loaders, data processing functions, visualizers, GNN model implementations, and evaluation metrics to benchmark GNN explainability methods.",
+  "fuente": "openalex"
+ },
+ "Longa2024Explaining": {
+  "doi": "10.1145/3696444",
+  "titulo": "Explaining the Explainers in Graph Neural Networks: a Comparative Study",
+  "revista": "ACM Computing Surveys",
+  "anio": "2025",
+  "resumen": "Following a fast initial breakthrough in graph-based learning, Graph Neural Networks (GNNs) have reached a widespread application in many science and engineering fields, prompting the need for methods to understand their decision process. GNN explainers have started to emerge in recent years, with a multitude of methods both novel or adapted from other domains. To sort out this plethora of alternative approaches, several studies have benchmarked the performance of different explainers in terms of various explainability metrics. However, these earlier works make no attempts at providing insights into why different GNN architectures are more or less explainable or which explainer should be preferred in a given setting. In this survey we fill these gaps by devising a systematic experimental study, which tests 12 explainers on eight representative message-passing architectures trained on six carefully designed graph and node classification datasets. With our results we provide key insights on the choice and applicability of GNN explainers, we isolate key components that make them usable and successful and provide recommendations on how to avoid common interpretation pitfalls. We conclude by highlighting open questions and directions of possible future research.",
+  "fuente": "openalex"
+ },
+ "Dai2024Trustworthy": {
+  "doi": "10.1007/s11633-024-1510-8",
+  "titulo": "A Comprehensive Survey on Trustworthy Graph Neural Networks: Privacy, Robustness, Fairness, and Explainability",
+  "revista": "Machine Intelligence Research",
+  "anio": "2024",
+  "resumen": "Abstract Graph neural networks (GNNs) have made rapid developments in the recent years. Due to their great ability in modeling graph-structured data, GNNs are vastly used in various applications, including high-stakes scenarios such as financial analysis, traffic predictions, and drug discovery. Despite their great potential in benefiting humans in the real world, recent study shows that GNNs can leak private information, are vulnerable to adversarial attacks, can inherit and magnify societal bias from training data and lack interpretability, which have risk of causing unintentional harm to the users and society. For example, existing works demonstrate that attackers can fool the GNNs to give the outcome they desire with unnoticeable perturbation on training graph. GNNs trained on social networks may embed the discrimination in their decision process, strengthening the undesirable societal bias. Consequently, trust-worthy GNNs in various aspects are emerging to prevent the harm from GNN models and increase the users’ trust in GNNs. In this paper, we give a comprehensive survey of GNNs in the computational aspects of privacy, robustness, fairness, and explainability. For each aspect, we give the taxonomy of the related methods and formulate the general frameworks for the multiple categories of trustworthy GNNs. We also discuss the future research directions of each aspect and connections between these aspects to help achieve trustworthiness.",
+  "fuente": "openalex"
+ },
+ "Adadi2018Peeking": {
+  "doi": "10.1109/ACCESS.2018.2870052",
+  "titulo": "Peeking Inside the Black-Box: A Survey on Explainable Artificial Intelligence (XAI)",
+  "revista": "IEEE Access",
+  "anio": "2018",
+  "resumen": "At the dawn of the fourth industrial revolution, we are witnessing a fast and widespread adoption of artificial intelligence (AI) in our daily life, which contributes to accelerating the shift towards a more algorithmic society. However, even with such unprecedented advancements, a key impediment to the use of AI-based systems is that they often lack transparency. Indeed, the black-box nature of these systems allows powerful predictions, but it cannot be directly explained. This issue has triggered a new debate on explainable AI (XAI). A research field holds substantial promise for improving trust and transparency of AI-based systems. It is recognized as the sine qua non for AI to continue making steady progress without disruption. This survey provides an entry point for interested researchers and practitioners to learn key aspects of the young and rapidly growing body of research related to XAI. Through the lens of the literature, we review the existing approaches regarding the topic, discuss trends surrounding its sphere, and present major research trajectories.",
+  "fuente": "openalex"
+ },
+ "Guidotti2018Survey": {
+  "doi": "10.1145/3236009",
+  "titulo": "A Survey of Methods for Explaining Black Box Models",
+  "revista": "ACM Computing Surveys",
+  "anio": "2019",
+  "resumen": "In recent years, many accurate decision support systems have been constructed as black boxes, that is as systems that hide their internal logic to the user. This lack of explanation constitutes both a practical and an ethical issue. The literature reports many approaches aimed at overcoming this crucial weakness, sometimes at the cost of sacrificing accuracy for interpretability. The applications in which black box decision systems can be used are various, and each approach is typically developed to provide a solution for a specific problem and, as a consequence, it explicitly or implicitly delineates its own definition of interpretability and explanation. The aim of this article is to provide a classification of the main problems addressed in the literature with respect to the notion of explanation and the type of black box system. Given a problem definition, a black box type, and a desired explanation, this survey should help the researcher to find the proposals more useful for his own work. The proposed classification of approaches to open black box models should also be useful for putting the many research open questions in perspective.",
+  "fuente": "openalex"
+ },
+ "Arrieta2020XAI": {
+  "doi": "10.1016/j.inffus.2019.12.012",
+  "titulo": "Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI",
+  "revista": "Information Fusion",
+  "anio": "2020",
+  "resumen": "In the last years, Artificial Intelligence (AI) has achieved a notable momentum that may deliver the best of expectations over many application sectors across the field. For this to occur, the entire community stands in front of the barrier of explainability, an inherent problem of AI techniques brought by sub-symbolism (e.g. ensembles or Deep Neural Networks) that were not present in the last hype of AI. Paradigms underlying this problem fall within the so-called eXplainable AI (XAI) field, which is acknowledged as a crucial feature for the practical deployment of AI models. This overview examines the existing literature in the field of XAI, including a prospect toward what is yet to be reached. We summarize previous efforts to define explainability in Machine Learning, establishing a novel definition that covers prior conceptual propositions with a major focus on the audience for which explainability is sought. We then propose and discuss about a taxonomy of recent contributions related to the explainability of different Machine Learning models, including those aimed at Deep Learning methods for which a second taxonomy is built. This literature analysis serves as the background for a series of challenges faced by XAI, such as the crossroads between data fusion and explainability. Our prospects lead toward the concept of Responsible Artificial Intelligence, namely, a methodology for the large-scale implementation of AI methods in real organizations with fairness, model explainability and accountability at its core. Our ultimate goal is to provide newcomers to XAI with a reference material in order to stimulate future research advances, but also to encourage experts and professionals from other disciplines to embrace the benefits of AI in their activity sectors, without any prior bias for its lack of interpretability.",
+  "fuente": "semanticscholar"
+ },
+ "Rudin2019Stop": {
+  "doi": "10.1038/s42256-019-0048-x",
+  "titulo": "Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead",
+  "revista": "Nature Machine Intelligence",
+  "anio": "2019",
+  "resumen": "Black box machine learning models are currently being used for high-stakes decision making throughout society, causing problems in healthcare, criminal justice and other domains. Some people hope that creating methods for explaining these black box models will alleviate some of the problems, but trying to explain black box models, rather than creating models that are interpretable in the first place, is likely to perpetuate bad practice and can potentially cause great harm to society. The way forward is to design models that are inherently interpretable. This Perspective clarifies the chasm between explaining black boxes and using inherently interpretable models, outlines several key reasons why explainable black boxes should be avoided in high-stakes decisions, identifies challenges to interpretable machine learning, and provides several example applications where interpretable models could potentially replace black box models in criminal justice, healthcare and computer vision. There has been a recent rise of interest in developing methods for ‘explainable AI’, where models are created to explain how a first ‘black box’ machine learning model arrives at a specific decision. It can be argued that instead efforts should be directed at building inherently interpretable models in the first place, in particular where they are applied in applications that directly affect human lives, such as in healthcare and criminal justice.",
+  "fuente": "semanticscholar"
+ },
+ "Nauta2023Anecdotal": {
+  "doi": "10.1145/3583558",
+  "titulo": "From Anecdotal Evidence to Quantitative Evaluation Methods: A Systematic Review on Evaluating Explainable AI",
+  "revista": "ACM Computing Surveys",
+  "anio": "2023",
+  "resumen": "The rising popularity of explainable artificial intelligence (XAI) to understand high-performing black boxes raised the question of how to evaluate explanations of machine learning (ML) models. While interpretability and explainability are often presented as a subjectively validated binary property, we consider it a multi-faceted concept. We identify 12 conceptual properties, such as Compactness and Correctness, that should be evaluated for comprehensively assessing the quality of an explanation. Our so-called Co-12 properties serve as categorization scheme for systematically reviewing the evaluation practices of more than 300 papers published in the past 7 years at major AI and ML conferences that introduce an XAI method. We find that one in three papers evaluate exclusively with anecdotal evidence, and one in five papers evaluate with users. This survey also contributes to the call for objective, quantifiable evaluation methods by presenting an extensive overview of quantitative XAI evaluation methods. Our systematic collection of evaluation methods provides researchers and practitioners with concrete tools to thoroughly validate, benchmark, and compare new and existing XAI methods. The Co-12 categorization scheme and our identified evaluation methods open up opportunities to include quantitative metrics as optimization criteria during model training to optimize for accuracy and interpretability simultaneously.",
+  "fuente": "openalex"
+ },
+ "Bodria2023Benchmarking": {
+  "doi": "10.1007/s10618-023-00933-9",
+  "titulo": "Benchmarking and survey of explanation methods for black box models",
+  "revista": "Data Mining and Knowledge Discovery",
+  "anio": "2023",
+  "resumen": "Abstract The rise of sophisticated black-box machine learning models in Artificial Intelligence systems has prompted the need for explanation methods that reveal how these models work in an understandable way to users and decision makers. Unsurprisingly, the state-of-the-art exhibits currently a plethora of explainers providing many different types of explanations. With the aim of providing a compass for researchers and practitioners, this paper proposes a categorization of explanation methods from the perspective of the type of explanation they return, also considering the different input data formats. The paper accounts for the most representative explainers to date, also discussing similarities and discrepancies of returned explanations through their visual appearance. A companion website to the paper is provided as a continuous update to new explainers as they appear. Moreover, a subset of the most robust and widely adopted explainers, are benchmarked with respect to a repertoire of quantitative metrics.",
+  "fuente": "openalex"
+ },
+ "Erion2021Expected": {
+  "doi": "10.1038/s42256-021-00343-w",
+  "titulo": "Improving performance of deep learning models with axiomatic attribution priors and expected gradients",
+  "revista": "Nature Machine Intelligence",
+  "anio": "2021",
+  "resumen": "This work introduces an explanation method, called ‘expected gradients’, that enables training with theoretically motivated feature attribution priors, to improve model performance on real-world tasks.",
+  "fuente": "semanticscholar"
+ },
+ "Strumbelj2014Explaining": {
+  "doi": "10.1007/s10115-013-0679-x",
+  "titulo": "Explaining prediction models and individual predictions with feature contributions",
+  "revista": "Knowledge and Information Systems",
+  "anio": "2014",
+  "resumen": "A sensitivity analysis-based method for explaining prediction models that can be applied to any type of classification or regression model, and which is equivalent to commonly used additive model-specific methods when explaining an additive model.",
+  "fuente": "semanticscholar"
+ },
+ "Castro2009Polynomial": {
+  "doi": "10.1016/j.cor.2008.04.004",
+  "titulo": "Polynomial calculation of the Shapley value based on sampling",
+  "revista": "Computers &amp; Operations Research",
+  "anio": "2009",
+  "resumen": "A polynomial method based on sampling theory that can be used to estimate the Shapley value for cooperative games is developed and some desirable statistical properties of the proposed approach are examined.",
+  "fuente": "semanticscholar"
+ },
+ "Lundberg2020Local": {
+  "doi": "10.1038/s42256-019-0138-9",
+  "titulo": "From local explanations to global understanding with explainable AI for trees",
+  "revista": "Nature Machine Intelligence",
+  "anio": "2020",
+  "resumen": "Tree-based machine learning models such as random forests, decision trees and gradient boosted trees are popular nonlinear predictive models, yet comparatively little attention has been paid to explaining their predictions. Here we improve the interpretability of tree-based models through three main contributions. (1) A polynomial time algorithm to compute optimal explanations based on game theory. (2) A new type of explanation that directly measures local feature interaction effects. (3) A new set of tools for understanding global model structure based on combining many local explanations of each prediction. We apply these tools to three medical machine learning problems and show how combining many high-quality local explanations allows us to represent global structure while retaining local faithfulness to the original model. These tools enable us to (1) identify high-magnitude but low-frequency nonlinear mortality risk factors in the US population, (2) highlight distinct population subgroups with shared risk characteristics, (3) identify nonlinear interaction effects among risk factors for chronic kidney disease and (4) monitor a machine learning model deployed in a hospital by identifying which features are degrading the model’s performance over time. Given the popularity of tree-based machine learning models, these improvements to their interpretability have implications across a broad set of domains. Tree-based machine learning models are widely used in domains such as healthcare, finance and public services. The authors present an explanation method for trees that enables the computation of optimal local explanations for individual predictions, and demonstrate their method on three medical datasets.",
+  "fuente": "semanticscholar"
+ },
+ "He2009Imbalanced": {
+  "doi": "10.1109/TKDE.2008.239",
+  "titulo": "Learning from Imbalanced Data",
+  "revista": "IEEE Transactions on Knowledge and Data Engineering",
+  "anio": "2009",
+  "resumen": "With the continuous expansion of data availability in many large-scale, complex, and networked systems, such as surveillance, security, Internet, and finance, it becomes critical to advance the fundamental understanding of knowledge discovery and analysis from raw data to support decision-making processes. Although existing knowledge discovery and data engineering techniques have shown great success in many real-world applications, the problem of learning from imbalanced data (the imbalanced learning problem) is a relatively new challenge that has attracted growing attention from both academia and industry. The imbalanced learning problem is concerned with the performance of learning algorithms in the presence of underrepresented data and severe class distribution skews. Due to the inherent complex characteristics of imbalanced data sets, learning from such data requires new understandings, principles, algorithms, and tools to transform vast amounts of raw data efficiently into information and knowledge representation. In this paper, we provide a comprehensive review of the development of research in learning from imbalanced data. Our focus is to provide a critical review of the nature of the problem, the state-of-the-art technologies, and the current assessment metrics used to evaluate learning performance under the imbalanced learning scenario. Furthermore, in order to stimulate future research in this field, we also highlight the major opportunities and challenges, as well as potential important research directions for learning from imbalanced data.",
+  "fuente": "openalex"
+ },
+ "Chawla2002SMOTE": {
+  "doi": "10.1613/jair.953",
+  "titulo": "SMOTE: Synthetic Minority Over-sampling Technique",
+  "revista": "Journal of Artificial Intelligence Research",
+  "anio": "2002",
+  "resumen": "An approach to the construction of classifiers from imbalanced datasets is described. A dataset is imbalanced if the classification categories are not approximately equally represented. Often real-world data sets are predominately composed of ``normal'' examples with only a small percentage of ``abnormal'' or ``interesting'' examples. It is also the case that the cost of misclassifying an abnormal (interesting) example as a normal example is often much higher than the cost of the reverse error. Under-sampling of the majority (normal) class has been proposed as a good means of increasing the sensitivity of a classifier to the minority class. This paper shows that a combination of our method of over-sampling the minority (abnormal) class and under-sampling the majority (normal) class can achieve better classifier performance (in ROC space) than only under-sampling the majority class. This paper also shows that a combination of our method of over-sampling the minority class and under-sampling the majority class can achieve better classifier performance (in ROC space) than varying the loss ratios in Ripper or class priors in Naive Bayes. Our method of over-sampling the minority class involves creating synthetic minority class examples. Experiments are performed using C4.5, Ripper and a Naive Bayes classifier. The method is evaluated using the area under the Receiver Operating Characteristic curve (AUC) and the ROC convex hull strategy.",
+  "fuente": "openalex"
+ },
+ "Johnson2019Survey": {
+  "doi": "10.1186/s40537-019-0192-5",
+  "titulo": "Survey on deep learning with class imbalance",
+  "revista": "Journal of Big Data",
+  "anio": "2019",
+  "resumen": "The purpose of this study is to examine existing deep learning techniques for addressing class imbalanced data. Effective classification with imbalanced data is an important area of research, as high class imbalance is naturally inherent in many real-world applications, e.g., fraud detection and cancer detection. Moreover, highly imbalanced data poses added difficulty, as most learners will exhibit bias towards the majority class, and in extreme cases, may ignore the minority class altogether. Class imbalance has been studied thoroughly over the last two decades using traditional machine learning models, i.e. non-deep learning. Despite recent advances in deep learning, along with its increasing popularity, very little empirical work in the area of deep learning with class imbalance exists. Having achieved record-breaking performance results in several complex domains, investigating the use of deep neural networks for problems containing high levels of class imbalance is of great interest. Available studies regarding class imbalance and deep learning are surveyed in order to better understand the efficacy of deep learning when applied to class imbalanced data. This survey discusses the implementation details and experimental results for each study, and offers additional insight into their strengths and weaknesses. Several areas of focus include: data complexity, architectures tested, performance interpretation, ease of use, big data application, and generalization to other domains. We have found that research in this area is very limited, that most existing work focuses on computer vision tasks with convolutional neural networks, and that the effects of big data are rarely considered. Several traditional methods for class imbalance, e.g. data sampling and cost-sensitive learning, prove to be applicable in deep learning, while more advanced methods that exploit neural network feature learning abilities show promising results. The survey concludes with a discussion that highlights various gaps in deep learning from class imbalanced data for the purpose of guiding future research.",
+  "fuente": "openalex"
+ },
+ "Lin2020Focal": {
+  "doi": "10.1109/TPAMI.2018.2858826",
+  "titulo": "Focal Loss for Dense Object Detection",
+  "revista": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+  "anio": "2020",
+  "resumen": "The highest accuracy object detectors to date are based on a two-stage approach popularized by R-CNN, where a classifier is applied to a sparse set of candidate object locations. In contrast, one-stage detectors that are applied over a regular, dense sampling of possible object locations have the potential to be faster and simpler, but have trailed the accuracy of two-stage detectors thus far. In this paper, we investigate why this is the case. We discover that the extreme foreground-background class imbalance encountered during training of dense detectors is the central cause. We propose to address this class imbalance by reshaping the standard cross entropy loss such that it down-weights the loss assigned to well-classified examples. Our novel Focal Loss focuses training on a sparse set of hard examples and prevents the vast number of easy negatives from overwhelming the detector during training. To evaluate the effectiveness of our loss, we design and train a simple dense detector we call RetinaNet. Our results show that when trained with the focal loss, RetinaNet is able to match the speed of previous one-stage detectors while surpassing the accuracy of all existing state-of-the-art two-stage detectors. Code is at: https://github.com/facebookresearch/Detectron.",
+  "fuente": "openalex"
+ },
+ "Saito2015PR": {
+  "doi": "10.1371/journal.pone.0118432",
+  "titulo": "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets",
+  "revista": "PLOS ONE",
+  "anio": "2015",
+  "resumen": "Binary classifiers are routinely evaluated with performance measures such as sensitivity and specificity, and performance is frequently illustrated with Receiver Operating Characteristics (ROC) plots. Alternative measures such as positive predictive value (PPV) and the associated Precision/Recall (PRC) plots are used less frequently. Many bioinformatics studies develop and evaluate classifiers that are to be applied to strongly imbalanced datasets in which the number of negatives outweighs the number of positives significantly. While ROC plots are visually appealing and provide an overview of a classifier's performance across a wide range of specificities, one can ask whether ROC plots could be misleading when applied in imbalanced classification scenarios. We show here that the visual interpretability of ROC plots in the context of imbalanced datasets can be deceptive with respect to conclusions about the reliability of classification performance, owing to an intuitive but wrong interpretation of specificity. PRC plots, on the other hand, can provide the viewer with an accurate prediction of future classification performance due to the fact that they evaluate the fraction of true positives among positive predictions. Our findings have potential implications for the interpretation of a large number of studies that use ROC plots on imbalanced datasets.",
+  "fuente": "openalex"
+ },
+ "Chicco2020MCC": {
+  "doi": "10.1186/s12864-019-6413-7",
+  "titulo": "The advantages of the Matthews correlation coefficient (MCC) over F1 score and accuracy in binary classification evaluation",
+  "revista": "BMC Genomics",
+  "anio": "2020",
+  "resumen": "Abstract Background To evaluate binary classifications and their confusion matrices, scientific researchers can employ several statistical rates, accordingly to the goal of the experiment they are investigating. Despite being a crucial issue in machine learning, no widespread consensus has been reached on a unified elective chosen measure yet. Accuracy and F 1 score computed on confusion matrices have been (and still are) among the most popular adopted metrics in binary classification tasks. However, these statistical measures can dangerously show overoptimistic inflated results, especially on imbalanced datasets. Results The Matthews correlation coefficient (MCC), instead, is a more reliable statistical rate which produces a high score only if the prediction obtained good results in all of the four confusion matrix categories (true positives, false negatives, true negatives, and false positives), proportionally both to the size of positive elements and the size of negative elements in the dataset. Conclusions In this article, we show how MCC produces a more informative and truthful score in evaluating binary classifications than accuracy and F 1 score, by first explaining the mathematical properties, and then the asset of MCC in six synthetic use cases and in a real genomics scenario. We believe that the Matthews correlation coefficient should be preferred to accuracy and F 1 score in evaluating binary classification tasks by all scientific communities.",
+  "fuente": "openalex"
+ },
+ "Gama2014Drift": {
+  "doi": "10.1145/2523813",
+  "titulo": "A survey on concept drift adaptation",
+  "revista": "ACM Computing Surveys",
+  "anio": "2014",
+  "resumen": "Concept drift primarily refers to an online supervised learning scenario when the relation between the input data and the target variable changes over time. Assuming a general knowledge of supervised learning in this article, we characterize adaptive learning processes; categorize existing strategies for handling concept drift; overview the most representative, distinct, and popular techniques and algorithms; discuss evaluation methodology of adaptive algorithms; and present a set of illustrative applications. The survey covers the different facets of concept drift in an integrated way to reflect on the existing scattered state of the art. Thus, it aims at providing a comprehensive introduction to the concept drift adaptation for researchers, industry analysts, and practitioners.",
+  "fuente": "openalex"
+ },
+ "Friedman1937": {
+  "doi": "10.1080/01621459.1937.10503522",
+  "titulo": "The Use of Ranks to Avoid the Assumption of Normality Implicit in the Analysis of Variance",
+  "revista": "Journal of the American Statistical Association",
+  "anio": "1937",
+  "resumen": "",
+  "fuente": ""
+ },
+ "Spearman1904": {
+  "doi": "10.2307/1412159",
+  "titulo": "The Proof and Measurement of Association between Two Things",
+  "revista": "The American Journal of Psychology",
+  "anio": "1904",
+  "resumen": "",
+  "fuente": ""
+ },
+ "Jaccard1912": {
+  "doi": "10.1111/j.1469-8137.1912.tb05611.x",
+  "titulo": "THE DISTRIBUTION OF THE FLORA IN THE ALPINE ZONE.\n                    <sup>1</sup>",
+  "revista": "New Phytologist",
+  "anio": "1912",
+  "resumen": "",
+  "fuente": ""
+ },
+ "Wilcoxon1945": {
+  "doi": "10.2307/3001968",
+  "titulo": "Individual Comparisons by Ranking Methods",
+  "revista": "Biometrics Bulletin",
+  "anio": "1945",
+  "resumen": "",
+  "fuente": ""
+ },
+ "Lakens2017TOST": {
+  "doi": "10.1177/1948550617697177",
+  "titulo": "Equivalence Tests",
+  "revista": "Social Psychological and Personality Science",
+  "anio": "2017",
+  "resumen": "Scientists should be able to provide support for the absence of a meaningful effect. Currently, researchers often incorrectly conclude an effect is absent based a nonsignificant result. A widely recommended approach within a frequentist framework is to test for equivalence. In equivalence tests, such as the two one-sided tests (TOST) procedure discussed in this article, an upper and lower equivalence bound is specified based on the smallest effect size of interest. The TOST procedure can be used to statistically reject the presence of effects large enough to be considered worthwhile. This practical primer with accompanying spreadsheet and R package enables psychologists to easily perform equivalence tests (and power analyses) by setting equivalence bounds based on standardized effect sizes and provides recommendations to prespecify equivalence bounds. Extending your statistical tool kit with equivalence tests is an easy way to improve your statistical and theoretical inferences.",
+  "fuente": "openalex"
+ },
+ "Efron1979Bootstrap": {
+  "doi": "10.1214/aos/1176344552",
+  "titulo": "Bootstrap Methods: Another Look at the Jackknife",
+  "revista": "The Annals of Statistics",
+  "anio": "1979",
+  "resumen": "We discuss the following problem: given a random sample $\\mathbf{X} = (X_1, X_2, \\cdots, X_n)$ from an unknown probability distribution $F$, estimate the sampling distribution of some prespecified random variable $R(\\mathbf{X}, F)$, on the basis of the observed data $\\mathbf{x}$. (Standard jackknife theory gives an approximate mean and variance in the case $R(\\mathbf{X}, F) = \\theta(\\hat{F}) - \\theta(F), \\theta$ some parameter of interest.) A general method, called the \"bootstrap,\" is introduced, and shown to work satisfactorily on a variety of estimation problems. The jackknife is shown to be a linear approximation method for the bootstrap. The exposition proceeds by a series of examples: variance of the sample median, error rates in a linear discriminant analysis, ratio estimation, estimating regression parameters, etc.",
+  "fuente": "openalex"
+ },
+ "Chen2018AMLReview": {
+  "doi": "10.1007/s10115-017-1144-z",
+  "titulo": "Machine learning techniques for anti-money laundering (AML) solutions in suspicious transaction detection: a review",
+  "revista": "Knowledge and Information Systems",
+  "anio": "2018",
+  "resumen": "A comprehensive survey of machine learning algorithms and methods applied to detect suspicious transactions, in particular, solutions of anti-money laundering typologies, link analysis, behavioural modelling, risk scoring, anomaly detection, and geographic capability have been identified and analysed.",
+  "fuente": "semanticscholar"
+ },
+ "Kute2021AMLReview": {
+  "doi": "10.1109/ACCESS.2021.3086230",
+  "titulo": "Deep Learning and Explainable Artificial Intelligence Techniques Applied for Detecting Money Laundering–A Critical Review",
+  "revista": "IEEE Access",
+  "anio": "2021",
+  "resumen": "Money laundering has been a global issue for decades, which is one of the major threat for economy and society. Government, regulatory and financial institutions are combating it together in their respective capacity, however still billions of dollars in fines by authorities make the headlines in the news. High-speed internet services have enabled financial institutions to deliver better customer experience through multi-channel engagements, which has led to exponential growth in transactions and new avenues for laundering the money for fraudsters. Literature shows the usage of statistical methods, data mining and Machine Learning (ML) techniques for money laundering detection, but limited research on Deep Learning (DL) techniques, primarily due to lack of model interpretability and explainability of the decisions made. Several studies are conducted on application of ML for Anti-Money Laundering (AML), and Explainable Artificial Intelligence (XAI) techniques in general, but lacks the study on usage of DL techniques together with XAI. This paper aims to review the current state-of-the-art literature on DL together with XAI for identifying suspicious money laundering transactions and identify future research areas. Key findings of the review are, researchers have preferred variants of Convolutional Neural Networks, and AutoEncoder; graph deep learning together with natural language processing is emerging as an important technology for AML; XAI use is not seen in AML domain; 51% ML methods used in AML are non-interpretable, 58% studies used sample of old real data; key challenges for researchers are access to recent real transaction data and scarcity of labelled training data; and data being highly imbalanced. Future research directions are, application of XAI techniques to bring-out explainability, graph deep learning using natural language processing (NLP), unsupervised and reinforcement learning to handle lack of labelled data; and joint research programs between research community and industry to benefit from domain knowledge and controlled access to data.",
+  "fuente": "openalex"
+ },
+ "Motie2024FraudGNN": {
+  "doi": "10.1016/j.eswa.2023.122156",
+  "titulo": "Financial fraud detection using graph neural networks: A systematic review",
+  "revista": "Expert Systems with Applications",
+  "anio": "2024",
+  "resumen": "",
+  "fuente": ""
+ },
+ "Pocher2023Anomalous": {
+  "doi": "10.1007/s12525-023-00654-3",
+  "titulo": "Detecting anomalous cryptocurrency transactions: An AML/CFT application of machine learning-based forensics",
+  "revista": "Electronic Markets",
+  "anio": "2023",
+  "resumen": "Abstract In shaping the Internet of Money, the application of blockchain and distributed ledger technologies (DLTs) to the financial sector triggered regulatory concerns. Notably, while the user anonymity enabled in this field may safeguard privacy and data protection, the lack of identifiability hinders accountability and challenges the fight against money laundering and the financing of terrorism and proliferation (AML/CFT). As law enforcement agencies and the private sector apply forensics to track crypto transfers across ecosystems that are socio-technical in nature, this paper focuses on the growing relevance of these techniques in a domain where their deployment impacts the traits and evolution of the sphere. In particular, this work offers contextualized insights into the application of methods of machine learning and transaction graph analysis. Namely, it analyzes a real-world dataset of Bitcoin transactions represented as a directed graph network through various techniques. The modeling of blockchain transactions as a complex network suggests that the use of graph-based data analysis methods can help classify transactions and identify illicit ones. Indeed, this work shows that the neural network types known as Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) are a promising AML/CFT solution. Notably, in this scenario GCN outperform other classic approaches and GAT are applied for the first time to detect anomalies in Bitcoin. Ultimately, the paper upholds the value of public–private synergies to devise forensic strategies conscious of the spirit of explainability and data openness.",
+  "fuente": "openalex"
+ },
+ "Vassallo2021Boosting": {
+  "doi": "10.1007/s42979-021-00558-z",
+  "titulo": "Application of Gradient Boosting Algorithms for Anti-money Laundering in Cryptocurrencies",
+  "revista": "SN Computer Science",
+  "anio": "2021",
+  "resumen": "Offshore decision tree-based gradient boosting algorithms outperform state-of-the-art Random Forest results at both an account and transaction level and the data-sampling approach NCL-SMOTE further improves recall at a transaction level, and an adaptation of eXtreme Gradient Boosting successfully reduces the impact of concept drift.",
+  "fuente": "semanticscholar"
+ },
+ "Alarab2023Graph": {
+  "doi": "10.1007/s11063-022-10904-8",
+  "titulo": "Graph-Based LSTM for Anti-money Laundering: Experimenting Temporal Graph Convolutional Network with Bitcoin Data",
+  "revista": "Neural Processing Letters",
+  "anio": "2023",
+  "resumen": "Abstract Elliptic data—one of the largest Bitcoin transaction graphs—has admitted promising results in many studies using classical supervised learning and graph convolutional network models for anti-money laundering. Despite the promising results provided by these studies, only few have considered the temporal information of this dataset, wherein the results were not very satisfactory. Moreover, there is very sparse existing literature that applies active learning to this type of blockchain dataset. In this paper, we develop a classification model that combines long-short-term memory with GCN—referred to as temporal-GCN—that classifies the illicit transactions of Elliptic data using its transaction’s features only. Subsequently, we present an active learning framework applied to the large-scale Bitcoin transaction graph dataset, unlike previous studies on this dataset. Uncertainties for active learning are obtained using Monte-Carlo dropout (MC-dropout) and Monte-Carlo based adversarial attack (MC-AA) which are Bayesian approximations. Active learning frameworks with these methods are compared using various acquisition functions that appeared in the literature. To the best of our knowledge, MC-AA method is the first time to be examined in the context of active learning. Our main finding is that temporal-GCN model has attained significant success in comparison to the previous studies with the same experimental settings on the same dataset. Moreover, we evaluate the performance of the provided acquisition functions using MC-AA and MC-dropout and compare the result against the baseline random sampling model.",
+  "fuente": "openalex"
+ },
+ "Lo2023Inspection": {
+  "doi": "10.1007/s10489-023-04504-9",
+  "titulo": "Inspection-L: self-supervised GNN node embeddings for money laundering detection in bitcoin",
+  "revista": "Applied Intelligence",
+  "anio": "2023",
+  "resumen": "Criminals have become increasingly experienced in using cryptocurrencies, such as Bitcoin, for money laundering. The use of cryptocurrencies can hide criminal identities and transfer hundreds of millions of dollars of dirty funds through their criminal digital wallets. However, this is considered a paradox because cryptocurrencies are goldmines for open-source intelligence, giving law enforcement agencies more power when conducting forensic analyses. This paper proposes Inspection-L, a graph neural network (GNN) framework based on a self-supervised Deep Graph Infomax (DGI) and Graph Isomorphism Network (GIN), with supervised learning algorithms, namely Random Forest (RF), to detect illicit transactions for anti-money laundering (AML). To the best of our knowledge, our proposal is the first to apply self-supervised GNNs to the problem of AML in Bitcoin. The proposed method was evaluated on the Elliptic dataset and shows that our approach outperforms the state-of-the-art in terms of key classification metrics, which demonstrates the potential of self-supervised GNN in the detection of illicit cryptocurrency transactions.",
+  "fuente": "semanticscholar"
+ },
+ "He2026Detection": {
+  "doi": "10.1007/s10489-026-07138-9",
+  "titulo": "An explainable graph neural network framework for illicit financial transaction detection",
+  "revista": "Applied Intelligence",
+  "anio": "2026",
+  "resumen": "This study proposes an explainable graph neural network framework for illicit transaction detection that is built upon the Topology Adaptive Graph Convolutional Network (TAGCN), which allows flexible integration of higher-order neighborhood information to capture complex propagation patterns within transaction graphs.",
+  "fuente": "semanticscholar"
+ },
+ "Lin2026Detecting": {
+  "doi": "10.1038/s41598-025-23901-3",
+  "titulo": "Detecting illicit transactions in bitcoin: a wavelet-temporal graph transformer approach for anti-money laundering",
+  "revista": "Scientific Reports",
+  "anio": "2026",
+  "resumen": "Anti-money laundering (AML) remains a critical challenge in cryptocurrency ecosystems, where blockchain’s transparency paradoxically coexists with pseudonymity. Traditional methods often fall short in modeling the temporal and structural complexity of transaction networks. This paper introduces ChronoWave-GNN, a graph neural framework designed from the theoretical perspective of time-frequency representation learning. By combining wavelet-based frequency decomposition with temporal encoding, our model captures nonstationary and multi-scale patterns inherent in illicit financial activity. This dual-domain perspective enhances the expressive capacity of graph representations without relying on modular patching. We validate our approach on the Elliptic dataset, where ChronoWave-GNN achieves a test accuracy of 0.9802 and F1-score of 0.9799, surpassing prior state-of-the-art results. These findings suggest that unifying temporal dynamics and spectral compression offers a principled and effective pathway for robust AML in decentralized financial systems.",
+  "fuente": "openalex"
+ },
+ "Wang2025CoSemiGNN": {
+  "doi": "10.1016/j.eswa.2025.129853",
+  "titulo": "CoSemiGNN: Blockchain fraud detection with dynamic graph neural networks based on co-association of semi-supervised",
+  "revista": "Expert Systems with Applications",
+  "anio": "2026",
+  "resumen": "",
+  "fuente": ""
+ },
+ "Almeida2025Techniques": {
+  "doi": "10.3390/risks13120249",
+  "titulo": "From Placement to Integration: A Parametric Study of Cryptocurrency-Based Money Laundering Techniques",
+  "revista": "Risks",
+  "anio": "2025",
+  "resumen": "The widespread adoption of cryptocurrencies has transformed the financial landscape by enabling swift, decentralised transactions. However, the pseudonymous nature of digital currencies has also fuelled illicit activities, such as money laundering. Criminals perform money laundering to access illicitly acquired funds without detection and convert illegally obtained assets into untraceable commodities, seamlessly integrated into the financial system. Although new regulatory measures have been introduced, illicit actors continue to exploit various methods, from peer-to-peer exchanges to cryptocurrency mixing services, to obscure the origins of illegal funds. This study presents a parametric analysis of these methods, examining dimensions such as duration, number of actors, contextual requirements, operational difficulty, traceability, and costs across each stage of the money laundering process: placement, layering, and integration. The analysis indicates that, while more sophisticated techniques may provide a higher degree of anonymity, they simultaneously require specialised technical expertise and meticulous planning. Consequently, there is a trade-off between the level of privacy attainable and the operational complexity inherent to each method. By systematically comparing these strategies, this analysis aims to contribute to a deeper understanding of cryptocurrency-based money laundering techniques, providing insight for more effective prevention and mitigation measures for both regulatory authorities and the financial sector.",
+  "fuente": "openalex"
+ },
+ "Rai2025Evaluating": {
+  "doi": "10.3389/frai.2025.1682919",
+  "titulo": "Evaluating XAI techniques under class imbalance using CPRD data",
+  "revista": "Frontiers in Artificial Intelligence",
+  "anio": "2025",
+  "resumen": "Introduction: XAI techniques such as Local Interpretable Model-Agnostic Explanations (LIME), SHapley Additive exPlanations (SHAP) and Partial Dependence Plots (PDPs) are widely used to interpret Machine Learning (ML) models for disease risk prediction, particularly in tabular Electronic Health Record (EHR) data. However, their reliability under real-world scenarios is not fully understood. Class imbalance is a common challenge in many real-world datasets, but it is rarely accounted for when evaluating the reliability and consistency of XAI techniques. Methods: In this study, we design a comparative evaluation framework to assess the impact of class imbalance on the consistency of model explanations generated by LIME, SHAP, and PDPs. Using UK primary care data from the Clinical Practice Research Datalink (CPRD), we train three ML models: XGBoost (XGB), Random Forest (RF), and Multi-layer Perceptron (MLP), to predict lung cancer risk and evaluate how interpretability is affected under class imbalance when compared against a balanced dataset. To our knowledge, this is the first study to evaluate explanation consistency under class imbalance across multiple models and interpretation methods using real-world clinical data. Results: Our main finding is that class imbalance in the training data can significantly affect the reliability and consistency of LIME and SHAP explanations when evaluated against models trained on balanced data. To explain these empirical findings, we also present a theoretical analysis of LIME and SHAP to understand why explanations change under different class distributions. It is also found that PDPs exhibit noticeable variation between models trained on imbalanced and balanced datasets with respect to clinically relevant features for predicting lung cancer risk. Discussion: These findings highlight a critical vulnerability in current XAI techniques, i.e., their interpretability are significantly affected under skewed class distributions, which is common in medical data and emphasises the importance of consistent model explanations for trustworthy ML deployment in healthcare.",
+  "fuente": "openalex"
+ },
+ "Unagar2025Survey": {
+  "doi": "10.1007/s42979-025-03828-2",
+  "titulo": "Survey on Detection of Cryptocurrency Money Laundering and Its Explanation Using XAI",
+  "revista": "SN Computer Science",
+  "anio": "2025",
+  "resumen": "A survey on various eXplainable artificial intelligence (XAI) techniques found in the literature that can be applied to graph data consisting of cryptocurrency transactions to provide an explanation for money laundering predictions highlights that various XAI approaches enhance interpretability while preserving model performance.",
+  "fuente": "semanticscholar"
+ },
+ "Fujiwara2024Stability": {
+  "doi": "10.1016/j.rineng.2024.103406",
+  "titulo": "Knowledge distillation with resampling for imbalanced data classification: Enhancing predictive performance and explainability stability",
+  "revista": "Results in Engineering",
+  "anio": "2024",
+  "resumen": "Machine learning classification models often struggle with imbalanced datasets, leading to poor performance in minority classes. While preprocessing approaches like resampling can improve minority class detection, they may introduce sampling bias and reduce model explainability. This study proposes a novel method combining random undersampling (RUS) with knowledge distillation (KD) to enhance both predictive performance and explainability stability for imbalanced data classification. Our approach employs a two-step learning process: (1) training a balanced teacher model using RUS and (2) training an imbalanced student model through response-based KD, utilizing both soft and hard targets. We hypothesize that this method mitigates class imbalance while preserving important information from the original dataset. We evaluated our proposed model against baseline and RUS-only models using five diverse imbalanced datasets from various domains. Performance was assessed using stratified 10-fold cross-validation with ROC-AUC and PR-AUC scores. Explainability stability was measured by the cosine similarity of SHAP values across cross-validation folds. Results demonstrate that our proposed model consistently outperforms both baseline and RUS-only models regarding ROC-AUC and PR-AUC scores across all datasets. Moreover, it exhibits superior explainability stability in the majority of cases, addressing the sampling bias issue associated with traditional resampling methods. This research contributes to the field of machine learning by offering a novel approach that simultaneously improves predictive performance and maintains explainability for imbalanced data classification. • To Novel method combines preprocessing and knowledge distillation for imbalanced data. • Improves classification performance while stabilizing model explainability. • Outperforms traditional preprocessing approaches in comparative experiments. • Applicable to various domains requiring both performance and explainability.",
+  "fuente": "openalex"
+ },
+ "Wan2024Memory": {
+  "doi": "10.3390/sym16030378",
+  "titulo": "A Novel Money Laundering Prediction Model Based on a Dynamic Graph Convolutional Neural Network and Long Short-Term Memory",
+  "revista": "Symmetry",
+  "anio": "2024",
+  "resumen": "Money laundering is an illicit activity that seeks to conceal the nature and origins of criminal proceeds, posing a substantial threat to the national economy, the political order, and social stability. To scientifically and reasonably predict money laundering risks, this paper focuses on the “layering” stage of the money laundering process in the field of supervised learning for money laundering fraud prediction. A money laundering and fraud prediction model based on deep learning, referred to as MDGC-LSTM, is proposed. The model combines the use of a dynamic graph convolutional network (MDGC) and a long short-term memory (LSTM) network to efficiently identify illegal money laundering activities within financial transactions. MDGC-LSTM constructs dynamic graph snapshots with symmetrical spatiotemporal structures based on transaction information, representing transaction nodes and currency flows as graph nodes and edges, respectively, and effectively captures the relationships between temporal and spatial structures, thus achieving the dynamic prediction of fraudulent transactions. The experimental results demonstrate that compared with traditional algorithms and other deep learning models, MDGC-LSTM achieves significant advantages in comprehensive spatiotemporal feature modeling. Specifically, based on the Elliptic dataset, MDGC-LSTM improves the Macro-F1 score by 0.25 compared to that of the anti-money laundering fraud prediction model currently considered optimal.",
+  "fuente": "openalex"
+ },
+ "Gawantka2024Explanations": {
+  "doi": "10.25046/aj090113",
+  "titulo": "A Novel Metric for Evaluating the Stability of XAI Explanations",
+  "revista": "Advances in Science, Technology and Engineering Systems Journal",
+  "anio": "2024",
+  "resumen": "Stability of explanationsAutomated systems are increasingly exerting influence on our lives, evident in scenarios like AI-driven candidate screening for jobs or loan applications.These scenarios often rely on eXplainable Artificial Intelligence (XAI) algorithms to meet legal requirements and provide understandable insights into critical processes.However, a significant challenge arises when some XAI methods lack determinism, resulting in the generation of different explanations for identical inputs (i.e., the same data instances and prediction model).The question of explanation stability becomes paramount in such cases.In this study, we introduce two intuitive methods for assessing the stability of XAI algorithms.A taxonomy was developed to categorize the evaluation criteria and the ideas were expanded to create an objective metric to classify the XAI algorithms based on their explanation stability.",
+  "fuente": "openalex"
+ },
+ "Lawal2025Dataset": {
+  "doi": "10.5121/ijnsa.2025.17602",
+  "titulo": "AN EXPLAINABLE GRAPH NEURAL NETWORK FRAMEWORK FOR ANTI–MONEY LAUNDERING IN CRYPTOCURRENCY TRANSACTIONS USING THE ELLIPTIC DATASET",
+  "revista": "International Journal of Network Security &amp; Its Applications",
+  "anio": "2025",
+  "resumen": "The detection of illicit cryptocurrency transactions remains a significant challenge due to the extreme class imbalance and limited generalization capabilities of machine learning models applied to Anti–Money Laundering (AML) data. In the widely used Elliptic dataset, illicit transactions represent less than 2% of all nodes, creating a high-risk setting in which models can achieve deceptively high training accuracy while failing to meaningfully identify malicious behavior. This study examines the behavior of Graph Neural Networks (GNNs) under these constraints and emphasizes the limitations rather than the performance of the approach. Instead of treating the model’s high training accuracy as a success, we demonstrate how imbalance, structural sparsity, and label noise impede reliable learning. We evaluate the model with and without common imbalance-handling strategies including class weighting and focal lossand illustrate that performance remains unstable. Furthermore, we investigate the explainability of the model using GNNExplainer, showing example subgraphs and salient features for known illicit nodes, and discuss their alignment with money-laundering patterns such as fan-out and transaction mixing. Our findings underscore the difficulties of applying GNNs to heavily imbalanced AML datasets and highlight the need for improved modeling strategies, semi-supervised techniques, and more robust explainability methods for real-world financial crime detection.",
+  "fuente": "openalex"
+ },
+ "Subashi2024Crypto": {
+  "doi": "10.2478/bjir-2024-0005",
+  "titulo": "Cryptocurrencies and Money Laundering",
+  "revista": "Balkan Journal of Interdisciplinary Research",
+  "anio": "2024",
+  "resumen": "Abstract Financial transactions involving cryptocurrencies have seen significant growth in recent years. Individuals and companies are using cryptocurrencies as a medium of exchange. This unstoppable process has brought opportunities for the cost-effective performance of financial transactions, but at the same time challenges for law enforcement institutions. A significant portion of cryptocurrency transactions are conducted outside the conventional banking financial system. Such transactions are difficult for law enforcement authorities to trace. There is a high possibility that cryptocurrencies will be used by money launderers to hide their identity and launder their proceeds of crime. Offshore Financial Centers, which apply a high degree of anonymity, are widely using cryptocurrencies. Countries and international institutions should take coordinated action to tackle money laundering in the field of virtual currencies as it is very difficult for one country, alone, to fight the phenomenon of money laundering in the world of cryptocurrencies. The study focuses on the difficulties faced by financial institutions and law enforcement authorities in tracking cryptocurrency transactions in the context of prevention of money laundering, seen from the Albanian perspective.",
+  "fuente": "openalex"
+ },
+ "Albrecht2019Crypto": {
+  "doi": "10.1108/jmlc-12-2017-0074",
+  "titulo": "The use of cryptocurrencies in the money laundering process",
+  "revista": "Journal of Money Laundering Control",
+  "anio": "2019",
+  "resumen": "Purpose This paper aims to analyze the money laundering process itself, how cryptocurrencies have been integrated into this process, and how regulatory and government bodies are responding to this new form of currency. Design/methodology/approach This paper is a theoretical paper that discusses cryptocurrencies and their role in the money laundering process. Findings Cryptocurrencies eliminate the need for intermediary financial institutions and allow direct peer-to-peer financial transactions. Because of the anonymity introduced through blockchain, cryptocurrencies have been favored by the darknet and other criminal networks. Originality/value Cryptocurrencies are a nascent form of money that first arose with the creation of bitcoin in 2009. This form of purely digital currency was meant as a direct competitor to government-backed fiat currency that are controlled by the central banking system. The paper adds to the recent discussions and debate on cryptocurrencies by suggesting additional regulation to prevent their use in money laundering and corruption schemes.",
+  "fuente": "openalex"
+ },
+ "Dupuis2020OpenDoors": {
+  "doi": "10.1108/jfc-06-2020-0113",
+  "titulo": "Money laundering with cryptocurrency: open doors and the regulatory dialectic",
+  "revista": "Journal of Financial Crime",
+  "anio": "2020",
+  "resumen": "Purpose The purpose of this study is to describe the opportunities and limitations of cryptocurrencies as a tool for money laundering through six currently available “open doors” (exchange mechanisms). The authors link the regulatory dialectic paradigm to know your customer and anti-money laundering evasion techniques, highlight six tactics to launder funds with virtual assets and investigate potential law enforcement and regulatory alternates used to reduce the incidence of money laundering with digital coins. Design/methodology/approach The methodology used is the analysis of significant recent events and the availability of “fintech” crime-fighting tools and a literature review focusing on the application of the regulatory dialectic to innovations in existing crypto-asset markets that make them compelling to money launderers. Findings The authors examine the illicit use of cryptocurrency through Kane’s regulatory dialectic paradigm, identify a number of avenues for crypto to fiat exchange that are still available for those seeking to launder money using digital coins, review recently “closed doors” and make recommendations regarding the regulation of crypto-related markets that may assist in making them less desirable for potential criminals. Research limitations/implications The research is constrained by the state of the market for crypto to fiat exchange as of time of writing; the technology and products to launder money using these open doors is continually changing (as predicted by the regulatory dialectic). Social implications The regulatory dialectic predicts that regulatory response is reactive and often increasingly burdensome or oppressive. There is continuous innovation in the cryptocurrency market, which seeks to preserve privacy and anonymity with which regulators seek to keep up. From a social perspective, the response of bank regulators worldwide to existing open doors for crypto to fiat exchange used for money laundering may prove costly to individuals engaging in legitimate transactions, as well as financial criminals and may also erode the ability of individuals to maintain privacy regarding their financial information. Originality/value To the authors’ knowledge, there are yet no broad overview regarding the feasibility of money laundering across crypto-related assets within the paradigm of the regulatory dialectic.",
+  "fuente": "openalex"
+ },
+ "Irwin2012Typologies": {
+  "doi": "10.1108/13685201211194745",
+  "titulo": "An analysis of money laundering and terrorism financing typologies",
+  "revista": "Journal of Money Laundering Control",
+  "anio": "2011",
+  "resumen": "Purpose – The purpose of this paper is to measure the size of the money laundering and terrorism financing problem, identify threats and trends, the techniques employed and the amount of funds involved to determine whether the information obtained about money laundering and terrorism financing in real-world environments can be transferred to virtual environments such as Second Life and World of Warcraft. \\nDesign/methodology/approach – Analysis of 184 Typologies obtained from a number of anti-money laundering and counter-terrorism financing (AML/CTF) bodies to: determine whether trends and/or patterns can be identified in the different phases of money laundering or terrorism financing, namely, the placement, layering and integration phases; and to establish whether trends and/or behaviours are ubiquitous to a particular money laundering or terrorism financing Type. \\nFindings – Money launderers and terrorism financers appeared to have slightly different preferences for the placement, layering and integration techniques. The more techniques that are used, the more cash can be successfully laundered or concealed. Although terrorism financers use similar channels to money launderers, they do not utilise as many of the placement, layering and integration techniques. Rather, they prefer to use a few techniques which maintain high levels of anonymity and appear innocuous. The sums of monies involved in money laundering and terrorism financing vary significantly. For example, the average maximum sum involved in money laundering cases was AUD 68.5M, as compared to AUD 4.8 for terrorism financing cases. \\nOriginality/value – This paper provides some insight into the relationship between predicate offence, the predominant techniques utilised in carrying out that offence and the sums of money involved.",
+  "fuente": "openalex"
+ },
+ "Foley2019Bitcoin": {
+  "doi": "10.1093/rfs/hhz015",
+  "titulo": "Sex, Drugs, and Bitcoin: How Much Illegal Activity Is Financed through Cryptocurrencies?",
+  "revista": "The Review of Financial Studies",
+  "anio": "2019",
+  "resumen": "Cryptocurrencies are among the largest unregulated markets in the world. We find that approximately one-quarter of bitcoin users are involved in illegal activity. We estimate that around $76 billion of illegal activity per year involve bitcoin (46% of bitcoin transactions), which is close to the scale of the U.S. and European markets for illegal drugs. The illegal share of bitcoin activity declines with mainstream interest in bitcoin and with the emergence of more opaque cryptocurrencies. The techniques developed in this paper have applications in cryptocurrency surveillance. Our findings suggest that cryptocurrencies are transforming the black markets by enabling “black e-commerce.” Received June 1, 2017; editorial decision December 8, 2018 by Editor Andrew Karolyi. Authors have furnished an Internet Appendix, which is available on the Oxford University Press Web site next to the link to the final published paper online.",
+  "fuente": "openalex"
+ },
+ "PaquetClouston2019Ransomware": {
+  "doi": "10.1093/cybsec/tyz003",
+  "titulo": "Ransomware payments in the Bitcoin ecosystem",
+  "revista": "Journal of Cybersecurity",
+  "anio": "2019",
+  "resumen": "Ransomware can prevent a user from accessing a device and its files until a ransom is paid to the attacker, most frequently in Bitcoin. With over 500 known ransomware families, it has become one of the dominant cybercrime threats for law enforcement, security professionals, and the public. However, a more comprehensive, evidence-based picture on the global direct financial impact of ransomware attacks is still missing. In this article, we present a data-driven method for identifying and gathering information on Bitcoin transactions related to illicit activity based on footprints left on the public Bitcoin blockchain. We implement this method on-top-of the GraphSense open-source platform and apply it to empirically analyze transactions related to 35 ransomware families. We estimate the lower bound direct financial impact of each ransomware family and find that, from 2013 to mid-2017, the market for ransomware payments has a minimum worth of USD 12 768 536 (22 967.54 BTC). We also find that the market is highly skewed with only a few number of players responsible for the majority of the payments. Based on these research findings, policy-makers and law enforcement agencies can use the statistics provided to understand the size of the illicit market and make informed decisions on how best to address the threat.",
+  "fuente": "openalex"
+ },
+ "Oztas2024Monitoring": {
+  "doi": "10.1016/j.future.2024.05.027",
+  "titulo": "Transaction monitoring in anti-money laundering: A qualitative analysis and points of view from industry",
+  "revista": "Future Generation Computer Systems",
+  "anio": "2024",
+  "resumen": "Financial institutions face significant challenges in their efforts to prevent money laundering and terrorist financing due to criminals’ continuously evolving techniques and the vast volume of transactions that need to be processed. The traditional rules-based methods utilised in banks produce high false positive rates, which lead to increased costs and inefficiencies. This study identified the perspectives of 8 anti-money laundering (AML) specialists on the current state and potential improvements in transaction monitoring methods. The results provide in-depth knowledge of the problems and requirements for researchers and practitioners. Semi-structured interviews conducted with the AML experts (totalling 480 min) identified the challenges, requirements for successful implementation, and future trends in transaction monitoring. The findings reveal a growing interest in machine learning and artificial intelligence to enhance the efficiency and accuracy of current approaches. Furthermore, innovative methods such as graph analysis and anomaly detection were suggested to overcome the limitations of rule-based systems. Requirements such as explainability, flexibility, and identifying new risks were extracted and analysed. This research contributes to the existing literature by providing valuable insights from industry experts, guiding the development of advanced transaction monitoring methods, and addressing the disconnect and lack of studies between industries and academicians in the domain.",
+  "fuente": "openalex"
+ },
+ "Ketenci2021TimeFrequency": {
+  "doi": "10.1109/access.2021.3072114",
+  "titulo": "A Time-Frequency Based Suspicious Activity Detection for Anti-Money Laundering",
+  "revista": "IEEE Access",
+  "anio": "2021",
+  "resumen": "Money laundering is the crucial mechanism utilized by criminals to inject proceeds of crime into the financial system. The primary responsibility of the detection of suspicious activity related to money laundering is with the financial institutions. Most of the current systems in these institutions are rule-based and ineffective (over 90 % false positives). The available data science-based anti-money laundering (AML) models to replace the existing rule-based systems work on customer relationship management (CRM) features and time characteristics of transaction behaviour. Due to thousands of possible account features, customer features, and their combinations, it is challenging to perform feature engineering to achieve reasonable accuracy. Aiming to improve the detection performance of suspicious transaction monitoring systems for AML systems, in this article, we introduce a novel feature set based on time-frequency analysis, that uses 2-D representations of financial transactions. Random forest is utilized as a machine learning method, and simulated annealing is adopted for hyperparameter tuning. The designed algorithm is tested on real banking data, proving the results’ efficacy in practically relevant environments. It is shown that the time-frequency characteristics are discriminatory features for suspicious and non-suspicious entities. Therefore, these features substantially improve the area under curve results (over 1%) of the existing data science-based transaction monitoring systems. Using time-frequency features alone, a false positive rate of 14.9% has been achieved, with an F-score of 59.05%. When combined with transaction and CRM features, the false positive rate is 11.85%, and the F-Score is improved to 74.06%.",
+  "fuente": "openalex"
+ },
+ "Labanca2022Amaretto": {
+  "doi": "10.1109/access.2022.3167699",
+  "titulo": "Amaretto: An Active Learning Framework for Money Laundering Detection",
+  "revista": "IEEE Access",
+  "anio": "2022",
+  "resumen": "Monitoring financial transactions is a critical Anti-Money Laundering (AML) obligation for financial institutions. In recent years, machine learning-based transaction monitoring systems have successfully complemented traditional rule-based systems to reduce the high number of false positives and the effort needed to review all the alerts manually. Unfortunately, machine learning-based solutions also have disadvantages: while unsupervised models can detect novel anomalous patterns, they are usually characterized by a high number of false alarms; supervised models, instead, usually offers a higher detection rate but require a large amount of labeled data to achieve such performance. In this paper, we present Amaretto, an active learning framework for money laundering detection that combines unsupervised and supervised learning techniques to support the transaction monitoring processes by improving the detection performance and reducing the compliance management costs. Amaretto exploits novel selection strategies to target a subset of transactions for investigation, making more efficient use of the feedback provided by the analyst. We perform the experimental evaluation on a synthetic dataset provided by the industrial partner, which simulates the profiles of clients trading in international capital markets. We show that Amaretto outperforms state-of-the-art solutions by reducing money laundering risk and improving detection performance. In particular, we compare state-of-the-art unsupervised and supervised techniques commonly used in the AML domain with the ones implemented in this work. We show that the Isolation and Random Forests of Amaretto perform best in the task under analysis, with an AUROC of 0.9 for the first (20% better on average) and a detection rate of 0.793 for the second (30 % better on average). In addition, they are characterized by lower investigation costs computed in terms of the daily number of transactions to be examined and the number of false positives and false negatives. Finally, we compare Amaretto against a state-of-the-art active learning fraud detection system, achieving better detection performances and lower costs in all the analyzed scenarios. Worth mentioning, Amaretto improves the detection rate up to 50 % and reduces the overall cost by 20% in the most realistic scenario under analysis.",
+  "fuente": "openalex"
+ },
+ "Bertrand2021Rights": {
+  "doi": "10.1093/idpl/ipab010",
+  "titulo": "Do AI-based anti-money laundering (AML) systems violate European fundamental rights?",
+  "revista": "International Data Privacy Law",
+  "anio": "2021",
+  "resumen": "Machine-learning algorithms are increasingly used to predict different forms of criminal behaviour.1 It is therefore natural that such algorithms should be used in transaction monitoring by financial institutions to comply with laws on anti-money laundering and countering financing of terrorism (AML/CFT). The EU’s Fourth AML Directive2 requires banks and other financial institutions to conduct ‘ongoing monitoring of the business relationship including scrutiny of transactions undertaken throughout the course of that relationship to ensure that the transactions being conducted are consistent with the obliged entity's knowledge of the customer, the business and risk profile, including where necessary the source of funds’.3 Monitoring must be sufficient to ‘enable the detection of unusual or suspicious transactions’.4 Most IT systems used for AML/CFT transaction monitoring already include complex rules-based algorithms.5 Regulators and financial institutions are currently studying the introduction of more opaque machine learning (ML) algorithms to supplement the existing rules-based systems. The introduction of ML algorithms in transaction monitoring could permit detection of new criminal activities, but also brings to the forefront data protection risks that so far have been only partially studied.6 A series of recent cases dealing with the collection and processing of personal data for the purpose of combatting crime and terrorism sheds new light on the compatibility of AML/CFT transaction monitoring with the General Data Protection Regulation (GDPR) and the EU Charter of Fundamental Rights (Charter).7 In particular, the Court of Justice of the European Union’s (CJEU) Digital Rights Ireland,8 Tele2 Sverige – Watson,9 Canadian PNR Agreement,10 and Quadrature du Net11 cases raise serious questions regarding the compatibility of current AML/CFT transaction monitoring systems (TMSs) and regulations with the GDPR and the Charter, leading us to the conclusion that current AML/CFT laws imposing transaction monitoring and reporting of suspicious transactions need to be substantially modified, particularly if new ML tools are to be introduced. In this article, we identify the shortfalls of the current legal framework but also make suggestions on how it can be improved in order to facilitate the introduction of ML algorithms while also improving compatibility with fundamental rights. Some of our recommendations for improvement are consistent with those already made in 2011 by the Article 29 Working Party12 and in 2020 by the European Data Protection Supervisor,13 although ours go into considerably more detail, drawing on solutions that have been developed in the field of intelligence gathering and cybersecurity.",
+  "fuente": "openalex"
+ },
+ "Hilal2022Anomaly": {
+  "doi": "10.1016/j.eswa.2021.116429",
+  "titulo": "Financial Fraud: A Review of Anomaly Detection Techniques and Recent Advances",
+  "revista": "Expert Systems with Applications",
+  "anio": "2022",
+  "resumen": "With the rise of technology and the continued economic growth evident in modern society, acts of fraud have become much more prevalent in the financial industry, costing institutions and consumers hundreds of billions of dollars annually. Fraudsters are continuously evolving their approaches to exploit the vulnerabilities of the current prevention measures in place, many of whom are targeting the financial sector. These crimes include credit card fraud, healthcare and automobile insurance fraud, money laundering, securities and commodities fraud and insider trading. On their own, fraud prevention systems do not provide adequate security against these criminal acts. As such, the need for fraud detection systems to detect fraudulent acts after they have already been committed and the potential cost savings of doing so is more evident than ever. Anomaly detection techniques have been intensively studied for this purpose by researchers over the last couple of decades, many of which employed statistical, artificial intelligence and machine learning models. Supervised learning algorithms have been the most popular types of models studied in research up until recently. However, supervised learning models are associated with many challenges that have been and can be addressed by semi-supervised and unsupervised learning models proposed in recently published literature. This survey aims to investigate and present a thorough review of the most popular and effective anomaly detection techniques applied to detect financial fraud, with a focus on highlighting the recent advancements in the areas of semi-supervised and unsupervised learning.",
+  "fuente": "openalex"
+ },
+ "Giudici2023Risk": {
+  "doi": "10.1016/j.eswa.2023.121220",
+  "titulo": "Artificial Intelligence risk measurement",
+  "revista": "Expert Systems with Applications",
+  "anio": "2024",
+  "resumen": "Financial institutions are increasingly leveraging on advanced technologies, facilitated by the availability of Machine Learning methods that are being integrated into several applications, such as credit scoring, anomaly detection, internal controls and regulatory compliance. Despite their high predictive accuracy, Machine Learning models may not provide sufficient explainability, robustness and/or fairness; therefore, they may not be trustworthy for the involved stakeholders, such as business users, auditors, regulators and end-customers. To measure the trustworthiness of AI applications, we propose the first Key AI Risk Indicators (KAIRI) framework for AI systems, considering financial services as a reference industry. To this aim, we map the recently proposed regulatory requirements proposed for Artificial Intelligence Act into a set of four measurable principles (Sustainability, Accuracy, Fairness, Explainability) and, for each of them, we propose a set of interrelated statistical metrics that can be employed to measure, manage and mitigate the risks that arise from artificial intelligence. We apply the proposed framework to a collection of case studies, that have been indicated as highly relevant by the European financial institutions we interviewed during our research activities. The results from data analysis indicate that the proposed framework can be employed to effectively measure AI risks, thereby promoting a safe and trustworthy AI in finance.",
+  "fuente": "openalex"
+ },
+ "FinXAI2026Mapping": {
+  "doi": "10.1016/j.finr.2026.100128",
+  "titulo": "Explainable artificial intelligence in finance: Mapping business problems and technological solutions",
+  "revista": "Finance Research Open",
+  "anio": "2026",
+  "resumen": "• Systematic review of 35 studies on explainable AI in finance • Common financial XAI use cases: credit risk, market forecasting, fraud detection. • Most frequently used XAI methods in these domains: SHAP and LIME • XAI benefits: increased transparency, stakeholder trust, and regulatory compliance. • Developed taxonomies for business problems, XAI methods, and financial use cases. The rapid adoption of Artificial Intelligence (AI) in the financial sector has transformed key areas such as credit risk management, capital markets forecasting, and fraud detection. Nevertheless, the mounting reliance on complex, opaque AI models, often referred to as black boxes, has raised critical concerns regarding transparency, accountability, fairness, and regulatory compliance. This research addresses these challenges by systematically mapping business problems in finance to technological solutions offered by explainable artificial intelligence (XAI). This study uses the Problem Space Mapping Framework (PSMF) and a systematic literature review to identify and analyze 35 representative financial XAI (FinXAI) use cases. From these use cases, business problems and XAI methods are then extracted and categorized. The results of the study include three comprehensive taxonomies that structure the dimensions of business needs, technological capabilities, and their intersection in practical use cases. The findings indicate that machine-learning-based methods such as SHAP and LIME are predominantly employed in the domains of credit risk management, capital markets forecasting, and fraud detection. These methods enhance process transparency, stakeholder trust, and regulatory compliance. This research offers actionable guidance for decision-makers in the financial industry. It helps them to better understand, select, and implement XAI technologies to address the pressing need for explainability and responsible AI use in high-stakes financial applications. The discussion encompasses limitations and prospective avenues for future research, underscoring the necessity for persistent development and empirical validation of XAI frameworks in the domain of finance.",
+  "fuente": "openalex"
+ },
+ "Chen2023CreditImbalance": {
+  "doi": "10.1016/j.ejor.2023.06.036",
+  "titulo": "Interpretable machine learning for imbalanced credit scoring datasets",
+  "revista": "European Journal of Operational Research",
+  "anio": "2024",
+  "resumen": "The class imbalance problem is common in the credit scoring domain, as the number of defaulters is usually much less than the number of non-defaulters. To date, research on investigating the class imbalance problem has mainly focused on indicating and reducing the adverse effect of the class imbalance on the predictive accuracy of machine learning techniques, while the impact of that on machine learning interpretability has never been studied in the literature. This paper fills this gap by analysing how the stability of Local Interpretable Model-agnostic Explanations (LIME) and SHapley Additive exPlanations (SHAP), two popular interpretation methods, are affected by class imbalance. Our experiments use 2016-2020 UK residential mortgage data collected from European Datawarehouse. We evaluate the stability of LIME and SHAP on datasets of progressively increased class imbalance. The results show that interpretations generated from LIME and SHAP are less stable as the class imbalance increases, which indicates that the class imbalance does have an adverse effect on machine learning interpretability. To check the robustness of our outcomes, we also analyse two open-source credit scoring datasets and we obtain similar results.",
+  "fuente": "openalex"
+ },
+ "TEM2026Stability": {
+  "doi": "10.1109/tem.2026.3687235",
+  "titulo": "Managing Trust in AI Systems: Evidence From Controlled Evaluation of Explanation Stability Under Data Imbalance",
+  "revista": "IEEE Transactions on Engineering Management",
+  "anio": "2026",
+  "resumen": "As advanced AI models are increasingly embedded in information systems to support organizational decision-making, the demand for explainable and trustworthy systems has grown significantly. While post-hoc explanation methods like SHAP and LIME are widely adopted to enhance interpretability and foster user trust, they often suffer from limitations such as instability in feature attributions, sensitivity to data sampling, and inconsistent outputs across iterations. This study proposes an explainable AI (XAI) artifact guided by the design science research (DSR) approach that systematically investigates the impact of class imbalance and sampling artifacts on the stability of feature explanations. Drawing on data from 2013–2023 across four integrated social media sources (BoxOfficeMojo, YouTube reviews, movie budget records, and metadata), we develop and evaluate a controlled sampling framework. The artifact incorporates (1) targeted class sampling to evaluate imbalance effects, (2) stability assessment using sequential rank agreement and coefficient of variation, and (3) robustness checks through variable stability index and coefficient stability index. Our findings highlight key factors that influence the reliability of SHAP and LIME outputs, based on 1,600 controlled simulation runs, multi-metric robustness checks (SRA, CV, VSI, CSI), and a design science–driven evaluation framework that explicitly isolates the effects of class imbalance. It also advances the development of responsible AI by enhancing the methodological rigor of explainability in socio-technical systems.",
+  "fuente": "openalex"
+ },
+ "Alarab2023Recurrent": {
+  "doi": "10.1007/s11042-023-17323-4",
+  "titulo": "Robust recurrent graph convolutional network approach based sequential prediction of illicit transactions in cryptocurrencies",
+  "revista": "Multimedia Tools and Applications",
+  "anio": "2023",
+  "resumen": "Abstract Money laundering has urged the need for machine learning algorithms for combating illicit services in the blockchain of cryptocurrencies due to its increasing complexity. Recent studies have revealed promising results using supervised learning methods in classifying illicit Bitcoin transactions of Elliptic data, one of the largest labelled data of Bitcoin transaction graphs. Nonetheless, all learning algorithms have failed to capture the dark market shutdown event that occurred in this data using its original features. This paper proposes a novel method named recurrent graph neural network model that extracts the temporal and graph topology of Bitcoin data to perform node classification as licit/illicit transactions. The proposed model performs sequential predictions that rely on recent labelled transactions designated by antecedent neighbouring features. Our main finding is that the proposed model against various models on Elliptic data has achieved state-of-the-art with accuracy and $$f_1$$ f 1 -score of 98.99% and 91.75%, respectively. Moreover, we visualise a snapshot of a Bitcoin transaction graph of Elliptic data to perform a case study using a backward reasoning process. The latter highlights the effectiveness of the proposed model from the explainability perspective. Sequential prediction leverages the dynamicity of the graph network in Elliptic data.",
+  "fuente": "openalex"
+ },
+ "DTA2022Evolving": {
+  "doi": "10.1108/dta-06-2021-0167",
+  "titulo": "Improving anti-money laundering in bitcoin using evolving graph convolutions and deep neural decision forest",
+  "revista": "Data Technologies and Applications",
+  "anio": "2023",
+  "resumen": "Purpose Money laundering is the process of concealing unlawfully obtained funds by presenting them as coming from a legitimate source. Criminals use crypto money laundering to hide the illicit origin of funds using a variety of methods. The most simplified form of bitcoin money laundering leans hard on the fact that transactions made in cryptocurrencies are pseudonymous, but open data gives more power to investigators and enables the crowdsourcing of forensic analysis. With the motive to curb these illegal activities, there exist various rules, policies and technologies collectively known as anti-money laundering (AML) tools. When properly implemented, AML restrictions reduce the negative effects of illegal economic activity while also promoting financial market integrity and stability, but these bear high costs for institutions. The purpose of this work is to motivate the opportunity to reconcile the cause of safety with that of financial inclusion, bearing in mind the limitations of the available data. The authors use the Elliptic dataset; to the best of the authors' knowledge, this is the largest labelled transaction dataset publicly available in any cryptocurrency. Design/methodology/approach AML in bitcoin can be modelled as a node classification task in dynamic networks. In this work, graph convolutional decision forest will be introduced, which combines the potentialities of evolving graph convolutional network and deep neural decision forest (DNDF). This model will be used to classify the unknown transactions in the Elliptic dataset. Additionally, the application of knowledge distillation (KD) over the proposed approach gives finest results compared to all the other experimented techniques. Findings The importance of utilising a concatenation between dynamic graph learning and ensemble feature learning is demonstrated in this work. The results show the superiority of the proposed model to classify the illicit transactions in the Elliptic dataset. Experiments also show that the results can be further improved when the system is fine-tuned using a KD framework. Originality/value Existing works used either ensemble learning or dynamic graph learning to tackle the problem of AML in bitcoin. The proposed model provides a novel view to combine the power of random forest with dynamic graph learning methods. Furthermore, the work also demonstrates the advantage of KD in improving the performance of the whole system.",
+  "fuente": "openalex"
+ },
+ "SciRep2025GCN": {
+  "doi": "10.1038/s41598-025-95672-w",
+  "titulo": "Graph convolution network for fraud detection in bitcoin transactions",
+  "revista": "Scientific Reports",
+  "anio": "2025",
+  "resumen": "Anti-money laundering has been an issue in our society from the beginning of time. It simply refers to certain regulations and laws set by the government to uncover illegal money, which is passed as legal income. Now, with the emergence of cryptocurrency, it ensures pseudonymity for users. Cryptocurrency is a type of currency that is not authorized by the government and does not exist physically but only on paper. This provides a better platform for criminals for their illicit transactions. New algorithms have been proposed to detect illicit transactions. Machine learning and deep learning algorithms give us hope in identifying these anomalies in transactions. We have selected the Elliptic Bitcoin Dataset. This data set is a graph data set generated from an anonymous blockchain. Each transaction is mapped to real entities with two categories: licit and illicit. Some of them are not labeled. We have run different algorithms for predicting illicit transactions like Logistic Regression, Long Short Term Memory, Support Vector Machine, Random Forest, and a variation of Graph Neural Networks, which is called Graph Convolution Network (GCN). GCN is of special interest in our case. Different evaluation parameters such as accuracy, ROC and F1 score are analyzed for different models. Our experimental results show that the proposed GCN model gives the accuracy [Formula: see text], the AUC 0.9444 and the RMSE 0.1123, which concludes that our GCN is better than the existing models, in particular with the model proposed in Weber et al. (Anti-money laundering in bitcoin: experimenting with graph convolutional networks for financial forensics, 2019. http://arxiv.org/abs/1908.02591 ).",
+  "fuente": "openalex"
+ },
+ "Zheng2026Heterophily": {
+  "doi": "10.1109/tkde.2026.3680353",
+  "titulo": "Graph Neural Networks for Graphs With Heterophily: A Survey",
+  "revista": "IEEE Transactions on Knowledge and Data Engineering",
+  "anio": "2026",
+  "resumen": "Recent years have witnessed fast developments of graph neural networks (GNNs) that have benefited myriad graph analytic tasks and applications. Most GNNs rely on the homophily assumption that nodes belonging to the same class are more likely to be connected. However, as a ubiquitous graph property in numerous real-world scenarios, heterophily, i.e., nodes with different labels tend to be linked, significantly limits the performance of tailor-made homophilic GNNs. Hence,GNNs for heterophilic graphsare gaining increasing research attention to enhance graph learning with heterophily. In this paper, we provide a comprehensive review of GNNs for heterophilic graphs. Specifically, we propose a systematic taxonomy that governs existing heterophilic GNN models, along with general summaries and detailed analyses. Furthermore, we discuss the relationship between heterophily and various graph research domains, aiming to facilitate the development of more effective GNNs across a spectrum of practical applications and learning tasks in the graph research community. In the end, we point out potential directions to advance and inspire future research and applications on heterophilic graph learning with GNNs.",
+  "fuente": "openalex"
+ },
+ "Residual2025Oversmoothing": {
+  "doi": "10.1007/s10994-025-06822-0",
+  "titulo": "Analyzing the effect of residual connections to oversmoothing in graph neural networks",
+  "revista": "Machine Learning",
+  "anio": "2025",
+  "resumen": "Abstract The performance of Graph Neural Networks (GNNs) diminishes as their depth increases. That is mainly attributed to oversmoothing, which leads to similar node representations through repeated graph convolutions. To enable deep GNNs, several approaches have been proposed, among which the use of residual connections. Residual connections have proven effective in benchmark datasets, but the way in which they improve the performance of deep GNNs has not been fully studied. We show that residual connections force the model to focus on the local neighborhood of graph nodes, making the GNN equivalent to the sum of shallow GCNs. We explain theoretically why this is the case and verify the theoretical results experimentally. However, our findings raise the question of whether residual connections are helpful in cases where deep networks are necessary. We assess this experimentally, in two situations: (a) in the presence of the “cold start\" problem, i.e. when there is no feature information about unlabeled nodes; and (b) in a new synthetic dataset of controllable long-interactions. These experiments highlight the drawbacks of GNNs using residual connections, while showing that simpler methods can be more effective.",
+  "fuente": "openalex"
+ },
+ "ERA2026Imbalanced": {
+  "doi": "10.3934/era.2026079",
+  "titulo": "Imbalanced node classification on graphs with graph neural networks: A survey",
+  "revista": "Electronic Research Archive",
+  "anio": "2026",
+  "resumen": "Imbalanced node classification is an important research topic in graph learning. With the rise of deep learning, powerful models like graph neural networks (GNNs) have been widely used in node classification tasks and achieved promising performance. However, real-world graphs are usually imbalanced, characterized by some classes having an adequate amount of data while others lack data. This imbalance presents the suboptimal classification performance of the model. Therefore, research on the GNNs-based imbalanced node classification is crucial. This article aims to systematically summarize the development status of GNNs in imbalanced node classification. First, the related concepts of GNNs and imbalanced node classification are introduced to establish a solid foundation for readers. Second, the methods are divided into data-level methods and algorithm-level methods, then subdivided into seven subcategories. Especially, we discuss the key thoughts, relative strengths, and weaknesses of classic methods in each subcategory. Then, datasets and common evaluation metrics are compiled to provide a wealth of useful resources. Finally, future research directions for imbalanced node classification on graphs are introduced to promote the boom of this field.",
+  "fuente": "openalex"
+ },
+ "Hurlbert1984": {
+  "doi": "10.2307/1942661",
+  "titulo": "Pseudoreplication and the Design of Ecological Field Experiments",
+  "revista": "Ecological Monographs",
+  "anio": "1984",
+  "resumen": "Pseudoreplication is defined as the use of inferential statistics to test for treatment effects with data from experiments where either treatments are not replicated (though samples may be) or replicates are not statistically independent. In ANOVA terminology, it is the testing for treatment effects with an error term inappropriate to the hypothesis being considered. Scrutiny of 176 experimental studies published between 1960 and the present revealed that pseudoreplication occurred in 27% of them, or 48% of all such studies that applied inferential statistics. The incidence of pseudoreplication is especially high in studies of marine benthos and small mammals. The critical features of controlled experimentation are reviewed. Nondemonic intrusion is defined as the impingement of chance events on an experiment in progress. As a safeguard against both it and preexisting gradients, interspersion of treatments is argued to be an obligatory feature of good design. Especially in small experiments, adequate interspersion can sometimes be assured only by dispensing with strict randomization procedures. Comprehension of this conflict between interspersion and randomization is aided by distinguishing pre—layout (or conventional) and layout—specific alpha (probability of type I error). Suggestions are offered to statisticians and editors of ecological journals as to how ecologists' understanding of experimental design and statistics might be improved.",
+  "fuente": "openalex"
+ },
+ "Lazic2010": {
+  "doi": "10.1186/1471-2202-11-5",
+  "titulo": "The problem of pseudoreplication in neuroscientific studies: is it affecting your analysis?",
+  "revista": "BMC Neuroscience",
+  "anio": "2010",
+  "resumen": "BACKGROUND: Pseudoreplication occurs when observations are not statistically independent, but treated as if they are. This can occur when there are multiple observations on the same subjects, when samples are nested or hierarchically organised, or when measurements are correlated in time or space. Analysis of such data without taking these dependencies into account can lead to meaningless results, and examples can easily be found in the neuroscience literature. RESULTS: A single issue of Nature Neuroscience provided a number of examples and is used as a case study to highlight how pseudoreplication arises in neuroscientific studies, why the analyses in these papers are incorrect, and appropriate analytical methods are provided. 12% of papers had pseudoreplication and a further 36% were suspected of having pseudoreplication, but it was not possible to determine for certain because insufficient information was provided. CONCLUSIONS: Pseudoreplication can undermine the conclusions of a statistical analysis, and it would be easier to detect if the sample size, degrees of freedom, the test statistic, and precise p-values are reported. This information should be a requirement for all publications.",
+  "fuente": "openalex"
+ },
+ "Bronstein2017Geometric": {
+  "doi": "10.1109/MSP.2017.2693418",
+  "titulo": "Geometric Deep Learning: Going beyond Euclidean data",
+  "revista": "IEEE Signal Processing Magazine",
+  "anio": "2017",
+  "resumen": "Geometric deep learning is an umbrella term for emerging techniques attempting to generalize (structured) deep neural models to non-Euclidean domains, such as graphs and manifolds. The purpose of this article is to overview different examples of geometric deep-learning problems and present available solutions, key difficulties, applications, and future research directions in this nascent field.",
+  "fuente": "openalex"
+ },
+ "LeCun2015DeepLearning": {
+  "doi": "10.1038/nature14539",
+  "titulo": "Deep learning",
+  "revista": "Nature",
+  "anio": "2015",
+  "resumen": "",
+  "fuente": ""
+ }
+}
