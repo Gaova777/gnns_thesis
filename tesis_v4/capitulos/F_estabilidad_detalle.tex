@@ -1,0 +1,31 @@
+\chapter{Estabilidad detallada y transacciones explicadas}\label{anx:detalle}
+
+\section{Estabilidad por escenario y arquitectura}
+
+La Tabla \ref{tab:esc_arq} desglosa por arquitectura la estabilidad por escenario de la Tabla
+\ref{tab:h1}, con pesos por clase. Cada celda es la media de tres semillas. Incluye GCN, que no
+supera el filtro de calidad con esta pérdida. Ninguna arquitectura muestra una caída sistemática
+hacia 1:100 y 1:200.
+
+\begin{table}[ht]
+\centering
+\caption{Estabilidad entre réplicas por escenario y arquitectura (pesos por clase, media de 3
+semillas).}
+\label{tab:esc_arq}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\input{tablas/escenario_por_arquitectura}
+\end{table}
+
+\section{Las transacciones explicadas}
+
+La Tabla \ref{tab:nodos} describe las 30 transacciones ilícitas de validación sobre las que se
+midió la estabilidad. Todas pertenecen a los pasos de tiempo 30 a 35, tienen pocas aristas y
+entre la cuarta parte y la mitad de sus variables valen cero. En promedio, cada una es
+clasificada correctamente por el 64,5~\% de los 54 modelos con pesos por clase de las tres
+arquitecturas que aprenden, de modo que el conjunto incluye transacciones que casi todos los
+modelos detectan y otras que casi ninguno detecta.
+
+{\small
+\input{tablas/nodos}
+}

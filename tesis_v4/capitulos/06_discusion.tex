@@ -1,3 +1,256 @@
 \chapter{Discusión}\label{cap:discusion}
 
-\textbf{[Por redactar después del Capítulo \ref{cap:resultados}.]}
+Los resultados del Capítulo \ref{cap:resultados} se resumen en una observación: la técnica de
+compensación del desbalance cambia mucho el rendimiento de los modelos, y la estabilidad de sus
+explicaciones responde poco a los factores del diseño. La arquitectura no la cambia, y el
+desbalance solo la reduce con GNNExplainer y cuando la pérdida no lo compensa, a la par que se
+degrada el modelo. El control de pesos aleatorios muestra por qué la respuesta es tan débil: con
+la correlación de Spearman sobre todas las variables, la estabilidad refleja sobre todo los datos
+de la transacción y el propio explicador. Este capítulo interpreta cada resultado, lo contrasta con la literatura y discute
+sus consecuencias y sus límites.
+
+\section{Cuándo el desbalance cambia la estabilidad}\label{sec:dis_h1}
+
+La hipótesis H1 esperaba que, con menos ejemplos ilícitos en proporción, el modelo aprendiera
+peor la clase rara y sus explicaciones sobre ella fueran menos estables. La literatura sobre
+datos tabulares apoyaba esa expectativa: Chen et al. encontraron que las explicaciones de LIME y
+SHAP pierden estabilidad a medida que aumenta el desbalance en datos de crédito
+\cite{Chen2023CreditImbalance}, y Rai et al. que el desbalance puede afectar de forma
+significativa la confiabilidad y la consistencia de LIME y SHAP en datos clínicos
+\cite{Rai2025Evaluating}. En Elliptic el resultado depende de la pérdida. Con \textit{focal
+loss} y sin ajuste, la estabilidad de GNNExplainer baja con el desbalance, en la dirección que
+encontraron esos estudios. Con pesos por clase no cambia. Cuatro razones, que no son
+excluyentes, explican por qué con pesos por clase el desbalance no tiene efecto, y por qué sí lo
+tiene con las otras pérdidas.
+
+\textbf{Los escenarios principales no quitan fraude.} Entre 1:10 y el nativo, el entrenamiento
+conserva siempre las 2.871 transacciones ilícitas; lo que cambia es cuántas negativas las
+acompañan. El modelo dispone de la misma información sobre la clase rara en todos esos
+escenarios.
+
+\textbf{Con pesos por clase, la proporción desaparece de la pérdida.} La pérdida con pesos por
+clase (Sección \ref{sec:desbalance}) es la media de las dos medias por clase, cada una con peso
+un medio. La razón entre clases no aparece en la expresión: el gradiente que recibe el modelo de
+la clase ilícita es el mismo con 28.710 negativas que con 117.933. Lo que cambia es la
+estimación de la media de las negativas, que es más ruidosa con menos ejemplos. Es coherente que
+el modelo aprenda casi lo mismo en todos los escenarios y que, como se observó, la explicación
+de un modelo cambie menos entre escenarios con la misma semilla (Jaccard top-10 de 0,60) que
+entre semillas en el mismo escenario (0,30). Con la entropía sin ajuste ocurre lo contrario:
+la clase ilícita pesa cada vez menos a medida que crece el desbalance, el modelo se degrada
+hasta predecir casi siempre la clase negativa, y GNNExplainer, que optimiza una máscara sobre la
+salida de ese modelo, pierde estabilidad con él. La \textit{focal loss} queda en un punto
+intermedio, en rendimiento y en estabilidad. El desbalance actúa, entonces, a través de la
+degradación del modelo, y una pérdida que lo compensa por completo corta esa vía.
+
+\textbf{Con pesos por clase, los escenarios de estrés quitan fraude y aun así no cambian la
+estabilidad.} En 1:100 y 1:200 se entrena con 1.179 y 589 ilícitas, y con pesos por clase la
+estabilidad tampoco baja, porque el rendimiento tampoco se derrumba. La única excepción
+parcial apareció en la partición original: con el Spearman sobre las variables distintas de
+cero, GNNExplainer bajaba de 0,753 en el nativo a 0,717 y 0,708 en 1:100 y 1:200 (Anexo
+\ref{anx:original}). Esa caída, de unas cuatro centésimas, no se repite sin el cierre, donde el
+escenario menos estable con esa medida es el nativo. Esto descarta que la
+ausencia de efecto se deba solo a que la información sobre la clase rara no cambió. Lo que el
+control de pesos aleatorios sugiere es que la estabilidad entre réplicas, tal como se mide aquí,
+depende poco del modelo: si con una red sin entrenar el explicador es igual de estable, un
+modelo entrenado con menos ejemplos ilícitos no tiene por qué producir explicaciones menos
+estables.
+
+\textbf{Qué varía en la medida.} Una diferencia de diseño puede explicar parte del contraste con
+los estudios tabulares. Esta tesis mide la estabilidad de un explicador sobre un modelo fijo:
+las cinco réplicas cambian la semilla del explicador, no el modelo. Cuando la evaluación
+compara explicaciones de modelos entrenados con distintas muestras de los datos, la variación
+del entrenamiento entra en la medida. Los resultados de esta tesis son compatibles con esa
+lectura: entre semillas, que es una forma de variación del entrenamiento, el acuerdo de las 10
+variables principales cae a 0,30. Si el desbalance afectara la estabilidad sobre todo a través
+de la variabilidad del modelo, una medida entre réplicas no lo detectaría. Comprobar esta
+explicación exige medir la variación entre modelos entrenados con distintas submuestras en cada
+nivel de desbalance, lo que queda como trabajo futuro.
+
+\section{Arquitectura y estabilidad}\label{sec:dis_h2}
+
+La hipótesis H2 esperaba diferencias entre arquitecturas, porque combinan de forma distinta a la
+transacción con sus vecinas. Entre las que aprenden no se encontraron, y el orden que sugería la
+corrida original, con GraphSAGE primera, no se repitió al cambiar la partición. Dos resultados
+permiten interpretar esta ausencia.
+
+El primero es el análisis exploratorio. En Elliptic, el 70~\% de las transacciones ilícitas no
+tiene ninguna vecina ilícita, y en la tarea de esta tesis una ilícita está rodeada sobre todo de
+negativas (Sección \ref{sec:eda}). La información útil está en la propia transacción. Las
+arquitecturas que le dan un peso propio (GraphSAGE, GAT y TAGCN) aprenden; la que la promedia
+con sus vecinas sin peso propio (GCN) no lo logra. Esta es una manifestación del problema de la
+heterofilia descrito en la literatura \cite{Zheng2026Heterophily}, aunque aquí la mezcla de
+clases proviene en parte de contar como negativas las transacciones sin etiqueta. Si las
+arquitecturas que aprenden se apoyan sobre todo en las variables propias de la transacción, es
+razonable que sus explicaciones de variables se parezcan en estabilidad.
+
+El segundo es la paradoja de GCN: la arquitectura que no aprende produce las explicaciones más
+estables con GNNExplainer en dos de las tres semillas. Una explicación posible, que esta tesis
+no comprueba, es que un modelo que apenas distingue clases tiene una función de salida más
+simple, y que un explicador que busca una máscara sobre ella converge más fácilmente al mismo
+resultado. Esta observación es la que motivó el control de
+pesos aleatorios y la que sostiene la conclusión central de la tesis: la estabilidad, sola, no
+certifica que una explicación diga algo sobre lo aprendido.
+
+Longa et al. encontraron que la explicabilidad depende de la arquitectura en sus experimentos
+\cite{Longa2024Explaining}. Los resultados de esta tesis no contradicen ese hallazgo: se refieren
+solo a la estabilidad entre réplicas, y en un grafo en el que la estructura aporta poco a la
+predicción. Es posible que en grafos donde la información de las vecinas es decisiva las
+diferencias entre arquitecturas se hagan visibles también en la estabilidad.
+
+\section{La técnica de compensación}\label{sec:dis_h3}
+
+La técnica de compensación es el factor con mayor efecto sobre el rendimiento. Sobre la
+estabilidad su efecto directo es mínimo, aunque, como se vio, decide si el desbalance la afecta. Sobre el rendimiento, dos resultados merecen comentario.
+
+El primero es que la mejor pérdida depende del escenario, y que la afirmación, sostenida en
+versiones anteriores de este trabajo, de que los pesos por clase detectan mejor que la
+\textit{focal loss} no es general: en el escenario nativo de la partición sin el cierre, la
+\textit{focal loss} la iguala en GraphSAGE y la supera en TAGCN. La diferencia de magnitud entre
+ambas pérdidas ayuda a entenderlo. Con $\alpha = 0{,}75$, la \textit{focal loss} da a cada
+ilícita tres veces el peso de una negativa; con pesos por clase, la razón es 41 a 1 en el
+nativo. Pero la \textit{focal loss} además atenúa los ejemplos que el modelo ya clasifica bien,
+que son casi todas las negativas; una explicación plausible, no comprobada aquí, es que en el
+nativo esa atenuación compense la diferencia de pesos. Cuando se quitan ilícitas (1:100 y 1:200), la compensación ya no alcanza y solo los pesos
+por clase mantienen la detección, en las dos particiones.
+
+El segundo es la fragilidad de la entropía sin ajuste: funciona bien en 1:10, donde la clase rara
+ya pesa una undécima parte del total, y cae al nivel del azar a partir de cierto desbalance,
+porque predecir siempre la clase negativa minimiza la pérdida. GAT sin ajuste es la excepción,
+lo que sugiere que su mecanismo de atención o sus hiperparámetros la protegen en parte de ese
+colapso; los datos de esta tesis no permiten distinguir entre ambas causas.
+
+Sobre la estabilidad, las diferencias entre pérdidas son de milésimas o pocas centésimas y su
+sentido depende del explicador. Con Shapley, la \textit{focal loss} es más estable que los pesos
+por clase en los 9 pares, pero por dos milésimas. Una diferencia sistemática pero tan pequeña no
+tiene consecuencias para el uso de las explicaciones. La hipótesis H3 se sostiene en el sentido
+práctico en que fue formulada.
+
+\section{Qué mide la estabilidad de una explicación}\label{sec:dis_medida}
+
+El hallazgo con más consecuencias metodológicas es el del control de pesos aleatorios. Con la
+correlación de Spearman sobre las 165 variables, la explicación de un modelo entrenado coincide
+con la de una red sin entrenar casi tanto como dos réplicas sobre el mismo modelo. Es la misma
+situación que Adebayo et al. describieron para mapas de saliencia de imágenes, en los que
+explicaciones visualmente convincentes apenas cambiaban al aleatorizar los pesos
+\cite{Adebayo2018Sanity}.
+
+La causa, en este caso, es concreta y se puede cuantificar. Después del escalado, cerca del 44~\%
+de las variables de una transacción vale cero, y los cuatro explicadores de variables les
+asignan importancia nula o casi nula por la forma en que están definidos. Ese bloque ocupa los
+últimos rangos en cualquier explicación de cualquier modelo, y la correlación de Spearman
+cuenta ese acuerdo. Además, en Integrated Gradients la atribución es el producto de la variable
+por un gradiente, y el orden resultante coincide en 0,97 con el orden de las variables por su
+valor absoluto: lo fija sobre todo la entrada.
+
+Con el Jaccard de las 10 variables principales, en cambio, la explicación del modelo entrenado
+y la de la red aleatoria comparten solo una fracción de sus variables, mucho menos que dos
+réplicas. Las variables que un analista leería primero sí dependen del modelo. Esto lleva a una
+recomendación concreta para quien evalúe la estabilidad de explicaciones de variables: reportar,
+junto con la correlación de rangos completa, una medida sobre las $k$ variables principales y un
+control de pesos aleatorios. Sin el control, una estabilidad alta puede deberse a la estructura
+de los datos y no al modelo; sin una medida de las principales, el bloque de variables nulas
+puede ocultar desacuerdos en lo que importa.
+
+\section{Implicaciones para la auditoría}\label{sec:dis_auditoria}
+
+Los resultados tienen tres consecuencias para el uso de explicaciones en un sistema de
+detección de lavado de dinero.
+
+\textbf{La estabilidad entre réplicas no basta como garantía.} Que un explicador devuelva lo
+mismo al repetirse es necesario, pero, como muestra el control, puede lograrse sin que la
+explicación dependa de lo aprendido. Una política de auditoría que exija explicaciones estables
+debería exigir también pruebas de que dependen del modelo.
+
+\textbf{La mayor fuente de variación es el entrenamiento.} Dos modelos que difieren solo en la
+semilla comparten en promedio unas cinco de sus diez variables principales para la misma
+transacción. Si una institución reentrena su modelo, las explicaciones de sus alertas cambiarán
+aunque los datos y el rendimiento no cambien. Una forma de mitigarlo es explicar con varios
+modelos entrenados con semillas distintas y reportar las variables en las que coinciden.
+
+\textbf{El explicador importa más que la arquitectura o el desbalance.} Los cuatro explicadores
+de variables señalan conjuntos distintos sobre el mismo modelo, con acuerdos del top-10 entre
+0,10 y 0,49. La elección del explicador determina qué variables verá el analista más que
+cualquiera de los factores del diseño, y esa elección debería documentarse y justificarse. El
+eje sintético (Anexo \ref{anx:sintetico}) añade que el explicador más estable no es el que
+señala las variables correctas: Shapley es el más estable en tres de las cuatro arquitecturas y
+su plausibilidad no supera al azar.
+
+\section{El cierre del mercado y la evaluación en Elliptic}\label{sec:dis_cierre}
+
+La partición temporal habitual de Elliptic deja la prueba completa después del cierre del
+mercado, y con ella ningún modelo de esta tesis supera al azar. Alarab y Prakoonwit señalaron
+que ningún algoritmo había logrado capturar ese evento con las variables originales
+\cite{Alarab2023Recurrent}. Para un estudio cuyo objetivo es comparar modelos o explicaciones, y
+no la adaptación a un cambio del mercado, una prueba en la que todos están al nivel del azar no
+discrimina. La partición sin el cierre recupera una prueba informativa a costa de 591 ilícitas de
+entrenamiento.
+
+La lección para la literatura es que los resultados de prueba sobre Elliptic deberían
+reportarse indicando si incluyen los pasos posteriores al cierre, y que un rendimiento alto en
+la partición habitual merece examinarse con cuidado. También muestra el valor de reportar el
+PR-AUC junto a la prevalencia: en la corrida original el ROC-AUC de GraphSAGE en prueba era
+0,711, una cifra que parece aceptable, mientras su PR-AUC era 0,010, prácticamente el azar.
+
+\section{Lecciones metodológicas del proceso}\label{sec:dis_lecciones}
+
+Los resultados de esta tesis son los de una segunda versión completa del estudio. La primera
+versión tenía errores que cambiaban sus conclusiones, y vale la pena registrarlos porque son
+errores fáciles de cometer en este tipo de trabajo.
+
+\textbf{Etiquetas invertidas.} En la primera versión, la conversión de las etiquetas de Elliptic
+trató las 157.205 transacciones sin etiqueta como lícitas y dejó fuera las 42.019 lícitas reales.
+Los modelos aprendieron una tarea distinta de la descrita. La versión actual verifica los conteos
+oficiales de cada clase y de cada partición antes de entrenar, y se detiene si no coinciden.
+
+\textbf{Una medida truncada.} La primera implementación de la correlación de Spearman entre
+explicaciones dimensionaba el vector de rangos por el número de variables principales y no por
+el número real de variables, de modo que descartaba casi todas. El error favorecía a una
+arquitectura y bastaba para invertir el orden de estabilidad entre arquitecturas.
+
+\textbf{Explicadores mal configurados.} Los valores por defecto de PGExplainer producían máscaras
+colapsadas o pérdidas no numéricas en Elliptic, y su entrenamiento usaba los primeros nodos del
+entrenamiento, entre los que no había ninguna ilícita (Sección \ref{sec:explicadores}).
+
+\textbf{Pseudorreplicación.} Una versión intermedia de las pruebas trató cada combinación de
+semilla y escenario como un bloque independiente y obtuvo diferencias muy significativas entre
+arquitecturas. Los modelos de una misma semilla en distintos escenarios resultaron casi
+idénticos, y con la unidad correcta esas diferencias desaparecieron
+\cite{Hurlbert1984, Lazic2010}.
+
+\textbf{Una prueba sin información.} La partición habitual de Elliptic dejaba la prueba después
+del cierre del mercado. La consecuencia no era un error de código sino de diseño: todas las
+comparaciones de rendimiento en prueba eran comparaciones entre modelos al nivel del azar.
+
+La lección común es que, en un estudio de esta naturaleza, la mayor parte del riesgo no está en
+el modelo sino en la medición: en cómo se definen las etiquetas, cómo se calcula una medida,
+cómo se configura un explicador y qué se toma como unidad independiente. Cada uno de estos
+errores producía resultados con apariencia razonable.
+
+\section{Limitaciones}\label{sec:dis_limitaciones}
+
+\begin{itemize}
+  \item \textbf{La partición la escogieron los autores.} Los cortes en los pasos 29 y 35 no
+        responden a un criterio externo, y otra partición anterior al cierre podría dar cifras de
+        rendimiento algo distintas. Las conclusiones sobre estabilidad, en cambio, se repiten
+        con la partición original.
+  \item \textbf{Tres semillas.} La comparación entre arquitecturas usa las semillas como bloques
+        y tiene poca potencia. La ausencia de diferencias no prueba la igualdad; muestra que no
+        hay un orden que se repita.
+  \item \textbf{Treinta transacciones.} Se explican 30 ilícitas de validación, las mismas para
+        todos los modelos. Es suficiente para comparar condiciones, pero no describe la
+        variedad completa de las ilícitas.
+  \item \textbf{Un solo conjunto de datos, con variables anónimas.} Los resultados se refieren a
+        Elliptic. Sin el significado de las variables no se puede juzgar si una explicación es
+        correcta; el eje sintético aborda esa pregunta solo de forma indirecta.
+  \item \textbf{Presupuesto de búsqueda reducido.} Ocho ensayos por combinación, igual para
+        todas las arquitecturas, y GAT limitada a 2 capas por memoria. Con más presupuesto el
+        rendimiento podría mejorar, en especial el de GAT.
+  \item \textbf{El filtro de calidad usa un umbral fijo de 0,5.} Por eso GAT con pesos por
+        clase no lo supera aunque su PR-AUC muestre que aprende. Un filtro sobre el PR-AUC
+        habría sido más adecuado bajo desbalance.
+  \item \textbf{PGExplainer no es evaluable en este grafo.} Con 2 o 3 aristas en el subgrafo
+        mediano, su estabilidad de aristas solo se pudo medir en una parte de las
+        transacciones, y con medidas muy gruesas.
+  \item \textbf{No determinismo del cálculo en GPU.} Repetir el entrenamiento reproduce las
+        conclusiones, pero no necesariamente todos los decimales.
+\end{itemize}

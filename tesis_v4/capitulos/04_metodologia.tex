@@ -6,8 +6,8 @@ cierre del mercado (Sección \ref{sec:particion}), los escenarios de desbalance
 (Sección \ref{sec:escenarios}), el entrenamiento de los modelos (Sección \ref{sec:entrenamiento}),
 los explicadores (Sección \ref{sec:explicadores}), las medidas de estabilidad
 (Sección \ref{sec:medidas}), el control de pesos aleatorios (Sección \ref{sec:control}) y las
-pruebas estadísticas (Sección \ref{sec:estadistica}). La Tabla \ref{tab:diseno} resume los
-factores.
+pruebas estadísticas (Sección \ref{sec:estadistica}). La Figura \ref{fig:flujo} muestra el
+flujo completo y la Tabla \ref{tab:diseno} resume los factores.
 
 \begin{table}[ht]
 \centering
@@ -30,6 +30,29 @@ variables distintas de cero, Jaccard de las 10 variables principales \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\begin{figure}[ht]
+\centering
+\small
+\begin{tikzpicture}[
+  caja/.style={draw, rounded corners=2pt, align=center, minimum height=1.05cm,
+               text width=2.55cm, fill=black!4, font=\footnotesize},
+  flecha/.style={-{Latex[length=2mm]}, thick}]
+\node[caja] (d) at (0,0) {Elliptic\\ 203.769 transacciones\\ etiquetas: modo C};
+\node[caja] (p) at (3.3,0) {Partición sin el cierre\\ 1--29 / 30--35 / 36--42};
+\node[caja] (e) at (6.6,0) {6 escenarios de desbalance (solo entrenamiento)};
+\node[caja] (h) at (9.9,0) {Búsqueda de hiperparámetros\\ 8 ensayos, PR-AUC val.};
+\node[caja] (m) at (9.9,-2.1) {216 modelos\\ 4 arq. $\times$ 3 pérdidas\\ $\times$ 3 semillas};
+\node[caja] (r) at (6.6,-2.1) {Rendimiento\\ PR-AUC, ROC-AUC,\\ filtro de calidad};
+\node[caja] (x) at (3.3,-2.1) {5 explicadores\\ 30 ilícitas de val.\\ 5 réplicas};
+\node[caja] (s) at (0,-2.1) {Estabilidad: 3 medidas\\ control de pesos\\ aleatorios, pruebas};
+\draw[flecha] (d) -- (p); \draw[flecha] (p) -- (e); \draw[flecha] (e) -- (h);
+\draw[flecha] (h) -- (m); \draw[flecha] (m) -- (r); \draw[flecha] (r) -- (x);
+\draw[flecha] (x) -- (s);
+\end{tikzpicture}
+\caption{Flujo experimental de la corrida principal.}
+\label{fig:flujo}
+\end{figure}
 
 \section{Datos}\label{sec:datos}
 
@@ -58,6 +81,33 @@ estabilidad, es que toda variable igual a su mediana queda exactamente en cero. 
 transacciones que se explican (Sección \ref{sec:explicadores}), en promedio el 44~\% de las
 variables vale cero, y la mediana de variables distintas de cero por transacción es 89 de
 165.
+
+\section{Análisis exploratorio del grafo}\label{sec:eda}
+
+El grafo es muy disperso (Figura \ref{fig:eda}a). Cada transacción tiene en promedio 2,3
+aristas y la mediana es 2; el 34,5~\% de las transacciones tiene una sola arista, y la de mayor
+grado tiene 473. Las ilícitas tienen menos conexiones que las lícitas (mediana 1 frente a 2;
+media 2,0 frente a 3,1). Ninguna arista une transacciones de pasos de tiempo distintos, de modo
+que cada paso es un grafo separado, con entre 1.089 y 7.880 transacciones.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{eda_grafo}
+\caption{(a) Distribución del número de aristas por transacción según su clase, en escala
+logarítmica. (b) Clase de las vecinas de las transacciones de cada clase, contando cada arista
+desde sus dos extremos.}
+\label{fig:eda}
+\end{figure}
+
+La homofilia de aristas entre transacciones etiquetadas es alta, 0,954, pero está dominada por
+las aristas entre lícitas, que son la gran mayoría. La composición de las vecinas de las
+ilícitas cuenta otra historia (Figura \ref{fig:eda}b): solo el 21,8~\% de las vecinas de una
+transacción ilícita es ilícita, el 18,5~\% es lícita y el 59,6~\% no tiene etiqueta. Visto por
+transacción, el 70~\% de las ilícitas no tiene ninguna vecina ilícita. En la tarea de esta tesis,
+en la que las transacciones sin etiqueta cuentan como negativas, una ilícita está rodeada sobre
+todo de negativas. La señal del fraude, por tanto, está principalmente en las variables de la
+propia transacción, y una arquitectura que la promedia con sus vecinas sin darle un peso propio
+la diluye (Sección \ref{sec:propiedades}). Este rasgo anticipa el bajo rendimiento de GCN.
 
 \section{Partición temporal y exclusión del cierre del mercado}\label{sec:particion}
 
@@ -166,7 +216,10 @@ cómputo.
 final hasta 150 épocas con Adam, con parada temprana a las 20 épocas sin mejora del F1 de
 validación. Esto se repite con tres semillas de modelo (42, 43 y 44); las semillas 43 y 44
 reutilizan los hiperparámetros encontrados con la 42, de modo que la diferencia entre semillas
-refleja solo la aleatoriedad del entrenamiento. El cálculo en GPU no es determinista a nivel de
+refleja solo la aleatoriedad del entrenamiento. Los hiperparámetros elegidos se listan en el Anexo
+\ref{anx:tablas}. La búsqueda prefirió para TAGCN siempre 128 dimensiones y 3 capas, con órdenes
+de filtro de 2 a 4, y para GAT siempre 2 capas; GraphSAGE alternó entre 2 y 3 capas y GCN eligió
+casi siempre 2. El cálculo en GPU no es determinista a nivel de
 pesos, porque las sumas de mensajes usan operaciones atómicas, lo que se suma a esa
 aleatoriedad.
 
@@ -188,7 +241,12 @@ se explican, y los análisis principales se restringen a las arquitecturas que a
 modelos: 30 ilícitas de validación sorteadas con una semilla fija (1234) entre las 773
 ilícitas de los pasos 30 a 35. Usar el mismo conjunto permite comparar explicaciones entre
 modelos. Se explica la validación y no la prueba porque es el periodo con el que se
-seleccionó el modelo y donde su comportamiento está mejor caracterizado.
+seleccionó el modelo y donde su comportamiento está mejor caracterizado. Las 30 transacciones son ilícitas, pero no todas son
+verdaderos positivos para cada modelo: con el umbral de 0,5, los modelos con pesos por clase
+aciertan en promedio entre 16,5 (TAGCN) y 22,3 (GCN) de ellas. Se explican todas, porque la
+pregunta es cuán reproducible es la explicación de una predicción, sea acertada o no, y porque
+restringirse a los aciertos de cada modelo impediría comparar modelos sobre las mismas
+transacciones.
 
 \textbf{Subgrafo receptivo.} Una GNN de $L$ capas solo usa, para predecir una transacción, la
 información de sus vecinas a $L$ saltos o menos (a $L \cdot K$ saltos en TAGCN). Cada
@@ -226,6 +284,23 @@ transacción. Solo PGExplainer tiene una fase de entrenamiento propia.
 \textbf{Réplicas.} Cada explicador se ejecuta cinco veces sobre cada transacción y cada modelo,
 con semillas distintas. La estabilidad mide cuánto se parecen esas cinco explicaciones.
 
+\subsection*{Detalles de implementación}
+
+Los modelos y los explicadores se implementaron con PyTorch 2.6 y PyTorch Geometric 2.7; la
+búsqueda de hiperparámetros con Optuna 4.8; las métricas con scikit-learn 1.8 y las pruebas
+estadísticas con SciPy 1.17. GNNExplainer y PGExplainer son las implementaciones de PyTorch
+Geometric. GNNExplainer se configuró para producir una máscara por variable y por nodo
+(\texttt{node\_mask\_type="attributes"}) y una máscara por arista, y explica la salida del
+modelo, no la etiqueta verdadera. Dos parámetros por defecto de PGExplainer se modificaron
+porque producían resultados inválidos en Elliptic: el coeficiente de tamaño de la máscara se
+bajó de 0,05 a 0,005, porque con el valor por defecto la máscara colapsaba a cero en todas las
+aristas, y la temperatura se fijó en 1 en lugar del esquema de 5 a 2, porque con este último
+la pérdida desbordaba a valores no numéricos. Además, los 50 nodos con que se entrena
+PGExplainer se toman solo entre los que reciben al menos una arista: cerca del 30~\% de los
+nodos de entrenamiento no recibe ninguna, y en ellos la pérdida de PGExplainer no está definida.
+Shapley por muestreo, Integrated Gradients y Expected Gradients son implementaciones propias
+(\texttt{src/explainability/}).
+
 \section{Medidas de estabilidad}\label{sec:medidas}
 
 Sea $\mathbf{a}^{(r)} \in \mathbb{R}^{165}$ el vector de importancias que la réplica $r$
@@ -256,8 +331,12 @@ la diferencia entre la variable y la referencia, que es cero; la máscara de GNN
 las entradas sin gradiente; y en Shapley y Expected Gradients la referencia suele coincidir con
 cero. Esas variables, cerca de la mitad, quedan siempre al final del orden en cualquier
 réplica y en cualquier modelo, y el Spearman global cuenta su acuerdo como si fuera
-información. Con la partición original se estimó que ese bloque fija por sí solo un piso de
-Spearman entre 0,74 y 0,82.
+información. El tamaño de ese efecto se puede calcular. Si dos explicaciones solo coinciden en
+dejar empatadas al final las variables nulas de la transacción y ordenan las demás al azar, su
+correlación de Spearman media sobre las 30 transacciones es 0,81 (entre 0,54 y 0,86 según la
+transacción, porque la fracción de variables nulas va del 23~\% al 50~\%). Ese es el piso que la
+medida principal da sin que las explicaciones compartan nada sobre las variables que sí
+importan (\texttt{tesis\_v4/scripts/piso\_spearman.py}).
 El Spearman sobre las variables distintas de cero elimina el bloque, y el Jaccard top-10 solo
 mira las variables que el analista vería primero.
 

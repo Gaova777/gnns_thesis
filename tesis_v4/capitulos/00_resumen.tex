@@ -1,6 +1,29 @@
 \chapter*{Resumen}
 \addcontentsline{toc}{chapter}{Resumen}
-\textbf{[Por redactar al cerrar los Capítulos 5 a 7.]}
+
+Las redes neuronales de grafos (GNN) se usan cada vez más para detectar lavado de dinero en
+criptomonedas, y en un entorno regulado sus alertas deben poder explicarse. Para que una
+explicación sirva como evidencia debe ser estable: el mismo método, aplicado a la misma
+transacción y al mismo modelo, debe dar el mismo resultado. Esta tesis estudia cómo cambia esa
+estabilidad cuando se varían el nivel de desbalance de clases, la arquitectura y la técnica que
+compensa el desbalance. Sobre el conjunto de datos Elliptic de transacciones de Bitcoin se
+entrenaron 216 modelos: cuatro arquitecturas (GCN, GraphSAGE, GAT y TAGCN), seis niveles de
+desbalance (de 1:10 a 1:200), tres funciones de pérdida y tres semillas. Sus predicciones se
+explicaron con GNNExplainer, PGExplainer, valores de Shapley, Integrated Gradients y Expected
+Gradients. Como la partición temporal habitual deja la prueba después del cierre de un mercado
+ilegal, donde ningún modelo supera al azar, el estudio usa solo el periodo anterior al cierre;
+con él, el mejor modelo alcanza un PR-AUC de 0,31 en prueba, frente a 0,02 del azar. La técnica
+de compensación cambia mucho el rendimiento, y de ella depende el efecto del desbalance: con
+pesos por clase la estabilidad no cambia entre 1:10 y 1:200, mientras que con \textit{focal
+loss} o sin ajuste la de GNNExplainer baja junto con el rendimiento del modelo. La arquitectura
+no cambia la estabilidad. Un control con pesos
+aleatorios muestra por qué: con la correlación de Spearman sobre todas las variables, la
+explicación de un modelo entrenado se parece a la de una red sin entrenar casi tanto como dos
+repeticiones entre sí, porque cerca de la mitad de las variables vale cero y los explicadores
+siempre la dejan al final. Las diez variables principales sí dependen del modelo, y cambian más
+entre semillas del entrenamiento que entre niveles de desbalance. La tesis concluye que la
+estabilidad de una explicación no basta para confiar en ella, y recomienda acompañarla de un
+control de pesos aleatorios y de una medida sobre las variables principales.
 
 \vspace{0.4cm}
 \noindent\textbf{Palabras clave:} redes neuronales de grafos, explicabilidad, estabilidad de
@@ -8,7 +31,29 @@ las explicaciones, lavado de dinero, desbalance de clases, Elliptic.
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-\textbf{[To be written once Chapters 5 to 7 are closed.]}
+
+Graph neural networks (GNNs) are increasingly used to detect money laundering in
+cryptocurrencies, and in a regulated setting their alerts must be explainable. For an
+explanation to serve as evidence it must be stable: the same method, applied to the same
+transaction and the same model, should give the same result. This thesis studies how that
+stability changes when the level of class imbalance, the architecture, and the technique used to
+compensate for imbalance are varied. On the Elliptic Bitcoin transaction dataset, 216 models
+were trained: four architectures (GCN, GraphSAGE, GAT, and TAGCN), six imbalance levels (from
+1:10 to 1:200), three loss functions, and three seeds. Their predictions were explained with
+GNNExplainer, PGExplainer, Shapley values, Integrated Gradients, and Expected Gradients. Because
+the usual temporal split places the test set after the closure of a dark market, where no model
+beats chance, the study uses only the period before the closure; with it, the best model
+reaches a test PR-AUC of 0.31, against 0.02 for chance. The compensation technique changes
+performance substantially, and the effect of imbalance depends on it: with class weights,
+stability does not change between 1:10 and 1:200, whereas with focal loss or no adjustment the
+stability of GNNExplainer drops together with model performance. Architecture does not change
+stability. A randomized-weights control shows why: with the
+Spearman correlation over all features, the explanation of a trained model resembles that of an
+untrained network almost as much as two repetitions resemble each other, because about half of
+the features are zero and the explainers always rank them last. The ten top features do depend
+on the model, and they vary more across training seeds than across imbalance levels. The thesis
+concludes that the stability of an explanation is not enough to trust it, and recommends
+complementing it with a randomized-weights control and a measure on the top features.
 
 \vspace{0.4cm}
 \noindent\textbf{Keywords:} graph neural networks, explainability, explanation stability,

@@ -25,7 +25,7 @@ La estabilidad de las explicaciones se mide en validación, por lo que no depend
 y sus conclusiones generales se repiten en las dos corridas:
 
 \begin{itemize}
-  \item El nivel de desbalance no cambia la estabilidad. Con GNNExplainer, pesos por clase y
+  \item Con pesos por clase, el nivel de desbalance no cambia la estabilidad. Con GNNExplainer y
         las tres arquitecturas que aprenden, el Spearman global fue 0,946, 0,947, 0,946 y
         0,947 en 1:10, 1:10 con SMOTE, 1:20 y nativo, y 0,940 y 0,938 en 1:100 y 1:200. La
         prueba de Friedman sobre los seis escenarios no rechazó la igualdad ($p = 0{,}84$).
@@ -59,3 +59,48 @@ una misma semilla en distintos escenarios son casi idénticos, por lo que una pr
 cada combinación de semilla y escenario como un bloque independiente (12 bloques) está
 pseudorreplicada y exagera la significancia. Las pruebas del Capítulo \ref{cap:resultados} usan
 como unidad el modelo.
+
+\section{Estabilidad por escenario en la partición original}
+
+La Tabla \ref{tab:orig_h1} reproduce, para la partición original, la estabilidad por escenario
+con las tres medidas (pesos por clase, GraphSAGE, GAT y TAGCN, 9 modelos por celda). Los valores
+y su ausencia de tendencia son muy parecidos a los de la Tabla \ref{tab:h1}. Fuente:
+\texttt{results\_v4/reunion\_0710/metrica\_robusta.log}.
+
+\begin{table}[ht]
+\centering
+\caption{Estabilidad entre réplicas por escenario en la partición original (pesos por clase,
+media de 9 modelos).}
+\label{tab:orig_h1}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llcccccc}
+\toprule
+Medida & Explicador & 1:10 & 1:10 + SMOTE & 1:20 & Nativo & 1:100 & 1:200 \\
+\midrule
+Spearman global & GNNExplainer & 0{,}946 & 0{,}947 & 0{,}946 & 0{,}947 & 0{,}940 & 0{,}938 \\
+ & Shapley & 0{,}993 & 0{,}992 & 0{,}992 & 0{,}992 & 0{,}991 & 0{,}992 \\
+ & Integrated Gradients & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 \\
+ & Expected Gradients & 0{,}926 & 0{,}922 & 0{,}925 & 0{,}923 & 0{,}927 & 0{,}922 \\
+\midrule
+Spearman $\neq 0$ & GNNExplainer & 0{,}749 & 0{,}753 & 0{,}751 & 0{,}753 & 0{,}717 & 0{,}708 \\
+ & Shapley & 0{,}985 & 0{,}984 & 0{,}985 & 0{,}985 & 0{,}982 & 0{,}983 \\
+ & Integrated Gradients & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 \\
+ & Expected Gradients & 0{,}958 & 0{,}956 & 0{,}957 & 0{,}956 & 0{,}954 & 0{,}953 \\
+\midrule
+Jaccard top-10 & GNNExplainer & 0{,}623 & 0{,}641 & 0{,}625 & 0{,}620 & 0{,}608 & 0{,}616 \\
+ & Shapley & 0{,}822 & 0{,}799 & 0{,}813 & 0{,}812 & 0{,}819 & 0{,}826 \\
+ & Integrated Gradients & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 & 1{,}000 \\
+ & Expected Gradients & 0{,}771 & 0{,}779 & 0{,}765 & 0{,}767 & 0{,}769 & 0{,}759 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En la partición original, el acuerdo de GNNExplainer entre modelos fue de 0,942 entre semillas
+en el mismo escenario, 0,987 entre escenarios con la misma semilla y 0,941 entre escenarios y
+semillas distintos con la medida principal, y de 0,391, 0,751 y 0,383 con el Jaccard top-10: el
+mismo patrón que se observa sin el cierre. Cambiar de escenario mueve menos la explicación que
+cambiar de semilla. Con el Spearman sobre las variables distintas de cero, GNNExplainer baja
+algo en 1:100 y 1:200 (0,717 y 0,708 frente a 0,753 en el nativo) en esta partición; sin el
+cierre esa caída no aparece (Tabla \ref{tab:h1}), por lo que no se considera un efecto del
+desbalance.

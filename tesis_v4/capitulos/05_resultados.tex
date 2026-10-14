@@ -111,7 +111,53 @@ análisis porque su PR-AUC muestra que sí ordena las transacciones mejor que el
 \input{tablas/filtro_calidad}
 \end{table}
 
-\section{H1: el nivel de desbalance no cambia la estabilidad}\label{sec:res_h1}
+\section{De la validación a la prueba}\label{sec:res_valtest}
+
+La Figura \ref{fig:curvas_val} muestra las curvas de validación del escenario nativo. Los
+valores de validación son mayores que los de prueba en todas las arquitecturas: GraphSAGE pasa
+de 0,478 a 0,273, TAGCN de 0,529 a 0,244, GAT de 0,282 a 0,172 y GCN de 0,214 a 0,085. Parte de
+la diferencia es esperable, porque la prevalencia de ilícitas es menor en prueba (2,3~\% frente
+a 3,7~\%) y el PR-AUC depende de ella. Pero la caída relativa es mayor que la de la prevalencia:
+aun sin el cierre del mercado, la actividad ilícita de los pasos 36 a 42 no es idéntica a la de
+los pasos 30 a 35.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{curvas_nativo_val}
+\caption{Curvas de precisión y exhaustividad (a) y ROC (b) en validación (pasos 30 a 35),
+escenario nativo, con la pérdida elegida para cada arquitectura. Trazo grueso: semilla 42;
+trazos finos: semillas 43 y 44.}
+\label{fig:curvas_val}
+\end{figure}
+
+La validación tampoco ordena del todo bien las configuraciones para la prueba. En el escenario
+nativo, la \textit{focal loss} supera claramente a los pesos por clase en validación en
+GraphSAGE (0,478 frente a 0,326), pero en prueba ambas quedan iguales (0,273 frente a 0,270). En
+TAGCN la ventaja de la \textit{focal loss} en validación sí se mantiene en prueba (0,244 frente
+a 0,113). El mejor resultado de prueba de toda la matriz, GraphSAGE con pesos por clase en 1:20
+(0,306), no es el mejor en validación. Con tres semillas y un periodo de validación de seis
+pasos, las diferencias de unas pocas centésimas entre configuraciones no deben interpretarse
+como un orden estable.
+
+\section{Rendimiento en los escenarios de estrés}\label{sec:res_estres}
+
+Los escenarios 1:100 y 1:200 quitan ilícitas del entrenamiento (quedan 1.179 y 589). La Figura
+\ref{fig:estres} muestra que, con pesos por clase, los modelos siguen detectando en prueba:
+GraphSAGE obtiene 0,268 en 1:100, prácticamente lo mismo que en el nativo, y 0,183 en 1:200;
+GAT, TAGCN y GCN quedan entre 0,08 y 0,14. Entrenar con la quinta parte de los ejemplos
+ilícitos reduce el rendimiento de prueba de GraphSAGE en un tercio, no lo anula. Con las otras
+dos pérdidas la caída es mayor (Tabla \ref{tab:rend_esc}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{curvas_estres_test}
+\caption{Curvas de precisión y exhaustividad en prueba para los escenarios de estrés, con pesos
+por clase. Trazo grueso: semilla 42; trazos finos: semillas 43 y 44. La línea discontinua es la
+prevalencia (0,023).}
+\label{fig:estres}
+\end{figure}
+
+\section{H1: el desbalance solo afecta la estabilidad cuando la pérdida no lo compensa}\label{sec:res_h1}
 
 La Figura \ref{fig:h1} y la Tabla \ref{tab:h1} muestran la estabilidad entre réplicas de cada
 explicador en los seis escenarios, con pesos por clase y las tres arquitecturas que aprenden.
@@ -154,11 +200,39 @@ las variables distintas de cero, GNNExplainer no alcanza la equivalencia ($p = 0
 valores van de 0,593 (nativo) a 0,707 (1:100), con un intervalo amplio, pero de nuevo el
 escenario menos estable es el nativo y no los más desbalanceados.
 
-\textbf{Veredicto sobre H1.} La hipótesis no se sostiene. En ninguno de los cuatro explicadores
-ni con ninguna de las tres medidas la estabilidad disminuye a medida que el desbalance se hace
-más extremo, ni siquiera en 1:100 y 1:200, donde además se quitaron transacciones ilícitas del
-entrenamiento. El mismo resultado se obtuvo con la partición original (Anexo
-\ref{anx:original}).
+\textbf{Con las otras pérdidas, GNNExplainer sí pierde estabilidad.} El análisis anterior usa
+los modelos con pesos por clase. Al repetirlo para cada pérdida (Tabla \ref{tab:h1_perdida}), el
+resultado cambia para GNNExplainer. Con \textit{focal loss}, la prueba de Friedman sobre los
+seis escenarios rechaza la igualdad con las tres medidas ($p$ entre 0,010 y 0,035), y la
+estabilidad baja del nativo a 1:200: de 0,923 a 0,909 con la medida principal, de 0,632 a 0,562
+sin las variables nulas y de 0,623 a 0,561 con el Jaccard top-10. Sin ajuste la caída es mayor
+y muy significativa ($p < 0{,}001$ con las tres medidas): de 0,942 en 1:10 a 0,889 en 1:200 con
+la medida principal, y de 0,589 a 0,502 con el Jaccard top-10 entre el nativo y 1:200. Con pesos
+por clase, en cambio, ninguna prueba rechaza ($p \geq 0{,}12$). Con Shapley y Expected Gradients
+el efecto es marginal: de las nueve combinaciones de pérdida y medida, solo una es
+significativa con cada uno (Shapley sin ajuste con la medida principal, de 0,993 a 0,985; y
+Expected Gradients con pesos por clase y el Jaccard top-10, que sube de 0,804 a 0,823). Juntando las tres
+pérdidas (27 modelos), la estabilidad de GNNExplainer baja de forma significativa con las tres
+medidas ($p \leq 0{,}003$).
+
+\begin{table}[ht]
+\centering
+\caption{Estabilidad entre réplicas por escenario y pérdida (GraphSAGE, GAT y TAGCN; media de
+9 modelos por celda).}
+\label{tab:h1_perdida}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\input{tablas/escenario_por_perdida}
+\end{table}
+
+\textbf{Veredicto sobre H1.} La hipótesis se sostiene solo en parte. La estabilidad de
+GNNExplainer disminuye a medida que el desbalance se hace más extremo cuando el modelo se
+entrena con \textit{focal loss} o sin ajuste, que son también las pérdidas con las que el
+rendimiento cae con el desbalance (Sección \ref{sec:res_rend}). Con pesos por clase, que
+mantienen el rendimiento, la estabilidad no cambia, ni siquiera en 1:100 y 1:200, donde además
+se quitaron ilícitas. Los explicadores Shapley y Expected Gradients prácticamente no responden al
+desbalance con ninguna pérdida. El desbalance no afecta la estabilidad de forma directa, sino a
+través de cuánto se degrada el modelo, y solo con el explicador que optimiza una máscara.
 
 \section{H2: no hay un orden estable entre arquitecturas}\label{sec:res_h2}
 
@@ -251,6 +325,34 @@ combinación, sin patrón por arquitectura ni por pérdida. La conclusión es qu
 problema, PGExplainer no produce una explicación de aristas evaluable, y que la variación entre
 pérdidas no puede atribuirse a la técnica de compensación.
 
+\section{Estabilidad y rendimiento del modelo}\label{sec:res_estab_rend}
+
+Una pregunta complementaria es si los modelos que detectan mejor producen explicaciones más
+estables. La Figura \ref{fig:estab_rend} muestra, para cada uno de los 216 modelos, la
+estabilidad de GNNExplainer frente a su PR-AUC de validación. Con el Spearman global la relación
+es positiva: la correlación de rangos es de 0,61 sobre todos los modelos y de 0,68 entre los
+entrenados con pesos por clase. El rango de estabilidad es, sin embargo, estrecho (de 0,87 a
+0,97), y los modelos menos estables son sobre todo los entrenados sin ajuste que colapsaron a
+predecir la clase negativa. Con el Jaccard top-10 la relación desaparece entre los modelos con
+pesos por clase (correlación de $-0{,}02$) y solo persiste entre los entrenados sin ajuste
+(0,59), de nuevo por los modelos colapsados. Con Shapley y Expected Gradients la relación es
+débil o nula con las tres medidas (correlaciones entre $-0{,}14$ y 0,20).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{estabilidad_rendimiento}
+\caption{Estabilidad de GNNExplainer frente al PR-AUC de validación, un punto por modelo (216
+modelos). La línea discontinua es el valor del azar (0,037). Los grupos de puntos casi
+superpuestos son modelos de una misma arquitectura, pérdida y semilla en distintos escenarios.}
+\label{fig:estab_rend}
+\end{figure}
+
+Estas correlaciones son descriptivas. Los puntos no son independientes: los modelos de una misma
+semilla en distintos escenarios forman grupos casi superpuestos en la figura, y una prueba que
+los contara por separado estaría pseudorreplicada. Lo que sí puede afirmarse es que, con
+GNNExplainer, un modelo que no aprende tiende a dar explicaciones algo menos estables entre
+réplicas, y que esa tendencia no se traslada a las variables principales.
+
 \section{Qué parte de la estabilidad depende del modelo}\label{sec:res_control}
 
 Las secciones anteriores muestran que la estabilidad apenas cambia con el escenario, la
@@ -286,7 +388,9 @@ pesos aleatorios, que no aprendió nada, recibe además explicaciones igual de e
 entrenada (0,927 en GNNExplainer). El orden de Integrated Gradients coincide con el orden de
 las variables por su valor absoluto con un Spearman de 0,97. La medida principal está dominada
 por el bloque de variables en cero (Sección \ref{sec:medidas}), que ocupa las mismas posiciones
-del orden con cualquier red.
+del orden con cualquier red. Por comparación, dos explicaciones que solo coincidieran en ese
+bloque y ordenaran el resto al azar tendrían un Spearman de 0,81 (Sección \ref{sec:medidas}): la
+estabilidad de GNNExplainer, entre 0,92 y 0,94, está poco por encima de ese piso.
 
 \textbf{Con el Jaccard top-10, sí depende.} Las 10 variables principales de la red entrenada y
 de la aleatoria comparten en promedio un índice de 0,22 con GNNExplainer y Expected Gradients,
@@ -304,6 +408,45 @@ escenario manteniendo la semilla mueve menos la explicación (Jaccard 0,60) que 
 semilla manteniendo el escenario. La principal fuente de variación de la explicación no es el
 desbalance, sino la aleatoriedad del entrenamiento.
 
+La Figura \ref{fig:modelos} resume esa comparación para los tres explicadores estocásticos. Con
+el Spearman global todas las barras están por encima de 0,7 y casi no se distinguen; con el
+Jaccard top-10 aparece un escalón claro entre las comparaciones con la misma semilla y las
+comparaciones entre semillas.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{acuerdo_modelos}
+\caption{Acuerdo entre explicaciones según qué cambia entre los dos modelos comparados
+(GraphSAGE, GAT y TAGCN; pesos por clase; escenarios principales). Réplicas del mismo modelo es
+la estabilidad entre réplicas.}
+\label{fig:modelos}
+\end{figure}
+
+\textbf{Arquitecturas distintas, explicaciones distintas.} Comparando arquitecturas con la misma
+semilla, escenario y pérdida (Tabla \ref{tab:arq}), el Spearman global sigue siendo alto, entre
+0,71 y 0,95 según el explicador, pero el Jaccard top-10 cae a valores entre 0,21 y 0,58. Con
+GNNExplainer, dos arquitecturas comparten en promedio unas 4 de sus 10 variables principales.
+Las arquitecturas no difieren en estabilidad, pero sí en qué variables señalan sus
+explicaciones.
+
+\begin{table}[ht]
+\centering
+\caption{Acuerdo entre las explicaciones de dos arquitecturas con la misma semilla, escenario y
+pérdida (pesos por clase, escenarios principales). Rango sobre los seis pares de arquitecturas.}
+\label{tab:arq}
+\small
+\begin{tabular}{lccc}
+\toprule
+Explicador & Spearman global & Spearman $\neq 0$ & Jaccard top-10 \\
+\midrule
+GNNExplainer & 0{,}88 a 0{,}92 & 0{,}58 a 0{,}69 & 0{,}21 a 0{,}29 \\
+Shapley & 0{,}83 a 0{,}95 & 0{,}80 a 0{,}91 & 0{,}50 a 0{,}58 \\
+Integrated Gradients & 0{,}95 & 0{,}76 a 0{,}77 & 0{,}37 a 0{,}42 \\
+Expected Gradients & 0{,}71 a 0{,}74 & 0{,}51 a 0{,}56 & 0{,}26 a 0{,}31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \textbf{Los explicadores no coinciden entre sí.} Sobre el mismo modelo, los cuatro explicadores
 de variables señalan conjuntos de variables principales muy distintos (Figura
 \ref{fig:explicadores}): con el Jaccard top-10 el acuerdo va de 0,10 (GNNExplainer frente a
@@ -319,6 +462,68 @@ principales; todas las pérdidas y semillas), con el Spearman global (a) y el Ja
 \label{fig:explicadores}
 \end{figure}
 
+\section{Un ejemplo: la explicación de una transacción}\label{sec:res_ejemplo}
+
+Las cifras anteriores son promedios sobre 30 transacciones. La Figura \ref{fig:ejemplo} muestra
+lo que significan para una sola, la primera del conjunto explicado, que GraphSAGE con pesos por
+clase en el escenario nativo clasifica correctamente como ilícita. Las variables se nombran
+L1 a L93 (las 93 variables propias de la transacción, en el orden del conjunto de datos) y A1 a
+A72 (las 72 agregadas de sus vecinas).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{ejemplo_explicacion}
+\caption{Importancia normalizada (máximo igual a 1) de las variables más importantes para una
+transacción ilícita de validación. (a) Los cuatro explicadores de variables sobre el mismo
+modelo (GraphSAGE, pesos por clase, nativo, semilla 42). (b) GNNExplainer sobre los modelos de
+las tres semillas. Un punto marca las variables que están entre las 10 principales de esa
+fila.}
+\label{fig:ejemplo}
+\end{figure}
+
+Dos rasgos de los resultados agregados se ven en este caso. Primero, los explicadores no
+coinciden (panel a). GNNExplainer reparte una importancia alta entre muchas variables: 84 de las
+165 reciben más de la mitad de la importancia máxima, y 8 de sus 10 principales son variables
+agregadas. Los otros tres concentran la importancia en pocas variables, y no en las mismas: de
+las 10 principales, GNNExplainer comparte 2 con Shapley, 5 con Integrated Gradients y 2 con
+Expected Gradients; el par que más coincide es Shapley con Expected Gradients, con 6. Segundo,
+el mismo explicador sobre modelos de semillas distintas cambia parte de sus variables
+principales (panel b): los modelos de las semillas 42 y 43 comparten 8 de sus 10 variables
+principales, pero el de la semilla 44 comparte solo 5 con cada uno. Un analista que recibiera
+la alerta de uno u otro modelo, que solo difieren en la semilla del entrenamiento (sus PR-AUC
+de validación son 0,27, 0,38 y 0,33), leería explicaciones distintas para la misma
+transacción.
+
+\section{Costo computacional de los explicadores}\label{sec:res_costo}
+
+La Tabla \ref{tab:costo} muestra el tiempo que tarda cada explicador en producir las cinco
+réplicas de la explicación de una transacción. Los explicadores de gradiente son entre 40 y más
+de 100 veces más rápidos que GNNExplainer y Shapley, aun ejecutándose en CPU: calculan sus
+gradientes en lote, mientras que GNNExplainer optimiza una máscara durante 100 iteraciones y
+Shapley evalúa el modelo sobre muchas combinaciones de variables. PGExplainer es el más costoso,
+porque incluye el entrenamiento de su red explicadora. Para un sistema que deba explicar muchas
+alertas, la diferencia de costo es relevante, y debe sopesarse con lo que muestra la Sección
+\ref{sec:res_control}: los explicadores rápidos no son menos estables.
+
+\begin{table}[ht]
+\centering
+\caption{Mediana de segundos por transacción explicada (cinco réplicas) sobre todos los
+modelos. GNNExplainer, Shapley y PGExplainer se ejecutaron en GPU; los dos de gradiente, en CPU.}
+\label{tab:costo}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Explicador & GCN & GraphSAGE & GAT & TAGCN & Todos \\
+\midrule
+GNNExplainer & 1{,}02 & 0{,}92 & 1{,}31 & 1{,}54 & 1{,}26 \\
+PGExplainer & 2{,}72 & 2{,}49 & 3{,}38 & 4{,}15 & 3{,}33 \\
+Shapley & 0{,}76 & 0{,}72 & 0{,}80 & 0{,}85 & 0{,}80 \\
+Integrated Gradients & 0{,}01 & 0{,}01 & 0{,}01 & 0{,}01 & 0{,}01 \\
+Expected Gradients & 0{,}01 & 0{,}01 & 0{,}02 & 0{,}03 & 0{,}02 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Síntesis}\label{sec:res_sintesis}
 
 La Tabla \ref{tab:veredictos} resume el contraste de las hipótesis.
@@ -332,8 +537,10 @@ La Tabla \ref{tab:veredictos} resume el contraste de las hipótesis.
 \toprule
 Hipótesis & Resultado & Veredicto \\
 \midrule
-H1: la estabilidad baja con el desbalance & Sin tendencia en 4 explicadores y 3 medidas;
-equivalencia entre nativo y 1:200 con la medida principal & No se sostiene \\
+H1: la estabilidad baja con el desbalance & Con pesos por clase, sin tendencia y con
+equivalencia entre nativo y 1:200. Con \textit{focal loss} y sin ajuste, GNNExplainer sí baja
+con las tres medidas & Se sostiene en parte: solo GNNExplainer y solo si la pérdida no compensa
+el desbalance \\
 H2: la estabilidad depende de la arquitectura & Sin orden repetido entre GraphSAGE, GAT y
 TAGCN; GCN, que no aprende, es la más estable & No se sostiene \\
 H3: la compensación no cambia la estabilidad & Diferencias de milésimas o pocas centésimas,
@@ -344,6 +551,8 @@ con sentido que cambia según el explicador & Se sostiene en términos práctico
 
 Los tres veredictos tienen una lectura común que el control de pesos aleatorios aclara: con la
 medida principal, la estabilidad refleja sobre todo la estructura de los datos de entrada y el
-explicador, no lo que el modelo aprendió, y por eso apenas responde a los factores del diseño.
+explicador, no lo que el modelo aprendió, y por eso responde poco a los factores del diseño. El
+efecto que sí aparece, la caída de GNNExplainer con el desbalance cuando la pérdida no lo
+compensa, acompaña a la caída del rendimiento de esos mismos modelos.
 Las 10 variables principales, en cambio, sí dependen del modelo, y varían más entre semillas
 que entre escenarios.

@@ -348,11 +348,208 @@ def fig_acuerdo_explicadores():
     return E.guardar(fig, "acuerdo_explicadores")
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+def fig_eda():
+    """(a) Distribución de grados por clase; (b) composición de las vecinas de cada clase."""
+    cls = pd.read_csv(ROOT / "data/raw/elliptic_txs_classes.csv")
+    ed = pd.read_csv(ROOT / "data/raw/elliptic_txs_edgelist.csv")
+    ed.columns = ["a", "b"]
+    lab = dict(zip(cls.txId, cls["class"].astype(str)))
+    deg = pd.concat([ed.a, ed.b]).value_counts().reindex(cls.txId, fill_value=0)
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(E.ANCHO, 2.6))
+    nombres = {"1": "Ilícitas", "2": "Lícitas", "unknown": "Sin etiqueta"}
+    colores = {"1": E.OKABE["bermellon"], "2": E.OKABE["azul"], "unknown": E.OKABE["gris"]}
+    for c in ["unknown", "2", "1"]:
+        g = deg[cls.set_index("txId")["class"].astype(str) == c]
+        vc = g.value_counts().sort_index()
+        ax.plot(vc.index, vc.values / vc.sum(), "o", ms=2.2, color=colores[c], label=nombres[c],
+                alpha=0.8)
+    ax.set(xscale="log", yscale="log", xlabel="Grado (número de aristas)",
+           ylabel="Fracción de transacciones")
+    ax.legend(loc="upper right")
+    ax.set_title("(a) Distribución de grados", fontsize=8.5)
+    la, lb = ed.a.map(lab), ed.b.map(lab)
+    pares = pd.concat([pd.DataFrame({"u": la, "v": lb}), pd.DataFrame({"u": lb, "v": la})])
+    orden = ["1", "2", "unknown"]
+    comp = pares.groupby("u").v.value_counts(normalize=True).unstack().reindex(index=orden,
+                                                                             columns=orden)
+    izq = np.zeros(3)
+    for c in orden:
+        bx.barh(range(3), comp[c].values, left=izq, color=colores[c], label=nombres[c],
+                height=0.6)
+        for i, v in enumerate(comp[c].values):
+            if v > 0.06:
+                bx.text(izq[i] + v / 2, i, f"{100 * v:.0f} %", ha="center", va="center",
+                        fontsize=7, color="white")
+        izq += comp[c].values
+    bx.set_yticks(range(3), [f"Vecinas de\n{nombres[c].lower()}" for c in orden], fontsize=7.5)
+    bx.invert_yaxis()
+    bx.set_xlim(0, 1)
+    bx.set_xlabel("Fracción de vecinas")
+    bx.grid(False)
+    bx.set_title("(b) Clase de las vecinas", fontsize=8.5)
+    E.coma(bx, "x")
+    fig.tight_layout(w_pad=2)
+    return E.guardar(fig, "eda_grafo")
+
+
+def fig_curvas_estres():
+    """Prueba en 1:100 y 1:200 con pesos por clase: PR por arquitectura."""
+    lab = _labels(CURV_PRE)
+    y = lab["test"]
+    met = pd.read_csv(CURV_PRE / "curvas_metricas_por_modelo.csv")
+    fig, axs = plt.subplots(1, 2, figsize=(E.ANCHO, 2.9), sharey=True)
+    for j, (ax, sc) in enumerate(zip(axs, ["1:100_subil", "1:200_subil"])):
+        for arch in E.ARQ:
+            ps = _curvas(CURV_PRE, sc, arch, "class_weighting", "test", y)
+            m = met[(met.scenario == sc) & (met.arch == arch)
+                    & (met.balancing == "class_weighting") & (met.split == "test")]
+            for i, p in enumerate(ps):
+                pr, rc, _ = precision_recall_curve(y, p)
+                kw = dict(color=E.COLOR_ARQ[arch], ls=E.LINEA_ARQ[arch])
+                if i == 0:
+                    ax.plot(rc, pr, lw=1.3, label=f"{arch} ({m.pr_auc.mean():.3f})"
+                            .replace(".", ","), **kw)
+                else:
+                    ax.plot(rc, pr, lw=0.5, alpha=0.45, **kw)
+        ax.axhline(y.mean(), color="k", lw=0.7, ls=(0, (2, 2)))
+        ax.set(xlabel="Exhaustividad (recall)", xlim=(0, 1), ylim=(0, 1))
+        ax.set_title(f"({'ab'[j]}) Escenario {E.NOMBRE_ESC[sc]}", fontsize=8.5)
+        ax.legend(title="PR-AUC media", loc="upper right", title_fontsize=8)
+        E.coma(ax)
+    axs[0].set_ylabel("Precisión")
+    fig.tight_layout(w_pad=1.5)
+    return E.guardar(fig, "curvas_estres_test")
+
+
+def fig_acuerdo_modelos():
+    """Acuerdo entre explicaciones de modelos distintos (3 arquitecturas, pesos por clase,
+    escenarios principales) frente a la estabilidad entre réplicas."""
+    s = pd.read_csv(ROB / "robusta_semillas.csv")
+    s = s[s.arch.isin(["GraphSAGE", "GAT", "TAGCN"]) & (s.balancing == "class_weighting")
+          & s.scenario.isin(["1:10", "1:10_os", "1:20", "native"])]
+    m = _modelos()
+    m = m[m.arch.isin(["GraphSAGE", "GAT", "TAGCN"]) & (m.balancing == "class_weighting")
+          & m.scenario.isin(["1:10", "1:10_os", "1:20", "native"])]
+    tipos = [("réplicas", "Réplicas del\nmismo modelo"),
+             ("otro escenario, misma semilla", "Otro escenario,\nmisma semilla"),
+             ("mismo escenario, otra semilla", "Mismo escenario,\notra semilla"),
+             ("otro escenario, otra semilla", "Otro escenario,\notra semilla")]
+    cols = [E.OKABE["azul"], E.OKABE["celeste"], E.OKABE["naranja"], E.OKABE["bermellon"]]
+    exs = ["GNNExplainer", "ShapleyFeatures", "ExpectedGradients"]
+    fig, axs = plt.subplots(1, 2, figsize=(E.ANCHO, 2.8), sharey=True)
+    w = 0.2
+    x = np.arange(len(exs))
+    for j, (ax, med) in enumerate(zip(axs, ["sp_all", "jac10"])):
+        for i, ((k, nombre), cc) in enumerate(zip(tipos, cols)):
+            if k == "réplicas":
+                v = [m[m.explainer == e][med].mean() for e in exs]
+            else:
+                v = [s[(s.explainer == e) & (s.tipo == k)][med].mean() for e in exs]
+            ax.bar(x + (i - 1.5) * w, v, w, color=cc, label=nombre)
+        ax.set_xticks(x, ["GNNExplainer", "Shapley", "Expected\nGradients"], fontsize=7.5)
+        ax.set_title(f"({'ab'[j]}) " + E.NOMBRE_MEDIDA[med], fontsize=8.5)
+        ax.set_ylim(0, 1.05)
+        E.coma(ax, "y")
+    axs[0].set_ylabel("Acuerdo medio")
+    h, l = axs[0].get_legend_handles_labels()
+    fig.subplots_adjust(left=0.09, right=0.99, top=0.92, bottom=0.33, wspace=0.08)
+    fig.legend(h, l, loc="lower center", ncol=4, bbox_to_anchor=(0.5, 0.0), fontsize=7)
+    return E.guardar(fig, "acuerdo_modelos")
+
+
+def fig_ejemplo():
+    """Explicación de una transacción concreta: (a) los cuatro explicadores sobre GraphSAGE,
+    pesos por clase, nativo, semilla 42; (b) GNNExplainer sobre las tres semillas."""
+    import json as _j
+    nodos = _j.loads((PRE / "explain_nodes_v4.json").read_text())["nodes"]
+    rk = {"GNNExplainer": PRE / "rankings", "ShapleyFeatures": PRE / "rankings",
+          "IntegratedGradients": ROOT / "results_v4_precierre_grad/rankings",
+          "ExpectedGradients": ROOT / "results_v4_precierre_grad/rankings"}
+
+    def imp(run, ex):
+        z = np.load(rk[ex] / f"{run}__{ex}.npz")
+        return z, np.abs(np.nan_to_num(z["feat"])).mean(axis=1)
+
+    z, _ = imp("native_GraphSAGE_class_weighting", "GNNExplainer")
+    i = int(np.where(z["tp"])[0][0])
+    nodo = int(z["nodes"][i])
+
+    def top(v, k=10):
+        return list(np.argsort(-v, kind="stable")[:k])
+
+    def nombre(f):
+        return f"L{f + 1}" if f < 93 else f"A{f - 92}"
+
+    filas_a = {}
+    for ex in E.EXPL:
+        _, a = imp("native_GraphSAGE_class_weighting", ex)
+        filas_a[E.NOMBRE_EXPL[ex]] = a[i] / (a[i].max() or 1)
+    filas_b = {}
+    for sd, suf in ((42, ""), (43, "_s43"), (44, "_s44")):
+        _, a = imp(f"native_GraphSAGE_class_weighting{suf}", "GNNExplainer")
+        filas_b[f"Semilla {sd}"] = a[i] / (a[i].max() or 1)
+    fig, axs = plt.subplots(1, 2, figsize=(E.ANCHO, 2.7))
+    for j, (ax, filas, tit) in enumerate(zip(
+            axs, (filas_a, filas_b),
+            ("(a) Cuatro explicadores, mismo modelo", "(b) GNNExplainer, tres semillas"))):
+        union = []
+        for v in filas.values():
+            for f in top(v, 5):
+                if f not in union:
+                    union.append(f)
+        union = union[:14]
+        M = np.array([[v[f] for f in union] for v in filas.values()])
+        ax.imshow(M, cmap="Blues", vmin=0, vmax=1, aspect="auto")
+        for r, v in enumerate(filas.values()):
+            t10 = set(top(v, 10))
+            for cidx, f in enumerate(union):
+                if f in t10:
+                    ax.text(cidx, r, "•", ha="center", va="center", fontsize=8,
+                            color="white" if M[r, cidx] > 0.6 else "k")
+        ax.set_xticks(range(len(union)), [nombre(f) for f in union], rotation=90, fontsize=6.5)
+        ax.set_yticks(range(len(filas)), list(filas), fontsize=7)
+        ax.grid(False)
+        ax.set_title(tit, fontsize=8.5)
+    fig.tight_layout(w_pad=1.5)
+    print(f"ejemplo: nodo {nodo} (posición {i}, verdadero positivo)")
+    return E.guardar(fig, "ejemplo_explicacion")
+
+
+def fig_estab_rendimiento():
+    """Estabilidad de GNNExplainer frente al PR-AUC de validación, un punto por modelo."""
+    import glob
+    import json as _j
+    m = _modelos()
+    pr = {}
+    for f in glob.glob(str(ROOT / "results_models_v4_precierre/*_meta.json")):
+        j = _j.loads(Path(f).read_text())
+        pr[j["run_id"]] = j["val_metrics"]["pr_auc"]
+    m = m[m.explainer == "GNNExplainer"].copy()
+    m["val"] = m.run_id.map(pr)
+    fig, axs = plt.subplots(1, 2, figsize=(E.ANCHO, 2.7), sharex=True)
+    for j, (ax, med) in enumerate(zip(axs, ["sp_all", "jac10"])):
+        for loss in E.PERDIDA:
+            d = m[m.balancing == loss]
+            ax.scatter(d.val, d[med], s=9, color=E.COLOR_PERDIDA[loss], alpha=0.75,
+                       label=E.NOMBRE_PERDIDA[loss], edgecolor="none")
+        ax.axvline(0.037, color="k", lw=0.6, ls=(0, (2, 2)))
+        ax.set_xlabel("PR-AUC en validación")
+        ax.set_title(f"({'ab'[j]}) " + E.NOMBRE_MEDIDA[med], fontsize=8.5)
+        E.coma(ax)
+    axs[0].set_ylabel("Estabilidad de GNNExplainer")
+    axs[0].legend(loc="lower right", markerscale=1.5)
+    fig.tight_layout(w_pad=1.5)
+    return E.guardar(fig, "estabilidad_rendimiento")
+
+
 FIGURAS = {"particion": fig_particion, "curvas_test": lambda: fig_curvas("test"),
            "curvas_val": lambda: fig_curvas("val"), "cierre": fig_cierre,
            "perdida": fig_perdida_escenario, "h1": fig_estabilidad_escenario,
            "h2": fig_estabilidad_arquitectura, "control": fig_control,
-           "explicadores": fig_acuerdo_explicadores}
+           "explicadores": fig_acuerdo_explicadores, "eda": fig_eda,
+           "estres": fig_curvas_estres, "modelos": fig_acuerdo_modelos,
+           "ejemplo": fig_ejemplo, "rendimiento": fig_estab_rendimiento}
 
 
 def main() -> int:

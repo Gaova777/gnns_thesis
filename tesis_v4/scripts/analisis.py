@@ -309,12 +309,173 @@ def tabla_pgexplainer():
                                                               "jaccard_edges_topk"]].mean())
 
 
+def sci(v):
+    """Notación científica para LaTeX con coma decimal: 4,6 x 10^-3."""
+    m, e = f"{v:.1e}".split("e")
+    return f"${m.replace('.', '{,}')} \\times 10^{{{int(e)}}}$"
+
+
+def tablas_anexo():
+    """Hiperparámetros elegidos (semilla 42) y resultados completos por configuración."""
+    import json
+    MOD = ROOT / "results_models_v4_precierre"
+    filas = ["\\begin{longtable}{lllcccccc}",
+             "\\caption{Hiperparámetros elegidos por la búsqueda (semilla 42; las semillas 43 y 44 "
+             "los reutilizan). $h$: dimensión oculta; $L$: capas; $p$: \\textit{dropout}; "
+             "$\\eta$: tasa de aprendizaje; $\\lambda$: decaimiento de pesos; $H$/$K$: cabezas "
+             "de GAT u orden de TAGCN.}\\label{tab:hiper}\\\\",
+             "\\toprule",
+             "Arquitectura & Escenario & Pérdida & $h$ & $L$ & $p$ & $\\eta$ & $\\lambda$ & "
+             "$H$/$K$ \\\\", "\\midrule", "\\endfirsthead",
+             "\\toprule",
+             "Arquitectura & Escenario & Pérdida & $h$ & $L$ & $p$ & $\\eta$ & $\\lambda$ & "
+             "$H$/$K$ \\\\", "\\midrule", "\\endhead"]
+    for arch in E.ARQ:
+        for sc in E.ESC:
+            for loss in E.PERDIDA:
+                f = MOD / f"{sc.replace(':', '-')}_{arch}_{loss}_meta.json"
+                bp = json.loads(f.read_text())["best_params"]
+                hk = bp.get("heads", bp.get("K", "--"))
+                filas.append(f"{arch} & {E.NOMBRE_ESC[sc]} & {E.NOMBRE_PERDIDA[loss]} & "
+                             f"{bp['hidden_dim']} & {bp['num_layers']} & "
+                             f"{c(bp['dropout'], 2)} & {sci(bp['lr'])} & "
+                             f"{sci(bp['weight_decay'])} & {hk} \\\\")
+        filas.append("\\midrule")
+    filas[-1] = "\\bottomrule"
+    filas.append("\\end{longtable}")
+    guardar("hiperparametros", "\n".join(filas) + "\n")
+
+    met = pd.read_csv(CURV / "curvas_metricas_por_config.csv")
+    rob = pd.read_csv(ROB / "robusta_config.csv")
+    st = pd.read_csv(PRE / "elliptic_v4_stability.csv")
+    ntp = st[st.explainer == "GNNExplainer"].groupby(KEYS).n_tp.mean()
+    filas = ["\\begin{longtable}{lllccccccc}",
+             "\\caption{Resultados completos por configuración (media de tres semillas). Val. y "
+             "Prueba: PR-AUC; ROC: ROC-AUC de prueba; F: modelos que superan el filtro (de 3); "
+             "VP: verdaderos positivos entre las 30 transacciones explicadas; GE y SH: "
+             "estabilidad (Spearman global) de GNNExplainer y Shapley; J: Jaccard top-10 de "
+             "GNNExplainer.}\\label{tab:completa}\\\\",
+             "\\toprule",
+             "Arq. & Escenario & Pérdida & Val. & Prueba & ROC & F & VP & GE / SH & J \\\\",
+             "\\midrule", "\\endfirsthead", "\\toprule",
+             "Arq. & Escenario & Pérdida & Val. & Prueba & ROC & F & VP & GE / SH & J \\\\",
+             "\\midrule", "\\endhead"]
+    for arch in E.ARQ:
+        for sc in E.ESC:
+            for loss in E.PERDIDA:
+                mv = met[(met.arch == arch) & (met.scenario == sc) & (met.balancing == loss)]
+                v, te = mv[mv.split == "val"].iloc[0], mv[mv.split == "test"].iloc[0]
+                r = rob[(rob.arch == arch) & (rob.scenario == sc) & (rob.balancing == loss)] \
+                    .set_index("explainer")
+                filas.append(
+                    f"{arch} & {E.NOMBRE_ESC[sc]} & {E.NOMBRE_PERDIDA[loss]} & "
+                    f"{c(v.pr_auc_mean)} & {c(te.pr_auc_mean)} & {c(te.roc_auc_mean)} & "
+                    f"{int(v.n_gate_passed)} & {c(ntp.get((sc, arch, loss), np.nan), 1)} & "
+                    f"{c(r.loc['GNNExplainer', 'sp_all'])} / "
+                    f"{c(r.loc['ShapleyFeatures', 'sp_all'])} & "
+                    f"{c(r.loc['GNNExplainer', 'jac10'])} \\\\")
+        filas.append("\\midrule")
+    filas[-1] = "\\bottomrule"
+    filas.append("\\end{longtable}")
+    guardar("completa", "\n".join(filas) + "\n")
+    print("VP medios entre los 30 nodos (GNNExplainer, por arquitectura):\n",
+          st[st.explainer == "GNNExplainer"].groupby("arch").n_tp.mean().round(1))
+
+
+def tablas_escenario_detalle():
+    """Estabilidad por escenario desglosada por arquitectura y por pérdida (anexo), y Friedman
+    con las tres pérdidas (27 bloques: arquitectura x pérdida x semilla)."""
+    m = pd.read_csv(ROB / "robusta_modelos.csv")
+    nm = {"sp_all": "Spearman global", "sp_nz": "Spearman $\\neq 0$", "jac10": "Jaccard top-10"}
+    for clave, col, valores, nombres in (
+            ("arquitectura", "arch", E.ARQ, {a: a for a in E.ARQ}),
+            ("perdida", "balancing", E.PERDIDA, E.NOMBRE_PERDIDA)):
+        base = m[m.arch.isin(APR)] if clave == "perdida" else m[m.balancing == "class_weighting"]
+        cuerpo = ["\\begin{tabular}{lll" + "c" * len(E.ESC) + "}", "\\toprule",
+                  "Medida & Explicador & " + ("Arquitectura" if clave == "arquitectura"
+                                             else "Pérdida") + " & "
+                  + " & ".join(E.NOMBRE_ESC[s] for s in E.ESC) + " \\\\", "\\midrule"]
+        for i, med in enumerate(E.MEDIDA):
+            if i:
+                cuerpo.append("\\midrule")
+            primera = True
+            for ex in ["GNNExplainer", "ShapleyFeatures", "ExpectedGradients"]:
+                for k, v in enumerate(valores):
+                    d = base[(base.explainer == ex) & (base[col] == v)] \
+                        .groupby("scenario")[med].mean()
+                    cuerpo.append(f"{nm[med] if primera else ''} & "
+                                  f"{E.NOMBRE_EXPL[ex] if k == 0 else ''} & {nombres[v]} & "
+                                  + " & ".join(c(d.get(s, np.nan)) for s in E.ESC) + " \\\\")
+                    primera = False
+        cuerpo += ["\\bottomrule", "\\end{tabular}"]
+        guardar(f"escenario_por_{clave}", "\n".join(cuerpo) + "\n")
+
+    t3 = m[m.arch.isin(APR)]
+    print("Friedman 27 bloques (arquitectura x pérdida x semilla), 6 escenarios:")
+    for ex in ["GNNExplainer", "ShapleyFeatures", "ExpectedGradients"]:
+        for med in E.MEDIDA:
+            tb = t3[t3.explainer == ex].pivot_table(index=["arch", "balancing", "seed"],
+                                                   columns="scenario", values=med)[E.ESC].dropna()
+            chi, p = stats.friedmanchisquare(*[tb[s] for s in E.ESC])
+            print(f"  {ex:18s} {med:7s} n={len(tb)} p={p:.4g} medias="
+                  + " ".join(f"{v:.3f}" for v in tb.mean()))
+
+
+def tabla_nodos():
+    """Las 30 transacciones explicadas: paso de tiempo, grado, fracción de variables nulas y en
+    qué fracción de los modelos con pesos por clase (3 arquitecturas que aprenden) son acierto."""
+    import contextlib
+    import io
+    import json
+    sys.path.insert(0, str(ROOT))
+    from src.data.loader import apply_label_mode, load_elliptic
+    from src.data.preprocessing import preprocess
+    with contextlib.redirect_stdout(io.StringIO()):
+        d = load_elliptic(root=str(ROOT / "data"))
+        apply_label_mode(d, "licit_unknown")
+        preprocess(d, train_range=(1, 29), val_range=(30, 35), test_range=(36, 42))
+    nodos = json.loads((PRE / "explain_nodes_v4.json").read_text())["nodes"]
+    import torch
+    deg = torch.bincount(torch.cat([d.edge_index[0], d.edge_index[1]]), minlength=d.num_nodes)
+    acierto = {n: [] for n in nodos}
+    for f in sorted((PRE / "rankings").glob("*_class_weighting*__GNNExplainer.npz")):
+        z = np.load(f)
+        if str(z["arch"]) not in APR:
+            continue
+        for n, tp in zip(z["nodes"], z["tp"]):
+            acierto[int(n)].append(bool(tp))
+    cuerpo = ["\\begin{longtable}{rrrrc}",
+              "\\caption{Las 30 transacciones ilícitas de validación explicadas. Nodo: índice en el "
+              "grafo; Paso: paso de tiempo; Grado: número de aristas; Nulas: fracción de "
+              "variables que valen 0 tras el escalado; Acierto: fracción de los 54 modelos con "
+              "pesos por clase (GraphSAGE, GAT y TAGCN; 6 escenarios; 3 semillas) que la "
+              "clasifican como ilícita con umbral 0,5.}\\label{tab:nodos}\\\\",
+              "\\toprule", "Nodo & Paso & Grado & Nulas & Acierto \\\\", "\\midrule",
+              "\\endfirsthead", "\\toprule", "Nodo & Paso & Grado & Nulas & Acierto \\\\",
+              "\\midrule", "\\endhead"]
+    for n in nodos:
+        a = acierto[n]
+        cuerpo.append(f"{n} & {int(d.timestep[n])} & {int(deg[n])} & "
+                      f"{c(float((d.x[n] == 0).float().mean()), 2)} & "
+                      f"{c(np.mean(a) if a else np.nan, 2)} \\\\")
+    cuerpo += ["\\bottomrule", "\\end{longtable}"]
+    guardar("nodos", "\n".join(cuerpo) + "\n")
+    print("nodos: aciertos medios", np.mean([np.mean(v) for v in acierto.values()]).round(3),
+          "n modelos", len(next(iter(acierto.values()))))
+
+
+KEYS = ["scenario", "arch", "balancing"]
+
+
 def main() -> int:
     tabla_particion()
     tabla_rendimiento()
     df = pruebas()
     tabla_control()
     tabla_pgexplainer()
+    tablas_anexo()
+    tablas_escenario_detalle()
+    tabla_nodos()
     pd.set_option("display.width", 220)
     print(df[df.hip == "H1"][["explainer", "medida", "n", "p", "W", "rango_medias", "tost_p"]]
           .round(4).to_string())

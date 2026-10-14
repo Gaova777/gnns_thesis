@@ -20,15 +20,21 @@ por muestreo.
 Los escenarios del eje sintético difieren de los de Elliptic: los niveles 1:50 y 1:100 se
 obtienen quitando transacciones ilícitas. Además se miden la \textbf{plausibilidad}
 (coincidencia de las variables o aristas señaladas con las que de verdad definen la
-tipología) y la \textbf{fidelidad} (cuánto cambia la predicción al retirar lo señalado, fid+,
-o al conservar solo lo señalado, fid$-$), cada una frente a una explicación al azar.
+tipología; para las variables, la fracción de las variables verdaderas que aparecen entre las 3
+principales) y la \textbf{fidelidad} (cuánto cambia la predicción al retirar lo señalado, fid+,
+o al conservar solo lo señalado, fid$-$), cada una frente a una explicación al azar del mismo
+tamaño. La fidelidad se calcula sobre lo que cada explicador explica: retirando aristas en
+GNNExplainer y PGExplainer, y retirando variables en Shapley. Por eso la fidelidad de
+GNNExplainer y la de Shapley no son comparables entre sí; cada una solo se compara con su propio
+valor al azar.
 
 \section{Resultados}
 
 \begin{table}[ht]
 \centering
 \caption{Eje sintético: estabilidad (Spearman global), plausibilidad de variables y fidelidad
-(fid+), con su valor al azar entre paréntesis. Medias sobre 36 configuraciones por fila.
+(fid+; sobre aristas en GNNExplainer y sobre variables en Shapley), con su valor al azar entre
+paréntesis. Medias sobre 36 configuraciones por fila.
 Fuente: \texttt{results\_phase1\_v4/summary\_v4.csv}.}
 \label{tab:sintetico}
 \small
@@ -52,8 +58,10 @@ La Tabla \ref{tab:sintetico} muestra el resultado central del eje: el explicador
 no es el más correcto. Shapley por muestreo es el más estable en tres de las cuatro
 arquitecturas (Spearman entre 0,95 y 0,98), pero su plausibilidad de variables no supera al
 azar (entre 0,11 y 0,16 frente a 0,15). GNNExplainer es menos estable, pero es el único cuya
-plausibilidad de variables supera claramente al azar (entre 0,24 y 0,45), y el de mayor
-fidelidad en tres de las cuatro arquitecturas (en GCN lo es Shapley). La estabilidad de GNNExplainer baja con el desbalance, de 0,92 en los niveles
+plausibilidad de variables supera claramente al azar (entre 0,24 y 0,45). Ambos explicadores
+superan a su propia línea base de fidelidad, salvo Shapley en GAT (0,118 frente a 0,101,
+$p = 0{,}22$), pero esas cifras no
+permiten decir cuál es más fiel, porque miden cosas distintas. La estabilidad de GNNExplainer baja con el desbalance, de 0,92 en los niveles
 nativo y 1:1 a 0,86 en 1:100, mientras que la de Shapley no cambia.
 
 Este resultado apoya una de las conclusiones del estudio principal: la estabilidad es

@@ -1,0 +1,166 @@
+\chapter{Marco contextual}\label{cap:contexto}
+
+Este capítulo sitúa el problema técnico de la tesis en su contexto: qué es el lavado de dinero
+y cómo se organiza (Sección \ref{sec:ctx_lavado}), cómo lo transforman las criptomonedas
+(Sección \ref{sec:ctx_cripto}), cómo lo detectan hoy las instituciones financieras y por qué
+esos sistemas son insuficientes (Sección \ref{sec:ctx_monitoreo}), y qué exige la regulación a
+los sistemas basados en inteligencia artificial (Sección \ref{sec:ctx_regulacion}). Cierra con
+la descripción del conjunto de datos Elliptic como representación de ese problema (Sección
+\ref{sec:ctx_elliptic}).
+
+\section{El lavado de dinero}\label{sec:ctx_lavado}
+
+El lavado de dinero es el conjunto de operaciones con las que se oculta el origen ilícito de
+unos fondos para que puedan usarse como si fueran legítimos. Es el paso que permite a una
+actividad criminal convertir sus ganancias en patrimonio aprovechable, y por eso combatirlo es
+una forma de combatir los delitos que lo originan, desde el narcotráfico hasta la corrupción y
+el financiamiento del terrorismo \cite{Chen2018AMLReview, Kute2021AMLReview}.
+
+\subsection{Las tres etapas}
+
+La descripción más extendida del proceso distingue tres etapas
+\cite{Irwin2012Typologies, Chen2018AMLReview}:
+
+\begin{enumerate}
+  \item \textbf{Colocación.} Los fondos de origen ilícito entran por primera vez al sistema
+        financiero, por ejemplo mediante depósitos fraccionados en efectivo, compras de
+        instrumentos financieros o, en el caso de las criptomonedas, la compra de activos
+        virtuales en plataformas de intercambio.
+  \item \textbf{Estratificación.} Los fondos se mueven a través de muchas operaciones, cuentas
+        e intermediarios con el fin de separar el dinero de su origen y dificultar su rastreo.
+        Es la etapa en la que se generan las cadenas de transacciones que un análisis de grafos
+        puede seguir.
+  \item \textbf{Integración.} Los fondos vuelven a la economía como ingresos aparentemente
+        legítimos, por ejemplo a través de inversiones, compras de bienes o empresas.
+\end{enumerate}
+
+Irwin et al. analizaron 184 tipologías documentadas por organismos de prevención del lavado y
+del financiamiento del terrorismo, y encontraron que quienes lavan dinero y quienes financian
+el terrorismo prefieren técnicas algo distintas en cada etapa, y que cuantas más técnicas se
+combinan, más dinero se logra ocultar \cite{Irwin2012Typologies}. Esa combinación de técnicas
+es la que vuelve el problema difícil para un sistema de reglas: el patrón no está en una
+operación aislada sino en la secuencia y en la red de operaciones.
+
+\subsection{La escala del problema}
+
+Medir el lavado es difícil precisamente porque está diseñado para no ser visto. Las
+estimaciones disponibles para las criptomonedas dan una idea de su magnitud. Foley et al.
+estimaron, con técnicas de análisis de la cadena de bloques, que cerca de una cuarta parte de
+los usuarios de Bitcoin participaba en actividades ilegales, y que esas actividades movían unos
+76.000 millones de dólares al año, el 46~\% de las transacciones de Bitcoin, una cifra comparable
+a los mercados de drogas ilegales de Estados Unidos y Europa \cite{Foley2019Bitcoin}. Los
+mismos autores observaron que la proporción ilegal disminuía a medida que crecía el interés
+general en Bitcoin y aparecían criptomonedas más opacas. En otro frente, Paquet-Clouston et al.
+reconstruyeron los pagos de 35 familias de \textit{ransomware} en Bitcoin y estimaron un mercado
+de al menos 12,7 millones de dólares entre 2013 y mediados de 2017, concentrado en unos pocos
+actores \cite{PaquetClouston2019Ransomware}.
+
+\section{Criptomonedas y lavado de dinero}\label{sec:ctx_cripto}
+
+\subsection{Qué cambia con las criptomonedas}
+
+Las criptomonedas permiten transferir valor de persona a persona sin un intermediario
+financiero, y la cadena de bloques asocia las transacciones a direcciones y no a identidades.
+Albrecht et al. señalan que esas dos propiedades las volvieron atractivas para los mercados de
+la red oscura y otras redes criminales, y analizan cómo se incorporan a cada etapa del lavado
+\cite{Albrecht2019Crypto}. Otros trabajos describen técnicas propias de este medio, como la
+mezcla de fondos de muchos usuarios para romper el rastro entre direcciones, el encadenamiento
+de transacciones y el paso por plataformas con controles débiles \cite{Almeida2025Techniques,
+Subashi2024Crypto}.
+
+El punto débil de quien lava con criptomonedas es la conversión a dinero tradicional, porque
+ahí reaparece un intermediario regulado. Dupuis y Gleason identificaron seis «puertas abiertas»
+para convertir criptomonedas en moneda tradicional que seguían disponibles para quien busca
+lavar fondos, y las analizaron con el paradigma de la dialéctica regulatoria: cada regulación
+cierra una puerta y los infractores buscan la siguiente \cite{Dupuis2020OpenDoors}.
+
+\subsection{Seudonimato y trazabilidad}
+
+La cadena de bloques de Bitcoin es pública: cualquiera puede ver todas las transacciones,
+sus montos y las direcciones que intervienen. Lo que no es público es quién controla cada
+dirección. Esta combinación de transparencia y seudonimato es la que hace posible el análisis
+forense de la cadena de bloques y, a la vez, la que lo limita \cite{Pocher2023Anomalous}. Un
+investigador puede seguir los fondos de transacción en transacción, pero necesita información
+externa, como la de una plataforma de intercambio, para atribuir una dirección a una persona. Por
+eso el problema se plantea de forma natural como el análisis de un grafo de transacciones, en
+el que lo que se observa son flujos y no identidades \cite{Weber2019Elliptic}.
+
+\section{Sistemas de monitoreo de transacciones}\label{sec:ctx_monitoreo}
+
+\subsection{Monitoreo basado en reglas}
+
+Las instituciones financieras están obligadas a monitorear las transacciones de sus clientes y
+reportar las sospechosas. La mayoría lo hace con sistemas de reglas: umbrales de monto,
+frecuencias inusuales, contrapartes en listas de riesgo o combinaciones de estos criterios. El
+problema conocido de estos sistemas es la proporción de falsas alarmas. Ketenci et al.
+reportan que la mayoría de los sistemas en uso son basados en reglas y que más del 90~\% de sus
+alertas son falsos positivos \cite{Ketenci2021TimeFrequency}. Oztas et al. entrevistaron a
+especialistas en prevención del lavado, que identificaron esa tasa de falsos positivos, con sus
+costos e ineficiencias, como uno de los problemas centrales del monitoreo actual, y señalaron el
+aprendizaje automático, el análisis de grafos y la detección de anomalías como vías para
+superarlo \cite{Oztas2024Monitoring}.
+
+\subsection{Monitoreo con aprendizaje automático}
+
+El aprendizaje automático se ha propuesto como complemento de las reglas para reducir las falsas
+alarmas \cite{Chen2018AMLReview, Hilal2022Anomaly}. Las revisiones distinguen enfoques
+supervisados, que aprenden de casos etiquetados y suelen detectar mejor pero necesitan muchas
+etiquetas, y no supervisados, que detectan patrones anómalos nuevos pero producen más falsas
+alarmas \cite{Hilal2022Anomaly}. Labanca et al. combinan ambos en un esquema de aprendizaje
+activo en el que el modelo elige qué transacciones conviene que el analista revise, para
+aprovechar mejor su retroalimentación \cite{Labanca2022Amaretto}. En todos los casos la
+escasez de ejemplos positivos es una constante: los casos confirmados de lavado son muy pocos
+frente al volumen de operaciones legítimas, lo que convierte el desbalance de clases en una
+característica estructural del problema y no en un accidente de los datos.
+
+Los entrevistados por Oztas et al. incluyeron la explicabilidad entre los requisitos para que
+un sistema de monitoreo basado en aprendizaje automático se adopte en la práctica
+\cite{Oztas2024Monitoring}. El analista que recibe una alerta tiene que decidir si la reporta, y
+para hacerlo necesita saber qué la motivó.
+
+\section{Regulación e inteligencia artificial explicable}\label{sec:ctx_regulacion}
+
+El uso de modelos opacos en decisiones con consecuencias para las personas plantea exigencias
+de transparencia que la regulación ha empezado a recoger. Bertrand et al. examinan si los
+sistemas de prevención del lavado basados en inteligencia artificial respetan los derechos
+fundamentales europeos, y recuerdan que la normativa de la Unión Europea obliga a las entidades
+financieras a un monitoreo continuo capaz de detectar transacciones inusuales o sospechosas; la
+introducción de algoritmos de aprendizaje automático más opacos en ese monitoreo plantea riesgos
+de protección de datos que solo se han estudiado en parte \cite{Bertrand2021Rights}.
+
+En el sector financiero en general, Giudici et al. proponen un marco de indicadores para
+medir los riesgos de la inteligencia artificial, en el que traducen los requisitos regulatorios
+propuestos para la inteligencia artificial en cuatro principios medibles: sostenibilidad,
+exactitud, equidad y explicabilidad \cite{Giudici2023Risk}. Una revisión sistemática de 35
+casos de uso de explicabilidad en finanzas encontró que la detección de fraude es una de las
+aplicaciones más frecuentes, que SHAP y LIME son los métodos más usados, y que los beneficios
+buscados son la transparencia, la confianza de los interesados y el cumplimiento regulatorio
+\cite{FinXAI2026Mapping}.
+
+Esta tesis parte de una observación que esa literatura suele dar por supuesta: para que una
+explicación sirva como evidencia ante un auditor, debe ser reproducible. Si el mismo método,
+aplicado a la misma transacción y al mismo modelo, produce explicaciones distintas, no puede
+sostener una decisión regulatoria \cite{Rudin2019Stop}. La estabilidad de las explicaciones es,
+por eso, una condición previa a su uso en un entorno regulado.
+
+\section{El conjunto de datos Elliptic}\label{sec:ctx_elliptic}
+
+Los datos reales de lavado de dinero rara vez son públicos, porque contienen información
+protegida de clientes y de investigaciones. Elliptic es una excepción: es un grafo de
+transacciones de Bitcoin publicado por la empresa del mismo nombre junto con investigadores del
+MIT e IBM, con una parte de las transacciones etiquetadas como lícitas o ilícitas según su
+asociación con entidades conocidas \cite{Weber2019Elliptic}. Las ilícitas corresponden a
+categorías como estafas, \textit{malware}, organizaciones terroristas, \textit{ransomware} y
+esquemas Ponzi; las lícitas, a plataformas de intercambio, proveedores de billeteras, mineros y
+servicios legales.
+
+Elliptic se ha convertido en la referencia pública para la detección de transacciones
+ilícitas en criptomonedas \cite{Alarab2023Graph, DTA2022Evolving}. Tiene tres rasgos que lo
+hacen adecuado para esta tesis: es real, está desbalanceado de forma natural y su estructura de
+grafo permite aplicar GNN. Tiene también dos limitaciones que condicionan el diseño. La primera es
+que sus variables están anonimizadas, de modo que no se puede juzgar si una explicación señala
+algo con sentido para un experto; solo se puede medir si es estable. La segunda es el cierre de
+un mercado ilegal en el paso de tiempo 43, que cambia la distribución de las transacciones
+ilícitas posteriores y que ningún modelo logra capturar con las variables originales
+\cite{Weber2019Elliptic, Alarab2023Recurrent}. El Capítulo \ref{cap:metodologia} describe el
+conjunto de datos en detalle y la forma en que se trató esa segunda limitación.

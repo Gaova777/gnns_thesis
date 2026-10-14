@@ -1,0 +1,51 @@
+\chapter{Glosario}\label{anx:glosario}
+
+\begin{description}
+  \item[Arista.] Conexión entre dos nodos de un grafo. En Elliptic, un flujo de fondos de una
+        transacción a otra.
+  \item[Campo receptivo.] Conjunto de nodos cuya información usa una GNN para predecir un nodo;
+        con $L$ capas, los vecinos a $L$ saltos o menos.
+  \item[Cierre del mercado.] Cierre de un mercado ilegal de la red oscura en el paso de tiempo 43
+        de Elliptic, después del cual la actividad ilícita cambia y los modelos dejan de
+        detectarla.
+  \item[Control de pesos aleatorios.] Prueba que compara la explicación de un modelo entrenado
+        con la de la misma arquitectura sin entrenar; si se parecen, la explicación no depende de
+        lo aprendido.
+  \item[Desbalance de clases.] Situación en la que una clase tiene muchos menos ejemplos que la
+        otra. Se expresa como una razón, por ejemplo 1:41 (una ilícita por cada 41 negativas).
+  \item[Escenario.] Nivel de desbalance con el que se entrena un modelo, obtenido submuestreando
+        negativas, sobremuestreando ilícitas o, en los escenarios de estrés, quitando ilícitas.
+  \item[Estabilidad.] Grado en que un explicador produce la misma explicación al repetirse sobre
+        la misma transacción y el mismo modelo.
+  \item[Explicador.] Método que asigna a cada variable, o a cada arista, una importancia en una
+        predicción concreta.
+  \item[Filtro de calidad.] Criterio para considerar que un modelo aprendió: F1 de al menos 0,30
+        y MCC de al menos 0,15 en validación, con umbral 0,5.
+  \item[\textit{Focal loss}.] Función de pérdida que reduce el peso de los ejemplos que el modelo
+        ya clasifica bien y pondera la clase rara.
+  \item[Grafo.] Estructura formada por nodos y aristas. En Elliptic, los nodos son
+        transacciones de Bitcoin.
+  \item[Heterofilia.] Tendencia de los nodos de clases distintas a conectarse entre sí; lo
+        opuesto es la homofilia.
+  \item[Jaccard top-10.] Fracción de variables compartidas entre las 10 más importantes de dos
+        explicaciones, sobre el total de variables distintas que aparecen en ambas listas.
+  \item[Modo C.] Definición de la clase negativa como lícitas más transacciones sin etiqueta.
+  \item[Partición temporal.] División de los datos en entrenamiento, validación y prueba según
+        el paso de tiempo, de modo que el modelo nunca ve el futuro.
+  \item[Pesos por clase.] Función de pérdida en la que cada clase aporta la mitad del total,
+        sin importar cuántos ejemplos tenga.
+  \item[PR-AUC.] Área bajo la curva de precisión y exhaustividad. Su valor al azar es la
+        proporción de ilícitas.
+  \item[Pseudorreplicación.] Tratar como independientes observaciones que no lo son, lo que
+        infla la significancia estadística.
+  \item[Réplica.] Cada una de las cinco ejecuciones de un explicador sobre la misma transacción
+        y el mismo modelo, con semillas distintas.
+  \item[Semilla.] Número que fija la aleatoriedad del entrenamiento o de un explicador. Dos
+        modelos que solo difieren en la semilla parten de pesos iniciales distintos.
+  \item[SMOTE.] Técnica que crea ejemplos sintéticos de la clase rara interpolando entre
+        ejemplos reales.
+  \item[Spearman global.] Correlación de rangos entre los órdenes completos de importancia de
+        las 165 variables de dos explicaciones.
+  \item[Variable nula.] Variable que vale exactamente cero tras el escalado, por ser igual a la
+        mediana del entrenamiento.
+\end{description}

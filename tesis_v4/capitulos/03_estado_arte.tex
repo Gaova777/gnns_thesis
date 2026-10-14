@@ -26,7 +26,19 @@ plazo para aprovechar el orden temporal, junto con esquemas de aprendizaje activ
 \cite{Alarab2023Graph}; representaciones de nodos aprendidas de forma autosupervisada
 \cite{Lo2023Inspection}; y arquitecturas temporales basadas en transformadores sobre grafos
 \cite{Lin2026Detecting}. Otras propuestas modelan el grafo de transacciones como una secuencia
-de instantáneas dinámicas \cite{Wan2024Memory, Wang2025CoSemiGNN}. En el ámbito forense,
+de instantáneas dinámicas \cite{Wan2024Memory, Wang2025CoSemiGNN}. Mohan et al. modelan la detección en Bitcoin como clasificación de
+nodos en redes dinámicas, combinando convoluciones de grafos que evolucionan en el tiempo con
+bosques de decisión neuronales \cite{DTA2022Evolving}, y Asiri et al. comparan regresión
+logística, máquinas de soporte vectorial, bosques aleatorios, redes LSTM y GCN sobre Elliptic
+\cite{SciRep2025GCN}.
+
+El cierre del mercado en el paso 43 es un problema reconocido. Alarab y Prakoonwit señalan que
+todos los algoritmos de aprendizaje han fallado en capturar ese evento con las variables
+originales de Elliptic, y proponen un modelo recurrente de grafos que hace predicciones
+secuenciales apoyándose en las transacciones etiquetadas más recientes
+\cite{Alarab2023Recurrent}. Ese enfoque supone que se dispone de etiquetas recientes durante la
+operación, un supuesto distinto del de esta tesis, que separa estrictamente el entrenamiento de
+la evaluación. En el ámbito forense,
 Pocher et al. analizan cómo los métodos de aprendizaje automático y de análisis del grafo de
 transacciones se aplican a la prevención del lavado en criptomonedas y qué implicaciones
 tiene su uso por autoridades y empresas \cite{Pocher2023Anomalous}.
@@ -79,9 +91,53 @@ SHAP y gráficos de dependencia parcial en la predicción de riesgo de enfermeda
 historias clínicas electrónicas, bajo distintos grados de desbalance \cite{Rai2025Evaluating}.
 Fujiwara et al. proponen combinar destilación de conocimiento y remuestreo para mejorar tanto
 el rendimiento como la estabilidad de las explicaciones en clasificación desbalanceada
-\cite{Fujiwara2024Stability}. Estos trabajos indican que el desbalance y las técnicas que lo
-compensan pueden afectar las explicaciones, pero no tratan datos en grafo ni explicadores de
-GNN.
+\cite{Fujiwara2024Stability}.
+
+El trabajo más cercano a la pregunta de esta tesis es el de Chen et al. sobre calificación
+crediticia. Partiendo de que la investigación sobre desbalance se había concentrado en su
+efecto sobre la exactitud y no sobre la interpretabilidad, evaluaron la estabilidad de LIME y
+SHAP sobre conjuntos de datos hipotecarios con desbalance creciente, y encontraron que las
+explicaciones se vuelven menos estables a medida que aumenta el desbalance, resultado que
+repitieron en otros dos conjuntos de datos de crédito \cite{Chen2023CreditImbalance}. Mammadov
+et al. propusieron un artefacto de diseño para evaluar de forma controlada el efecto del
+desbalance y del muestreo sobre la estabilidad de SHAP y LIME, con medidas de acuerdo de rangos
+y de variabilidad, sobre 1.600 simulaciones \cite{TEM2026Stability}. Estos trabajos muestran que
+el desbalance y las técnicas que lo compensan pueden afectar las explicaciones, y en el caso de
+Chen et al. ofrecen una hipótesis concreta, la de que más desbalance produce explicaciones
+menos estables, que esta tesis contrasta en un dominio distinto. Ninguno trata datos en grafo
+ni explicadores de GNN.
+
+\section{Síntesis comparativa}
+
+La Tabla \ref{tab:ea} resume los trabajos más cercanos según cuatro rasgos: si usan grafos, si
+explican las predicciones, si miden la estabilidad de las explicaciones y si varían el
+desbalance de forma controlada.
+
+\begin{table}[ht]
+\centering
+\caption{Trabajos relacionados según su cobertura de los cuatro rasgos que combina la tesis,
+de acuerdo con lo que declara el resumen de cada trabajo. \checkmark: lo declara; --: no lo
+declara. Desbalance controlado significa variar el nivel de desbalance, no solo la técnica que
+lo compensa.}
+\label{tab:ea}
+\small
+\begin{tabularx}{\textwidth}{Xcccc}
+\toprule
+Trabajo & Grafos & Explicación & Estabilidad medida & Desbalance controlado \\
+\midrule
+Weber et al. \cite{Weber2019Elliptic} & \checkmark & -- & -- & -- \\
+Alarab et al. \cite{Alarab2023Graph, Alarab2023Recurrent} & \checkmark & \checkmark & -- & -- \\
+Lawal et al. \cite{Lawal2025Dataset} & \checkmark & \checkmark & -- & -- \\
+He et al. \cite{He2026Detection} & \checkmark & \checkmark & -- & -- \\
+Agarwal et al. \cite{Agarwal2023Evaluating} & \checkmark & \checkmark & -- & -- \\
+Longa et al. \cite{Longa2024Explaining} & \checkmark & \checkmark & -- & -- \\
+Chen et al. \cite{Chen2023CreditImbalance} & -- & \checkmark & \checkmark & \checkmark \\
+Mammadov et al. \cite{TEM2026Stability} & -- & \checkmark & \checkmark & \checkmark \\
+Rai et al. \cite{Rai2025Evaluating} & -- & \checkmark & \checkmark & \checkmark \\
+Esta tesis & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \section{Vacío de investigación}\label{sec:ea_vacio}
 

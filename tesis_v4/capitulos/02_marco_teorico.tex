@@ -1,23 +1,31 @@
 \chapter{Marco teórico}\label{cap:marco}
 
-\section{Lavado de dinero en criptomonedas}
+Este capítulo presenta los fundamentos técnicos que usa la tesis: el aprendizaje sobre grafos
+y las cuatro arquitecturas estudiadas (Secciones \ref{sec:ml} a \ref{sec:propiedades}), el
+desbalance de clases y las métricas de rendimiento (Secciones \ref{sec:desbalance} y
+\ref{sec:metricas}), los métodos de explicabilidad (Sección \ref{sec:xai}) y las herramientas con
+que se mide y se contrasta la estabilidad de las explicaciones (Secciones \ref{sec:acuerdo} y
+\ref{sec:pruebas}).
 
-El lavado de dinero es el proceso por el cual se oculta el origen ilícito de unos fondos para
-integrarlos en la economía formal. La literatura lo describe en tres etapas: colocación, en la
-que los fondos entran al sistema; estratificación, en la que se mueven a través de muchas
-operaciones para borrar su rastro; e integración, en la que vuelven a la economía como fondos
-aparentemente legítimos \cite{Chen2018AMLReview}. Las criptomonedas ofrecen a esas etapas un
-medio rápido, transfronterizo y seudónimo, y han dado lugar a técnicas propias como la mezcla
-de fondos, el encadenamiento de transacciones y el uso de plataformas de intercambio con
-controles débiles \cite{Almeida2025Techniques, Subashi2024Crypto}.
+\section{Del aprendizaje automático al aprendizaje sobre grafos}\label{sec:ml}
 
-Los sistemas tradicionales de monitoreo se basan en reglas fijas, como umbrales de monto o
-listas de contrapartes, y producen una proporción muy alta de falsas alarmas
-\cite{Kute2021AMLReview}. El aprendizaje automático permite aprender patrones a partir de casos
-etiquetados \cite{Chen2018AMLReview, Vassallo2021Boosting, Pocher2023Anomalous}. En Bitcoin, la
-cadena de bloques es pública y las transacciones están enlazadas por los fondos que se
-transfieren, de modo que el problema se puede plantear como la clasificación de los nodos de
-un grafo \cite{Weber2019Elliptic}.
+Un clasificador supervisado aprende una función $f: \mathbb{R}^d \to [0, 1]$ que, a partir de
+las $d$ variables de un ejemplo, estima la probabilidad de que pertenezca a la clase positiva.
+Los modelos clásicos, como la regresión logística o los bosques aleatorios, tratan cada ejemplo
+de forma independiente. Las redes neuronales profundas componen muchas transformaciones no
+lineales con parámetros que se ajustan por descenso de gradiente, y aprenden representaciones
+intermedias de los datos en lugar de depender de variables diseñadas a mano \cite{LeCun2015DeepLearning}.
+
+En muchos problemas los ejemplos no son independientes: están conectados. Una transacción de
+Bitcoin recibe fondos de transacciones anteriores y los envía a otras posteriores, y lo que se
+sabe de esas transacciones vecinas es información sobre ella. Los datos de este tipo se
+representan como un grafo $\mathcal{G} = (\mathcal{V}, \mathcal{E})$, con un conjunto de nodos
+$\mathcal{V}$ y un conjunto de aristas $\mathcal{E} \subseteq \mathcal{V} \times \mathcal{V}$.
+El aprendizaje profundo geométrico extiende las redes neuronales a dominios de este tipo, que no
+tienen la estructura regular de una imagen o una secuencia \cite{Bronstein2017Geometric}. En la
+tarea de esta tesis, la clasificación de nodos, se conocen las etiquetas de una parte de los
+nodos y se quiere predecir la de los demás usando tanto sus variables como su posición en el
+grafo.
 
 \section{Redes neuronales de grafos}\label{sec:gnn}
 
@@ -70,6 +78,43 @@ adyacencia normalizada $\tilde{\mathbf{A}}$, con una matriz de pesos por cada po
 \end{equation}
 El término $k = 0$ da al nodo un peso propio, y cada capa alcanza vecinos a $K$ saltos.
 
+\textbf{Comparación.} Las cuatro arquitecturas difieren en dos aspectos que importan para este
+problema. El primero es si la transacción tiene un peso propio, separado del de sus vecinas:
+GraphSAGE lo tiene por construcción, GAT puede asignarse a sí misma un peso de atención alto y
+TAGCN lo tiene en el término $k = 0$; GCN, en cambio, mezcla a la transacción con sus vecinas
+con un peso que depende solo de los grados. El segundo es el alcance: con $L$ capas, GCN,
+GraphSAGE y GAT ven $L$ saltos, mientras que TAGCN ve $L \cdot K$ saltos.
+
+\section{Propiedades de los grafos que condicionan el aprendizaje}\label{sec:propiedades}
+
+\textbf{Homofilia y heterofilia.} La mayoría de las GNN suponen, de forma implícita, que los
+nodos conectados tienden a pertenecer a la misma clase, una propiedad llamada homofilia. Cuando
+los nodos de clases distintas tienden a conectarse entre sí, situación llamada heterofilia, las
+GNN diseñadas bajo el supuesto contrario pierden rendimiento, porque promediar con las vecinas
+mezcla la señal del nodo con la de la otra clase \cite{Zheng2026Heterophily}. Una medida simple
+es la homofilia de aristas, la fracción de aristas cuyos dos extremos tienen la misma clase:
+\begin{equation}
+  h = \frac{|\{(u, v) \in \mathcal{E} : y_u = y_v\}|}{|\mathcal{E}|}.
+\end{equation}
+Para la clase rara conviene mirar además la composición de las vecinas de sus nodos: si la
+mayoría de las vecinas de una transacción ilícita no son ilícitas, la información útil está
+sobre todo en la propia transacción.
+
+\textbf{Sobresuavizado.} Cada capa de una GNN promedia la representación de un nodo con las de
+sus vecinos. Al apilar muchas capas, las representaciones de nodos distintos se vuelven cada
+vez más parecidas y el rendimiento cae, un fenómeno llamado sobresuavizado
+\cite{Residual2025Oversmoothing}. Por eso las GNN que se usan en la práctica suelen tener pocas
+capas, entre dos y tres, como en esta tesis.
+
+\textbf{Campo receptivo.} Una consecuencia útil de la estructura por capas es que la predicción
+de un nodo en una GNN de $L$ capas solo depende de su vecindario a $L$ saltos. Ese subgrafo
+receptivo contiene toda la información que el modelo usa para esa predicción, de modo que una
+explicación puede calcularse sobre él sin perder nada.
+
+\textbf{Dispersión.} En grafos de transacciones la mayoría de los nodos tiene muy pocas aristas.
+Un grafo disperso limita lo que la agregación de vecinas puede aportar y, como se verá, también
+lo que un explicador de aristas puede decir.
+
 \section{Desbalance de clases}\label{sec:desbalance}
 
 Cuando una clase es mucho más frecuente que otra, la pérdida promedio está dominada por la
@@ -81,7 +126,11 @@ Sobre los datos, se puede submuestrear la clase mayoritaria o sobremuestrear la 
 SMOTE \cite{Chawla2002SMOTE} genera ejemplos sintéticos de la clase minoritaria interpolando
 entre un ejemplo y uno de sus vecinos más cercanos de la misma clase:
 $\tilde{\mathbf{x}} = \mathbf{x}_i + \lambda(\mathbf{x}_j - \mathbf{x}_i)$, con
-$\lambda \sim \mathcal{U}(0, 1)$.
+$\lambda \sim \mathcal{U}(0, 1)$. En un grafo, el ejemplo sintético necesita además una posición en la
+estructura; una opción sencilla es que herede las aristas del ejemplo a partir del cual se
+generó. Las revisiones sobre clasificación de nodos desbalanceada agrupan los métodos en los que
+actúan sobre los datos, como el sobremuestreo y el submuestreo, y los que actúan sobre el
+algoritmo, como la reponderación de la pérdida \cite{ERA2026Imbalanced}.
 
 Sobre la pérdida, sea $p_i$ la probabilidad que el modelo asigna a la clase verdadera del
 ejemplo $i$. La entropía cruzada sin ajuste es $\mathcal{L} = -\frac{1}{n}\sum_i \log p_i$.
@@ -102,14 +151,35 @@ clase. Con $\alpha = 0{,}75$ para la clase rara y $0{,}25$ para la frecuente, un
 ilícito pesa tres veces lo que uno negativo, mientras que con pesos por clase y una razón de
 41 a 1 pesa 41 veces más.
 
-\textbf{Métricas bajo desbalance.} La exactitud no sirve: con un 2~\% de ilícitas, predecir
-siempre la clase negativa da un 98~\% de aciertos. La curva ROC relaciona la tasa de
-verdaderos positivos con la de falsos positivos, y como esta última se divide por el número
-enorme de negativos, puede verse alta aunque las falsas alarmas superen con creces a los
-aciertos. La curva de precisión y exhaustividad sí refleja ese costo, y su área (PR-AUC) tiene
-como referencia del azar la prevalencia de la clase positiva \cite{Saito2015PR}. El
-coeficiente de correlación de Matthews resume la matriz de confusión completa y es más
-informativo que el F1 bajo desbalance \cite{Chicco2020MCC}.
+\section{Métricas de rendimiento bajo desbalance}\label{sec:metricas}
+
+Sea un umbral $\tau$ sobre la probabilidad estimada: una transacción se clasifica como ilícita
+si $f(\mathbf{x}) \geq \tau$. Con los verdaderos positivos (VP), falsos positivos (FP),
+verdaderos negativos (VN) y falsos negativos (FN) se definen la precisión, la exhaustividad
+(\textit{recall}) y la tasa de falsos positivos:
+\begin{equation}
+  P = \frac{\mathrm{VP}}{\mathrm{VP} + \mathrm{FP}}, \qquad
+  R = \frac{\mathrm{VP}}{\mathrm{VP} + \mathrm{FN}}, \qquad
+  \mathrm{TFP} = \frac{\mathrm{FP}}{\mathrm{FP} + \mathrm{VN}},
+\end{equation}
+y a partir de ellas el F1 y el coeficiente de correlación de Matthews:
+\begin{equation}
+  F_1 = \frac{2PR}{P + R}, \qquad
+  \mathrm{MCC} = \frac{\mathrm{VP}\cdot\mathrm{VN} - \mathrm{FP}\cdot\mathrm{FN}}
+  {\sqrt{(\mathrm{VP}+\mathrm{FP})(\mathrm{VP}+\mathrm{FN})(\mathrm{VN}+\mathrm{FP})(\mathrm{VN}+\mathrm{FN})}}.
+\end{equation}
+El MCC usa las cuatro celdas de la matriz de confusión y solo es alto si el clasificador acierta
+en las dos clases, por lo que es más informativo que el F1 y la exactitud bajo desbalance
+\cite{Chicco2020MCC}.
+
+Las métricas anteriores dependen del umbral. Las curvas resumen todos los umbrales a la vez. La
+curva ROC grafica $R$ frente a $\mathrm{TFP}$, y la curva de precisión y exhaustividad grafica
+$P$ frente a $R$. Sus áreas, ROC-AUC y PR-AUC, valen 1 para un clasificador perfecto. Bajo un
+clasificador al azar, el ROC-AUC vale 0,5 y el PR-AUC vale la prevalencia $\pi$ de la clase
+positiva. La diferencia importa bajo desbalance: como la TFP se divide por el número enorme de
+negativos, un modelo puede tener una TFP de 0,05 y un ROC-AUC alto mientras produce muchas más
+falsas alarmas que aciertos; la precisión sí refleja ese costo \cite{Saito2015PR}. Por eso esta
+tesis usa el PR-AUC como métrica principal y lo compara siempre con la prevalencia.
 
 \section{Explicabilidad de modelos}\label{sec:xai}
 
@@ -175,6 +245,25 @@ equivalentes se parecen entre sí. En grafos, las evaluaciones sistemáticas han
 los explicadores difieren mucho entre sí y que su desempeño depende del conjunto de datos y de
 la arquitectura \cite{Agarwal2023Evaluating, Longa2024Explaining}.
 
+Cuando se conoce la explicación correcta, como en un grafo sintético construido con ese fin, la
+plausibilidad puede medirse como la coincidencia entre lo que señala el explicador y lo que de
+verdad define la clase, por ejemplo la fracción de las $k$ variables principales que pertenecen
+al conjunto verdadero. La fidelidad no necesita esa referencia: se mide cambiando la entrada
+según la explicación y observando la predicción. Si $f$ es la probabilidad de la clase predicha,
+$S$ el conjunto de elementos señalados (variables o aristas, según lo que explique el método),
+$\mathbf{x}_{\setminus S}$ la entrada sin esos elementos y $\mathbf{x}_{S}$ la entrada con solo
+ellos,
+\begin{equation}
+  \mathrm{fid}^{+} = f(\mathbf{x}) - f(\mathbf{x}_{\setminus S}), \qquad
+  \mathrm{fid}^{-} = f(\mathbf{x}) - f(\mathbf{x}_{S}).
+\end{equation}
+Una explicación fiel tiene un $\mathrm{fid}^{+}$ alto, porque quitar lo señalado cambia la
+predicción, y un $\mathrm{fid}^{-}$ bajo, porque lo señalado basta para sostenerla. Ambas se
+comparan con las que daría una explicación al azar del mismo tamaño. Esta tesis usa estas medidas
+solo en el eje sintético (Anexo \ref{anx:sintetico}), porque en Elliptic no hay una explicación
+de referencia y retirar variables de una transacción produce entradas fuera de la distribución
+de los datos.
+
 La estabilidad es una condición necesaria para usar una explicación como evidencia: si dos
 ejecuciones del mismo explicador sobre el mismo modelo y la misma transacción dan órdenes de
 importancia distintos, el analista no sabe a cuál creer. Pero no es suficiente. Un explicador
@@ -188,3 +277,71 @@ La correlación de Spearman \cite{Spearman1904} compara los órdenes completos d
 el índice de Jaccard \cite{Jaccard1912} compara los conjuntos de las $k$ variables más
 importantes. También se han propuesto métricas diseñadas específicamente para la estabilidad
 de las explicaciones \cite{Gawantka2024Explanations}.
+
+\section{Medidas de acuerdo entre explicaciones}\label{sec:acuerdo}
+
+Sean $\mathbf{a}, \mathbf{b} \in \mathbb{R}^d$ dos vectores de importancia sobre las mismas $d$
+variables, y $r(\mathbf{a})$ el vector de rangos de $\mathbf{a}$, con rangos medios en caso de
+empate.
+
+\textbf{Correlación de Spearman.} Es la correlación de Pearson entre los rangos
+\cite{Spearman1904}:
+\begin{equation}
+  \rho(\mathbf{a}, \mathbf{b}) = \frac{\operatorname{cov}\left(r(\mathbf{a}), r(\mathbf{b})\right)}
+  {\sigma_{r(\mathbf{a})}\,\sigma_{r(\mathbf{b})}}.
+\end{equation}
+Vale 1 si los dos órdenes coinciden, 0 si no tienen relación y $-1$ si están invertidos. Mira el
+orden completo, incluidas las variables menos importantes. Esto tiene una consecuencia que la
+tesis examina en detalle: si muchas variables reciben importancia cero en ambas explicaciones,
+empatan en los últimos rangos y aportan acuerdo aunque no digan nada sobre la predicción.
+
+\textbf{Índice de Jaccard de las $k$ principales.} Sea $T_k(\mathbf{a})$ el conjunto de las $k$
+variables de mayor importancia. El índice \cite{Jaccard1912}
+\begin{equation}
+  J_k(\mathbf{a}, \mathbf{b}) = \frac{|T_k(\mathbf{a}) \cap T_k(\mathbf{b})|}
+  {|T_k(\mathbf{a}) \cup T_k(\mathbf{b})|}
+\end{equation}
+vale 1 si las dos explicaciones señalan las mismas $k$ variables y 0 si no comparten ninguna. Si
+comparten $m$ variables, $J_k = m / (2k - m)$. Solo mira lo que un analista vería primero, y no
+depende del orden dentro del conjunto ni de las variables poco importantes.
+
+Las dos medidas se complementan. El Spearman es sensible a todo el orden y comparable con la
+literatura; el Jaccard se acerca más a cómo se usa una explicación en la práctica.
+
+\section{Pruebas estadísticas}\label{sec:pruebas}
+
+\textbf{Prueba de Friedman.} Compara $k$ tratamientos medidos sobre los mismos $n$ bloques sin
+suponer normalidad \cite{Friedman1937}. Dentro de cada bloque se ordenan los $k$ valores y se
+calcula el rango medio $\bar{R}_j$ de cada tratamiento. El estadístico
+\begin{equation}
+  \chi^2_F = \frac{12 n}{k(k+1)} \sum_{j=1}^{k} \left(\bar{R}_j - \frac{k+1}{2}\right)^2
+\end{equation}
+sigue aproximadamente una distribución $\chi^2$ con $k - 1$ grados de libertad bajo la hipótesis
+de que los tratamientos son iguales. El coeficiente de concordancia de Kendall,
+$W = \chi^2_F / (n(k-1))$, mide entre 0 y 1 cuán consistente es el orden de los tratamientos
+entre bloques.
+
+\textbf{Prueba de signos.} Para comparar dos condiciones sobre $n$ pares, cuenta en cuántos
+pares la primera supera a la segunda. Bajo la hipótesis de igualdad ese número sigue una
+distribución binomial con probabilidad 0,5. Es menos potente que la prueba de Wilcoxon
+\cite{Wilcoxon1945}, pero no supone nada sobre la magnitud de las diferencias, lo que conviene
+con pocos pares.
+
+\textbf{Equivalencia (TOST).} Una prueba de diferencias que no rechaza no demuestra que no haya
+efecto: puede que la muestra sea pequeña. La prueba de equivalencia de dos pruebas unilaterales
+invierte la pregunta: fija un margen $\delta$ por debajo del cual una diferencia se considera
+irrelevante y contrasta las hipótesis $H_{01}: \mu \leq -\delta$ y $H_{02}: \mu \geq \delta$.
+Si ambas se rechazan, la diferencia está dentro del margen \cite{Lakens2017TOST}.
+
+\textbf{Intervalos \textit{bootstrap}.} Remuestreando con reemplazo las unidades observadas y
+recalculando la media en cada remuestra se obtiene una aproximación a su distribución, de la que
+se toman los percentiles 2,5 y 97,5 como intervalo de confianza del 95~\% \cite{Efron1979Bootstrap}.
+
+\textbf{Pseudorreplicación.} Todas las pruebas anteriores suponen que las unidades son
+independientes. La pseudorreplicación consiste en tratar como independientes observaciones que
+no lo son, por ejemplo mediciones repetidas sobre el mismo sujeto, y conduce a contrastar el
+efecto con un término de error que no corresponde a la hipótesis \cite{Hurlbert1984}. Su
+consecuencia es inflar la significancia, y es un error frecuente aun en revistas de alto impacto
+\cite{Lazic2010}. En esta tesis la unidad que puede repetirse de forma independiente es el
+modelo entrenado con una semilla; los modelos de una misma semilla en distintos escenarios
+comparten su inicialización y sus hiperparámetros, y no son réplicas independientes.

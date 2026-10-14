@@ -1,3 +1,84 @@
 \chapter{Conclusiones}\label{cap:conclusiones}
 
-\textbf{[Por redactar después del Capítulo \ref{cap:resultados}.]}
+Esta tesis estudió la estabilidad de las explicaciones que producen cinco métodos de
+explicabilidad sobre redes neuronales de grafos entrenadas para detectar transacciones ilícitas
+en Elliptic, variando el nivel de desbalance de clases, la arquitectura y la técnica de
+compensación, con 216 modelos y tres semillas de modelo. Este capítulo responde las preguntas de
+investigación, resume los aportes y señala el trabajo futuro.
+
+\section{Respuestas a las preguntas de investigación}
+
+\textbf{¿Disminuye la estabilidad de las explicaciones a medida que el desbalance se hace más
+extremo?} Depende de la pérdida y del explicador. Con pesos por clase, la estabilidad de los
+cuatro explicadores de variables no muestra ninguna tendencia entre 1:10 y 1:200, y la
+diferencia entre el escenario real y el más extremo es menor que 0,05. Con \textit{focal loss}
+y, sobre todo, sin ajuste, la estabilidad de GNNExplainer baja con el desbalance con las tres
+medidas, a la par que baja el rendimiento de esos modelos. Shapley y Expected Gradients apenas
+responden. La hipótesis H1 se sostiene solo en parte: el desbalance afecta la estabilidad a
+través de la degradación del modelo, y una pérdida que lo compensa por completo evita el
+efecto.
+
+\textbf{¿Producen las distintas arquitecturas explicaciones con distinta estabilidad?} No entre
+las que aprenden. GraphSAGE, GAT y TAGCN quedan dentro de dos centésimas con la medida
+principal, sin un orden que se repita entre semillas ni entre particiones. GCN no aprende en
+este problema, porque la señal del fraude está en la propia transacción y GCN la promedia con
+sus vecinas, y aun así obtiene las explicaciones más estables. La hipótesis H2 no se sostiene.
+
+\textbf{¿Cambia la estabilidad según la técnica de compensación?} En la práctica no. La técnica
+de compensación es el factor que más cambia el rendimiento (la mejor pérdida depende del
+escenario y, con poco fraude, solo los pesos por clase mantienen la detección), pero mueve la
+estabilidad en milésimas o pocas centésimas, con un sentido que cambia según el explicador. La
+hipótesis H3 se sostiene.
+
+\textbf{¿Refleja la estabilidad lo que el modelo aprendió?} Con la correlación de Spearman sobre
+todas las variables, no: la explicación de un modelo entrenado se parece a la de una red sin
+entrenar casi tanto como dos réplicas entre sí, porque cerca de la mitad de las variables de
+cada transacción vale cero y todos los explicadores la dejan al final del orden. Las diez
+variables principales, en cambio, sí dependen del modelo, y varían más entre semillas del
+entrenamiento que entre niveles de desbalance.
+
+\section{Aportes}
+
+\begin{enumerate}
+  \item \textbf{Evidencia sobre la estabilidad de explicaciones de GNN en un problema real de
+        lavado de dinero}, con un diseño factorial replicado y pruebas que respetan la unidad
+        independiente: la arquitectura no determina la estabilidad, y el desbalance solo la
+        reduce cuando la pérdida no lo compensa y a través de la degradación del modelo.
+  \item \textbf{Un artefacto de medida y su corrección.} El bloque de variables nulas infla la
+        correlación de Spearman entre explicaciones. La tesis lo cuantifica, propone dos medidas
+        que no dependen de él y muestra con un control de pesos aleatorios que la estabilidad
+        alta no garantiza que la explicación dependa del modelo.
+  \item \textbf{Una partición de Elliptic que recupera una prueba informativa}, y la evidencia de
+        que la partición habitual deja la prueba después del cierre del mercado, donde ningún
+        modelo supera al azar.
+  \item \textbf{Recomendaciones para auditar explicaciones}: acompañar la estabilidad de un
+        control de pesos aleatorios y de una medida sobre las variables principales, explicar
+        con varios modelos entrenados con semillas distintas, y documentar la elección del
+        explicador, que es lo que más cambia lo que ve el analista.
+\end{enumerate}
+
+\section{Trabajo futuro}
+
+\begin{itemize}
+  \item Medir la variación de las explicaciones entre modelos entrenados con distintas
+        submuestras en cada nivel de desbalance, para comprobar si el desbalance afecta la
+        estabilidad a través de la variabilidad del modelo y no del explicador.
+  \item Repetir el estudio en conjuntos de datos de transacciones donde la información de las
+        vecinas sea más decisiva, para ver si allí aparecen diferencias entre arquitecturas.
+  \item Estudiar explicaciones de consenso entre semillas y entre explicadores como forma de
+        producir explicaciones más reproducibles para un analista.
+  \item Evaluar explicadores de subgrafos o de caminos, más adecuados que los de aristas
+        individuales en un grafo tan disperso como Elliptic.
+  \item Sustituir el filtro de calidad basado en un umbral fijo por uno basado en el PR-AUC.
+\end{itemize}
+
+\section{Reflexión final}
+
+El objetivo de explicar un modelo de detección de lavado de dinero es que una persona pueda
+entender y defender una alerta. Esta tesis muestra que, antes de preguntar si una explicación es
+correcta, conviene preguntar si es del modelo. Una explicación puede repetirse con precisión y,
+aun así, decir más sobre los datos de entrada y sobre el método que la produjo que sobre lo que
+el modelo aprendió. Medirlo exige poco: una red sin entrenar como referencia y una medida que
+mire lo que el analista lee primero. Incorporarlo a la evaluación de explicaciones es, quizá, la
+lección más útil de este trabajo para quienes construyan sistemas explicables en entornos
+regulados.
