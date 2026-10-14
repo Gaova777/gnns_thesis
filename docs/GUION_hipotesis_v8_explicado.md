@@ -256,6 +256,25 @@ directa, sino a través de cuánto se degrada el modelo.
 estabilidad, ni con 1 por cada 200. Sin compensarlo, la estabilidad de GNNExplainer baja junto
 con el rendimiento del modelo, en las dos particiones.»
 
+**Antecedentes de la hipótesis (revisados en texto completo el 14-oct).** La lámina cita ahora
+los dos trabajos en los que se apoya la expectativa:
+
+- *Chen et al. (2024), datos de crédito:* LIME y SHAP pierden estabilidad a medida que crece el
+  desbalance; miden la variabilidad entre entrenamientos repetidos. Es la hipótesis que
+  contrastamos. (Su texto completo no se pudo leer: el sitio pide una verificación anti-robots;
+  lo dicho sale del resumen y de cómo lo describen Rai et al.)
+- *Rai et al. (2025), datos clínicos:* entrenan con 40 %, 30 %, 20 %, 10 %, 5 % y 1 % de casos y
+  miden cuánto se parecen las explicaciones a las de un modelo balanceado (Jaccard de las 10
+  principales, como nosotros). Ese parecido baja con el desbalance. **No es estabilidad entre
+  repeticiones**: ellos mismos lo distinguen de Chen et al.
+- *Alarab y Prakoonwit (2022), Elliptic:* con un bosque aleatorio, algunas técnicas de
+  remuestreo cambian la importancia de las variables por permutación; no todas (en el conjunto
+  de entrenamiento, ninguna de forma significativa).
+
+*Cómo compararlo:* «Coincide en parte. Vemos la misma dirección, pero solo cuando la pérdida no
+compensa el desbalance. Y, como en Alarab y Prakoonwit, cambiar de escenario mueve algo las
+variables señaladas: con la misma semilla se conservan unas 6 de las 10 principales.»
+
 ---
 
 ## Lámina 17. Hipótesis 1: por qué
@@ -529,8 +548,18 @@ las variables de una transacción vale cero, y los explicadores siempre las deja
 - El 46 % de las variables vale 0 después del escalado. Solo ese bloque ya da 0,74 a 0,82.
 - Con medidas que no se inflan, GNNExplainer baja a 0,75 y a 0,63.
 - Es la prueba de Adebayo et al. (2018).
+- **Lo que ya se sabía (texto completo revisado el 14-oct).** Adebayo et al. muestran que el
+  resultado depende de cómo se compara: con Integrated Gradients, el Spearman sobre la
+  importancia en valor absoluto sigue alto después de aleatorizar los pesos, y sin valor
+  absoluto cae a cero. Nosotros comparamos en valor absoluto en los cuatro explicadores (está en
+  el código y ahora en la Metodología). Agarwal et al. (2023), con grafos sintéticos y otra
+  definición de estabilidad (frente a perturbaciones mínimas de la entrada), encuentran que la
+  estabilidad de las explicaciones sobre variables se parece a la de explicaciones aleatorias.
 
 **Si preguntan.**
+- *¿Esto ya se sabía?* En parte, y eso lo refuerza: Adebayo lo vio en imágenes y Agarwal en
+  grafos sintéticos. Lo nuevo es medirlo en un problema real de lavado y encontrar la causa
+  concreta, el bloque de variables en cero.
 - *¿Entonces la tesis está mal?* No. La hipótesis 1 se sostiene con las tres medidas. En las
   hipótesis 2 y 3 las diferencias crecen con la medida exigente y su sentido depende del
   explicador. Lo que cambia es qué tanto se puede concluir de una estabilidad alta, que es
@@ -629,6 +658,18 @@ veces por encima. La caída no era de los modelos: era del cambio del mercado.
 | GAT | 0,005 | 0,17 | 0,48 | 0,85 |
 | GCN | 0,012 | 0,09 | 0,60 | 0,73 |
 | Azar | 0,006 | 0,023 | 0,50 | 0,50 |
+
+**Si preguntan.**
+- *Otros reportan exactitudes de 0,98 o 0,99 en Elliptic; ¿por qué ustedes tienen PR-AUC de
+  0,3?* Miden otra tarea. Alarab y Prakoonwit (2023) y Lin et al. (2026) clasifican lícitas
+  frente a ilícitas entre las transacciones etiquetadas (una ilícita por cada nueve) y reportan
+  exactitud y F1, que bajo desbalance engañan. Además, Alarab y Prakoonwit usan como variables
+  el número de vecinas lícitas e ilícitas de cada transacción, o sea etiquetas de las vecinas,
+  y Lin et al. reparten los nodos al azar, sin orden temporal. Nosotros tratamos las sin
+  etiqueta como negativas (1 por cada 41) y respetamos el tiempo. Por eso no decimos que
+  nuestros modelos sean peores ni mejores.
+- *¿Alarab no resolvió el cierre del mercado?* Reporta F1 superior a 0,80 en el paso 43, pero
+  gracias a las etiquetas de las vecinas, que supone conocer en el momento de predecir.
 
 ### Láminas 36 y 37. Las curvas con el desbalance real, sin el cierre
 
@@ -736,18 +777,28 @@ dos niveles, frente a 0,010 con todo el fraude. El azar es 0,006.
 | «GAT es la más estable» o cualquier orden entre redes | El orden cambia con el explicador: GraphSAGE con GNNExplainer, GAT con Shapley. |
 | «La forma de compensar el desbalance no afecta la estabilidad» | Afecta unas centésimas, y en sentido contrario en GNNExplainer y en Shapley. |
 | «El desbalance no afecta la estabilidad» (sin más) | Solo con pesos por clase. Sin ajuste, la de GNNExplainer baja con el desbalance en las dos particiones (p < 0,001); con focal loss, solo sin el cierre. |
+| «Lawal y colegas mostraron que pesos por clase y focal loss no estabilizan el modelo» | Lo dice su resumen, pero su texto no presenta esos resultados (y su prueba tiene 8 nodos). No citarlo para eso. |
+| «Rai y colegas midieron la estabilidad bajo desbalance» | Midieron el parecido con un modelo balanceado, no la repetición. |
+| «Nuestros modelos rinden peor que los publicados (0,98)» | Es otra tarea, otra partición y otra métrica. |
+| «Alarab y Prakoonwit mostraron que el remuestreo cambia las variables» (sin más) | Solo con algunas técnicas y en uno de los dos conjuntos. |
 | «Friedman da p = 0,0001 entre arquitecturas» | Ese valor trata como independientes modelos casi idénticos. Solo hay 3 semillas independientes. |
 
 ## Referencias
 
 - Adebayo, J. et al. (2018). Sanity checks for saliency maps. NeurIPS.
+- Agarwal, C. et al. (2023). Evaluating explainability for graph neural networks. Scientific Data, 10, 144.
+- Alarab, I. y Prakoonwit, S. (2022). Effect of data resampling on feature importance in imbalanced blockchain data. Data Science and Management, 5(2), 66-76.
+- Alarab, I. y Prakoonwit, S. (2023). Robust recurrent graph convolutional network approach based sequential prediction of illicit transactions in cryptocurrencies. Multimedia Tools and Applications, 83, 58449-58464.
 - Cawley, G. y Talbot, N. (2010). On over-fitting in model selection and subsequent selection bias in performance evaluation. JMLR, 11, 2079-2107.
+- Chen, Y. et al. (2024). Interpretable machine learning for imbalanced credit scoring datasets. European Journal of Operational Research, 312(1), 357-372.
 - Chawla, N. et al. (2002). SMOTE: synthetic minority over-sampling technique. JAIR, 16, 321-357.
 - Elkan, C. (2001). The foundations of cost-sensitive learning. IJCAI.
 - Erion, G. et al. (2021). Improving performance of deep learning models with axiomatic attribution priors and expected gradients. Nature Machine Intelligence, 3, 620-631.
 - Krishna, S. et al. (2022). The disagreement problem in explainable machine learning: a practitioner's perspective. arXiv:2202.01602.
 - Lakens, D. (2017). Equivalence tests: a practical primer. Social Psychological and Personality Science, 8(4), 355-362.
+- Lin, Z. et al. (2026). Detecting illicit transactions in bitcoin: a wavelet-temporal graph transformer approach for anti-money laundering. Scientific Reports.
 - Lin, T.-Y. et al. (2017). Focal loss for dense object detection. ICCV.
+- Rai, T. et al. (2025). Evaluating XAI techniques under class imbalance using CPRD data. Frontiers in Artificial Intelligence, 8, 1682919.
 - Saito, T. y Rehmsmeier, M. (2015). The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets. PLoS ONE.
 - Sundararajan, M. et al. (2017). Axiomatic attribution for deep networks. ICML.
 - Weber, M. et al. (2019). Anti-money laundering in Bitcoin: experimenting with graph convolutional networks for financial forensics. arXiv:1908.02591.

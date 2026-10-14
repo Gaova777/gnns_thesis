@@ -47,6 +47,8 @@ REF = dict(
     adebayo="Adebayo, J. et al. (2018). Sanity checks for saliency maps. NeurIPS.",
     bergstra="Bergstra, J. et al. (2011). Algorithms for hyper-parameter optimization. NeurIPS.",
     weber="Weber, M. et al. (2019). Anti-money laundering in Bitcoin: experimenting with graph convolutional networks. arXiv:1908.02591.",
+    tabular="Chen, Y. et al. (2024). Interpretable ML for imbalanced credit scoring datasets. EJOR, 312(1) · Rai, T. et al. (2025). XAI under class imbalance. Front. Artif. Intell., 8.",
+    agarwal="Adebayo, J. et al. (2018). Sanity checks for saliency maps. NeurIPS · Agarwal, C. et al. (2023). Evaluating explainability for graph neural networks. Scientific Data, 10, 144.",
     yuan="Yuan, H. et al. (2023). Explainability in graph neural networks: a taxonomic survey. IEEE TPAMI, 45(5), 5782-5799.",
 )
 
@@ -542,10 +544,10 @@ if _fc.exists() and _fr.exists() and len(pd.read_csv(_fc)) == 48:
         'diferencias crecen con la medida exigente y dependen del explicador.</p></div>',
         "Tabla 4. Escenario con el desbalance real, pesos por clase, 4 arquitecturas, 3 semillas. "
         "Estabilidad entre repeticiones y acuerdo: Spearman sobre las 165 variables, 30 nodos.",
-        REF["adebayo"],
+        REF["agarwal"],
         [("Validez de la medida", "J", "Nos preguntó por qué todo salía estable. Para responder hicimos la prueba que propone Adebayo: explicar la misma arquitectura con los pesos entrenados y con pesos al azar, sin entrenar, sobre los mismos nodos."),
          ("Clic 1 · el control", "J", "Si la estabilidad dependiera de lo que el modelo aprendió, con pesos al azar debería caer. No cae: la red sin entrenar da prácticamente la misma cifra. Y la explicación del modelo entrenado se parece mucho a la de la red al azar."),
-         ("Clic 2 · la causa", "J", "La causa está en los datos. Después del escalado, casi la mitad de las variables de un nodo vale exactamente cero, porque son iguales a su mediana. Por la forma en que se calcula cada explicador, una variable en cero recibe importancia cero. Entonces casi media lista queda siempre al fondo, y solo eso ya da una correlación de 0,74 a 0,82."),
+         ("Clic 2 · la causa", "J", "La causa está en los datos. Después del escalado, casi la mitad de las variables de un nodo vale exactamente cero, porque son iguales a su mediana. Por la forma en que se calcula cada explicador, una variable en cero recibe importancia cero. Entonces casi media lista queda siempre al fondo, y solo eso ya da una correlación de 0,74 a 0,82. No es algo solo nuestro: Adebayo ya mostró que, cuando se compara la importancia en valor absoluto, como hacemos nosotros, la correlación sigue alta aunque los pesos sean al azar. Y Agarwal y colegas encontraron, con grafos sintéticos, que la estabilidad de las explicaciones sobre variables se parece a la de explicaciones aleatorias."),
          ("Clic 3 · medidas que no se inflan", "J", "Por eso calculamos dos medidas más: la misma correlación solo sobre las variables distintas de cero, y cuántas de las diez variables más importantes coinciden. Con ellas el nivel baja de forma apreciable."),
          ("Clic 4 · qué cambia", "J", "Qué cambia en las hipótesis. H1 se sostiene con las tres medidas: el escenario no agrega nada a lo que ya mueve la semilla. En H2 y H3 las diferencias dejan de verse planas con las medidas nuevas, y las repetimos. Con GNNExplainer, pesos por clase es más estable que focal loss en los nueve modelos; con Shapley el orden se invierte. Y GraphSAGE queda por encima de las otras dos redes con GNNExplainer, pero no con Shapley. O sea que el efecto existe, es pequeño y depende del explicador."),
          ])
@@ -907,6 +909,16 @@ if (RP / "curvas/curvas_metricas_por_config.csv").exists():
          ("Clic 3 · lectura", "A", "La lectura honesta es esta: lo que la tesis afirma sobre la estabilidad no depende de cómo se partan los datos. Lo que afirmaba sobre cuál forma de compensar detecta mejor, sí depende, y lo decimos así."),
          ]))
 
+# H1 con antecedentes de la literatura (revisión del texto completo, 14-oct)
+set_ref(15, REF["tabular"])
+set_notas(15, [
+    ("la hipótesis 1", "J", "Primera hipótesis: el desbalance."),
+    ("Clic 1 · qué esperábamos", "J", "Esperábamos que, a más desbalance, las explicaciones fueran menos estables."),
+    ("Clic 2 · por qué", "J", "Porque con menos fraude para aprender, el modelo traza una frontera más frágil, y una explicación de algo frágil debería moverse más al repetirla. Y no era una idea nuestra: en datos de crédito, Chen y colegas encontraron que LIME y SHAP pierden estabilidad a medida que crece el desbalance, y en datos clínicos Rai y colegas, que las explicaciones se alejan de las de un modelo balanceado."),
+    ("Clic 3 · qué dio", "J", "Pero con pesos por clase la estabilidad sale igual en los cuatro escenarios: 0,928, 0,928, 0,929 y 0,931, con sus barras de incertidumbre. Todo cabe en el margen de cinco centésimas."),
+    ("Clic 4 · veredicto", "J", "No era lo esperado. La prueba de equivalencia confirma que son iguales, y con Shapley pasa lo mismo. La pregunta es por qué, y más adelante veremos que sin compensar el desbalance la historia cambia."),
+])
+
 # ═════════════════════════════════════════════════════════════════════════════
 # Resumen y plan
 # ═════════════════════════════════════════════════════════════════════════════
@@ -927,6 +939,13 @@ rep(24, '<span class="estado">Optimización completa cuando salga el candidato</
 rep(24, "<p>H1, H2 y H3 con las seis preguntas</p>",
     "<p>H1, H2 y H3 con las seis preguntas y su porqué</p><p>El efecto del explicador</p>")
 
+set_notas(23, [
+    ("Resumen", "J", "Las cuatro preguntas juntas."),
+    ("Clic 1 · la hipótesis 1", "J", "El desbalance solo cambia la estabilidad cuando la pérdida no lo compensa: sin ajuste, la de GNNExplainer baja con menos fraude; con pesos por clase no cambia. Va en la misma dirección que los estudios con datos tabulares, pero solo en ese caso."),
+    ("Clic 2 · la hipótesis 2", "J", "La arquitectura no la cambia entre las que aprenden; GCN no aprende porque mezcla la transacción con sus vecinas sin darle un peso propio."),
+    ("Clic 3 · la hipótesis 3", "J", "La forma de compensar mueve la estabilidad unas centésimas, y en sentido distinto según el explicador; el casi cero de PGExplainer es una limitación del explicador."),
+    ("Clic 4 · calidad", "J", "Y estable no es correcto: una red sin entrenar da casi la misma estabilidad. Eso es lo que la tesis aporta, y coincide con lo que Adebayo y Agarwal vieron en otros datos."),
+])
 _n23 = S[23].count("Iguales las tres que aprenden; GCN no aprende")
 assert _n23 == 1, _n23
 S[23] = S[23].replace("Iguales las tres que aprenden; GCN no aprende",

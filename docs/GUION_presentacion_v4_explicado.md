@@ -619,7 +619,10 @@ Añadir al discurso:
 - **El límite de la medida.** El 46 % de las variables de las 30 transacciones vale 0 después
   del escalado. Solo ese bloque común ya da un Spearman de 0,74 a 0,82. Y una red sin entrenar
   da casi la misma estabilidad que la entrenada: GNNExplainer 0,95 y 0,93; Shapley 0,97 y 0,96
-  (prueba de Adebayo et al. 2018).
+  (prueba de Adebayo et al. 2018). Adebayo ya había visto que, al comparar la importancia en
+  valor absoluto (como hacemos), la correlación sigue alta aunque los pesos sean al azar, y
+  Agarwal et al. (2023) que la estabilidad de las explicaciones sobre variables se parece a la de
+  explicaciones aleatorias.
 - **Las dos medidas que no se inflan:** el Spearman solo sobre las variables distintas de 0, y
   la coincidencia de las 10 variables más importantes (índice de Jaccard). Con ellas
   GNNExplainer baja de 0,95 a 0,75 y a 0,63.
@@ -628,7 +631,8 @@ Añadir al discurso:
   alta, que es la tesis de fondo: estable no es lo mismo que correcto.
 
 Referencias de esta actualización: Adebayo, J. et al. (2018). Sanity checks for saliency maps.
-NeurIPS. Erion, G. et al. (2021). Improving performance of deep learning models with axiomatic
+NeurIPS. Agarwal, C. et al. (2023). Evaluating explainability for graph neural networks.
+Scientific Data, 10, 144. Erion, G. et al. (2021). Improving performance of deep learning models with axiomatic
 attribution priors and expected gradients. Nature Machine Intelligence, 3, 620-631.
 Sundararajan, M. et al. (2017). Axiomatic attribution for deep networks. ICML.
 

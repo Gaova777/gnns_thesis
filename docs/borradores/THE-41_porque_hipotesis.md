@@ -60,6 +60,12 @@ Es la prueba de aleatorización de parámetros de Adebayo et al. (2018): se expl
 arquitectura con los pesos entrenados y con pesos al azar, sobre los mismos 30 nodos. Si la
 medida dependiera de lo que el modelo aprendió, debería caer con pesos al azar.
 
+El propio artículo de Adebayo (texto completo revisado el 14-oct) muestra que el resultado
+depende de la comparación: con Integrated Gradients, el Spearman sobre valores absolutos sigue
+alto tras aleatorizar y sin valor absoluto cae a cero. Esta tesis compara en valor absoluto en
+los cuatro explicadores. Agarwal et al. (2023) encuentran, con otra definición de estabilidad,
+que la de las explicaciones sobre variables se parece a la de explicaciones aleatorias.
+
 Escenario nativo, pesos por clase, 4 arquitecturas, 3 semillas (48 combinaciones).
 
 | Explicador | Estabilidad, modelo entrenado | Estabilidad, red sin entrenar | Acuerdo entre ambas |
