@@ -29,7 +29,9 @@ El cierre del mercado en el paso 43 es un problema reconocido. Alarab y Prakoonw
 todos los algoritmos de aprendizaje han fallado en capturar ese evento con las variables
 originales de Elliptic, y proponen un modelo recurrente de grafos que hace predicciones
 secuenciales apoyándose en las transacciones etiquetadas más recientes
-\cite{Alarab2023Recurrent}. Ese enfoque supone que se dispone de etiquetas recientes durante la
+\cite{Alarab2023Recurrent}. Para ello añaden a cada transacción dos variables, el número de
+vecinas antecedentes lícitas y el de ilícitas, y con ellas reportan un F1 superior a 0,80 en el
+paso 43. Ese enfoque supone que se dispone de etiquetas recientes durante la
 operación, un supuesto distinto del de esta tesis, que separa estrictamente el entrenamiento de
 la evaluación. En el ámbito forense,
 Pocher et al. analizan cómo los métodos de aprendizaje automático y de análisis del grafo de
@@ -41,9 +43,12 @@ mayoría de los trabajos reporta el desempeño con la partición temporal habitu
 particiones aleatorias, y pocos discuten el efecto del cierre del mercado sobre la prueba. La
 segunda es que el desbalance de clases se trata como un obstáculo para el rendimiento. Lawal
 et al. examinan explícitamente las limitaciones de las GNN sobre Elliptic bajo ese
-desbalance, y muestran que un modelo puede lograr una exactitud alta en entrenamiento sin
-identificar de forma significativa las transacciones ilícitas, con y sin estrategias como los
-pesos por clase y la \textit{focal loss}, con un rendimiento que sigue siendo inestable; además muestran ejemplos de explicaciones con GNNExplainer \cite{Lawal2025Dataset}. Ninguno de estos trabajos mide qué ocurre con las
+desbalance. En su experimento, que trata las transacciones sin etiqueta como una tercera clase,
+el modelo alcanzó una exactitud del 100~\% en entrenamiento y validación, pero en la prueba,
+de ocho nodos, predijo la clase mayoritaria para todos \cite{Lawal2025Dataset}. Su resumen
+menciona pesos por clase, \textit{focal loss} y GNNExplainer, pero el texto no presenta
+resultados de esas variantes, por lo que aquí se cita solo como ejemplo de una exactitud
+engañosa. Ninguno de estos trabajos mide qué ocurre con las
 explicaciones cuando cambia el desbalance.
 
 \section{Explicabilidad en la detección de lavado de dinero}\label{sec:ea_xai_aml}
@@ -58,8 +63,13 @@ En el campo general de la explicabilidad de GNN, las taxonomías clasifican los 
 evaluaciones comparativas han mostrado que los explicadores discrepan entre sí. Agarwal et al.
 construyeron un generador de grafos sintéticos con explicaciones de referencia, capaz de
 variar el tamaño, la distribución de grados y la homofilia del grafo, y una biblioteca para
-evaluar explicadores sobre esos grafos y sobre grafos reales \cite{Agarwal2023Evaluating}. Longa et al. probaron 12 explicadores
-sobre 8 arquitecturas de paso de mensajes y 6 conjuntos de datos, y analizaron por qué unas
+evaluar explicadores sobre esos grafos y sobre grafos reales \cite{Agarwal2023Evaluating}.
+Entre sus medidas incluyen la estabilidad, entendida como el parecido entre la explicación de un
+grafo y la de una versión con perturbaciones mínimas, y encontraron que la estabilidad de las
+explicaciones sobre variables se parece más a la de explicaciones aleatorias que la de las
+explicaciones sobre nodos. Longa et al. probaron 12 explicadores
+sobre 8 arquitecturas de paso de mensajes y 6 conjuntos de datos, midiendo la plausibilidad y la
+fidelidad de las explicaciones, y analizaron por qué unas
 arquitecturas resultan más explicables que otras y qué explicador conviene en cada caso
 \cite{Longa2024Explaining}.
 
@@ -75,10 +85,23 @@ el modelo aprendió \cite{Adebayo2018Sanity}.
 
 La relación entre desbalance de clases y explicaciones se ha estudiado en datos tabulares. Rai
 et al. diseñaron un marco comparativo para evaluar la confiabilidad y la consistencia de LIME,
-SHAP y gráficos de dependencia parcial en la predicción del riesgo de cáncer de pulmón con historias clínicas electrónicas, comparando modelos entrenados con datos desbalanceados y balanceados \cite{Rai2025Evaluating}.
+SHAP y gráficos de dependencia parcial en la predicción del riesgo de cáncer de pulmón con
+historias clínicas electrónicas \cite{Rai2025Evaluating}. Entrenaron modelos con proporciones de
+casos del 40~\%, 30~\%, 20~\%, 10~\%, 5~\% y 1~\% y con la distribución original, y midieron la
+consistencia como el acuerdo, con el índice de Jaccard de las 10 variables principales y un
+acuerdo de rangos, entre las explicaciones de cada modelo y las de un modelo de referencia
+entrenado con datos balanceados. Esa consistencia baja a medida que aumenta el desbalance. Los
+autores distinguen expresamente su medida de la estabilidad entre entrenamientos repetidos que
+estudian Chen et al.
 Fujiwara et al. proponen combinar destilación de conocimiento y remuestreo para mejorar tanto
 el rendimiento como la estabilidad de las explicaciones en clasificación desbalanceada
-\cite{Fujiwara2024Stability}.
+\cite{Fujiwara2024Stability}. Sobre Elliptic, Alarab y Prakoonwit compararon técnicas de
+remuestreo con un bosque aleatorio entrenado sobre las transacciones etiquetadas, y midieron la
+importancia de las variables por permutación antes y después de remuestrear. Con la prueba de
+Wilcoxon encontraron cambios significativos solo con algunas técnicas y conjuntos: en la prueba
+de Elliptic, con SMOTE-SF ($p = 0{,}001$); en el entrenamiento, con ninguna
+\cite{Alarab2022Resampling}. Ese trabajo examina si cambian las variables importantes, no la
+estabilidad de la explicación al repetirla.
 
 El trabajo más cercano a la pregunta de esta tesis es el de Chen et al. sobre calificación
 crediticia. Partiendo de que la investigación sobre desbalance se había concentrado en su
@@ -103,9 +126,12 @@ desbalance de forma controlada.
 \begin{table}[ht]
 \centering
 \caption{Trabajos relacionados según su cobertura de los cuatro rasgos que combina la tesis,
-de acuerdo con lo que declara el resumen de cada trabajo. \checkmark: lo declara; --: no lo
-declara. Desbalance controlado significa variar el nivel de desbalance, no solo la técnica que
-lo compensa.}
+según su texto completo, salvo Chen et al., Mammadov et al. y He et al., para los que se usó el
+resumen.
+\checkmark: lo hace; --: no lo hace. Desbalance controlado significa variar el nivel de
+desbalance, no solo la técnica que lo compensa. $^a$ Estabilidad frente a perturbaciones
+mínimas de la entrada. $^b$ Acuerdo con las explicaciones de un modelo balanceado, no entre
+réplicas.}
 \label{tab:ea}
 \small
 \begin{tabularx}{\textwidth}{Xcccc}
@@ -114,13 +140,14 @@ Trabajo & Grafos & Explicación & Estabilidad medida & Desbalance controlado \\
 \midrule
 Weber et al. \cite{Weber2019Elliptic} & \checkmark & -- & -- & -- \\
 Alarab et al. \cite{Alarab2023Graph, Alarab2023Recurrent} & \checkmark & \checkmark & -- & -- \\
-Lawal et al. \cite{Lawal2025Dataset} & \checkmark & \checkmark & -- & -- \\
+Lawal et al. \cite{Lawal2025Dataset} & \checkmark & -- & -- & -- \\
+Alarab y Prakoonwit \cite{Alarab2022Resampling} & -- & \checkmark & -- & -- \\
 He et al. \cite{He2026Detection} & \checkmark & \checkmark & -- & -- \\
-Agarwal et al. \cite{Agarwal2023Evaluating} & \checkmark & \checkmark & -- & -- \\
+Agarwal et al. \cite{Agarwal2023Evaluating} & \checkmark & \checkmark & \checkmark$^a$ & -- \\
 Longa et al. \cite{Longa2024Explaining} & \checkmark & \checkmark & -- & -- \\
 Chen et al. \cite{Chen2023CreditImbalance} & -- & \checkmark & \checkmark & \checkmark \\
 Mammadov et al. \cite{TEM2026Stability} & -- & \checkmark & \checkmark & \checkmark \\
-Rai et al. \cite{Rai2025Evaluating} & -- & \checkmark & \checkmark & \checkmark \\
+Rai et al. \cite{Rai2025Evaluating} & -- & \checkmark & \checkmark$^b$ & \checkmark \\
 Esta tesis & \checkmark & \checkmark & \checkmark & \checkmark \\
 \bottomrule
 \end{tabularx}
@@ -130,7 +157,8 @@ Esta tesis & \checkmark & \checkmark & \checkmark & \checkmark \\
 
 De la revisión se desprende que (1) los trabajos sobre Elliptic se concentran en el
 rendimiento y tratan la explicación de forma cualitativa; (2) las evaluaciones sistemáticas de
-explicadores de GNN usan sobre todo grafos sintéticos o de otros dominios y no varían el
+explicadores de GNN usan sobre todo grafos sintéticos o de otros dominios, miden la estabilidad,
+cuando la miden, frente a perturbaciones de la entrada y no entre réplicas, y no varían el
 desbalance; y (3) los estudios sobre desbalance y explicaciones usan datos tabulares. No se
 encontró un estudio que mida la estabilidad de varios explicadores de GNN sobre un problema
 real de lavado de dinero mientras se controlan, en un diseño factorial con réplicas

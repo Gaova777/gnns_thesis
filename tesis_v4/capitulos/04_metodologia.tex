@@ -304,7 +304,8 @@ Shapley por muestreo, Integrated Gradients y Expected Gradients son implementaci
 \section{Medidas de estabilidad}\label{sec:medidas}
 
 Sea $\mathbf{a}^{(r)} \in \mathbb{R}^{165}$ el vector de importancias que la réplica $r$
-asigna a las variables de una transacción. La estabilidad de esa transacción es el promedio,
+asigna a las variables de una transacción. Las importancias se toman en valor absoluto en los
+cuatro explicadores de variables: interesa cuánto pesa cada variable, no su signo. La estabilidad de esa transacción es el promedio,
 sobre los $\binom{5}{2} = 10$ pares de réplicas, de una medida de acuerdo $s$:
 \begin{equation}
   E = \frac{1}{10} \sum_{r < r'} s\!\left(\mathbf{a}^{(r)}, \mathbf{a}^{(r')}\right),

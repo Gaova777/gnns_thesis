@@ -300,8 +300,9 @@ Lo que se explica sale directo de este mecanismo. Como la decisión usa **flujos
   pocos ejemplos para aprender dónde está la frontera entre lícito e ilícito. Una frontera
   aprendida con pocos ejemplos es frágil, y una explicación de algo frágil debería moverse más al
   repetirla.
-- Además hay antecedentes. Alarab y Prakoonwit (2022) mostraron en datos de blockchain que
-  remuestrear para corregir el desbalance cambia qué variables parecen importantes.
+- Además hay antecedentes. Alarab y Prakoonwit (2022) mostraron en Elliptic, con un bosque
+  aleatorio, que algunas técnicas de remuestreo cambian qué variables parecen importantes (no
+  todas: en el conjunto de entrenamiento ninguna lo hizo de forma significativa).
 - El dibujo es un **esquema**, no datos. Muestra las dos posibilidades antes de ver resultados:
   la línea que baja (la hipótesis) y la línea plana (sin efecto).
 - Se usa «≈1:40» y no «1:38,4» porque Cristian pidió un número genérico en esta lámina: el

@@ -15,8 +15,8 @@ La hipótesis H1 esperaba que, con menos ejemplos ilícitos en proporción, el m
 peor la clase rara y sus explicaciones sobre ella fueran menos estables. La literatura sobre
 datos tabulares apoyaba esa expectativa: Chen et al. encontraron que las explicaciones de LIME y
 SHAP pierden estabilidad a medida que aumenta el desbalance en datos de crédito
-\cite{Chen2023CreditImbalance}, y Rai et al. que el desbalance puede afectar de forma
-significativa la confiabilidad y la consistencia de LIME y SHAP en datos clínicos
+\cite{Chen2023CreditImbalance}, y Rai et al. que, en datos clínicos, las explicaciones de LIME y
+SHAP se parecen cada vez menos a las de un modelo balanceado a medida que aumenta el desbalance
 \cite{Rai2025Evaluating}. En Elliptic el resultado depende de la pérdida. Con \textit{focal
 loss} y sin ajuste, la estabilidad de GNNExplainer baja con el desbalance, en la dirección que
 encontraron esos estudios. Con pesos por clase no cambia. Cuatro razones, que no son
@@ -92,9 +92,9 @@ resultado. Esta observación es la que motivó el control de
 pesos aleatorios y la que sostiene la conclusión central de la tesis: la estabilidad, sola, no
 certifica que una explicación diga algo sobre lo aprendido.
 
-Longa et al. encontraron que la explicabilidad depende de la arquitectura en sus experimentos
-\cite{Longa2024Explaining}. Los resultados de esta tesis no contradicen ese hallazgo: se refieren
-solo a la estabilidad entre réplicas, y en un grafo en el que la estructura aporta poco a la
+Longa et al. encontraron que la explicabilidad, medida como plausibilidad y fidelidad, depende
+de la arquitectura en sus experimentos \cite{Longa2024Explaining}. Los resultados de esta tesis
+no contradicen ese hallazgo: se refieren a otra propiedad, la estabilidad entre réplicas, y en un grafo en el que la estructura aporta poco a la
 predicción. Es posible que en grafos donde la información de las vecinas es decisiva las
 diferencias entre arquitecturas se hagan visibles también en la estabilidad.
 
@@ -133,7 +133,14 @@ correlación de Spearman sobre las 165 variables, la explicación de un modelo e
 con la de una red sin entrenar casi tanto como dos réplicas sobre el mismo modelo. Es la misma
 situación que Adebayo et al. describieron para mapas de saliencia de imágenes, en los que
 explicaciones visualmente convincentes apenas cambiaban al aleatorizar los pesos
-\cite{Adebayo2018Sanity}.
+\cite{Adebayo2018Sanity}. Adebayo et al. observaron además que el resultado de esa prueba
+depende de la medida: con Integrated Gradients, la correlación de Spearman entre las
+atribuciones en valor absoluto seguía alta después de aleatorizar las capas superiores, mientras
+que sin valor absoluto caía a cero. Esta tesis compara importancias en valor absoluto, y lo que
+encuentra con el Spearman global es coherente con esa observación. Agarwal et al., con otra
+definición de estabilidad, también encontraron que la de las explicaciones sobre variables se
+parece más a la de explicaciones aleatorias que la de las explicaciones sobre nodos
+\cite{Agarwal2023Evaluating}.
 
 La causa, en este caso, es concreta y se puede cuantificar. Después del escalado, cerca del 44~\%
 de las variables de una transacción vale cero, y los cuatro explicadores de variables les
@@ -161,7 +168,8 @@ comparable porque la tarea, los datos o las métricas son distintos.
 \begin{table}[ht]
 \centering
 \caption{Resultados de la tesis frente a la literatura. Lo que se atribuye a cada trabajo se
-limita a lo que declara su resumen.}
+basa en su texto completo, salvo Chen et al., Mammadov et al., Fujiwara et al., He et al. y
+Vassallo et al., para los que se usó el resumen.}
 \label{tab:literatura}
 \scriptsize
 \renewcommand{\arraystretch}{1.25}
@@ -170,23 +178,29 @@ limita a lo que declara su resumen.}
 Trabajo & Qué reporta & Qué encontró esta tesis & Relación \\
 \midrule
 Weber et al. \cite{Weber2019Elliptic}; Alarab y Prakoonwit \cite{Alarab2023Recurrent} &
-Ningún modelo capta el cierre del mercado del paso 43 con las variables originales. &
+Con las variables originales, ningún modelo capta el cierre del mercado del paso 43. Alarab y
+Prakoonwit lo mejoran añadiendo como variables las etiquetas de las vecinas. &
 Con la prueba después del cierre, las cuatro arquitecturas quedan en el azar (PR-AUC entre 0,005
 y 0,012). & Coincide \\
 Alarab y Prakoonwit \cite{Alarab2023Recurrent}; Lin et al. \cite{Lin2026Detecting} &
-Exactitud de 0,98 a 0,99 y F1 de 0,92 a 0,98 sobre Elliptic. &
-PR-AUC de prueba de hasta 0,31 y ROC-AUC de hasta 0,90 sin el cierre. & No comparable: métricas
-distintas, que bajo desbalance no son equivalentes, y posiblemente otra definición de la tarea \\
-Lawal et al. \cite{Lawal2025Dataset} &
-Bajo el desbalance de Elliptic un modelo puede lograr exactitud alta sin identificar el fraude;
-pesos por clase y \textit{focal loss} no lo estabilizan del todo. &
-La técnica de compensación cambia mucho el rendimiento, y la mejor depende del escenario. &
-Coincide \\
+Exactitud de 0,98 a 0,99 y F1 de 0,92 a 0,98, clasificando lícitas frente a ilícitas;
+Alarab y Prakoonwit usan las etiquetas de las vecinas como variables, y Lin et al. una partición
+aleatoria estratificada. &
+PR-AUC de prueba de hasta 0,31 y ROC-AUC de hasta 0,90 sin el cierre, con las sin etiqueta como
+negativas y partición temporal. & No comparable: otra tarea, otra partición y otras métricas \\
 Chen et al. \cite{Chen2023CreditImbalance}; Rai et al. \cite{Rai2025Evaluating}; Mammadov et
 al. \cite{TEM2026Stability} &
-En datos tabulares, el desbalance reduce la estabilidad de LIME y SHAP. &
+En datos tabulares, con más desbalance las explicaciones de LIME y SHAP son menos estables
+entre entrenamientos (Chen et al.) y se parecen menos a las de un modelo balanceado (Rai et al.). &
 Con GNNExplainer la estabilidad baja con el desbalance sin ajuste y con \textit{focal loss}; con
-pesos por clase no cambia; Shapley casi no responde. & Coincide en parte \\
+pesos por clase no cambia; Shapley casi no responde. Entre escenarios con la misma semilla, las
+explicaciones de GNNExplainer comparten más variables principales (Jaccard top-10 de 0,60) que
+entre semillas (0,30). & Coincide en parte \\
+Alarab y Prakoonwit \cite{Alarab2022Resampling} &
+En Elliptic, con un bosque aleatorio, algunas técnicas de remuestreo cambian la importancia de
+las variables por permutación, pero no todas ni en los dos conjuntos. &
+Entre escenarios con la misma semilla, incluido el de SMOTE, GNNExplainer conserva unas 6 de sus
+10 variables principales. & Coincide en parte \\
 Fujiwara et al. \cite{Fujiwara2024Stability} &
 El remuestreo puede reducir la estabilidad de las explicaciones; la destilación la mejora. &
 Submuestrear negativas o añadir ilícitas con SMOTE no redujo la estabilidad con pesos por clase.
@@ -198,21 +212,26 @@ Coincide \\
 Adebayo et al. \cite{Adebayo2018Sanity} &
 Algunas explicaciones de imágenes apenas cambian al aleatorizar los pesos. &
 Con Spearman global, la explicación de la red entrenada y la de una sin entrenar coinciden casi
-como dos réplicas; con el Jaccard top-10, no. & Coincide, con un matiz de medida \\
+como dos réplicas; con el Jaccard top-10, no. & Coincide, también en que depende de la medida \\
 Longa et al. \cite{Longa2024Explaining} &
-La explicabilidad depende de la arquitectura y del explicador. &
+La plausibilidad y la fidelidad dependen de la arquitectura y del explicador. &
 La estabilidad no depende de la arquitectura entre las que aprenden; el explicador sí cambia
-qué variables se señalan. & Coincide en el explicador; difiere en la arquitectura \\
+qué variables se señalan. & Coincide en el explicador; en la arquitectura miden otra propiedad \\
 Zheng et al. \cite{Zheng2026Heterophily} &
-La heterofilia limita a las GNN que suponen homofilia. &
-Una ilícita tiene en su mayoría vecinas negativas; GCN, que no da peso propio al nodo, no
-aprende. & Coincide \\
+La heterofilia limita a las GNN que suponen homofilia; en fraude, los defraudadores se conectan
+sobre todo con clientes legítimos. Separar la representación del nodo de la de sus vecinas es
+una de las soluciones. &
+Una ilícita tiene en su mayoría vecinas negativas; GCN, que mezcla el nodo con sus vecinas
+sin separarlos, apenas aprende. & Coincide \\
 He et al. \cite{He2026Detection} &
 Marco explicable basado en TAGCN para transacciones ilícitas. &
 TAGCN rinde entre las mejores, pero sus explicaciones no son más estables. & Complementa \\
 Agarwal et al. \cite{Agarwal2023Evaluating} &
-Grafos sintéticos con explicación de referencia para medir la calidad de los explicadores. &
-En el eje sintético, el explicador más estable no es el más plausible. & Complementa \\
+Con grafos sintéticos, la estabilidad frente a perturbaciones de las explicaciones sobre
+variables se parece a la de explicaciones aleatorias. &
+Con Spearman global, la estabilidad entre réplicas es casi igual al acuerdo con una red sin
+entrenar; en el eje sintético, el explicador más estable no es el más plausible. & Coincide, con
+otra definición de estabilidad \\
 Vassallo et al. \cite{Vassallo2021Boosting} &
 Una adaptación de XGBoost reduce el impacto del cambio de concepto. &
 La tesis evita el cambio con la partición en lugar de adaptarse a él. & Enfoque distinto \\
@@ -225,13 +244,15 @@ Tres de estas comparaciones merecen comentario.
 \textbf{El rendimiento no es comparable con las cifras publicadas sobre Elliptic.} Varios
 trabajos reportan exactitudes cercanas a 0,99 y F1 superiores a 0,90
 \cite{Alarab2023Recurrent, Lin2026Detecting}. Las cifras de esta tesis son mucho menores, pero
-pueden medir otra cosa. Esta tesis trata las 157.205 transacciones sin etiqueta como negativas,
-lo que da una razón de 41 a 1, mientras que en el trabajo original sobre Elliptic se clasifican
-solo las transacciones etiquetadas, con una razón cercana a 9 a 1 \cite{Weber2019Elliptic}; los
-resúmenes de los trabajos citados no precisan qué definición usan. Además, bajo un desbalance fuerte la
-exactitud y el F1 pueden ser engañosos \cite{Chicco2020MCC, Saito2015PR}, y Lawal et al. muestran
-que en Elliptic un modelo puede tener una exactitud alta sin identificar de forma significativa
-el fraude \cite{Lawal2025Dataset}. Por eso esta tesis no afirma que sus modelos sean peores ni
+miden otra cosa. Esta tesis trata las 157.205 transacciones sin etiqueta como negativas, lo que
+da una razón de 41 a 1. Los dos trabajos citados, como el original sobre Elliptic
+\cite{Weber2019Elliptic}, plantean la tarea como lícitas frente a ilícitas entre las
+transacciones etiquetadas, con una razón cercana a 9 a 1; Lin et al. declaran expresamente que
+excluyen las transacciones sin etiqueta. Además, Alarab y Prakoonwit añaden como variables el número de vecinas lícitas e ilícitas
+de cada transacción, que supone conocer las etiquetas de las vecinas en el momento de
+predecir, y Lin et al. reparten los nodos etiquetados al azar entre entrenamiento, validación y
+prueba, sin respetar el orden temporal. Bajo un desbalance fuerte, además, la exactitud y el F1
+pueden ser engañosos \cite{Chicco2020MCC, Saito2015PR}. Por eso esta tesis no afirma que sus modelos sean peores ni
 mejores que los publicados: afirma que, en la tarea más cercana a la operación real, las tres
 arquitecturas que aprenden detectan el fraude entre 7 y 12 veces mejor que el azar en un periodo
 posterior al de entrenamiento.

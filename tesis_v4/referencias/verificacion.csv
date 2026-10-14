@@ -72,6 +72,7 @@ Hurlbert1984,10.2307/1942661,aceptada,journal-article,1984,Ecological Monographs
 Lazic2010,10.1186/1471-2202-11-5,aceptada,journal-article,2010,BMC Neuroscience,The problem of pseudoreplication in neuroscientific studies: is it affecting your analysis?,pseudorreplicación
 Bronstein2017Geometric,10.1109/MSP.2017.2693418,aceptada,journal-article,2017,IEEE Signal Processing Magazine,Geometric Deep Learning: Going beyond Euclidean data,aprendizaje geométrico
 LeCun2015DeepLearning,10.1038/nature14539,aceptada,journal-article,2015,Nature,Deep learning,aprendizaje profundo
+Alarab2022Resampling,10.1016/j.dsm.2022.04.003,aceptada,journal-article,2022,Data Science and Management,Effect of data resampling on feature importance in imbalanced blockchain data: comparison studies of resampling techniques,remuestreo e importancia de variables en Elliptic
 Kipf2017GCN,,excepción (URL 200),,,,https://arxiv.org/abs/1609.02907,método o dataset usado
 Hamilton2017GraphSAGE,,excepción (URL 200),,,,https://papers.nips.cc/paper/6703-inductive-representation-learning-on-large-graphs,método o dataset usado
 Velickovic2018GAT,,excepción (URL 200),,,,https://arxiv.org/abs/1710.10903,método o dataset usado
