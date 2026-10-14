@@ -13,7 +13,8 @@ extremo?} Depende de la pérdida y del explicador. Con pesos por clase, la estab
 cuatro explicadores de variables no muestra ninguna tendencia entre 1:10 y 1:200, y la
 diferencia entre el escenario real y el más extremo es menor que 0,05. Con \textit{focal loss}
 y, sobre todo, sin ajuste, la estabilidad de GNNExplainer baja con el desbalance con las tres
-medidas, a la par que baja el rendimiento de esos modelos. Shapley y Expected Gradients apenas
+medidas, a la par que baja el rendimiento de esos modelos; la caída sin ajuste se repite en la
+partición original, la de \textit{focal loss} no. Shapley y Expected Gradients apenas
 responden. La hipótesis H1 se sostiene solo en parte: el desbalance afecta la estabilidad a
 través de la degradación del modelo, y una pérdida que lo compensa por completo evita el
 efecto.

@@ -29,6 +29,9 @@ y sus conclusiones generales se repiten en las dos corridas:
         las tres arquitecturas que aprenden, el Spearman global fue 0,946, 0,947, 0,946 y
         0,947 en 1:10, 1:10 con SMOTE, 1:20 y nativo, y 0,940 y 0,938 en 1:100 y 1:200. La
         prueba de Friedman sobre los seis escenarios no rechazó la igualdad ($p = 0{,}84$).
+  \item Sin ajuste, la estabilidad de GNNExplainer baja con el desbalance en las dos
+        particiones (en esta, de 0,930 en 1:10 a 0,901 en 1:200, $p < 0{,}001$). Con
+        \textit{focal loss}, en esta partición no baja ($p \geq 0{,}29$).
   \item GCN es la arquitectura más débil en las dos particiones.
   \item Con poco fraude (1:100 y 1:200) solo los pesos por clase mantienen la detección.
   \item El control de pesos aleatorios dio, sobre 12 modelos, un acuerdo entre la explicación

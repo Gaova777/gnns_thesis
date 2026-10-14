@@ -97,7 +97,7 @@ Todo lo que sigue se reporta con las tres.
 
 ---
 
-## 2. H1: el nivel de desbalance no cambia la estabilidad
+## 2. H1: el nivel de desbalance no cambia la estabilidad con pesos por clase (y sí sin ajuste)
 
 ### 2.1 Qué se observó
 
@@ -207,6 +207,32 @@ la decisión de diseño de no tocar las ilícitas. En 1:100 y 1:200 tampoco se r
 estabilidad entre réplicas, pero esa medida no distingue un modelo que aprendió de uno que no
 (sección 1.3). Lo que sí registra el desbalance severo es el rendimiento y el acuerdo con el
 modelo nativo: el modelo aprende menos y señala otras variables.
+
+### 2.6 Por forma de compensar (actualización del 14-oct)
+
+**Actualización del 14-oct: H1 depende de la forma de compensar.** Lo anterior vale para pesos
+por clase. Al repetir la prueba para cada forma de compensar (GraphSAGE, GAT y TAGCN; 3 semillas;
+6 niveles; prueba de Friedman), GNNExplainer da:
+
+| GNNExplainer | Sin el cierre (corrida principal) | Partición original |
+|---|---|---|
+| Pesos por clase | no cambia (p ≥ 0,12 con las tres medidas) | no cambia (p ≥ 0,22) |
+| Focal loss | baja: 0,923 → 0,909 del real a 1:200 (p = 0,010); top-10 0,623 → 0,561 (p = 0,035) | no cambia (p ≥ 0,29) |
+| Sin ajuste | baja: 0,942 en 1:10 → 0,889 en 1:200 (p < 0,001); top-10 0,589 → 0,502 | baja: 0,930 → 0,901 (p < 0,001); top-10 0,590 → 0,505 |
+
+Shapley y Expected Gradients casi no responden (diferencias de milésimas). Lo que se repite en
+las dos particiones es la caída **sin ajuste**; la de focal loss solo aparece sin el cierre.
+
+*Por qué:* sin ajuste, a más desbalance el fraude pesa menos en la pérdida, el modelo se degrada
+hasta marcar casi todo como no fraude, y GNNExplainer, que optimiza una máscara sobre la salida de
+ese modelo, pierde estabilidad con él. Pesos por clase saca la proporción de la pérdida (cada
+clase pesa la mitad) y corta ese efecto. El desbalance no actúa sobre la explicación de forma
+directa, sino a través de cuánto se degrada el modelo.
+
+*Cómo decirlo:* «H1 se sostiene en parte. Con pesos por clase, el desbalance no cambia la
+estabilidad, ni con 1 por cada 200. Sin compensarlo, la estabilidad de GNNExplainer baja junto
+con el rendimiento del modelo, en las dos particiones.»
+
 
 ---
 
@@ -380,6 +406,7 @@ explicación sea correcta, ni siquiera que sea la misma si se reentrena el model
 | «El submuestreo solo desplaza el logit en log(1/β)» (Elkan 2001; Dal Pozzolo et al. 2015), como mecanismo observado | En los modelos sin ajuste el desplazamiento mediano entre nativo y 1:10 es de −0,4 a 0,2 (la teoría predice +1,34) y la correlación de puntajes es de 0,40 a 0,80. Vale como expectativa teórica para el clasificador óptimo, no como lo que pasó. |
 | «Entre escenarios el acuerdo es 0,99, más que entre semillas» | Compara modelos de la misma semilla, que son casi idénticos, contra una referencia de otra semilla. Ver 2.3. |
 | «Las tres arquitecturas se apoyan en las mismas variables» | Entre arquitecturas el Jaccard de las 10 variables más importantes es de 0,20 a 0,50: comparten de 3 a 7 de las 10. |
+| «El desbalance no afecta la estabilidad» (sin más) | Solo con pesos por clase. Sin ajuste, la de GNNExplainer baja con el desbalance en las dos particiones (p < 0,001); con focal loss, solo sin el cierre. |
 | «La estabilidad de 0,93 a 0,99 muestra que el modelo aprendió algo consistente» | Una red sin entrenar da casi la misma cifra. Ver 1.3. |
 
 ---

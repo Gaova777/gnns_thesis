@@ -951,6 +951,30 @@ existentes no enseña patrones que el modelo no hubiera visto ya.
 - **«Frontera frágil», con una analogía:** si aprendo a distinguir perros de gatos con dos fotos
   de gato, mi idea de «gato» es pobre y cualquier detalle me hace cambiar de opinión.
 
+**Actualización del 14-oct: H1 depende de la forma de compensar.** Lo anterior vale para pesos
+por clase. Al repetir la prueba para cada forma de compensar (GraphSAGE, GAT y TAGCN; 3 semillas;
+6 niveles; prueba de Friedman), GNNExplainer da:
+
+| GNNExplainer | Sin el cierre (corrida principal) | Partición original |
+|---|---|---|
+| Pesos por clase | no cambia (p ≥ 0,12 con las tres medidas) | no cambia (p ≥ 0,22) |
+| Focal loss | baja: 0,923 → 0,909 del real a 1:200 (p = 0,010); top-10 0,623 → 0,561 (p = 0,035) | no cambia (p ≥ 0,29) |
+| Sin ajuste | baja: 0,942 en 1:10 → 0,889 en 1:200 (p < 0,001); top-10 0,589 → 0,502 | baja: 0,930 → 0,901 (p < 0,001); top-10 0,590 → 0,505 |
+
+Shapley y Expected Gradients casi no responden (diferencias de milésimas). Lo que se repite en
+las dos particiones es la caída **sin ajuste**; la de focal loss solo aparece sin el cierre.
+
+*Por qué:* sin ajuste, a más desbalance el fraude pesa menos en la pérdida, el modelo se degrada
+hasta marcar casi todo como no fraude, y GNNExplainer, que optimiza una máscara sobre la salida de
+ese modelo, pierde estabilidad con él. Pesos por clase saca la proporción de la pérdida (cada
+clase pesa la mitad) y corta ese efecto. El desbalance no actúa sobre la explicación de forma
+directa, sino a través de cuánto se degrada el modelo.
+
+*Cómo decirlo:* «H1 se sostiene en parte. Con pesos por clase, el desbalance no cambia la
+estabilidad, ni con 1 por cada 200. Sin compensarlo, la estabilidad de GNNExplainer baja junto
+con el rendimiento del modelo, en las dos particiones.»
+
+
 ---
 
 ## Lámina 14. H1: por qué dio eso y en qué impacta
@@ -1232,8 +1256,9 @@ las diferencias que estamos comparando.
 
 **Qué decir**
 
-> Las cuatro preguntas juntas. El desbalance no cambia la estabilidad, porque el fraude es el
-> mismo y el modelo aprende parecido. La arquitectura no la cambia entre las que aprenden; GCN no
+> Las cuatro preguntas juntas. Con pesos por clase el desbalance no cambia la estabilidad,
+> porque el fraude es el mismo y el modelo aprende parecido; sin compensarlo, la de GNNExplainer
+> baja junto con el rendimiento (actualización del 14-oct en la lámina 13). La arquitectura no la cambia entre las que aprenden; GCN no
 > aprende porque diluye la señal de la propia transacción. La forma de compensar no la cambia; el
 > casi cero de PGExplainer es una limitación del explicador. Y estable no es correcto: eso es lo
 > que la tesis aporta.

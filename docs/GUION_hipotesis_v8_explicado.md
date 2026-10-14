@@ -25,8 +25,10 @@ se dice otra cosa.
 3. En lavado de dinero el fraude es muy escaso: en nuestros datos hay 1 transacción ilícita
    por cada 40. A eso se le llama **desbalance**. La pregunta de la tesis es si el desbalance,
    el tipo de red o la forma de compensar el desbalance vuelven inestables las explicaciones.
-4. Resultado: ninguno de los tres cambia la estabilidad de forma apreciable, ni siquiera con 1
-   fraude por cada 200.
+4. Resultado: el tipo de red no cambia la estabilidad, y la forma de compensar el desbalance
+   la mueve centésimas. El desbalance solo la reduce cuando no se compensa: con pesos por clase
+   no cambia ni con 1 fraude por cada 200; sin ajuste, la de GNNExplainer baja junto con el
+   rendimiento del modelo (actualización del 14-oct, lámina 16).
 5. Y el hallazgo que lo explica: **la estabilidad no dice si el modelo aprendió**. Una red sin
    entrenar da casi la misma cifra. Estable no es lo mismo que correcto.
 
@@ -231,6 +233,29 @@ encontramos diferencia», sino «la diferencia, si existe, es menor que 0,05» (
 - *¿No es raro esperar una cosa y obtener otra?* Es el resultado. La lámina siguiente explica
   por qué, y la 21 lo pone a prueba con un caso extremo.
 
+**Actualización del 14-oct: H1 depende de la forma de compensar.** Lo anterior vale para pesos
+por clase. Al repetir la prueba para cada forma de compensar (GraphSAGE, GAT y TAGCN; 3 semillas;
+6 niveles; prueba de Friedman), GNNExplainer da:
+
+| GNNExplainer | Sin el cierre (corrida principal) | Partición original |
+|---|---|---|
+| Pesos por clase | no cambia (p ≥ 0,12 con las tres medidas) | no cambia (p ≥ 0,22) |
+| Focal loss | baja: 0,923 → 0,909 del real a 1:200 (p = 0,010); top-10 0,623 → 0,561 (p = 0,035) | no cambia (p ≥ 0,29) |
+| Sin ajuste | baja: 0,942 en 1:10 → 0,889 en 1:200 (p < 0,001); top-10 0,589 → 0,502 | baja: 0,930 → 0,901 (p < 0,001); top-10 0,590 → 0,505 |
+
+Shapley y Expected Gradients casi no responden (diferencias de milésimas). Lo que se repite en
+las dos particiones es la caída **sin ajuste**; la de focal loss solo aparece sin el cierre.
+
+*Por qué:* sin ajuste, a más desbalance el fraude pesa menos en la pérdida, el modelo se degrada
+hasta marcar casi todo como no fraude, y GNNExplainer, que optimiza una máscara sobre la salida de
+ese modelo, pierde estabilidad con él. Pesos por clase saca la proporción de la pérdida (cada
+clase pesa la mitad) y corta ese efecto. El desbalance no actúa sobre la explicación de forma
+directa, sino a través de cuánto se degrada el modelo.
+
+*Cómo decirlo:* «H1 se sostiene en parte. Con pesos por clase, el desbalance no cambia la
+estabilidad, ni con 1 por cada 200. Sin compensarlo, la estabilidad de GNNExplainer baja junto
+con el rendimiento del modelo, en las dos particiones.»
+
 ---
 
 ## Lámina 17. Hipótesis 1: por qué
@@ -247,7 +272,8 @@ Acuerdo entre explicaciones: mismo nivel y otra semilla 0,940; otro nivel y otra
 
 **Si preguntan.**
 - *¿Entonces la hipótesis no podía fallar?* En ese rango y con pesos por clase, no. Por eso se
-  hizo el caso extremo de la lámina 21.
+  hizo el caso extremo de la lámina 21. Sin ajuste sí falla, porque la proporción entra en la
+  pérdida y el modelo se degrada (ver la actualización de la lámina 16).
 - *¿No dice la teoría que submuestrear solo desplaza el puntaje?* Es la expectativa teórica
   (Elkan 2001), pero en nuestros modelos sin ajuste no se observó. No lo afirmamos.
 
@@ -289,7 +315,8 @@ modelos. Validación y prueba final no cambian. Se entrenaron 72 modelos: 2 nive
 **Qué decir.** Estas son las curvas con 1 fraude por cada 100 y por cada 200. Miren la curva
 azul, sin ajuste: en GraphSAGE y en TAGCN queda pegada al azar; el modelo ya no aprende. Con
 pesos por clase, la naranja, GraphSAGE todavía llega a 0,37 y 0,36. Con tan poco fraude,
-compensar el desbalance deja de ser opcional.
+compensar el desbalance deja de ser opcional. Y no solo para el rendimiento: sin ajuste, la
+estabilidad de GNNExplainer también baja en estos niveles (lámina 16).
 
 **Qué hay detrás.** PR-AUC de validación de GraphSAGE (azar 0,024):
 
@@ -614,7 +641,9 @@ y 0,33 con pesos por clase; TAGCN 0,53 y 0,21.
 
 **Qué decir.** También repetimos 1 por cada 100 y 1 por cada 200. Pesos por clase se mantiene
 entre 0,33 y 0,46 en todos los niveles. Focal loss se cae en los extremos, y sin ajuste el
-modelo queda en el azar en varios niveles. La estabilidad de las explicaciones no cambia.
+modelo queda en el azar en varios niveles. Con pesos por clase la estabilidad de las
+explicaciones no cambia; con focal loss y sin ajuste, la de GNNExplainer baja hacia 1:200, a la par
+que el rendimiento (lámina 16).
 
 **Qué hay detrás.**
 
@@ -636,8 +665,8 @@ Estabilidad con pesos por clase: GNNExplainer 0,92 a 0,94; Shapley 0,99; Expecte
 ### Lámina 39. Qué se mantiene y qué cambia
 
 **Qué decir.** Lo que la tesis afirma sobre la estabilidad no depende de cómo se partan los
-datos: no depende del desbalance, no hay una red más estable, y con poco fraude solo pesos por
-clase sostiene al modelo. Cambian dos cosas. La buena: la prueba final ya no cae al azar. Y una
+datos: con pesos por clase no depende del desbalance, sin ajuste la de GNNExplainer baja con él,
+no hay una red más estable, y con poco fraude solo pesos por clase sostiene al modelo. Cambian dos cosas. La buena: la prueba final ya no cae al azar. Y una
 corrección: pesos por clase no es siempre la que mejor detecta.
 
 **Qué hay detrás.**
@@ -658,7 +687,8 @@ corrección: pesos por clase no es siempre la que mejor detecta.
 ## Lámina 40. Resumen
 
 **Qué decir.** Tres de las cuatro preguntas no salieron como esperábamos, y para cada una
-tenemos una causa medida. El desbalance no cambia la estabilidad ni en el caso extremo. El
+tenemos una causa medida. Con pesos por clase el desbalance no cambia la estabilidad ni en el
+caso extremo; sin compensarlo, la de GNNExplainer baja junto con el rendimiento. El
 tipo de red decide si el modelo aprende. La forma de compensar el desbalance mueve centésimas.
 Y la más importante: estable no es correcto.
 
@@ -700,6 +730,7 @@ dos niveles, frente a 0,010 con todo el fraude. El azar es 0,006.
 | «La estabilidad alta muestra que el modelo aprendió» | Una red sin entrenar da casi lo mismo. |
 | «GAT es la más estable» o cualquier orden entre redes | El orden cambia con el explicador: GraphSAGE con GNNExplainer, GAT con Shapley. |
 | «La forma de compensar el desbalance no afecta la estabilidad» | Afecta unas centésimas, y en sentido contrario en GNNExplainer y en Shapley. |
+| «El desbalance no afecta la estabilidad» (sin más) | Solo con pesos por clase. Sin ajuste, la de GNNExplainer baja con el desbalance en las dos particiones (p < 0,001); con focal loss, solo sin el cierre. |
 | «Friedman da p = 0,0001 entre arquitecturas» | Ese valor trata como independientes modelos casi idénticos. Solo hay 3 semillas independientes. |
 
 ## Referencias

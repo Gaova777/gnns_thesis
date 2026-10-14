@@ -39,7 +39,8 @@ entre semillas en el mismo escenario (0,30). Con la entropía sin ajuste ocurre 
 la clase ilícita pesa cada vez menos a medida que crece el desbalance, el modelo se degrada
 hasta predecir casi siempre la clase negativa, y GNNExplainer, que optimiza una máscara sobre la
 salida de ese modelo, pierde estabilidad con él. La \textit{focal loss} queda en un punto
-intermedio, en rendimiento y en estabilidad. El desbalance actúa, entonces, a través de la
+intermedio, en rendimiento y en estabilidad, y su efecto sobre la estabilidad no se repite en la
+partición original, mientras que el de la entropía sin ajuste sí. El desbalance actúa, entonces, a través de la
 degradación del modelo, y una pérdida que lo compensa por completo corta esa vía.
 
 \textbf{Con pesos por clase, los escenarios de estrés quitan fraude y aun así no cambian la

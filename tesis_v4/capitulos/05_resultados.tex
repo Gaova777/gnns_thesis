@@ -213,7 +213,11 @@ el efecto es marginal: de las nueve combinaciones de pérdida y medida, solo una
 significativa con cada uno (Shapley sin ajuste con la medida principal, de 0,993 a 0,985; y
 Expected Gradients con pesos por clase y el Jaccard top-10, que sube de 0,804 a 0,823). Juntando las tres
 pérdidas (27 modelos), la estabilidad de GNNExplainer baja de forma significativa con las tres
-medidas ($p \leq 0{,}003$).
+medidas ($p \leq 0{,}003$). En la partición original el efecto de la entropía sin ajuste se
+repite ($p < 0{,}001$ con las tres medidas; de 0,930 en 1:10 a 0,901 en 1:200 con la medida
+principal), pero el de la \textit{focal loss} no ($p \geq 0{,}29$), y con pesos por clase tampoco
+hay efecto ($p \geq 0{,}22$). La caída sin ajuste es, por tanto, el resultado que no depende de
+la partición.
 
 \begin{table}[ht]
 \centering
