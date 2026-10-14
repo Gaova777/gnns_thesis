@@ -1,0 +1,60 @@
+clave,doi,estado,tipo,anio,revista,titulo,uso
+Wu2021Survey,10.1109/TNNLS.2020.2978386,aceptada,journal-article,2021,IEEE Transactions on Neural Networks and Learning Systems,A Comprehensive Survey on Graph Neural Networks,review de GNN
+Zhou2020Review,10.1016/j.aiopen.2021.01.001,aceptada,journal-article,2020,AI Open,Graph neural networks: A review of methods and applications,review de GNN
+Scarselli2009GNN,10.1109/TNN.2008.2005605,aceptada,journal-article,2009,IEEE Transactions on Neural Networks,The Graph Neural Network Model,origen de las GNN
+Yuan2023Taxonomic,10.1109/TPAMI.2022.3204236,aceptada,journal-article,2022,IEEE Transactions on Pattern Analysis and Machine Intelligence,Explainability in Graph Neural Networks: A Taxonomic Survey,survey de explicabilidad en GNN
+Agarwal2023Evaluating,10.1038/s41597-023-01974-x,aceptada,journal-article,2023,Scientific Data,Evaluating explainability for graph neural networks,evaluación de explicadores de GNN
+Longa2024Explaining,10.1145/3696444,aceptada,journal-article,2025,ACM Computing Surveys,Explaining the Explainers in Graph Neural Networks: a Comparative Study,comparación de explicadores de GNN
+Dai2024Trustworthy,10.1007/s11633-024-1510-8,aceptada,journal-article,2024,Machine Intelligence Research,"A Comprehensive Survey on Trustworthy Graph Neural Networks: Privacy, Robustness, Fairness, and Explainability",survey GNN confiables
+Adadi2018Peeking,10.1109/ACCESS.2018.2870052,aceptada,journal-article,2018,IEEE Access,Peeking Inside the Black-Box: A Survey on Explainable Artificial Intelligence (XAI),survey XAI
+Guidotti2018Survey,10.1145/3236009,aceptada,journal-article,2019,ACM Computing Surveys,A Survey of Methods for Explaining Black Box Models,survey XAI
+Arrieta2020XAI,10.1016/j.inffus.2019.12.012,aceptada,journal-article,2020,Information Fusion,"Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI",survey XAI
+Rudin2019Stop,10.1038/s42256-019-0048-x,aceptada,journal-article,2019,Nature Machine Intelligence,Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead,interpretabilidad en decisiones de alto riesgo
+Nauta2023Anecdotal,10.1145/3583558,aceptada,journal-article,2023,ACM Computing Surveys,From Anecdotal Evidence to Quantitative Evaluation Methods: A Systematic Review on Evaluating Explainable AI,evaluación cuantitativa de XAI
+Bodria2023Benchmarking,10.1007/s10618-023-00933-9,aceptada,journal-article,2023,Data Mining and Knowledge Discovery,Benchmarking and survey of explanation methods for black box models,benchmark de explicadores
+Erion2021Expected,10.1038/s42256-021-00343-w,aceptada,journal-article,2021,Nature Machine Intelligence,Improving performance of deep learning models with axiomatic attribution priors and expected gradients,Expected Gradients (método usado)
+Strumbelj2014Explaining,10.1007/s10115-013-0679-x,aceptada,journal-article,2014,Knowledge and Information Systems,Explaining prediction models and individual predictions with feature contributions,Shapley por muestreo (método usado)
+Castro2009Polynomial,10.1016/j.cor.2008.04.004,aceptada,journal-article,2009,Computers &amp; Operations Research,Polynomial calculation of the Shapley value based on sampling,Shapley por muestreo
+Lundberg2020Local,10.1038/s42256-019-0138-9,aceptada,journal-article,2020,Nature Machine Intelligence,From local explanations to global understanding with explainable AI for trees,SHAP en revista
+He2009Imbalanced,10.1109/TKDE.2008.239,aceptada,journal-article,2009,IEEE Transactions on Knowledge and Data Engineering,Learning from Imbalanced Data,desbalance de clases
+Chawla2002SMOTE,10.1613/jair.953,aceptada,journal-article,2002,Journal of Artificial Intelligence Research,SMOTE: Synthetic Minority Over-sampling Technique,SMOTE (método usado)
+Johnson2019Survey,10.1186/s40537-019-0192-5,aceptada,journal-article,2019,Journal of Big Data,Survey on deep learning with class imbalance,deep learning con desbalance
+Lin2020Focal,10.1109/TPAMI.2018.2858826,aceptada,journal-article,2020,IEEE Transactions on Pattern Analysis and Machine Intelligence,Focal Loss for Dense Object Detection,focal loss (método usado)
+Saito2015PR,10.1371/journal.pone.0118432,aceptada,journal-article,2015,PLOS ONE,The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets,PR frente a ROC bajo desbalance
+Chicco2020MCC,10.1186/s12864-019-6413-7,aceptada,journal-article,2020,BMC Genomics,The advantages of the Matthews correlation coefficient (MCC) over F1 score and accuracy in binary classification evaluation,MCC
+Gama2014Drift,10.1145/2523813,aceptada,journal-article,2014,ACM Computing Surveys,A survey on concept drift adaptation,cambio de distribución en el tiempo
+Friedman1937,10.1080/01621459.1937.10503522,aceptada,journal-article,1937,Journal of the American Statistical Association,The Use of Ranks to Avoid the Assumption of Normality Implicit in the Analysis of Variance,prueba de Friedman
+Spearman1904,10.2307/1412159,aceptada,journal-article,1904,The American Journal of Psychology,The Proof and Measurement of Association between Two Things,correlación de rangos
+Jaccard1912,10.1111/j.1469-8137.1912.tb05611.x,aceptada,journal-article,1912,New Phytologist,"THE DISTRIBUTION OF THE FLORA IN THE ALPINE ZONE.
+                    <sup>1</sup>",índice de Jaccard
+Wilcoxon1945,10.2307/3001968,aceptada,journal-article,1945,Biometrics Bulletin,Individual Comparisons by Ranking Methods,prueba de Wilcoxon
+Lakens2017TOST,10.1177/1948550617697177,aceptada,journal-article,2017,Social Psychological and Personality Science,Equivalence Tests,equivalencia TOST
+Efron1979Bootstrap,10.1214/aos/1176344552,aceptada,journal-article,1979,The Annals of Statistics,Bootstrap Methods: Another Look at the Jackknife,bootstrap
+Chen2018AMLReview,10.1007/s10115-017-1144-z,aceptada,journal-article,2018,Knowledge and Information Systems,Machine learning techniques for anti-money laundering (AML) solutions in suspicious transaction detection: a review,review ML para AML
+Kute2021AMLReview,10.1109/ACCESS.2021.3086230,aceptada,journal-article,2021,IEEE Access,Deep Learning and Explainable Artificial Intelligence Techniques Applied for Detecting Money Laundering–A Critical Review,review DL y XAI para AML
+Motie2024FraudGNN,10.1016/j.eswa.2023.122156,aceptada,journal-article,2024,Expert Systems with Applications,Financial fraud detection using graph neural networks: A systematic review,review GNN para fraude
+Pocher2023Anomalous,10.1007/s12525-023-00654-3,aceptada,journal-article,2023,Electronic Markets,Detecting anomalous cryptocurrency transactions: An AML/CFT application of machine learning-based forensics,ML forense en cripto
+Vassallo2021Boosting,10.1007/s42979-021-00558-z,aceptada,journal-article,2021,SN Computer Science,Application of Gradient Boosting Algorithms for Anti-money Laundering in Cryptocurrencies,AML en criptomonedas
+Alarab2023Graph,10.1007/s11063-022-10904-8,aceptada,journal-article,2023,Neural Processing Letters,Graph-Based LSTM for Anti-money Laundering: Experimenting Temporal Graph Convolutional Network with Bitcoin Data,GNN sobre Elliptic
+Lo2023Inspection,10.1007/s10489-023-04504-9,aceptada,journal-article,2023,Applied Intelligence,Inspection-L: self-supervised GNN node embeddings for money laundering detection in bitcoin,GNN sobre Elliptic
+He2026Detection,10.1007/s10489-026-07138-9,aceptada,journal-article,2026,Applied Intelligence,An explainable graph neural network framework for illicit financial transaction detection,detección en Elliptic
+Lin2026Detecting,10.1038/s41598-025-23901-3,aceptada,journal-article,2026,Scientific Reports,Detecting illicit transactions in bitcoin: a wavelet-temporal graph transformer approach for anti-money laundering,detección de lavado
+Wang2025CoSemiGNN,10.1016/j.eswa.2025.129853,aceptada,journal-article,2026,Expert Systems with Applications,CoSemiGNN: Blockchain fraud detection with dynamic graph neural networks based on co-association of semi-supervised,GNN semisupervisada AML
+Almeida2025Techniques,10.3390/risks13120249,aceptada,journal-article,2025,Risks,From Placement to Integration: A Parametric Study of Cryptocurrency-Based Money Laundering Techniques,review técnicas AML
+Rai2025Evaluating,10.3389/frai.2025.1682919,aceptada,journal-article,2025,Frontiers in Artificial Intelligence,Evaluating XAI techniques under class imbalance using CPRD data,evaluación de XAI
+Unagar2025Survey,10.1007/s42979-025-03828-2,aceptada,journal-article,2025,SN Computer Science,Survey on Detection of Cryptocurrency Money Laundering and Its Explanation Using XAI,survey XAI
+Fujiwara2024Stability,10.1016/j.rineng.2024.103406,aceptada,journal-article,2024,Results in Engineering,Knowledge distillation with resampling for imbalanced data classification: Enhancing predictive performance and explainability stability,estabilidad de explicaciones
+Wan2024Memory,10.3390/sym16030378,aceptada,journal-article,2024,Symmetry,A Novel Money Laundering Prediction Model Based on a Dynamic Graph Convolutional Neural Network and Long Short-Term Memory,anterior bib
+Gawantka2024Explanations,10.25046/aj090113,aceptada,journal-article,2024,"Advances in Science, Technology and Engineering Systems Journal",A Novel Metric for Evaluating the Stability of XAI Explanations,anterior bib
+Lawal2025Dataset,10.5121/ijnsa.2025.17602,aceptada,journal-article,2025,International Journal of Network Security &amp; Its Applications,AN EXPLAINABLE GRAPH NEURAL NETWORK FRAMEWORK FOR ANTI–MONEY LAUNDERING IN CRYPTOCURRENCY TRANSACTIONS USING THE ELLIPTIC DATASET,anterior bib
+Subashi2024Crypto,10.2478/bjir-2024-0005,aceptada,journal-article,2024,Balkan Journal of Interdisciplinary Research,Cryptocurrencies and Money Laundering,anterior bib
+Kipf2017GCN,,excepción (URL 200),,,,https://arxiv.org/abs/1609.02907,método o dataset usado
+Hamilton2017GraphSAGE,,excepción (URL 200),,,,https://papers.nips.cc/paper/6703-inductive-representation-learning-on-large-graphs,método o dataset usado
+Velickovic2018GAT,,excepción (URL 200),,,,https://arxiv.org/abs/1710.10903,método o dataset usado
+Du2017TAGCN,,excepción (URL 200),,,,https://arxiv.org/abs/1710.10370,método o dataset usado
+Ying2019GNNExplainer,,excepción (URL 200),,,,https://papers.nips.cc/paper/9123-gnnexplainer-generating-explanations-for-graph-neural-networks,método o dataset usado
+Luo2020PGExplainer,,excepción (URL 200),,,,https://proceedings.neurips.cc/paper/2020/hash/e37b08dd3015330dcbb5d6663667b8b8-Abstract.html,método o dataset usado
+Lundberg2017SHAP,,excepción (URL 200),,,,https://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-model-predictions,método o dataset usado
+Sundararajan2017IG,,excepción (URL 200),,,,https://proceedings.mlr.press/v70/sundararajan17a.html,método o dataset usado
+Adebayo2018Sanity,,excepción (URL 200),,,,https://papers.nips.cc/paper/8160-sanity-checks-for-saliency-maps,método o dataset usado
+Weber2019Elliptic,,excepción (URL 200),,,,https://arxiv.org/abs/1908.02591,método o dataset usado

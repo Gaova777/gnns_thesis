@@ -1,0 +1,74 @@
+\chapter{Eje sintético}\label{anx:sintetico}
+
+Elliptic no publica el significado de sus variables ni anota qué patrón de lavado sigue cada
+transacción ilícita, de modo que sobre él solo se puede medir la estabilidad de las
+explicaciones, no si señalan lo correcto. Para observar esa segunda propiedad se construyó un
+grafo sintético de transacciones en el que cada transacción ilícita pertenece a una tipología
+conocida y en el que se sabe qué aristas y qué variables la delatan. Este anexo resume sus
+resultados como evidencia complementaria; no forma parte del contraste de hipótesis.
+
+\section{Diseño}
+
+El generador (\texttt{phase1/synthetic\_aml\_generator.py}, opción \texttt{--v4}, semilla 42)
+produce un grafo con tipologías de lavado insertadas sobre un fondo de transacciones
+legítimas. Se verificó que ninguna variable aislada permite separar las clases (AUC de una
+sola variable entre 0,50 y 0,62) y que las cuatro arquitecturas aprenden la tipología con un
+margen de al menos 0,10. Se entrenaron 144 configuraciones: las 4 arquitecturas, 4 escenarios,
+3 técnicas de compensación y 3 semillas, explicadas con GNNExplainer, PGExplainer y Shapley
+por muestreo.
+
+Los escenarios del eje sintético difieren de los de Elliptic: los niveles 1:50 y 1:100 se
+obtienen quitando transacciones ilícitas. Además se miden la \textbf{plausibilidad}
+(coincidencia de las variables o aristas señaladas con las que de verdad definen la
+tipología) y la \textbf{fidelidad} (cuánto cambia la predicción al retirar lo señalado, fid+,
+o al conservar solo lo señalado, fid$-$), cada una frente a una explicación al azar.
+
+\section{Resultados}
+
+\begin{table}[ht]
+\centering
+\caption{Eje sintético: estabilidad (Spearman global), plausibilidad de variables y fidelidad
+(fid+), con su valor al azar entre paréntesis. Medias sobre 36 configuraciones por fila.
+Fuente: \texttt{results\_phase1\_v4/summary\_v4.csv}.}
+\label{tab:sintetico}
+\small
+\begin{tabular}{llccc}
+\toprule
+Arquitectura & Explicador & Estabilidad & Plausibilidad de variables & Fidelidad (fid+) \\
+\midrule
+GCN & GNNExplainer & 0,848 & 0,296 (0,150) & 0,147 (0,030) \\
+    & Shapley      & 0,984 & 0,114 (0,150) & 0,195 (0,063) \\
+GraphSAGE & GNNExplainer & 0,907 & 0,404 (0,150) & 0,363 (0,048) \\
+          & Shapley      & 0,953 & 0,157 (0,150) & 0,135 (0,092) \\
+GAT & GNNExplainer & 0,850 & 0,244 (0,150) & 0,264 (0,054) \\
+    & Shapley      & 0,959 & 0,118 (0,150) & 0,118 (0,101) \\
+TAGCN & GNNExplainer & 0,957 & 0,447 (0,150) & 0,277 (0,053) \\
+      & Shapley      & 0,945 & 0,159 (0,150) & 0,154 (0,083) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La Tabla \ref{tab:sintetico} muestra el resultado central del eje: el explicador más estable
+no es el más correcto. Shapley por muestreo es el más estable en tres de las cuatro
+arquitecturas (Spearman entre 0,95 y 0,98), pero su plausibilidad de variables no supera al
+azar (entre 0,11 y 0,16 frente a 0,15). GNNExplainer es menos estable, pero es el único cuya
+plausibilidad de variables supera claramente al azar (entre 0,24 y 0,45), y el de mayor
+fidelidad en tres de las cuatro arquitecturas (en GCN lo es Shapley). La estabilidad de GNNExplainer baja con el desbalance, de 0,92 en los niveles
+nativo y 1:1 a 0,86 en 1:100, mientras que la de Shapley no cambia.
+
+Este resultado apoya una de las conclusiones del estudio principal: la estabilidad es
+necesaria pero no suficiente, y debe complementarse con pruebas de que la explicación depende
+del modelo.
+
+\section{Advertencias}
+
+\begin{itemize}
+  \item La plausibilidad de aristas no es comparable entre arquitecturas. TAGCN ve 6 saltos y
+        su subgrafo receptivo contiene casi todo el grafo (mediana de 9.311 nodos y 47.311
+        aristas), mientras que las otras tres ven 2 saltos (unos 36 nodos y 78 aristas). La
+        plausibilidad al azar vale 0,001 en TAGCN y cerca de 0,47 en las demás, y la ganancia
+        aparente de TAGCN se debe a esa línea base. Por eso la tabla no la incluye.
+  \item En las arquitecturas de dos saltos, la plausibilidad de aristas de los explicadores
+        apenas supera al azar (entre 0,01 y 0,03), y la de PGExplainer queda por debajo.
+  \item PGExplainer falló en 24 de 432 combinaciones, todas en los escenarios 1:50 y 1:100.
+\end{itemize}

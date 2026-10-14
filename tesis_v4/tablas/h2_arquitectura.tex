@@ -1,0 +1,18 @@
+% Generado por tesis_v4/scripts/analisis.py. No editar a mano.
+\begin{tabular}{llccccccl}
+\toprule
+Medida & Explicador & GCN & GraphSAGE & GAT & TAGCN & $p$ (4) & $p$ (3) & Primera \\
+\midrule
+Spearman global & GNNExplainer & 0{,}937 & 0{,}931 & 0{,}923 & 0{,}929 & 0{,}532 & 0{,}264 & GCN 2, GraphSAGE 1 \\
+ & Shapley & 0{,}996 & 0{,}994 & 0{,}994 & 0{,}991 & 0{,}042 & 0{,}097 & GCN 3 \\
+ & Expected Gradients & 0{,}923 & 0{,}935 & 0{,}932 & 0{,}920 & 0{,}172 & 0{,}097 & GraphSAGE 2, GAT 1 \\
+\midrule
+Spearman $\neq 0$ & GNNExplainer & 0{,}691 & 0{,}672 & 0{,}635 & 0{,}630 & 0{,}334 & 0{,}097 & GCN 2, GraphSAGE 1 \\
+ & Shapley & 0{,}993 & 0{,}991 & 0{,}990 & 0{,}985 & 0{,}042 & 0{,}097 & GCN 3 \\
+ & Expected Gradients & 0{,}958 & 0{,}965 & 0{,}960 & 0{,}952 & 0{,}457 & 0{,}264 & GAT 1, GraphSAGE 1, GCN 1 \\
+\midrule
+Jaccard top-10 & GNNExplainer & 0{,}708 & 0{,}622 & 0{,}650 & 0{,}568 & 0{,}060 & 0{,}097 & GCN 2, GAT 1 \\
+ & Shapley & 0{,}948 & 0{,}929 & 0{,}927 & 0{,}896 & 0{,}122 & 0{,}264 & GCN 2, GraphSAGE 1 \\
+ & Expected Gradients & 0{,}798 & 0{,}800 & 0{,}816 & 0{,}806 & 0{,}532 & 0{,}264 & GAT 2, GCN 1 \\
+\bottomrule
+\end{tabular}

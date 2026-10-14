@@ -1,0 +1,132 @@
+/home/juan/Escritorio/gnn_thesis/gnns_thesis/scripts/v4/reunion_0710/metrica_robusta.py:131: RuntimeWarning: Mean of empty slice
+  per.append(np.nanmean([pair(a, b, NZ[int(n)]) for a, b in combinations(f, 2)],
+30 nodos; variables distintas de 0 por nodo: mediana 89 de 165
+
+════ sp_all ════
+H1 · por escenario (pesos por clase, 3 arquitecturas)
+scenario              1:10  1:10_os   1:20  native  1:100_subil  1:200_subil
+explainer                                                                   
+GNNExplainer         0.935    0.929  0.929   0.917        0.939        0.932
+ShapleyFeatures      0.992    0.992  0.993   0.994        0.991        0.991
+IntegratedGradients  1.000    1.000  1.000   1.000        1.000        1.000
+ExpectedGradients    0.931    0.930  0.921   0.934        0.918        0.927
+H2 · por arquitectura (escenarios principales, pesos por clase; incluye GCN)
+arch                   GCN  GraphSAGE    GAT  TAGCN
+explainer                                          
+GNNExplainer         0.937      0.931  0.923  0.929
+ShapleyFeatures      0.996      0.994  0.994  0.991
+IntegratedGradients  1.000      1.000  1.000  1.000
+ExpectedGradients    0.923      0.935  0.932  0.920
+H3 · por pérdida (escenarios principales, 3 arquitecturas)
+balancing            class_weighting  focal_loss   none
+explainer                                              
+GNNExplainer                   0.928       0.922  0.930
+ShapleyFeatures                0.993       0.995  0.994
+IntegratedGradients            1.000       1.000  1.000
+ExpectedGradients              0.929       0.933  0.938
+Acuerdo entre modelos (3 arquitecturas, pesos por clase, escenarios principales)
+tipo                 mismo escenario, otra semilla  otro escenario, misma semilla  otro escenario, otra semilla
+explainer                                                                                                      
+GNNExplainer                                 0.929                          0.960                         0.922
+ShapleyFeatures                              0.949                          0.974                         0.947
+IntegratedGradients                          0.954                          0.976                         0.951
+ExpectedGradients                            0.741                          0.857                         0.721
+
+════ sp_nz ════
+H1 · por escenario (pesos por clase, 3 arquitecturas)
+scenario              1:10  1:10_os   1:20  native  1:100_subil  1:200_subil
+explainer                                                                   
+GNNExplainer         0.680    0.656  0.654   0.593        0.707        0.667
+ShapleyFeatures      0.988    0.987  0.988   0.990        0.985        0.985
+IntegratedGradients  1.000    1.000  1.000   1.000        1.000        1.000
+ExpectedGradients    0.959    0.958  0.954   0.965        0.952        0.954
+H2 · por arquitectura (escenarios principales, pesos por clase; incluye GCN)
+arch                   GCN  GraphSAGE    GAT  TAGCN
+explainer                                          
+GNNExplainer         0.691      0.672  0.635  0.630
+ShapleyFeatures      0.993      0.991  0.990  0.985
+IntegratedGradients  1.000      1.000  1.000  1.000
+ExpectedGradients    0.958      0.965  0.960  0.952
+H3 · por pérdida (escenarios principales, 3 arquitecturas)
+balancing            class_weighting  focal_loss   none
+explainer                                              
+GNNExplainer                   0.646       0.626  0.668
+ShapleyFeatures                0.988       0.992  0.990
+IntegratedGradients            1.000       1.000  1.000
+ExpectedGradients              0.959       0.960  0.962
+Acuerdo entre modelos (3 arquitecturas, pesos por clase, escenarios principales)
+tipo                 mismo escenario, otra semilla  otro escenario, misma semilla  otro escenario, otra semilla
+explainer                                                                                                      
+GNNExplainer                                 0.699                          0.827                         0.670
+ShapleyFeatures                              0.906                          0.953                         0.902
+IntegratedGradients                          0.769                          0.880                         0.755
+ExpectedGradients                            0.566                          0.761                         0.534
+
+════ jac10 ════
+H1 · por escenario (pesos por clase, 3 arquitecturas)
+scenario              1:10  1:10_os   1:20  native  1:100_subil  1:200_subil
+explainer                                                                   
+GNNExplainer         0.621    0.623  0.614   0.595        0.638        0.600
+ShapleyFeatures      0.918    0.899  0.921   0.931        0.890        0.886
+IntegratedGradients  1.000    1.000  1.000   1.000        1.000        1.000
+ExpectedGradients    0.816    0.814  0.795   0.804        0.793        0.823
+H2 · por arquitectura (escenarios principales, pesos por clase; incluye GCN)
+arch                   GCN  GraphSAGE    GAT  TAGCN
+explainer                                          
+GNNExplainer         0.708      0.622  0.650  0.568
+ShapleyFeatures      0.948      0.929  0.927  0.896
+IntegratedGradients  1.000      1.000  1.000  1.000
+ExpectedGradients    0.798      0.800  0.816  0.806
+H3 · por pérdida (escenarios principales, 3 arquitecturas)
+balancing            class_weighting  focal_loss   none
+explainer                                              
+GNNExplainer                   0.613       0.598  0.625
+ShapleyFeatures                0.917       0.941  0.922
+IntegratedGradients            1.000       1.000  1.000
+ExpectedGradients              0.807       0.799  0.805
+Acuerdo entre modelos (3 arquitecturas, pesos por clase, escenarios principales)
+tipo                 mismo escenario, otra semilla  otro escenario, misma semilla  otro escenario, otra semilla
+explainer                                                                                                      
+GNNExplainer                                 0.300                          0.597                         0.262
+ShapleyFeatures                              0.583                          0.766                         0.566
+IntegratedGradients                          0.408                          0.668                         0.381
+ExpectedGradients                            0.310                          0.605                         0.269
+
+════ Acuerdo entre arquitecturas (pesos por clase, misma semilla) ════
+                                         sp_all  sp_nz  jac10
+explainer           a         b                              
+ExpectedGradients   GAT       TAGCN       0.720  0.525  0.258
+                    GCN       GAT         0.744  0.560  0.308
+                              GraphSAGE   0.722  0.526  0.269
+                              TAGCN       0.714  0.513  0.257
+                    GraphSAGE GAT         0.711  0.512  0.272
+                              TAGCN       0.719  0.542  0.303
+GNNExplainer        GAT       TAGCN       0.881  0.584  0.231
+                    GCN       GAT         0.914  0.681  0.286
+                              GraphSAGE   0.920  0.688  0.263
+                              TAGCN       0.876  0.587  0.212
+                    GraphSAGE GAT         0.920  0.681  0.267
+                              TAGCN       0.891  0.599  0.246
+IntegratedGradients GAT       TAGCN       0.952  0.760  0.373
+                    GCN       GAT         0.954  0.767  0.420
+                              GraphSAGE   0.953  0.759  0.385
+                              TAGCN       0.953  0.761  0.377
+                    GraphSAGE GAT         0.951  0.755  0.388
+                              TAGCN       0.954  0.769  0.412
+ShapleyFeatures     GAT       TAGCN       0.830  0.803  0.499
+                    GCN       GAT         0.881  0.855  0.577
+                              GraphSAGE   0.886  0.860  0.561
+                              TAGCN       0.882  0.838  0.523
+                    GraphSAGE GAT         0.950  0.907  0.579
+                              TAGCN       0.835  0.815  0.522
+
+════ Acuerdo entre explicadores (mismo modelo, 3 arquitecturas) ════
+                                         sp_all  sp_nz  jac10
+a                   b                                        
+GNNExplainer        ExpectedGradients     0.524  0.294  0.177
+                    IntegratedGradients   0.844  0.445  0.288
+                    ShapleyFeatures       0.483  0.075  0.099
+IntegratedGradients ExpectedGradients     0.553  0.428  0.489
+ShapleyFeatures     ExpectedGradients     0.382  0.186  0.209
+                    IntegratedGradients   0.409  0.203  0.218
+fin robusta rc=0

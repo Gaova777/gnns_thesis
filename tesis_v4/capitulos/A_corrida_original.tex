@@ -1,0 +1,61 @@
+\chapter{Corrida con la partición original}\label{anx:original}
+
+Antes de excluir el periodo del cierre del mercado se ejecutó el estudio completo con la
+partición habitual de Elliptic: entrenamiento con los pasos 1 a 34 (3.462 ilícitas y 132.803
+negativas, razón 1:38,4), validación con los pasos 35 a 42 y prueba con los pasos 43 a 49. Se
+entrenaron 252 modelos: las mismas 4 arquitecturas, 3 pérdidas y 3 semillas, con los escenarios
+nativo, 1:10, 1:20, 1:10 con SMOTE, 1:1 (que se apartó del análisis principal), 1:100 y 1:200.
+En esta partición los escenarios de estrés conservan 1.328 y 664 ilícitas. Este anexo resume
+lo que esa corrida muestra y por qué motivó el cambio de partición. Los resultados completos
+están en \texttt{results\_v4/}.
+
+\section{La prueba cae al nivel del azar}
+
+En la prueba, después del cierre, la prevalencia de ilícitas es de 0,6~\%, que es el PR-AUC
+de un clasificador al azar. Con la pérdida elegida en validación, en el escenario nativo, el
+PR-AUC de prueba fue de 0,010 para GraphSAGE, 0,008 para TAGCN, 0,005 para GAT y 0,012 para
+GCN. El ROC-AUC fue 0,711, 0,667, 0,476 y 0,601. Ningún modelo detecta las transacciones
+ilícitas posteriores al cierre, lo que reproduce lo reportado por los autores del conjunto de
+datos \cite{Weber2019Elliptic}. En validación, en cambio, los modelos sí aprendían: GraphSAGE
+con pesos por clase alcanzaba un PR-AUC de 0,462 frente a 0,037 del azar.
+
+\section{Lo que se mantiene en las dos particiones}
+
+La estabilidad de las explicaciones se mide en validación, por lo que no depende de la prueba,
+y sus conclusiones generales se repiten en las dos corridas:
+
+\begin{itemize}
+  \item El nivel de desbalance no cambia la estabilidad. Con GNNExplainer, pesos por clase y
+        las tres arquitecturas que aprenden, el Spearman global fue 0,946, 0,947, 0,946 y
+        0,947 en 1:10, 1:10 con SMOTE, 1:20 y nativo, y 0,940 y 0,938 en 1:100 y 1:200. La
+        prueba de Friedman sobre los seis escenarios no rechazó la igualdad ($p = 0{,}84$).
+  \item GCN es la arquitectura más débil en las dos particiones.
+  \item Con poco fraude (1:100 y 1:200) solo los pesos por clase mantienen la detección.
+  \item El control de pesos aleatorios dio, sobre 12 modelos, un acuerdo entre la explicación
+        del modelo entrenado y la de la red sin entrenar de 0,896 con GNNExplainer, 0,911 con
+        Shapley, 0,956 con Integrated Gradients y 0,688 con Expected Gradients, frente a una
+        estabilidad entre réplicas de 0,949, 0,970, 1 y 0,929.
+\end{itemize}
+
+\section{Lo que cambia}
+
+Tres resultados de la corrida original no se repiten sin el cierre, y por eso no se presentan
+como conclusiones de la tesis:
+
+\begin{itemize}
+  \item Con la partición original, GraphSAGE fue la arquitectura más estable con GNNExplainer
+        en las tres semillas (Spearman global 0,964 frente a 0,939 de GAT y 0,937 de TAGCN). Sin
+        el cierre ese orden desaparece (Sección \ref{sec:res_h2}).
+  \item Con la partición original, pesos por clase dio explicaciones de GNNExplainer más
+        estables que \textit{focal loss} en los 9 pares de arquitectura y semilla (prueba de
+        signos, $p = 0{,}004$), pero con Shapley el sentido se invertía. Sin el cierre la
+        diferencia con GNNExplainer tampoco se sostiene (Sección \ref{sec:res_h3}).
+  \item En validación, pesos por clase era la mejor pérdida en el escenario nativo. Sin el
+        cierre, \textit{focal loss} la iguala o la supera en ese escenario.
+\end{itemize}
+
+Una advertencia metodológica surgió de esta corrida y se aplica a toda la tesis: los modelos de
+una misma semilla en distintos escenarios son casi idénticos, por lo que una prueba que trata
+cada combinación de semilla y escenario como un bloque independiente (12 bloques) está
+pseudorreplicada y exagera la significancia. Las pruebas del Capítulo \ref{cap:resultados} usan
+como unidad el modelo.

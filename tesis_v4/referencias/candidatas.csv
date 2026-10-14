@@ -1,0 +1,49 @@
+clave,doi,uso
+Wu2021Survey,10.1109/TNNLS.2020.2978386,review de GNN
+Zhou2020Review,10.1016/j.aiopen.2021.01.001,review de GNN
+Scarselli2009GNN,10.1109/TNN.2008.2005605,origen de las GNN
+Yuan2023Taxonomic,10.1109/TPAMI.2022.3204236,survey de explicabilidad en GNN
+Agarwal2023Evaluating,10.1038/s41597-023-01974-x,evaluación de explicadores de GNN
+Longa2024Explaining,10.1145/3696444,comparación de explicadores de GNN
+Dai2024Trustworthy,10.1007/s11633-024-1510-8,survey GNN confiables
+Adadi2018Peeking,10.1109/ACCESS.2018.2870052,survey XAI
+Guidotti2018Survey,10.1145/3236009,survey XAI
+Arrieta2020XAI,10.1016/j.inffus.2019.12.012,survey XAI
+Rudin2019Stop,10.1038/s42256-019-0048-x,interpretabilidad en decisiones de alto riesgo
+Nauta2023Anecdotal,10.1145/3583558,evaluación cuantitativa de XAI
+Bodria2023Benchmarking,10.1007/s10618-023-00933-9,benchmark de explicadores
+Erion2021Expected,10.1038/s42256-021-00343-w,Expected Gradients (método usado)
+Strumbelj2014Explaining,10.1007/s10115-013-0679-x,Shapley por muestreo (método usado)
+Castro2009Polynomial,10.1016/j.cor.2008.04.004,Shapley por muestreo
+Lundberg2020Local,10.1038/s42256-019-0138-9,SHAP en revista
+He2009Imbalanced,10.1109/TKDE.2008.239,desbalance de clases
+Chawla2002SMOTE,10.1613/jair.953,SMOTE (método usado)
+Johnson2019Survey,10.1186/s40537-019-0192-5,deep learning con desbalance
+Lin2020Focal,10.1109/TPAMI.2018.2858826,focal loss (método usado)
+Saito2015PR,10.1371/journal.pone.0118432,PR frente a ROC bajo desbalance
+Chicco2020MCC,10.1186/s12864-019-6413-7,MCC
+Gama2014Drift,10.1145/2523813,cambio de distribución en el tiempo
+Friedman1937,10.1080/01621459.1937.10503522,prueba de Friedman
+Spearman1904,10.2307/1412159,correlación de rangos
+Jaccard1912,10.1111/j.1469-8137.1912.tb05611.x,índice de Jaccard
+Wilcoxon1945,10.2307/3001968,prueba de Wilcoxon
+Lakens2017TOST,10.1177/1948550617697177,equivalencia TOST
+Efron1979Bootstrap,10.1214/aos/1176344552,bootstrap
+Chen2018AMLReview,10.1007/s10115-017-1144-z,review ML para AML
+Kute2021AMLReview,10.1109/ACCESS.2021.3086230,review DL y XAI para AML
+Motie2024FraudGNN,10.1016/j.eswa.2023.122156,review GNN para fraude
+Pocher2023Anomalous,10.1007/s12525-023-00654-3,ML forense en cripto
+Vassallo2021Boosting,10.1007/s42979-021-00558-z,AML en criptomonedas
+Alarab2023Graph,10.1007/s11063-022-10904-8,GNN sobre Elliptic
+Lo2023Inspection,10.1007/s10489-023-04504-9,GNN sobre Elliptic
+He2026Detection,10.1007/s10489-026-07138-9,detección en Elliptic
+Lin2026Detecting,10.1038/s41598-025-23901-3,detección de lavado
+Wang2025CoSemiGNN,10.1016/j.eswa.2025.129853,GNN semisupervisada AML
+Almeida2025Techniques,10.3390/risks13120249,review técnicas AML
+Rai2025Evaluating,10.3389/frai.2025.1682919,evaluación de XAI
+Unagar2025Survey,10.1007/s42979-025-03828-2,survey XAI
+Fujiwara2024Stability,10.1016/j.rineng.2024.103406,estabilidad de explicaciones
+Wan2024Memory,10.3390/sym16030378,anterior bib
+Gawantka2024Explanations,10.25046/aj090113,anterior bib
+Lawal2025Dataset,10.5121/ijnsa.2025.17602,anterior bib
+Subashi2024Crypto,10.2478/bjir-2024-0005,anterior bib

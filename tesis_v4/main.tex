@@ -1,0 +1,131 @@
+\documentclass[a4paper,oneside,12pt]{book}
+
+% Manuscrito v4. Reescrito desde cero sobre los resultados de octubre de 2026:
+% corrida principal sin el periodo del cierre del mercado (pasos 1 a 42), etiquetas
+% corregidas (modo C), tres semillas de modelo en todo. El manuscrito v3 (tesis_latex/)
+% queda como registro histórico y sus cifras de Elliptic están retractadas.
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-lcroman,es-tabla,es-nodecimaldot]{babel}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{graphicx}
+\graphicspath{{figuras/}}
+\usepackage{float}
+\usepackage{booktabs,tabularx,longtable}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,width=0.95\textwidth}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{15.13202pt}
+\addtolength{\topmargin}{-3.13202pt}
+
+\usepackage{mathptmx}
+\renewcommand{\ttdefault}{lmtt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\onehalfspacing
+
+% Los artículos (generados desde Crossref) solo traen DOI; las excepciones (actas y arXiv)
+% traen la URL donde se verificaron.
+\usepackage[backend=biber,style=numeric,sorting=none,doi=true,url=true,eprint=true,
+            isbn=false,maxbibnames=6,minbibnames=3]{biblatex}
+\addbibresource{bibliografia.bib}
+\AtBeginBibliography{\sloppy\small}
+
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
+
+\newcommand{\pd}{p\text{-valor}}
+
+\begin{document}
+
+% ================================================= PORTADAS
+\begin{titlepage}
+\begin{center}
+\includegraphics[width=0.4\textwidth]{utp.jpg}
+
+\vspace{1.5cm}
+{\LARGE \bfseries \linespread{1.3}\selectfont
+Estabilidad de las explicaciones de redes neuronales de grafos para la detección de lavado
+de dinero bajo desbalance extremo de clases\par}
+
+\vspace{2.5cm}
+{\Large Alejandro Gómez Huertas \\[0.3cm] Juan Diego Garzón Ovalle}
+
+\vfill
+{\large Universidad Tecnológica de Pereira \\ Facultad de Ingenierías \\
+Maestría en Ingeniería de Sistemas y Computación \\ Pereira, Colombia \\ 2026}
+\end{center}
+\end{titlepage}
+
+\begin{titlepage}
+\begin{center}
+\vspace*{1cm}
+{\LARGE \bfseries \linespread{1.3}\selectfont
+Estabilidad de las explicaciones de redes neuronales de grafos para la detección de lavado
+de dinero bajo desbalance extremo de clases\par}
+
+\vspace{2cm}
+{\Large Alejandro Gómez Huertas \\[0.3cm] Juan Diego Garzón Ovalle}
+
+\vspace{2.5cm}
+{\large Tesis presentada como requisito parcial para optar al título de:}\\[0.5cm]
+{\Large \textbf{Magíster en Ingeniería de Sistemas y Computación}}
+
+\vspace{2cm}
+{\large \textbf{Director} \\[0.2cm] \Large Ph.D. Cristian Rosero Arias}
+
+\vfill
+{\large Universidad Tecnológica de Pereira \\ Facultad de Ingenierías \\
+Maestría en Ingeniería de Sistemas y Computación \\ Pereira, Colombia \\ 2026}
+\end{center}
+\end{titlepage}
+
+\pagenumbering{roman}
+\input{capitulos/00_resumen}
+
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{Índice de figuras}
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{Índice de tablas}
+\clearpage
+\input{capitulos/00_acronimos}
+
+\clearpage
+\pagenumbering{arabic}
+\input{capitulos/01_introduccion}
+\input{capitulos/02_marco_teorico}
+\input{capitulos/03_estado_arte}
+\input{capitulos/04_metodologia}
+\input{capitulos/05_resultados}
+\input{capitulos/06_discusion}
+\input{capitulos/07_conclusiones}
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Referencias}
+\printbibliography[title={Referencias}]
+
+\appendix
+\input{capitulos/A_corrida_original}
+\input{capitulos/B_eje_sintetico}
+\input{capitulos/C_reproducibilidad}
+
+\end{document}

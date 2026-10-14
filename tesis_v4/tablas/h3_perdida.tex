@@ -1,0 +1,18 @@
+% Generado por tesis_v4/scripts/analisis.py. No editar a mano.
+\begin{tabular}{llccccc}
+\toprule
+Medida & Explicador & Pesos por clase & Focal loss & Sin ajuste & PC $>$ FL & PC $>$ SA \\
+\midrule
+Spearman global & GNNExplainer & 0{,}928 & 0{,}922 & 0{,}930 & 6.0/9 (0{,}508) & 4.0/9 (1{,}000) \\
+ & Shapley & 0{,}993 & 0{,}995 & 0{,}994 & 0.0/9 (0{,}004) & 5.0/9 (1{,}000) \\
+ & Expected Gradients & 0{,}929 & 0{,}933 & 0{,}938 & 2.0/9 (0{,}180) & 1.0/9 (0{,}039) \\
+\midrule
+Spearman $\neq 0$ & GNNExplainer & 0{,}646 & 0{,}626 & 0{,}668 & 5.0/9 (1{,}000) & 2.0/9 (0{,}180) \\
+ & Shapley & 0{,}988 & 0{,}992 & 0{,}990 & 1.0/9 (0{,}039) & 4.0/9 (1{,}000) \\
+ & Expected Gradients & 0{,}959 & 0{,}960 & 0{,}962 & 4.0/9 (1{,}000) & 4.0/9 (1{,}000) \\
+\midrule
+Jaccard top-10 & GNNExplainer & 0{,}613 & 0{,}598 & 0{,}625 & 5.0/9 (1{,}000) & 5.0/9 (1{,}000) \\
+ & Shapley & 0{,}917 & 0{,}941 & 0{,}922 & 2.0/9 (0{,}180) & 5.0/9 (1{,}000) \\
+ & Expected Gradients & 0{,}807 & 0{,}799 & 0{,}805 & 7.0/9 (0{,}180) & 4.0/9 (1{,}000) \\
+\bottomrule
+\end{tabular}

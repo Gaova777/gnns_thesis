@@ -24,6 +24,8 @@ Los puntajes crudos quedan en results_v4_grad/control_aleatorio/ para no repetir
 
 Salida: results_v4/reunion_0710/control_aleatorio.csv y un resumen por pantalla.
 Uso: uv run --frozen python scripts/v4/reunion_0710/control_aleatorio.py [--seeds 42 43 44]
+Con --variante precierre usa la corrida sin el cierre del mercado (partición 1-29 / 30-35 /
+36-42) y escribe en results_v4_precierre/robusta/ (crudos en results_v4_precierre_grad/).
 """
 from __future__ import annotations
 
@@ -55,6 +57,19 @@ OUT = ROOT / "results_v4" / "reunion_0710"
 ARCHS = ["GCN", "GraphSAGE", "GAT", "TAGCN"]
 EXPL = ["GNNExplainer", "ShapleyFeatures", "IntegratedGradients", "ExpectedGradients"]
 R = 5
+RANGOS = {"train_range": (1, 34), "val_range": (35, 42), "test_range": (43, 49)}
+NODOS = ROOT / "results_v4" / "explain_nodes_v4.json"
+RAW = ROOT / "results_v4_grad" / "control_aleatorio"
+
+
+def usar_precierre() -> None:
+    """Reasigna rutas y partición a la corrida sin el cierre del mercado (THE-44)."""
+    global MODELS, OUT, RANGOS, NODOS, RAW
+    MODELS = ROOT / "results_models_v4_precierre"
+    OUT = ROOT / "results_v4_precierre" / "robusta"
+    RANGOS = {"train_range": (1, 29), "val_range": (30, 35), "test_range": (36, 42)}
+    NODOS = ROOT / "results_v4_precierre" / "explain_nodes_v4.json"
+    RAW = ROOT / "results_v4_precierre_grad" / "control_aleatorio"
 
 
 def random_model(meta: dict, in_channels: int, seed: int):
@@ -133,12 +148,16 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, nargs="+", default=[42, 43, 44])
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--variante", choices=["original", "precierre"], default="original")
     a = ap.parse_args()
+    if a.variante == "precierre":
+        usar_precierre()
+    OUT.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(a.threads)
     data = load_elliptic(root=str(ROOT / "data"))
     apply_label_mode(data, "licit_unknown")
-    preprocess(data)
-    nodes = json.loads((ROOT / "results_v4" / "explain_nodes_v4.json").read_text())["nodes"]
+    preprocess(data, **RANGOS)
+    nodes = json.loads(NODOS.read_text())["nodes"]
     refs = gr.reference_pool(data)
     absx = {n: data.x[n].abs().numpy() for n in nodes}
     zero = float(np.mean([(data.x[n] == 0).float().mean().item() for n in nodes]))
@@ -175,7 +194,7 @@ def main() -> int:
                     "jac10_estab_entrenado": stability_top(ft),
                     "jac10_estab_azar": stability_top(fa),
                 }
-                raw = ROOT / "results_v4_grad" / "control_aleatorio"
+                raw = RAW
                 raw.mkdir(parents=True, exist_ok=True)
                 np.savez_compressed(
                     raw / f"{rid}__{ex}.npz", nodes=np.array(sorted(ft)),

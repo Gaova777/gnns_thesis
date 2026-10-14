@@ -18,6 +18,8 @@ la estabilidad entre semillas y el acuerdo entre escenarios.
 
 Salidas en results_v4/reunion_0710/: robusta_modelos.csv, robusta_config.csv,
 robusta_semillas.csv. Uso: uv run --frozen python scripts/v4/reunion_0710/metrica_robusta.py
+Con --variante precierre lee la corrida sin el cierre del mercado (partición 1-29 / 30-35 /
+36-42) y escribe en results_v4_precierre/robusta/.
 """
 from __future__ import annotations
 
@@ -46,6 +48,21 @@ MAIN = ["1:10", "1:10_os", "1:20", "native"]
 APR = ["GraphSAGE", "GAT", "TAGCN"]
 KEY = ["scenario", "arch", "balancing"]
 MEDIDAS = ["sp_all", "sp_nz", "jac10"]
+RANGOS = {"train_range": (1, 34), "val_range": (35, 42), "test_range": (43, 49)}
+NODOS = ROOT / "results_v4/explain_nodes_v4.json"
+
+
+def usar_precierre() -> None:
+    """Reasigna rutas y partición a la corrida sin el cierre del mercado (THE-44)."""
+    global MODELS, OUT, RK, RANGOS, NODOS
+    MODELS = ROOT / "results_models_v4_precierre"
+    OUT = ROOT / "results_v4_precierre" / "robusta"
+    RK = {"GNNExplainer": ROOT / "results_v4_precierre/rankings",
+          "ShapleyFeatures": ROOT / "results_v4_precierre/rankings",
+          "IntegratedGradients": ROOT / "results_v4_precierre_grad/rankings",
+          "ExpectedGradients": ROOT / "results_v4_precierre_grad/rankings"}
+    RANGOS = {"train_range": (1, 29), "val_range": (30, 35), "test_range": (36, 42)}
+    NODOS = ROOT / "results_v4_precierre/explain_nodes_v4.json"
 
 
 def rho(a, b):
@@ -75,13 +92,19 @@ def load(run_id: str, ex: str):
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--variante", choices=["original", "precierre"], default="original")
+    if ap.parse_args().variante == "precierre":
+        usar_precierre()
+    OUT.mkdir(parents=True, exist_ok=True)
     from src.data.loader import apply_label_mode, load_elliptic
     from src.data.preprocessing import preprocess
     with contextlib.redirect_stdout(io.StringIO()):
         data = load_elliptic(root=str(ROOT / "data"))
         apply_label_mode(data, "licit_unknown")
-        preprocess(data)
-    nodes = json.loads((ROOT / "results_v4/explain_nodes_v4.json").read_text())["nodes"]
+        preprocess(data, **RANGOS)
+    nodes = json.loads(NODOS.read_text())["nodes"]
     NZ = {n: (data.x[n] != 0).numpy() for n in nodes}
     print(f"{len(nodes)} nodos; variables distintas de 0 por nodo: "
           f"mediana {int(np.median([v.sum() for v in NZ.values()]))} de {data.x.shape[1]}")

@@ -1,0 +1,190 @@
+\chapter{Marco teórico}\label{cap:marco}
+
+\section{Lavado de dinero en criptomonedas}
+
+El lavado de dinero es el proceso por el cual se oculta el origen ilícito de unos fondos para
+integrarlos en la economía formal. La literatura lo describe en tres etapas: colocación, en la
+que los fondos entran al sistema; estratificación, en la que se mueven a través de muchas
+operaciones para borrar su rastro; e integración, en la que vuelven a la economía como fondos
+aparentemente legítimos \cite{Chen2018AMLReview}. Las criptomonedas ofrecen a esas etapas un
+medio rápido, transfronterizo y seudónimo, y han dado lugar a técnicas propias como la mezcla
+de fondos, el encadenamiento de transacciones y el uso de plataformas de intercambio con
+controles débiles \cite{Almeida2025Techniques, Subashi2024Crypto}.
+
+Los sistemas tradicionales de monitoreo se basan en reglas fijas, como umbrales de monto o
+listas de contrapartes, y producen una proporción muy alta de falsas alarmas
+\cite{Kute2021AMLReview}. El aprendizaje automático permite aprender patrones a partir de casos
+etiquetados \cite{Chen2018AMLReview, Vassallo2021Boosting, Pocher2023Anomalous}. En Bitcoin, la
+cadena de bloques es pública y las transacciones están enlazadas por los fondos que se
+transfieren, de modo que el problema se puede plantear como la clasificación de los nodos de
+un grafo \cite{Weber2019Elliptic}.
+
+\section{Redes neuronales de grafos}\label{sec:gnn}
+
+Sea un grafo con $N$ nodos, matriz de atributos $\mathbf{X} \in \mathbb{R}^{N \times d}$ y
+conjunto de vecinos $\mathcal{N}(v)$ de cada nodo $v$. Una red neuronal de grafos calcula en
+cada capa $\ell$ una representación $\mathbf{h}_v^{(\ell)}$ de cada nodo combinando su propia
+representación con las de sus vecinos \cite{Scarselli2009GNN, Wu2021Survey, Zhou2020Review}:
+\begin{equation}
+  \mathbf{h}_v^{(\ell+1)} = \phi\!\left(\mathbf{h}_v^{(\ell)},\;
+  \bigoplus_{u \in \mathcal{N}(v)} \psi\!\left(\mathbf{h}_v^{(\ell)}, \mathbf{h}_u^{(\ell)}\right)\right),
+  \qquad \mathbf{h}_v^{(0)} = \mathbf{x}_v,
+\end{equation}
+donde $\bigoplus$ es una agregación invariante al orden (suma, media o máximo) y $\phi$ y
+$\psi$ son funciones con parámetros aprendidos. Tras $L$ capas, la representación de un nodo
+depende solo de los nodos a $L$ saltos o menos, su subgrafo receptivo. La última capa produce
+la probabilidad de cada clase. Las cuatro arquitecturas del estudio difieren en cómo combinan
+el nodo con sus vecinos.
+
+\textbf{GCN} \cite{Kipf2017GCN}. Promedia al nodo con sus vecinos usando la matriz de adyacencia
+normalizada por el grado, con un único conjunto de pesos:
+\begin{equation}
+  \mathbf{h}_v^{(\ell+1)} = \sigma\!\left(\mathbf{W}^{(\ell)} \sum_{u \in \mathcal{N}(v) \cup \{v\}}
+  \frac{\mathbf{h}_u^{(\ell)}}{\sqrt{(d_u + 1)(d_v + 1)}}\right).
+\end{equation}
+El nodo entra en la suma como un vecino más y no tiene un peso propio.
+
+\textbf{GraphSAGE} \cite{Hamilton2017GraphSAGE}. Separa la representación del nodo de la de sus
+vecinos con dos matrices de pesos:
+\begin{equation}
+  \mathbf{h}_v^{(\ell+1)} = \sigma\!\left(\mathbf{W}_1^{(\ell)} \mathbf{h}_v^{(\ell)} +
+  \mathbf{W}_2^{(\ell)} \frac{1}{|\mathcal{N}(v)|} \sum_{u \in \mathcal{N}(v)} \mathbf{h}_u^{(\ell)}\right).
+\end{equation}
+
+\textbf{GAT} \cite{Velickovic2018GAT}. Pondera a cada vecino, incluido el propio nodo, con un
+coeficiente de atención aprendido:
+\begin{equation}
+  \mathbf{h}_v^{(\ell+1)} = \sigma\!\left(\sum_{u \in \mathcal{N}(v) \cup \{v\}} \alpha_{vu}
+  \mathbf{W}^{(\ell)} \mathbf{h}_u^{(\ell)}\right), \qquad
+  \alpha_{vu} = \operatorname{softmax}_u\!\left(\operatorname{LeakyReLU}\!\left(\mathbf{a}^\top
+  [\mathbf{W}\mathbf{h}_v \,\|\, \mathbf{W}\mathbf{h}_u]\right)\right),
+\end{equation}
+y repite el cálculo con varias cabezas de atención independientes cuyos resultados se
+concatenan.
+
+\textbf{TAGCN} \cite{Du2017TAGCN}. Aplica un filtro polinomial de orden $K$ sobre la matriz de
+adyacencia normalizada $\tilde{\mathbf{A}}$, con una matriz de pesos por cada potencia:
+\begin{equation}
+  \mathbf{H}^{(\ell+1)} = \sigma\!\left(\sum_{k=0}^{K} \tilde{\mathbf{A}}^{k} \mathbf{H}^{(\ell)}
+  \mathbf{W}_k^{(\ell)}\right).
+\end{equation}
+El término $k = 0$ da al nodo un peso propio, y cada capa alcanza vecinos a $K$ saltos.
+
+\section{Desbalance de clases}\label{sec:desbalance}
+
+Cuando una clase es mucho más frecuente que otra, la pérdida promedio está dominada por la
+clase mayoritaria y el modelo puede minimizarla prediciendo casi siempre esa clase
+\cite{He2009Imbalanced, Johnson2019Survey}. Las estrategias para compensarlo actúan sobre los
+datos o sobre la pérdida.
+
+Sobre los datos, se puede submuestrear la clase mayoritaria o sobremuestrear la minoritaria.
+SMOTE \cite{Chawla2002SMOTE} genera ejemplos sintéticos de la clase minoritaria interpolando
+entre un ejemplo y uno de sus vecinos más cercanos de la misma clase:
+$\tilde{\mathbf{x}} = \mathbf{x}_i + \lambda(\mathbf{x}_j - \mathbf{x}_i)$, con
+$\lambda \sim \mathcal{U}(0, 1)$.
+
+Sobre la pérdida, sea $p_i$ la probabilidad que el modelo asigna a la clase verdadera del
+ejemplo $i$. La entropía cruzada sin ajuste es $\mathcal{L} = -\frac{1}{n}\sum_i \log p_i$.
+Con pesos por clase, cada ejemplo se pondera por el inverso de la frecuencia de su clase,
+$w_c = n / (2 n_c)$, de modo que
+\begin{equation}
+  \mathcal{L}_{\text{PC}} = \frac{1}{2}\,\frac{1}{n_{+}}\sum_{i:\,y_i = 1} (-\log p_i) +
+  \frac{1}{2}\,\frac{1}{n_{-}}\sum_{i:\,y_i = 0} (-\log p_i),
+\end{equation}
+y cada clase aporta la mitad de la pérdida sin importar cuántos ejemplos tenga. La
+\textit{focal loss} \cite{Lin2020Focal} reduce el peso de los ejemplos que el modelo ya
+clasifica bien:
+\begin{equation}
+  \mathcal{L}_{\text{FL}} = -\frac{1}{n}\sum_i \alpha_{y_i} (1 - p_i)^{\gamma} \log p_i,
+\end{equation}
+donde $\gamma$ controla cuánto se atenúan los ejemplos fáciles y $\alpha_{y_i}$ pondera la
+clase. Con $\alpha = 0{,}75$ para la clase rara y $0{,}25$ para la frecuente, un ejemplo
+ilícito pesa tres veces lo que uno negativo, mientras que con pesos por clase y una razón de
+41 a 1 pesa 41 veces más.
+
+\textbf{Métricas bajo desbalance.} La exactitud no sirve: con un 2~\% de ilícitas, predecir
+siempre la clase negativa da un 98~\% de aciertos. La curva ROC relaciona la tasa de
+verdaderos positivos con la de falsos positivos, y como esta última se divide por el número
+enorme de negativos, puede verse alta aunque las falsas alarmas superen con creces a los
+aciertos. La curva de precisión y exhaustividad sí refleja ese costo, y su área (PR-AUC) tiene
+como referencia del azar la prevalencia de la clase positiva \cite{Saito2015PR}. El
+coeficiente de correlación de Matthews resume la matriz de confusión completa y es más
+informativo que el F1 bajo desbalance \cite{Chicco2020MCC}.
+
+\section{Explicabilidad de modelos}\label{sec:xai}
+
+La explicabilidad busca que las decisiones de un modelo puedan ser comprendidas por una persona
+\cite{Adadi2018Peeking, Guidotti2018Survey, Arrieta2020XAI}. Los métodos post hoc explican un
+modelo ya entrenado sin modificarlo, y los locales explican una predicción individual
+asignando una importancia a cada elemento de la entrada. En grafos, esos elementos pueden ser
+las variables de los nodos, las aristas o subgrafos completos \cite{Yuan2023Taxonomic,
+Dai2024Trustworthy}. Esta tesis estudia explicaciones de variables: para una transacción, cuál
+de sus 165 variables pesó más en la predicción.
+
+\textbf{GNNExplainer} \cite{Ying2019GNNExplainer}. Busca una máscara $\mathbf{M}$ sobre las
+variables (y opcionalmente sobre las aristas) que preserve la predicción del modelo y sea a la
+vez pequeña:
+\begin{equation}
+  \min_{\mathbf{M}} \; -\log P\!\left(\hat{y} \mid \mathbf{X} \odot \sigma(\mathbf{M})\right)
+  + \lambda_1 \lVert \sigma(\mathbf{M}) \rVert_1 + \lambda_2 \, H\!\left(\sigma(\mathbf{M})\right),
+\end{equation}
+donde $H$ es la entropía de la máscara, que la empuja hacia valores cercanos a 0 o 1. La
+máscara se inicializa al azar y se optimiza por descenso de gradiente, por lo que dos
+ejecuciones pueden terminar en máscaras distintas.
+
+\textbf{PGExplainer} \cite{Luo2020PGExplainer}. Entrena una red que, a partir de las
+representaciones de los dos extremos de una arista, predice su importancia. Una vez entrenada,
+explica cualquier nodo sin optimizar de nuevo. Atribuye importancia a aristas, no a variables.
+
+\textbf{Valores de Shapley} \cite{Lundberg2017SHAP, Strumbelj2014Explaining}. Tratan a las
+variables como jugadores de un juego cooperativo cuyo pago es la predicción. La importancia de
+la variable $j$ es su contribución marginal promedio sobre todos los órdenes posibles en que
+las variables se incorporan:
+\begin{equation}
+  \varphi_j = \frac{1}{|\Pi|}\sum_{\pi \in \Pi} \left[f\!\left(S_{\pi}^{j} \cup \{j\}\right)
+  - f\!\left(S_{\pi}^{j}\right)\right],
+\end{equation}
+donde $S_{\pi}^{j}$ es el conjunto de variables que preceden a $j$ en el orden $\pi$ y las
+variables ausentes toman un valor de referencia. Como hay $d!$ órdenes, se estima con una
+muestra aleatoria de permutaciones \cite{Castro2009Polynomial}, y por ello es estocástico.
+
+\textbf{Integrated Gradients} \cite{Sundararajan2017IG}. Integra el gradiente de la salida a lo
+largo del camino recto entre una referencia $\mathbf{x}'$ y la entrada $\mathbf{x}$:
+\begin{equation}
+  \mathrm{IG}_j(\mathbf{x}) = (x_j - x'_j) \int_0^1 \frac{\partial f\!\left(\mathbf{x}' +
+  \alpha(\mathbf{x} - \mathbf{x}')\right)}{\partial x_j}\, d\alpha.
+\end{equation}
+La integral se aproxima con una suma de Riemann. Con una referencia fija, el método es
+determinista. Si la referencia es el vector cero y una variable vale cero, su atribución es
+exactamente cero.
+
+\textbf{Expected Gradients} \cite{Erion2021Expected}. Sustituye la referencia fija por una
+distribución de referencias $D$ tomadas de los datos y promedia:
+$\mathrm{EG}_j(\mathbf{x}) = \mathbb{E}_{\mathbf{x}' \sim D,\, \alpha \sim \mathcal{U}(0,1)}
+\left[(x_j - x'_j)\, \partial_j f(\mathbf{x}' + \alpha(\mathbf{x} - \mathbf{x}'))\right]$.
+La esperanza se estima por muestreo, por lo que es estocástico.
+
+\section{Evaluación de las explicaciones}
+
+No existe una única medida de la calidad de una explicación. Las revisiones sistemáticas
+distinguen varias propiedades \cite{Nauta2023Anecdotal, Bodria2023Benchmarking}: la
+\textbf{fidelidad}, si la explicación refleja lo que de verdad usa el modelo; la
+\textbf{plausibilidad}, si coincide con lo que un experto considera relevante; y la
+\textbf{estabilidad} o consistencia, si explicaciones de la misma predicción en condiciones
+equivalentes se parecen entre sí. En grafos, las evaluaciones sistemáticas han mostrado que
+los explicadores difieren mucho entre sí y que su desempeño depende del conjunto de datos y de
+la arquitectura \cite{Agarwal2023Evaluating, Longa2024Explaining}.
+
+La estabilidad es una condición necesaria para usar una explicación como evidencia: si dos
+ejecuciones del mismo explicador sobre el mismo modelo y la misma transacción dan órdenes de
+importancia distintos, el analista no sabe a cuál creer. Pero no es suficiente. Un explicador
+que ignorara el modelo y devolviera siempre el mismo orden sería perfectamente estable e
+inútil. Adebayo et al. \cite{Adebayo2018Sanity} propusieron por eso comparar la explicación de
+un modelo entrenado con la de la misma arquitectura con pesos aleatorios: si se parecen, la
+explicación no depende de lo aprendido.
+
+Para medir el acuerdo entre dos explicaciones se usan comparaciones de rangos o de conjuntos.
+La correlación de Spearman \cite{Spearman1904} compara los órdenes completos de importancia, y
+el índice de Jaccard \cite{Jaccard1912} compara los conjuntos de las $k$ variables más
+importantes. También se han propuesto métricas diseñadas específicamente para la estabilidad
+de las explicaciones \cite{Gawantka2024Explanations}.

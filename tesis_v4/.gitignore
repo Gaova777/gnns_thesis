@@ -1,0 +1,12 @@
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.lof
+*.lot
+*.out
+*.run.xml
+*.toc
+*.log
+figuras/*.png
+!figuras/utp.jpg

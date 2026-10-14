@@ -1,0 +1,48 @@
+\chapter{Reproducibilidad}\label{anx:reproducibilidad}
+\sloppy
+
+\section{Entorno}
+
+Los experimentos se ejecutaron en una estación con GPU NVIDIA RTX 4060 de 8~GB, con Python
+3.12 y PyTorch Geometric. Las dependencias exactas están fijadas en \texttt{uv.lock}, en la raíz
+del repositorio, y se instalan con \texttt{uv sync}. El conjunto de datos Elliptic se descarga
+automáticamente en \texttt{data/} la primera vez.
+
+\section{Corrida principal (sin el cierre del mercado)}
+
+\begin{itemize}
+  \item Configuración: \texttt{configs/experiment\_v4\_precierre.yaml}.
+  \item Entrenamiento y explicación: \texttt{scripts/v4/run\_precierre.sh} y
+        \texttt{scripts/v4/cola\_precierre.sh}. Producen 216 modelos en
+        \texttt{results\_models\_v4\_precierre/} y las explicaciones en
+        \texttt{results\_v4\_precierre/} y \texttt{results\_v4\_precierre\_grad/}.
+  \item Curvas y métricas de rendimiento:
+        \texttt{scripts/v4/reunion\_0410/curvas.py --variante precierre}.
+  \item Medidas robustas y control de pesos aleatorios:
+        \texttt{scripts/v4/cola\_robusta\_precierre.sh}, que ejecuta en secuencia
+        \texttt{metrica\_robusta.py} y \texttt{control\_aleatorio.py} con
+        \texttt{--variante precierre}.
+\end{itemize}
+
+\section{Tablas, figuras y bibliografía del manuscrito}
+
+Las tablas y figuras se regeneran sin GPU desde los resultados guardados:
+
+\begin{itemize}
+  \item \texttt{tesis\_v4/scripts/analisis.py}: tablas \LaTeX{} y pruebas estadísticas
+        (\texttt{tesis\_v4/tablas/}).
+  \item \texttt{tesis\_v4/scripts/figuras.py}: figuras en PDF vectorial
+        (\texttt{tesis\_v4/figuras/}).
+  \item \texttt{tesis\_v4/scripts/verificar\_referencias.py}: genera
+        \texttt{bibliografia.bib} consultando Crossref por DOI y rechaza todo lo que no sea un
+        artículo de revista o tenga una retractación registrada. Las únicas excepciones son
+        los artículos originales de los métodos y del conjunto de datos usados, listados en
+        \texttt{tesis\_v4/referencias/excepciones.bib} con la URL donde se verificaron.
+\end{itemize}
+
+\section{Determinismo}
+
+Las semillas de datos (2026), de modelo (42, 43 y 44), de selección de transacciones (1234) y de
+los explicadores están fijadas. Aun así, el entrenamiento en GPU no es determinista a nivel de
+pesos, porque las agregaciones de mensajes usan sumas atómicas. Repetir la corrida reproduce
+las conclusiones, pero no necesariamente todos los decimales.

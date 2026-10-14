@@ -1,0 +1,168 @@
+\chapter{Introducción}\label{cap:introduccion}
+
+\section{Planteamiento del problema}
+
+La detección de lavado de dinero se apoya cada vez más en modelos de aprendizaje automático
+que examinan transacciones en busca de patrones anómalos \cite{Chen2018AMLReview,
+Kute2021AMLReview}. En el caso de las criptomonedas, las transacciones forman de manera natural
+un grafo, en el que cada transacción es un nodo y cada transferencia de fondos entre
+transacciones es una arista. Las redes neuronales de grafos (\textit{Graph Neural Networks},
+GNN) aprovechan esa estructura combinando los atributos de cada transacción con los de sus
+vecinas \cite{Scarselli2009GNN, Wu2021Survey}, y se han convertido en una de las familias de
+modelos más estudiadas para la detección de fraude financiero \cite{Motie2024FraudGNN}.
+
+En un entorno regulado no basta con que el modelo acierte. El analista que revisa una alerta
+necesita saber por qué la transacción fue marcada como sospechosa, y esa justificación debe
+poder sostenerse ante un auditor \cite{Rudin2019Stop, Arrieta2020XAI}. Las GNN son modelos
+opacos, por lo que la justificación se obtiene con métodos de explicabilidad
+post hoc que asignan una importancia a cada variable o a cada arista que intervino en la
+predicción \cite{Yuan2023Taxonomic}. Esos métodos, sin embargo, son en su mayoría
+estocásticos u optimizan una máscara a partir de una inicialización aleatoria. Si se ejecutan
+dos veces sobre la misma transacción y el mismo modelo, pueden devolver explicaciones
+distintas. Una explicación que cambia cada vez que se pide no sirve como evidencia.
+
+A esa fuente de variación se suma otra, propia del dominio. Las transacciones ilícitas son
+una fracción muy pequeña del total. En el conjunto de datos Elliptic, que es la referencia
+pública más usada para este problema \cite{Weber2019Elliptic}, hay 4.545 transacciones
+etiquetadas como ilícitas frente a más de 199.000 lícitas o sin etiqueta. Bajo un desbalance
+así, los modelos aprenden la clase rara a partir de pocos ejemplos \cite{He2009Imbalanced,
+Johnson2019Survey}, y es razonable esperar que sus explicaciones sobre esa clase también sean
+más frágiles. Las técnicas que compensan el desbalance, como reponderar la función de
+pérdida o generar ejemplos sintéticos de la clase rara \cite{Chawla2002SMOTE, Lin2020Focal},
+modifican lo que el modelo aprende y podrían modificar también lo que el explicador reporta.
+
+La literatura ha evaluado la calidad de los explicadores de GNN principalmente en grafos
+sintéticos o en tareas de química y redes sociales \cite{Agarwal2023Evaluating,
+Longa2024Explaining}, y la evaluación de la estabilidad de las explicaciones se ha estudiado
+sobre todo fuera de los grafos \cite{Nauta2023Anecdotal, Bodria2023Benchmarking}. No se
+encontró un estudio que mida, con un diseño factorial y réplicas independientes, cómo cambian
+la estabilidad de las explicaciones de distintas GNN cuando se varían el nivel de desbalance y
+la técnica que lo compensa, en un problema real de lavado de dinero. Ese es el vacío que
+aborda esta tesis.
+
+\section{Una limitación del conjunto de datos que condiciona el diseño}
+
+Elliptic cubre 49 pasos de tiempo separados aproximadamente dos semanas entre sí. En el paso
+43 se cerró un mercado ilegal importante de la red, y los autores del conjunto de datos
+reportaron que, a partir de ese momento, ningún modelo era capaz de detectar las nuevas
+transacciones ilícitas \cite{Weber2019Elliptic}. La partición temporal habitual entrena con
+los pasos 1 a 34, valida con los pasos 35 a 42 y evalúa con los pasos 43 a 49, de modo que la
+prueba cae completa después del cierre. En la primera versión de los experimentos de esta
+tesis, todos los modelos quedaron en el nivel del azar en esa prueba (Anexo
+\ref{anx:original}).
+
+Por esa razón, el estudio principal usa solo los pasos 1 a 42, anteriores al cierre, y los
+reparte en entrenamiento (1 a 29), validación (30 a 35) y prueba (36 a 42). Los pasos 43 a 49
+no se usan. La decisión, sus costos y la comparación con la partición habitual se exponen en
+el Capítulo \ref{cap:metodologia}.
+
+\section{Preguntas de investigación}
+
+\textbf{Pregunta principal.} ¿Cómo cambia la estabilidad de las explicaciones que producen
+los métodos de explicabilidad sobre redes neuronales de grafos entrenadas para detectar
+transacciones ilícitas en Elliptic, cuando se varía el nivel de desbalance de clases, la
+arquitectura de la red y la técnica empleada para compensar el desbalance?
+
+\textbf{Preguntas específicas.}
+\begin{enumerate}
+  \item ¿Disminuye la estabilidad de las explicaciones a medida que el desbalance de clases
+        con el que se entrena el modelo se hace más extremo?
+  \item ¿Producen las distintas arquitecturas (GCN, GraphSAGE, GAT y TAGCN) explicaciones con
+        distinta estabilidad?
+  \item ¿Cambia la estabilidad de las explicaciones según la técnica usada para compensar el
+        desbalance (sin ajuste, pesos por clase o \textit{focal loss})?
+  \item ¿Refleja la estabilidad medida lo que el modelo aprendió, o se debe principalmente a
+        los datos de entrada y al propio explicador?
+\end{enumerate}
+
+\section{Hipótesis}\label{sec:hipotesis}
+
+Las hipótesis se formularon antes de observar los resultados y se contrastan en el Capítulo
+\ref{cap:resultados}.
+
+\begin{description}
+  \item[H1 (desbalance).] La estabilidad de las explicaciones disminuye a medida que el
+        desbalance de clases del entrenamiento se hace más extremo, porque el modelo dispone de
+        menos ejemplos de la clase ilícita de los cuales aprender.
+  \item[H2 (arquitectura).] La estabilidad de las explicaciones depende de la arquitectura,
+        porque cada una combina de forma distinta la información de la transacción con la de
+        sus vecinas.
+  \item[H3 (compensación).] La técnica de compensación del desbalance no cambia la
+        estabilidad de las explicaciones, porque modifica cuánto pesa cada clase en la
+        función de pérdida pero no la información disponible para el modelo.
+\end{description}
+
+\section{Objetivos}
+
+\subsection{Objetivo general}
+
+Evaluar la estabilidad de los métodos de explicabilidad aplicados a redes neuronales de grafos
+entrenadas para detectar lavado de dinero en el conjunto de datos Elliptic, bajo distintos
+niveles de desbalance de clases, arquitecturas y técnicas de compensación, con el fin de
+establecer qué factores la determinan y en qué medida sus explicaciones son confiables para
+una auditoría.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+  \item Medir el efecto del nivel de desbalance de clases, desde 1:10 hasta 1:200, sobre la
+        estabilidad de las explicaciones de cinco explicadores: GNNExplainer, PGExplainer,
+        valores de Shapley por muestreo, Integrated Gradients y Expected Gradients.
+  \item Comparar la estabilidad de las explicaciones entre cuatro arquitecturas de GNN: GCN,
+        GraphSAGE, GAT y TAGCN.
+  \item Analizar el efecto de tres técnicas de compensación del desbalance (sin ajuste, pesos
+        por clase y \textit{focal loss}) y del sobremuestreo con SMOTE sobre el rendimiento
+        predictivo y sobre la estabilidad de las explicaciones.
+  \item Determinar, mediante un control con pesos aleatorios y medidas de acuerdo que no
+        dependen de las variables nulas, qué parte de la estabilidad medida proviene del modelo
+        entrenado y qué parte de los datos de entrada y del explicador.
+\end{enumerate}
+
+Respecto de la propuesta aprobada, dos métodos se sustituyeron por alternativas que se ajustan
+mejor al problema. GNNShap se reemplazó por valores de Shapley
+estimados por muestreo sobre las variables de la transacción \cite{Strumbelj2014Explaining},
+porque la pregunta de la tesis es qué variables pesan y GNNShap atribuye importancia a las
+aristas. GraphSMOTE se reemplazó por SMOTE sobre los atributos \cite{Chawla2002SMOTE}, porque
+la estructura del grafo de Elliptic no se modifica en ningún escenario. Integrated Gradients
+\cite{Sundararajan2017IG} y Expected Gradients \cite{Erion2021Expected} se añadieron como
+explicadores de referencia, uno determinista y uno estocástico, que no requieren entrenamiento.
+
+\section{Contribuciones}
+
+\begin{enumerate}
+  \item Un diseño factorial replicado (4 arquitecturas, 6 escenarios de desbalance, 3 técnicas
+        de compensación y 3 semillas de modelo, 216 modelos) que mide la estabilidad de cinco
+        explicadores sobre las mismas 30 transacciones ilícitas.
+  \item La evidencia de que la partición temporal habitual de Elliptic deja la prueba
+        completa después del cierre del mercado ilegal y vuelve inútil la evaluación en
+        prueba, junto con una partición alternativa que la recupera.
+  \item La identificación de un artefacto de medida: cerca de la mitad de las variables de
+        una transacción valen cero después del escalado, y los explicadores las dejan siempre
+        al final del orden de importancia, lo que infla la correlación de Spearman entre
+        explicaciones. La tesis cuantifica ese efecto con dos medidas que no dependen de esas
+        variables y con un control de pesos aleatorios \cite{Adebayo2018Sanity}.
+\end{enumerate}
+
+\section{Alcance y limitaciones}
+
+El estudio se limita al conjunto de datos Elliptic y a la tarea de clasificar transacciones
+como ilícitas o no ilícitas. Las transacciones sin etiqueta se tratan como no ilícitas, que es
+el supuesto más cercano a la operación real (Capítulo \ref{cap:metodologia}). La estabilidad se
+mide sobre explicaciones de variables, salvo en PGExplainer, que solo explica aristas. No se
+evalúa la plausibilidad de las explicaciones frente a un patrón real de lavado, porque Elliptic
+no publica el significado de sus variables ni anotaciones de tipologías; un grafo sintético
+construido con ese fin se resume en el Anexo \ref{anx:sintetico}. No se contempla el despliegue
+del sistema ni su evaluación con analistas.
+
+\section{Estructura del documento}
+
+El Capítulo \ref{cap:marco} presenta los fundamentos de las GNN, del desbalance de clases y de
+los métodos de explicabilidad usados. El Capítulo \ref{cap:estado} revisa los trabajos sobre
+detección de lavado con grafos y sobre la evaluación de explicaciones. El Capítulo
+\ref{cap:metodologia} describe los datos, la partición temporal, los escenarios, el
+entrenamiento, los explicadores, las medidas de estabilidad y las pruebas estadísticas. El
+Capítulo \ref{cap:resultados} presenta los resultados y contrasta las hipótesis. El Capítulo
+\ref{cap:discusion} interpreta los resultados y sus límites, y el Capítulo
+\ref{cap:conclusiones} resume las respuestas a las preguntas de investigación. Los anexos
+recogen la corrida con la partición original, el eje sintético y los detalles de
+reproducibilidad.
